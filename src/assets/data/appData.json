@@ -1,0 +1,276 @@
+[{
+    "description": "Location",
+    "group": [
+        {
+            "type": "selector",
+            "description": "Break", 
+            "selections": [
+                "",
+                "HB: 17th St.",
+                "HB: Taco Bell Reef",
+                "HB: Sanchos",
+                "HB: North Peir",
+                "HB: South Peir",
+                "HB: River Jetties",
+                "Salt Creek",
+                "Lowers",
+                "O-Side: Harbor North",
+                "O-Side: Harbor Middles",
+                "O-Side: Harbor South",
+                "O-Side: Jettie Southside",
+                "O-Side: Pier North",
+                "O-Side: Pier South",
+                "O-Side: Tyson",
+                "O-Side: Trenchtown",
+                "O-Side: Blvd",
+                "O-Side: Rock",
+                "O-Side: Poo Poos",
+                "C-Bad: Northend",
+                "C-Bad: Southside",
+                "Ponto: North",
+                "Ponto: Proper",
+                "Ponto: South",
+                "Sea Bluff",
+                "Sandbags",
+                "Grandview: Proper",
+                "Avocados",
+                "Beacons: North",
+                "Beacons: Out Front",
+                "Beacons: Wall",
+                "D Street: North",
+                "D Street: Diamond House",
+                "D Street: Hollywood Squares",
+                "Boneyards",
+                "Swamis",
+                "Brown House",
+                "Pipes",
+                "Traps",
+                "Barneys",
+                "Turtles",
+                "85s",
+                "Tippers",
+                "Suckouts",
+                "Cardiff Reef",
+                "Cardiff Reef South",
+                "Georges",
+                "Bus Stops",
+                "P-Lots",
+                "Seaside Reef",
+                "Palis",
+                "Tabletops",
+                "Cherry Hill",
+                "Rock Piles",
+                "Del Mar Rivermouth",
+                "Del Mar: 29th",
+                "Del Mar: 19th",
+                "Del Mar: 15th",
+                "Del Mar: 11th",
+                "Del Mar: 8th",
+                "Del Mar: The Mouse Hole",
+                "Torrey Pines: North",
+                "Torrey Pines: South",
+                "Blacks",
+                "Scripps",
+                "La Jolla Shores",
+                "Mission Drive",
+                "Mission: San Fernando",
+                "South Mission Jetti",
+                "OB Jetti",
+                "OB Avalanche",
+                "OB Pier",
+                "Loscombs",
+                "Rosarito: Smoke Stacks",
+                "Rosarito: Peir",
+                "K-38s",
+                "Gaviotas",
+                "La Fonda",
+                "Punta Baja",
+                "Elijandros",
+                "Harbor",
+                "Notch",
+                "Wall",
+                "Abreojos",
+                "Abreojos: 3 pole",
+                "Abreojos: Razors",
+                "Scorpian Bay",
+                "Estuary",
+                "Colorados"
+            ]
+        }
+    ]
+},
+{
+    "description": "Swell",
+    "group": [
+        {
+            "type": "selector",
+            "description": "Direction", 
+            "selections": [
+                "",
+                "N",
+                "NE",
+                "NW",
+                "E",
+                "W",
+                "S",
+                "SE",
+                "SW"
+            ]
+        },
+        {
+            "type": "selector",
+            "description": "Height", 
+            "selections": [
+                "",
+                "knee high",
+                "waist high",
+                "chest high",
+                "shoulder high",
+                "head high",
+                "over head",
+                "double over head",
+                "triple over head"
+            ]
+        },
+        {
+            "type": "selector",
+            "description": "Report", 
+            "selections": [
+                "",
+                "1ft",
+                "2ft",
+                "3ft",
+                "4ft",
+                "5ft",
+                "6ft",
+                "7ft",
+                "8ft",
+                "9ft",
+                "10ft",
+                "11ft",
+                "12ft",
+                "13ft",
+                "14ft",
+                "15ft",
+                "16ft",
+                "17ft",
+                "18ft"
+            ]
+        }
+    ]
+},
+{
+    "description": "Wind",
+    "group": [
+        {
+            "type": "selector",
+            "description": "Direction", 
+            "selections": [
+                "",
+                "N",
+                "NE",
+                "NW",
+                "E",
+                "W",
+                "S",
+                "SE",
+                "SW"
+            ]
+        },
+        {
+            "type": "selector",
+            "description": "Orientation", 
+            "selections": [
+                "",
+                "Offshore",
+                "Onshore",
+                "Sideshore => rights",
+                "Sideshore => lefts"
+            ]
+        },
+        {
+            "type": "selector",
+            "description": "MPH", 
+            "selections": [
+                "",
+                "1mph",
+                "2mph",
+                "3mph",
+                "4mph",
+                "5mph",
+                "6mph",
+                "7mph",
+                "8mph",
+                "9mph",
+                "10mph",
+                "11mph",
+                "12mph",
+                "13mph",
+                "14mph",
+                "15mph"
+            ]
+        },
+        {
+            "type": "selector",
+            "description": "Surface", 
+            "selections": [
+                "",
+                "Oily Glass",
+                "Glassy",
+                "Texture",
+                "Choppy",
+                "Victory at sea"
+            ]
+        }
+    ]
+},
+{
+    "description": "Tide",
+    "group": [
+        {
+            "type": "selector",
+            "description": "Phase", 
+            "selections": [
+                "",
+                "High",
+                "High => Low",
+                "Low",
+                "Low => High"
+            ]
+        },
+        {
+            "type": "selector",
+            "description": "Height", 
+            "selections": [
+                "",
+                "-2ft",
+                "-1ft",
+                "0ft",
+                "1ft",
+                "2ft",
+                "3ft",
+                "4ft",
+                "5ft",
+                "6ft",
+                "7ft",
+                "8ft",
+                "9ft",
+                "10ft"
+            ]
+        }
+    ]
+},
+{
+    "description": "Conditions",
+    "group": [
+        {
+            "type": "radio",
+            "description": "Conditions", 
+            "selections": [
+                "Firing",
+                "Good",
+                "Bad"
+            ]
+        }
+    ]
+}]
