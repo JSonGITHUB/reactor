@@ -21,7 +21,7 @@ class Header extends React.Component {
     navClassesOpen = "width-100-percent header mt-2 pointer fadeInFaded fadedDark bg-dark";
     navClassesClose = "width-100-percent header mt-2 pointer fadeOutFaded faded bg-dark";
     isNavButton = (event) => (event.target.nodeName === "BUTTON") ? true : false;
-    showContent = (event) => (window.location.pathname = event.target.innerHTML);
+    showContent = (event) => (window.location.pathname = "reactor/" + event.target.innerHTML);
     goHome = () => window.location.pathname = "Home";
     navButton = (label) => <button key={getKey(label)} className="navButton buttonPad">{label}</button>;
     logoButton = (label) => <button className="navButton logoButton">{label}</button>;
