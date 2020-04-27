@@ -10,6 +10,7 @@ import Calculator from './components/Calculator.js';
 import BowlBuilder from './components/BowlBuilder.js';
 import SurfLog from './components/Logger.js';
 import './assets/css/App.css';
+import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 class App extends React.Component {
     
   constructor(props) {
@@ -53,7 +54,25 @@ class App extends React.Component {
     let AppComponent = () => componentTag(this.currentComponent);
     
     return (
-      AppComponent()
+      //AppComponent();
+      <Router>
+        <div className="App">
+            <Header company={this.company} width={this.state.width} isMotionOn={this.state.isMotionOn} setMotion={this.setMotion}/>
+              <div className="fadeIn">
+                <Switch>
+                  <Route path="/" exact component={Home} />
+                  <Route path="/Home" exact component={Home} />
+                  <Route path="/BowlBuilder" exact component={BowlBuilder} />
+                  <Route path="/TempConverter" exact component={Calculator} />
+                  <Route path="/Essay" exact component={FormEssay} />
+                  <Route path="/Reservation" exact component={Reservation} />
+                  <Route path="/GuestList" exact component={SignUpDialog} />
+                  <Route path="/SurfLog" exact component={SurfLog} />
+                </Switch>
+              </div>
+            <Footer isMotionOn={this.state.isMotionOn} setMotion={this.setMotion}/>
+          </div>
+      </Router>
     );
   }
 }

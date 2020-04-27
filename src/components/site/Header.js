@@ -22,6 +22,7 @@ class Header extends React.Component {
     navClassesClose = "width-100-percent header mt-2 pointer fadeOutFaded faded bg-dark";
     isNavButton = (event) => (event.target.nodeName === "BUTTON") ? true : false;
     showContent = (event) => (window.location.pathname = event.target.innerHTML);
+    goHome = () => window.location.pathname = "Home";
     navButton = (label) => <button key={getKey(label)} className="navButton buttonPad">{label}</button>;
     logoButton = (label) => <button className="navButton logoButton">{label}</button>;
     closeButton = <button className="navButton menuPad"><img src={close} alt="close menu" /></button>;
@@ -45,10 +46,7 @@ class Header extends React.Component {
     portraitNav = (item) => <div key={getKey("nav")}>{this.navButton(item)}</div>;
 
     render() {
-        const menuClick = (event) => this.setState({
-                menu: !this.state.menu,
-                initialized: true
-            })
+        const menuClick = (event) => (event.target.nodeName === "SPAN") ? this.goHome() : displayMenu();
         const isWideScreen = (this.props.width >= 1080) ? true : false;
         const closedClasses = (this.state.initialized) ? this.navClassesClose : this.navClassesClosed;
         const navClasses = (this.state.menu) ? this.navClassesOpen : closedClasses;
@@ -73,18 +71,22 @@ class Header extends React.Component {
                                 {getMenuItems()}
                             </div>
         const hamburgerOpen = <div className="flexContainer">
-                                <div className="flex3ColumnLeft">{this.logoButton(this.mobileLogo)}</div>
+                                <div className="flex3ColumnLeft mt-13">{this.logoButton(this.mobileLogo)}</div>
                                 <div className="flex3Column"><br/><br/>{getMenuItems()}</div>
                                 <div className="flex3ColumnRight">{getMenuButton}</div>
                             </div>
         const hamburgerClosed = <div className="flexContainer">
-                            <div className="flex3ColumnLeft">{this.logoButton(this.mobileLogo)}</div>
+                            <div className="flex3ColumnLeft m-auto">{this.logoButton(this.mobileLogo)}</div>
                             <div className="flex3Column bg-dark"></div>
-                            <div className="flex3ColumnRight">{this.burgerButton}</div>
+                            <div className="flex3ColumnRight m-auto">{this.burgerButton}</div>
                         </div>
                             
         const hamburgerNav = (this.state.menu) ? hamburgerOpen : hamburgerClosed;
         const getNavigation = (isWideScreen) ? navigation : hamburgerNav;
+        const displayMenu = () => this.setState({
+            menu: !this.state.menu,
+            initialized: true
+        })
         
         return (
             <div className="App-header">

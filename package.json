@@ -11,6 +11,7 @@
     "react-date-picker": "^8.0.1",
     "react-datetime-picker": "^3.0.1",
     "react-dom": "^16.13.1",
+    "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.1",
     "write": "^2.0.0"
   },

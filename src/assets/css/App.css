@@ -166,6 +166,9 @@ select {
   flex: 75%;
   margin:auto;
 }
+.m-auto {
+  margin:auto;
+}
 .flex3ColumnLeft {
   justify-content: left;
   align-items: left;
@@ -173,7 +176,6 @@ select {
   height: auto;
   min-height: 2px;
   flex: 75%;
-  margin:auto;
 }
 .flex3ColumnRight {
   justify-content: right;
@@ -182,7 +184,6 @@ select {
   height: auto;
   min-height: 2px;
   flex: 75%;
-  margin:auto;
 }
 .flex5Column {
   justify-content: center;
@@ -546,6 +547,9 @@ input.error {
 }
 .mt-10 {
   margin-top: 10px;
+}
+.mt-13 {
+  margin-top: 13px;
 }
 .mt-15 {
   margin-top: 15px;
