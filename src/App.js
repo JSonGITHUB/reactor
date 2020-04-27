@@ -42,6 +42,7 @@ class App extends React.Component {
   };
   
   render() {
+    console.log(`process.env.PUBLIC_URL: ${process.env.PUBLIC_URL}`)
     window.addEventListener('resize', debounce(this.setIt, 250));
     const componentTag = (current) => <div className="App">
             <Header company={this.company} width={this.state.width} isMotionOn={this.state.isMotionOn} setMotion={this.setMotion}/>

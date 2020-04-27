@@ -21,7 +21,7 @@ class Footer extends React.Component {
         const path = window.location.pathname.toLocaleLowerCase();
         const isPageSurfLog = (path === '/surflog') ? true : false;
         const bottom = (isPageSurfLog) ? 'b-collapse' : 'b-0';
-        const footerClasses = bottom + ' subfooter flexContainer responsive height200';
+        const footerClasses = bottom + ' fixed subfooter flexContainer responsive height200';
         return (
             <div>
                 <div id='footer' className={footerClasses}>
@@ -37,7 +37,7 @@ class Footer extends React.Component {
                         <Toggle isMotionOn={this.props.isMotionOn} setMotion={this.props.setMotion} id='toggle'/>
                     </div>
                 </div>
-                <div className="flexContainer footer">
+                <div className="flexContainer footer fixed">
                     <div className="flex3Column bg-green" />
                     <div className="flex3Column bg-yellow" />
                     <div className="flex3Column bg-red" />
