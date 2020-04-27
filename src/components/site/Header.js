@@ -53,7 +53,7 @@ class Header extends React.Component {
         const siteNavClick = (event) => (this.isNavButton(event)) ? (this.showContent(event)) : menuClick(event);
         const getMenuButton = (this.state.menu) ? this.closeButton : this.burgerButton;
         const path = window.location.pathname.toLocaleLowerCase();
-        const isHomePage = (path === '/reactor/home') ? true : false;
+        const isHomePage = (path === '/reactor/home' || path === '/reactor/') ? true : false;
         console.log(`path: ${path} isHomePage: ${isHomePage}`)
         const Branding = () => {
             if (isHomePage === true) { return this.homepageHeader }
