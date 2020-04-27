@@ -22,7 +22,7 @@ class Header extends React.Component {
     navClassesClose = "width-100-percent header mt-2 pointer fadeOutFaded faded bg-dark";
     isNavButton = (event) => (event.target.nodeName === "BUTTON") ? true : false;
     showContent = (event) => (window.location.pathname = "reactor/" + event.target.innerHTML);
-    goHome = () => window.location.pathname = "Home";
+    goHome = () => window.location.pathname = "/reactor/Home";
     navButton = (label) => <button key={getKey(label)} className="navButton buttonPad">{label}</button>;
     logoButton = (label) => <button className="navButton logoButton">{label}</button>;
     closeButton = <button className="navButton menuPad"><img src={close} alt="close menu" /></button>;
@@ -53,8 +53,8 @@ class Header extends React.Component {
         const siteNavClick = (event) => (this.isNavButton(event)) ? (this.showContent(event)) : menuClick(event);
         const getMenuButton = (this.state.menu) ? this.closeButton : this.burgerButton;
         const path = window.location.pathname.toLocaleLowerCase();
-        const isHomePage = (path === '/home' || path === '/') ? true : false;
-        //console.log(`path: ${path} isHomePage: ${isHomePage}`)
+        const isHomePage = (path === '/reactor/home') ? true : false;
+        console.log(`path: ${path} isHomePage: ${isHomePage}`)
         const Branding = () => {
             if (isHomePage === true) { return this.homepageHeader }
             return <div className='mt-88'></div>

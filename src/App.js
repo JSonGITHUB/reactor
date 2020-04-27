@@ -60,14 +60,15 @@ class App extends React.Component {
             <Header company={this.company} width={this.state.width} isMotionOn={this.state.isMotionOn} setMotion={this.setMotion}/>
               <div className="fadeIn">
                 <Switch>
-                  <Route path="/" exact component={Home} />
-                  <Route path="/Home" exact component={Home} />
-                  <Route path="/BowlBuilder" exact component={BowlBuilder} />
-                  <Route path="/TempConverter" exact component={Calculator} />
-                  <Route path="/Essay" exact component={FormEssay} />
-                  <Route path="/Reservation" exact component={Reservation} />
-                  <Route path="/GuestList" exact component={SignUpDialog} />
-                  <Route path="/SurfLog" exact component={SurfLog} />
+                  <Route path="/reactor" exact component={Home} />
+                  <Route path="/reactor/" exact component={Home} />
+                  <Route path="/reactor/Home" exact component={Home} />
+                  <Route path="/reactor/BowlBuilder" exact component={BowlBuilder} />
+                  <Route path="/reactor/TempConverter" exact component={Calculator} />
+                  <Route path="/reactor/Essay" exact component={FormEssay} />
+                  <Route path="/reactor/Reservation" exact component={Reservation} />
+                  <Route path="/reactor/GuestList" exact component={SignUpDialog} />
+                  <Route path="/reactor/SurfLog" exact component={SurfLog} />
                 </Switch>
               </div>
             <Footer isMotionOn={this.state.isMotionOn} setMotion={this.setMotion}/>
