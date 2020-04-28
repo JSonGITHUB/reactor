@@ -12,7 +12,7 @@ import SurfLog from './components/Logger.js';
 import './assets/css/App.css';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 class App extends React.Component {
-    
+  production = true; 
   constructor(props) {
     super(props);
     this.state = {
@@ -21,6 +21,7 @@ class App extends React.Component {
     };
     this.setIt = this.setIt.bind(this);
   }
+  base = (this.production) ? 'https://jsongithub.github.io/reactor/' : 'http://localhost:3000/reactor/';
   company = "KFA";
   path = window.location.pathname;
   componentId = this.path.replace('/','').toLocaleLowerCase();
@@ -53,10 +54,10 @@ class App extends React.Component {
           </div>;
 
     let AppComponent = () => componentTag(this.currentComponent);
-    
+    console.log(`base: ${this.base}`)
     return (
       //AppComponent();
-      <Router>
+      <Router basename={this.base}>
         <div className="App">
             <Header company={this.company} width={this.state.width} isMotionOn={this.state.isMotionOn} setMotion={this.setMotion}/>
               <div className="fadeIn">

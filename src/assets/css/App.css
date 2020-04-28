@@ -321,13 +321,13 @@ body {
   opacity: 0;
 }
 .fadeIn {
-	animation: fadeIn 1s ease;
+	animation: fadeIn .5s ease;
 }
 .fadeInFaded {
-	animation: fadeInFaded 1s ease;
+	animation: fadeInFaded .5s ease;
 }
 .fadeOutFaded {
-	animation: fadeOutFaded 1s ease;
+	animation: fadeOutFaded .5s ease;
 }
 .stripe {
 	width: 100%;
