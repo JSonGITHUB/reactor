@@ -496,7 +496,7 @@ input.error {
   position: fixed;
 }
 .b-collapse {
-  bottom: -200px;
+  bottom: -250px;
   position: fixed;
   animation: bottomCollapse 1s ease;
 }
@@ -663,7 +663,7 @@ input.error {
 }
 @keyframes bottomCollapse {
   from { bottom: 0px }
-  to { bottom: -190px }
+  to { bottom: -250px }
 }
 @keyframes fadeIn {
   from { opacity: 0 }
