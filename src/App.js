@@ -16,7 +16,8 @@ class App extends React.Component {
     super(props);
     this.state = {
       isMotionOn: true,
-      width: window.innerWidth
+      width: window.innerWidth,
+      height: window.innerHeight
     };
     this.setIt = this.setIt.bind(this);
   }
@@ -26,11 +27,15 @@ class App extends React.Component {
   componentId = this.path.replace('/','').toLocaleLowerCase();
   currentComponent = this.componentId;
   setMotion = () => this.setState({ isMotionOn: !this.state.isMotionOn });
-  
+  widthChanged = () => (window.innerWidth !== this.state.width) ? true : false;
+  heightChanged = () => (window.innerHeight !== this.state.height) ? true : false;
   updateState = () => {
-    this.setState({ width: window.innerWidth })
+    this.setState({ 
+      width: window.innerWidth,
+      height: window.innerHeight
+    })
   }
-  setIt = () => (window.innerWidth !== this.state.width) ? this.updateState() : false;
+  setIt = () => (this.widthChanged() || this.heightChanged()) ? this.updateState() : false;
   components = {
     surflog: <SurfLog />,
     guestlist: <SignUpDialog title="Guest List" message="Sign up" />,
@@ -71,7 +76,9 @@ class App extends React.Component {
                   <Route path="/SurfLog" component={SurfLog} />
                 </Switch>
               </div>
-            <Footer isMotionOn={this.state.isMotionOn} setMotion={this.setMotion}/>
+            <Switch>
+              <Footer isMotionOn={this.state.isMotionOn} setMotion={this.setMotion}/>
+            </Switch>
           </div>
       </Router>
     );

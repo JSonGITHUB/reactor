@@ -19,7 +19,7 @@ class Footer extends React.Component {
                         <Loader isMotionOn={this.props.isMotionOn}/>
                     </div>
         const path = window.location.pathname.toLocaleLowerCase();
-        const isPageSurfLog = (path === '/surflog') ? true : false;
+        const isPageSurfLog = (path.includes('surflog') || window.innerHeight < 600) ? true : false;
         const bottom = (isPageSurfLog) ? 'b-collapse' : 'b-0';
         const footerClasses = bottom + ' fixed subfooter flexContainer responsive height200';
         return (
