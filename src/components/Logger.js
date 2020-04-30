@@ -64,7 +64,7 @@ class Logger extends React.Component {
     render() {      
         let {isLoaded, items} = this.state;           
         //console.log(`Logger => ${JSON.stringify(this.state, null, 2)}`);
-        let appInterface = <div className="App-content">
+        let appInterface = <div className="App-content fadeIn">
                                 <div className="flex3Column"></div>
                                 <div className="flex3Column">
                                     <Loader />
@@ -72,7 +72,7 @@ class Logger extends React.Component {
                                 <div className="flex3Column"></div>
                             </div>;
         if (isLoaded) {
-            appInterface = <div className="App-content">
+            appInterface = <div className="App-content fadeIn">
                 <div className="flex3Column"></div>
                 <div className="flex3Column">
                     <LogEntry

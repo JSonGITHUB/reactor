@@ -4,6 +4,7 @@ import TextColorizer from '../utils/TextColorizer.js';
 import menu from '../../assets/images/menuYellow.png';
 import close from '../../assets/images/menuClose.png';
 import getKey from '../utils/KeyGenerator.js';
+import {BrowserRouter as Router, Switch, Link, Route} from 'react-router-dom';
 
 class Header extends React.Component {
 
@@ -21,12 +22,26 @@ class Header extends React.Component {
     navClassesOpen = "width-100-percent header mt-2 pointer fadeInFaded fadedDark bg-dark";
     navClassesClose = "width-100-percent header mt-2 pointer fadeOutFaded faded bg-dark";
     isNavButton = (event) => (event.target.nodeName === "BUTTON") ? true : false;
-    showContent = (event) => (window.location.pathname = "reactor/" + event.target.innerHTML);
+    showContent = (event) => {
+        this.displayMenu();
+    };
     goHome = () => window.location.pathname = "/reactor/Home";
-    navButton = (label) => <button key={getKey(label)} className="navButton buttonPad">{label}</button>;
-    logoButton = (label) => <button className="navButton logoButton">{label}</button>;
-    closeButton = <button className="navButton menuPad"><img src={close} alt="close menu" /></button>;
-    burgerButton = <button className="navButton menuPad"><img src={menu} alt="open menu" /></button>;
+    navButton = (label) => <Link key={getKey("link")} to={label}>
+                                <button key={getKey(label)} className="navButton buttonPad" onClick={this.siteNavClick}>
+                                    {label}
+                                </button>
+                            </Link>;
+    displayMenu = (event) => {
+        this.setState({
+            menu: !this.state.menu,
+            initialized: true
+        })
+    }
+    menuClick = (event) => (event.target.nodeName === "SPAN") ? this.goHome() : this.displayMenu();
+    siteNavClick = (event) => (this.isNavButton(event)) ? (this.showContent(event)) : this.menuClick(event);
+    logoButton = (label) => <button className="navButton logoButton" onClick={this.siteNavClick}>{label}</button>;
+    closeButton = <button className="navButton menuPad" onClick={this.siteNavClick}><img src={close} alt="close menu" /></button>;
+    burgerButton = <button className="navButton menuPad" onClick={this.siteNavClick}><img src={menu} alt="open menu" /></button>;
     homepageHeader = <div className="pt-70">
                         <Loader isMotionOn={this.props.isMotionOn}/>
                         <TextColorizer class='bigHeader' text={this.props.company}/>
@@ -46,15 +61,12 @@ class Header extends React.Component {
     portraitNav = (item) => <div key={getKey("nav")}>{this.navButton(item)}</div>;
 
     render() {
-        const menuClick = (event) => (event.target.nodeName === "SPAN") ? this.goHome() : displayMenu();
         const isWideScreen = (this.props.width >= 1080) ? true : false;
         const closedClasses = (this.state.initialized) ? this.navClassesClose : this.navClassesClosed;
         const navClasses = (this.state.menu) ? this.navClassesOpen : closedClasses;
-        const siteNavClick = (event) => (this.isNavButton(event)) ? (this.showContent(event)) : menuClick(event);
         const getMenuButton = (this.state.menu) ? this.closeButton : this.burgerButton;
         const path = window.location.pathname.toLocaleLowerCase();
         const isHomePage = (path === '/reactor/home' || path === '/reactor/') ? true : false;
-        console.log(`path: ${path} isHomePage: ${isHomePage}`)
         const Branding = () => {
             if (isHomePage === true) { return this.homepageHeader }
             return <div className='mt-88'></div>
@@ -81,12 +93,8 @@ class Header extends React.Component {
                             <div className="flex3ColumnRight m-auto">{this.burgerButton}</div>
                         </div>
                             
-        const hamburgerNav = (this.state.menu) ? hamburgerOpen : hamburgerClosed;
+        const hamburgerNav = (this.state.menu === true) ? hamburgerOpen : hamburgerClosed;
         const getNavigation = (isWideScreen) ? navigation : hamburgerNav;
-        const displayMenu = () => this.setState({
-            menu: !this.state.menu,
-            initialized: true
-        })
         
         return (
             <div className="App-header">
@@ -96,7 +104,7 @@ class Header extends React.Component {
                     <div className="flex3Column bg-yellow" />
                     <div className="flex3Column bg-red" />
                 </div>
-                <div className={navClasses} onClick={siteNavClick}>{getNavigation}</div>
+                <div className={navClasses}>{getNavigation}</div>
                 <Branding />
             </div>
         );

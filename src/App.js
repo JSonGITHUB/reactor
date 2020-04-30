@@ -21,7 +21,7 @@ class App extends React.Component {
     };
     this.setIt = this.setIt.bind(this);
   }
-  base = (this.production) ? 'https://jsongithub.github.io/reactor/' : 'http://localhost:3000/reactor/';
+  base = (this.production) ? 'https://jsongithub.github.io/reactor/' : 'reactor/';
   company = "KFA";
   path = window.location.pathname;
   componentId = this.path.replace('/','').toLocaleLowerCase();
@@ -59,18 +59,19 @@ class App extends React.Component {
       //AppComponent();
       <Router basename={this.base}>
         <div className="App">
-            <Header company={this.company} width={this.state.width} isMotionOn={this.state.isMotionOn} setMotion={this.setMotion}/>
-              <div className="fadeIn">
+            <Switch>
+              <Header company={this.company} menu='false' width={this.state.width} isMotionOn={this.state.isMotionOn} setMotion={this.setMotion}/>
+            </Switch> 
+            <div className="fadeIn">
                 <Switch>
-                  <Route path="/reactor" exact component={Home} />
-                  <Route path="/reactor/" exact component={Home} />
-                  <Route path="/reactor/Home" exact component={Home} />
-                  <Route path="/reactor/BowlBuilder" exact component={BowlBuilder} />
-                  <Route path="/reactor/TempConverter" exact component={Calculator} />
-                  <Route path="/reactor/Essay" exact component={FormEssay} />
-                  <Route path="/reactor/Reservation" exact component={Reservation} />
-                  <Route path="/reactor/GuestList" exact component={SignUpDialog} />
-                  <Route path="/reactor/SurfLog" exact component={SurfLog} />
+                  <Route exact path="/" exact component={Home} />
+                  <Route path="/Home" component={Home} />
+                  <Route path="/BowlBuilder" component={BowlBuilder} />
+                  <Route path="/TempConverter" component={Calculator} />
+                  <Route path="/Essay" component={FormEssay} />
+                  <Route path="/Reservation" component={Reservation} />
+                  <Route path="/GuestList" component={SignUpDialog} />
+                  <Route path="/SurfLog" component={SurfLog} />
                 </Switch>
               </div>
             <Footer isMotionOn={this.state.isMotionOn} setMotion={this.setMotion}/>

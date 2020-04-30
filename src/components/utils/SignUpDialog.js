@@ -16,7 +16,7 @@ class SignUpDialog extends React.Component {
 
     render() {
         return (
-            <div className="App-content flexContainer">
+            <div className="App-content flexContainer fadeIn">
                 <div className="flex3Column" />
                 <div className="flex3Column" >
                     <Dialog title={this.state.title}

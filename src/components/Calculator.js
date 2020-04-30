@@ -27,7 +27,7 @@ class Calculator extends React.Component {
         const celsius = scale === 'f' ? boilingVerdict.tryConvert(temperature, boilingVerdict.toCelsius) : temperature;
         const fahrenheit = scale === 'c' ? boilingVerdict.tryConvert(temperature, boilingVerdict.toFahrenheit) : temperature;
         return (
-            <div className="p-20 App-content">
+            <div className="p-20 App-content fadeIn">
                 {/*<div className="p-20 neumorphism">*/}
                 <div className="p-20">
                     <TemperatureInput

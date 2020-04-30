@@ -5,7 +5,7 @@ class Home extends React.Component {
     
     render() {
         return (
-            <div className="App">
+            <div className="App fadeIn">
                 <header className="App-content">
                     <a className="App-link"
                     href="https://jsongithub.github.io/portfolio/"
