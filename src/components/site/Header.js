@@ -39,7 +39,7 @@ class Header extends React.Component {
     }
     menuClick = (event) => (event.target.nodeName === "SPAN") ? this.goHome() : this.displayMenu();
     siteNavClick = (event) => (this.isNavButton(event)) ? (this.showContent(event)) : this.menuClick(event);
-    logoButton = (label) => <button className="navButton logoButton" onClick={this.siteNavClick}>{label}</button>;
+    logoButton = (label) => <Link key={getKey("link")} to="Home"><div className="navButton logoButton">{label}</div></Link>;
     closeButton = <button className="navButton menuPad" onClick={this.siteNavClick}><img src={close} alt="close menu" /></button>;
     burgerButton = <button className="navButton menuPad" onClick={this.siteNavClick}><img src={menu} alt="open menu" /></button>;
     homepageHeader = <div className="pt-70">
