@@ -21,7 +21,7 @@ class App extends React.Component {
     };
     this.setIt = this.setIt.bind(this);
   }
-  base = (this.production) ? 'https://jsongithub.github.io/reactor/' : 'reactor/';
+  base = (this.production) ? 'reactor/' : 'reactor/';
   company = "KFA";
   path = window.location.pathname;
   componentId = this.path.replace('/','').toLocaleLowerCase();
