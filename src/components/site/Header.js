@@ -41,8 +41,8 @@ class Header extends React.Component {
     logoButton = (label) => <Link key={getKey("link")} to="Home"><div className="navButton logoButton">{label}</div></Link>;
     closeButton = <button className="navButton menuPad" onClick={this.siteNavClick}><img src={close} alt="close menu" /></button>;
     burgerButton = <button className="navButton menuPad" onClick={this.siteNavClick}><img src={menu} alt="open menu" /></button>;
-    mobileLogo = <TextColorizer class='navBranding mt--4' text={this.props.company}/>;
-    headerLogo = <TextColorizer class='navBranding' text={this.props.company}/>;
+    mobileLogo = <TextColorizer class='navBranding mt-7' text={this.props.company}/>;
+    headerLogo = <TextColorizer class='navBranding mt-7' text={this.props.company}/>;
     navItems = [
         'Home',
         'BowlBuilder',
@@ -82,14 +82,14 @@ class Header extends React.Component {
                                 {getMenuItems()}
                             </div>
         const hamburgerOpen = <div className="flexContainer">
-                                <div className="flex3ColumnLeft mt-13">{this.logoButton(this.mobileLogo)}</div>
+                                <div className="flex3ColumnLeft">{this.logoButton(this.mobileLogo)}</div>
                                 <div className="flex3Column"><br/><br/>{getMenuItems()}</div>
                                 <div className="flex3ColumnRight">{getMenuButton}</div>
                             </div>
         const hamburgerClosed = <div className="flexContainer">
-                            <div className="flex3ColumnLeft m-auto">{this.logoButton(this.mobileLogo)}</div>
+                            <div className="flex3ColumnLeft">{this.logoButton(this.mobileLogo)}</div>
                             <div className="flex3Column bg-dark"></div>
-                            <div className="flex3ColumnRight m-auto">{this.burgerButton}</div>
+                            <div className="flex3ColumnRight">{this.burgerButton}</div>
                         </div>
                             
         const hamburgerNav = (this.state.menu === true) ? hamburgerOpen : hamburgerClosed;

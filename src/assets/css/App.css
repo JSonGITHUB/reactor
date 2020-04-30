@@ -147,7 +147,6 @@ select {
   justify-content: center;
   height: auto;
   min-height: 2px;
-  margin:auto;
   flex: 8;
 }
 .flex2Column {
@@ -158,13 +157,9 @@ select {
   margin:auto;
 }
 .flex3Column {
-  justify-content: center;
-  align-items: center;
-  text-align: center;
   height: auto;
   min-height: 2px;
   flex: 75%;
-  margin:auto;
 }
 .m-auto {
   margin:auto;
@@ -401,16 +396,15 @@ body {
   padding: 8px 22px 8px 32px;
 }
 .logoButton {
+  display: inline-block;
+  float: left;
   padding: 0px 32px;
-  vertical-align: middle;
 }
 .navButton {
   border: none;
   background-color: #222222;
   color: #00FF00;
-  text-align: center;
   text-decoration: none;
-  display: inline-block;
   font-size: 16px;
   cursor: pointer;
 }
