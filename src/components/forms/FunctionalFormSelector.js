@@ -49,7 +49,7 @@ function FormSelector(props) {
     return (
         <form onSubmit={handleSubmit} className="neumorphism p-20 mb-30">
             {label}<br/><br/>
-            <textarea id="bowl" rows="11" cols="10" className="mb-20" value={bowlIngredients} onChange={showBowlIngredients} /><br/>
+            <textarea id="bowl" rows="11" cols={window.innerWidth/15} className="mb-20" value={bowlIngredients} onChange={showBowlIngredients} /><br/>
             <label>    
                 <select onChange={handleChange}>
                     {selectItems}

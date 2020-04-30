@@ -62,7 +62,7 @@ class SelectorForm extends React.Component {
         return (
             <form onSubmit={this.handleSubmit} className="neumorphism p-20 mb-30">
                 {this.state.header}<br/><br/>
-                <textarea id="ingredients" rows="11" cols="10" className="mb-20" value={this.state.bowlIngredients} /><br/>
+                <textarea id="ingredients" rows="11" cols={window.innerWidth/15} className="mb-20" value={this.state.bowlIngredients} /><br/>
                 <label>
                     <select value={this.state.value} onChange={this.handleChange}>
                         {this.state.selectItems}

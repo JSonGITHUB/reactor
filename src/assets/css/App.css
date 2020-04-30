@@ -385,6 +385,9 @@ body {
 	50% { background-position: 0% 50% }
 	100% { background-position: 100% 50% }
 }
+.r-vw {
+  border-radius: 2vw;
+}
 .r-20 {
   border-radius: 20px;
 }
@@ -515,6 +518,9 @@ input.error {
 .pt-70 {
   padding-top: 70px;
 }
+.p-vw { 
+  padding: 1vw;
+}
 .p-2 { 
   padding: 2px;
 }
@@ -526,6 +532,9 @@ input.error {
 }
 .p-20 { 
   padding: 20px;
+}
+.m-vw {
+  margin: 1vw;
 }
 .m-1 {
   margin: 1px;

@@ -90,7 +90,7 @@ class LogEntry extends React.Component {
 
             const setSelectorStatus = ((item.selections.indexOf(this.log[groupTitle][item.description])) !== -1) ? this.selectorStatus.push(true) : this.selectorStatus.push(false);
             
-            return <div className={this.selectorColor(item,groupTitle) + " r-5 p-5 bg-green"}>
+            return <div className={this.selectorColor(item,groupTitle) + " r-vw p-vw bg-green"}>
                 <div className="mb-5">{item.description}: </div>
                 <Selector 
                     groupTitle={groupTitle} 
@@ -102,7 +102,7 @@ class LogEntry extends React.Component {
             </div>;
     }
 
-    radio = (item, groupTitle) => <div className="r-5 bg-green">
+    radio = (item, groupTitle) => <div className="r-vw bg-green">
                 {this.radioItems(item, groupTitle)}
             </div>;
     group = (item) => item.group;
@@ -110,8 +110,8 @@ class LogEntry extends React.Component {
 
     groups = () => this.items().map((item) => {
         const headerClasses = 'subHeader color-yellow';
-        const selectorClasses = "greet p-2 bg-vdk-green flex3Column";
-        const groupClasses = "flexContainer r-5";
+        const selectorClasses = "greet p-vw bg-vdk-green flex3Column";
+        const groupClasses = "flexContainer r-vw";
         const description = item.description;
         const addToLogs = (group) => {
             this.log[description][group.description] = group.selections[this.defaultSelection(group, description)]
@@ -146,7 +146,7 @@ class LogEntry extends React.Component {
                     <DatePicker
                         onChange={this.onDateChange}
                         value={getDate()} 
-                        className='p-10 bg-green flex3Column r-5 m-5'
+                        className='p-vw bg-green flex3Column r-vw m-vw'
                     /><br/>
                 </div>
             </div>
@@ -162,7 +162,7 @@ class LogEntry extends React.Component {
                     <br/>
                     
                     <div className="mb-5">Additional Comments: </div>
-                    <textarea rows="10" cols="50" value={this.state.entry} onChange={this.updateNotes} /><br/><br/>
+                    <textarea rows="10" cols={window.innerWidth/15} value={this.state.entry} onChange={this.updateNotes} /><br/><br/>
                     <button onClick={this.handleSubmit}>
                         {this.buttonLabel}
                     </button>
