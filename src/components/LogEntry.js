@@ -92,13 +92,15 @@ class LogEntry extends React.Component {
             
             return <div className={this.selectorColor(item,groupTitle) + " r-vw p-vw bg-green"}>
                 <div className="mb-5">{item.description}: </div>
-                <Selector 
-                    groupTitle={groupTitle} 
-                    selected={this.defaultSelection(item,groupTitle)} 
-                    label={item.description} 
-                    items={item.selections}
-                    onChange={this.handleSelection}
-                />
+                <div className="mb-5">
+                    <Selector 
+                        groupTitle={groupTitle} 
+                        selected={this.defaultSelection(item,groupTitle)} 
+                        label={item.description} 
+                        items={item.selections}
+                        onChange={this.handleSelection}
+                    />
+                </div>
             </div>;
     }
 
