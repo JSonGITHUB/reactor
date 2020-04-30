@@ -34,7 +34,7 @@ class FormRadio extends React.Component {
             let displayColor = (index === 0) ? "bg-neogreen" : "bg-yellow";
             displayColor = (index === 2) ? "bg-red" : displayColor;
             
-            const buttonClass = displayColor + " pt-10 pb-5 radius-10 m-5 button";
+            const buttonClass = displayColor + " pt-10 pb-5 r-5 m-5 button";
             
             const click = () => {
                 this.props.onChange(this.state.groupTitle, this.state.groupTitle, item);
