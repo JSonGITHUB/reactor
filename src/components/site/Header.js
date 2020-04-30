@@ -16,7 +16,6 @@ class Header extends React.Component {
         };
         this.company = this.props.company;
         this.isMotionOn = this.props.isMotionOn; 
-        this.setMotion = this.props.setMotion;
     }
     navClassesClosed = "width-100-percent header mt-2 pointer faded bg-dark";
     navClassesOpen = "width-100-percent header mt-2 pointer fadeInFaded fadedDark bg-dark";
@@ -42,10 +41,6 @@ class Header extends React.Component {
     logoButton = (label) => <Link key={getKey("link")} to="Home"><div className="navButton logoButton">{label}</div></Link>;
     closeButton = <button className="navButton menuPad" onClick={this.siteNavClick}><img src={close} alt="close menu" /></button>;
     burgerButton = <button className="navButton menuPad" onClick={this.siteNavClick}><img src={menu} alt="open menu" /></button>;
-    homepageHeader = <div className="pt-70">
-                        <Loader isMotionOn={this.props.isMotionOn}/>
-                        <TextColorizer class='bigHeader' text={this.props.company}/>
-                    </div>;
     mobileLogo = <TextColorizer class='navBranding mt--4' text={this.props.company}/>;
     headerLogo = <TextColorizer class='navBranding' text={this.props.company}/>;
     navItems = [
@@ -67,8 +62,12 @@ class Header extends React.Component {
         const getMenuButton = (this.state.menu) ? this.closeButton : this.burgerButton;
         const path = window.location.pathname.toLocaleLowerCase();
         const isHomePage = (path === '/reactor/home' || path === '/reactor/') ? true : false;
+        const homepageHeader = <div className="pt-70">
+                        <Loader isMotionOn={this.props.isMotionOn}/>
+                        <TextColorizer class='bigHeader' text={this.props.company}/>
+                    </div>;
         const Branding = () => {
-            if (isHomePage === true) { return this.homepageHeader }
+            if (isHomePage === true) { return homepageHeader }
             return <div className='mt-88'></div>
         };
         const backgroundClass = (this.props.isMotionOn) ? 'rgb-stripe' : 'rgb-stripeStopped';

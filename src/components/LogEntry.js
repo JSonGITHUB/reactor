@@ -111,7 +111,7 @@ class LogEntry extends React.Component {
     groups = () => this.items().map((item) => {
         const headerClasses = 'subHeader color-yellow';
         const selectorClasses = "greet p-vw bg-vdk-green flex3Column";
-        const groupClasses = "flexContainer r-vw";
+        const groupClasses = (window.innerWidth < 500) ? "r-vw" : "flexContainer r-vw";
         const description = item.description;
         const addToLogs = (group) => {
             this.log[description][group.description] = group.selections[this.defaultSelection(group, description)]

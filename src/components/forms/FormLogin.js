@@ -13,7 +13,7 @@ class FormLogin extends React.Component {
     }
 
     handleChange(event) {
-        console.log("value: " + event.target.value)
+        //console.log("value: " + event.target.value)
         this.setState({value: event.target.value});
         this.setState({isLoggedIn: true});
     }

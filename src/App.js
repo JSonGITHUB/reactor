@@ -42,10 +42,9 @@ class App extends React.Component {
   };
   
   render() {
-    console.log(`process.env.PUBLIC_URL: ${process.env.PUBLIC_URL}`)
     window.addEventListener('resize', debounce(this.setIt, 250));
     const componentTag = (current) => <div className="App">
-            <Header company={this.company} width={this.state.width} isMotionOn={this.state.isMotionOn} setMotion={this.setMotion}/>
+            <Header company={this.company} width={this.state.width} isMotionOn={this.state.isMotionOn}/>
               <div className="fadeIn">
                 {this.components[current]}
               </div>
@@ -58,7 +57,7 @@ class App extends React.Component {
       <Router basename={this.base}>
         <div className="App">
             <Switch>
-              <Header company={this.company} menu='false' width={this.state.width} isMotionOn={this.state.isMotionOn} setMotion={this.setMotion}/>
+              <Header company={this.company} menu='false' width={this.state.width} isMotionOn={this.state.isMotionOn}/>
             </Switch> 
             <div className="fadeIn">
                 <Switch>
