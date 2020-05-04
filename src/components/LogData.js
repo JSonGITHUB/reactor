@@ -11,7 +11,14 @@ class LogData extends React.Component {
         localStorage.setItem("lastPostId", `${st}${nd}`);
         return `${st}${nd}`;
     }
-
+    init = () => {
+        const recordId = this.getRecordId();
+        console.log(`LogData => init: this.state.recordId: ${recordId} - this.state.log: ${this.getLogTemplate}`);
+        this.setState({
+            log: this.getLogTemplate,
+            recordId: recordId
+        });
+    }
     getLogTemplate = {
         Day: {
           Date: "2020-04-07T07:00:00.000Z",
@@ -49,7 +56,6 @@ class LogData extends React.Component {
         super(props);
         console.log(`LOGDATA !!!!! props.recordId: ${props.recordId}`)
         console.log(`LOGDATA !!!!! postDirectory: ${JSON.stringify(this.postDirectory.getDirectory(),null, 2)}`)
-        
         this.state = {
             recordId: (props.recordId === null) ? this.getRecordId() : props.recordId,
             log: (JSON.parse(localStorage.getItem(props.recordId)) === null) ? this.getLogTemplate : JSON.parse(localStorage.getItem(props.recordId))
@@ -58,7 +64,8 @@ class LogData extends React.Component {
     getDate = () => this.state.log.Day.Date;
     
     render() {      
-            return <p>Count: {this.state.postDirectory.length}</p> 
+        console.log(`LogData => render: this.state.recordId: ${this.state.recordId} - this.state.log: ${this.state.log}`);
+        return <p>Count: {this.state.postDirectory.length}</p> 
     }
     
 }
