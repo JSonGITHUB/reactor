@@ -27,7 +27,7 @@ class Loader extends React.Component {
                 <div className="ml--28">
                     <img id="shaka" src={shakaBlack} className={shakaClass} alt="js" />
                 </div>
-                <div className="flexContainer">
+                <div className="flexContainer width-100-percent">
                     <div className="flex3Column height200" />
                     <div className="flex3Column height200">
                         <img id="logo1" src={logoRed} className={logo1Class} alt="logoRed" />

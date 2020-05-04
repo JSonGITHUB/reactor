@@ -20,24 +20,25 @@ class Footer extends React.Component {
                     </div>
         const path = window.location.pathname.toLocaleLowerCase();
         const isPageSurfLog = (path.includes('surflog') || window.innerHeight < 600) ? true : false;
-        const bottom = (isPageSurfLog) ? 'b-collapse' : 'b-0';
-        const footerClasses = bottom + ' fixed subfooter flexContainer responsive height200';
+        const isPageHome = (path.includes('home') || path === "/reactor" || path === "/reactor/") ? true : console.log(`path: ${path}`);
+        const bottom = (isPageSurfLog||!isPageHome) ? 'b-collapse' : 'b-0';
+        const footerClasses = bottom + ' fixed subfooter flexContainer width-100-percent responsive height200';
         return (
             <div>
                 <div id='footer' className={footerClasses}>
-                    <div className="flex3Column responsive bg-dk-green m-1 p-10 color-neogreen">
+                    <div className="flex3Column responsive bg-dkGreen m-1 p-10 color-neogreen">
                         <LoginControl />
                     </div>
-                    <div className="flex3Column responsive bg-dk-yellow m-1 color-yellow">
+                    <div className="flex3Column responsive bg-dkYellow m-1 color-yellow">
                         {loaderTag}
                         <img className="mb-1" src={js} alt="js" />
                         <CopyrightText />
                     </div>
-                    <div className="flex3Column responsive bg-dk-red m-1 p-10 color-red">
+                    <div className="flex3Column responsive bg-dkRed m-1 p-10 color-red">
                         <Toggle isMotionOn={this.props.isMotionOn} setMotion={this.props.setMotion} id='toggle'/>
                     </div>
                 </div>
-                <div className="flexContainer footer fixed">
+                <div className="flexContainer width-100-percent footer fixed">
                     <div className="flex3Column bg-green" />
                     <div className="flex3Column bg-yellow" />
                     <div className="flex3Column bg-red" />

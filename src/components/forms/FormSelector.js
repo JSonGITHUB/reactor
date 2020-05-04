@@ -64,12 +64,17 @@ class SelectorForm extends React.Component {
                 {this.state.header}<br/><br/>
                 <textarea id="ingredients" rows="11" cols={window.innerWidth/15} className="mb-20" value={this.state.bowlIngredients} /><br/>
                 <label>
-                    <select value={this.state.value} onChange={this.handleChange}>
-                        {this.state.selectItems}
-                    </select>
-                </label><br/>
-                <input type="submit" value="Add Item" onClick={this.add}/>
-                <input type="submit" value="Remove Item" onClick={this.remove} className="ml-2"/>
+                    <div className="p-20 bg-yellow r-10 mb-10">
+                        <span className="greet color-black bold">select: </span>
+                        <select value={this.state.value} onChange={this.handleChange}>
+                            {this.state.selectItems}
+                        </select>
+                    </div>
+                </label>
+                <span>
+                    <input type="submit" value="add" onClick={this.add} className="bold greet p-20 r-10 w-200 bg-green brdr-green"/>
+                    <input type="submit" value="remove" onClick={this.remove} className="bold greet ml-2 p-20 r-10 w-200 bg-red brdr-red"/>
+                </span>
             </form>
         );
     };

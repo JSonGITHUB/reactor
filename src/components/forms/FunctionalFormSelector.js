@@ -50,14 +50,18 @@ function FormSelector(props) {
         <form onSubmit={handleSubmit} className="neumorphism p-20 mb-30">
             {label}<br/><br/>
             <textarea id="bowl" rows="11" cols={window.innerWidth/15} className="mb-20" value={bowlIngredients} onChange={showBowlIngredients} /><br/>
-            <label>    
-                <select onChange={handleChange}>
-                    {selectItems}
-                </select>
+            <label>
+                <div className="p-20 bg-yellow r-10 mb-10">
+                    <span className="greet color-black bold">select: </span>
+                    <select onChange={handleChange}>
+                        {selectItems}
+                    </select>
+                </div>
             </label>
-            <br/>
-            <input type="submit" value="Add Item" onClick={add}/>
-            <input type="submit" value="Remove Item" className="ml-2" onClick={remove}/>
+            <span>
+                <input type="submit" value="add" className="bold greet p-20 r-10 w-200 bg-green brdr-green" onClick={add}/>
+                <input type="submit" value="remove" className="bold greet ml-2 p-20 r-10 w-200 bg-red brdr-red" onClick={remove}/>
+            </span>
         </form>
     );
 }

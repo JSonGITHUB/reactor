@@ -7,10 +7,11 @@ export default function Dialog(props) {
             <h1 className="Dialog-title">
                 {props.title}
             </h1>
-            <p className="Dialog-message">
+            <p>
                 {props.message}
             </p>
             {props.children}
+                
         </FancyBorder>
     );
 }

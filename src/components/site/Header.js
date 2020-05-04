@@ -17,18 +17,18 @@ class Header extends React.Component {
         this.company = this.props.company;
         this.isMotionOn = this.props.isMotionOn; 
     }
-    navClassesClosed = "width-100-percent header mt-2 pointer faded bg-dark";
-    navClassesOpen = "width-100-percent header mt-2 pointer fadeInFaded fadedDark bg-dark";
-    navClassesClose = "width-100-percent header mt-2 pointer fadeOutFaded faded bg-dark";
+    navClassesClosed = "width-100-percent navigation mt-2 pointer faded bg-dark";
+    navClassesOpen = "width-100-percent navigation mt-2 pointer fadeInFaded fadedDark bg-dark";
+    navClassesClose = "width-100-percent navigation mt-2 pointer fadeOutFaded faded bg-dark";
     isNavButton = (event) => (event.target.nodeName === "BUTTON") ? true : false;
     showContent = (event) => {
         this.displayMenu();
     };
     goHome = () => window.location.pathname = "/reactor/Home";
     navButton = (label) => <Link key={getKey("link")} to={label}>
-                                <button key={getKey(label)} className="navButton buttonPad" onClick={this.siteNavClick}>
+                                <div key={getKey(label)} className="button greet m-1 p-15 color-yellow r-5 width-100-percent bg-dkGreen" onClick={this.siteNavClick}>
                                     {label}
-                                </button>
+                                </div>
                             </Link>;
     displayMenu = (event) => {
         this.setState({
@@ -50,6 +50,7 @@ class Header extends React.Component {
         'Essay',
         'Reservation',
         'GuestList',
+        'LogDirectory',
         'SurfLog'
     ];
     wideNav = (item) => this.navButton(item);
@@ -81,29 +82,35 @@ class Header extends React.Component {
                                 {this.logoButton(this.headerLogo)}
                                 {getMenuItems()}
                             </div>
-        const hamburgerOpen = <div className="flexContainer">
-                                <div className="flex3ColumnLeft">{this.logoButton(this.mobileLogo)}</div>
-                                <div className="flex3Column"><br/><br/>{getMenuItems()}</div>
-                                <div className="flex3ColumnRight">{getMenuButton}</div>
+        const hamburgerOpen = <div>
+                                <div className="flexContainer width-100-percent">
+                                    <div className="flex3ColumnLeft">{this.logoButton(this.mobileLogo)}</div>
+                                    <div className="flex3Column"></div>
+                                    <div className="flex3ColumnRight">{getMenuButton}</div>
+                                </div>
+                                <div className="t-0 navigation width-100-percent bg-dark pb-200">{getMenuItems()}</div>
                             </div>
-        const hamburgerClosed = <div className="flexContainer">
-                            <div className="flex3ColumnLeft">{this.logoButton(this.mobileLogo)}</div>
-                            <div className="flex3Column bg-dark"></div>
-                            <div className="flex3ColumnRight">{this.burgerButton}</div>
-                        </div>
+        const hamburgerClosed = <div>
+                                    <div className="flexContainer width-100-percent">
+                                        <div className="flex3ColumnLeft">{this.logoButton(this.mobileLogo)}</div>
+                                        <div className="flex3Column"></div>
+                                        <div className="flex3ColumnRight">{this.burgerButton}</div>
+                                    </div>
+                                <div className="t-collapse navigation width-100-percent bg-dark">{getMenuItems()}</div>
+                            </div>
                             
         const hamburgerNav = (this.state.menu === true) ? hamburgerOpen : hamburgerClosed;
         const getNavigation = (isWideScreen) ? navigation : hamburgerNav;
         
         return (
             <div className="App-header">
+                <div className={navClasses}>{getNavigation}</div>
                 <Background />
-                <div className="flexContainer header">
+                <div className="flexContainer header width-100-percent">
                     <div className="flex3Column bg-green" />
                     <div className="flex3Column bg-yellow" />
                     <div className="flex3Column bg-red" />
                 </div>
-                <div className={navClasses}>{getNavigation}</div>
                 <Branding />
             </div>
         );

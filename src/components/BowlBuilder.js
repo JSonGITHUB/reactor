@@ -60,7 +60,7 @@ class BowlBuilder extends React.Component {
     
     render() {
         return (
-            <div className="flexContainer App-content fadeIn">
+            <div className="flexContainer width-100-percent App-content fadeIn">
                 <div className="flex5Column"></div>
                 <div className="flex5Column">{this.PokiBowl}</div>
                 <div className="flex5Column"></div>

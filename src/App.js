@@ -8,9 +8,11 @@ import Header from './components/site/Header.js';
 import Home from './components/Home.js';
 import Calculator from './components/Calculator.js';
 import BowlBuilder from './components/BowlBuilder.js';
+import LogDirectory from './components/LogDirectory.js';
 import SurfLog from './components/Logger.js';
 import './assets/css/App.css';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
+import ScrollToTop from './components/utils/ScrollToTop.js';
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -37,7 +39,7 @@ class App extends React.Component {
   }
   setIt = () => (this.widthChanged() || this.heightChanged()) ? this.updateState() : false;
   components = {
-    surflog: <SurfLog />,
+    surflog: <SurfLog logId="FriMay0120207:10:29PM"/>,
     guestlist: <SignUpDialog title="Guest List" message="Sign up" />,
     reservation: <Reservation />,
     essay: <FormEssay className='mt-40' />,
@@ -57,9 +59,15 @@ class App extends React.Component {
           </div>;
 
     let AppComponent = () => componentTag(this.currentComponent);
-    return (
+    const logIdExists = (window.location.search.includes("logId")) ? true : false;
+    const startIndex = () => window.location.search.indexOf("logId=")+6;
+    const endIndex = () => window.location.search.length;
+    const getLogId = () => window.location.search.substring(startIndex(), endIndex());
+    const logId = (logIdExists) ? getLogId() : "";
+     return (
       //AppComponent();
       <Router basename={this.base}>
+        <ScrollToTop />
         <div className="App">
             <Switch>
               <Header company={this.company} menu='false' width={this.state.width} isMotionOn={this.state.isMotionOn}/>
@@ -73,7 +81,9 @@ class App extends React.Component {
                   <Route path="/Essay" component={FormEssay} />
                   <Route path="/Reservation" component={Reservation} />
                   <Route path="/GuestList" component={SignUpDialog} />
-                  <Route path="/SurfLog" component={SurfLog} />
+                  {/*<Route path="/SurfLog" component={SurfLog} />*/}
+                  <Route path='/SurfLog' render={(props) => <SurfLog {...props} logId={logId} />}/>
+                  <Route path="/LogDirectory" component={LogDirectory} />
                 </Switch>
               </div>
             <Switch>

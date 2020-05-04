@@ -24,14 +24,14 @@ class FormEssay extends React.Component {
 
     render() {
         return (
-            <div className="App-content flexContainer fadeIn">
+            <div className="App-content flexContainer width-100-percent fadeIn">
                 <div className="flex3Column" />
                 <div className="flex3Column" >
                     <form onSubmit={this.handleSubmit} className="neumorphism p-20">
                         <label>
                             <textarea rows="13" cols={window.innerWidth/15} className="mb-30" value={this.state.value} onChange={this.handleChange} />
                         </label><br/>
-                        <input type="submit" value="Submit" />
+                        <input type="submit" value="Submit" className="greet p-20 r-10 w-200 bg-green brdr-green"/>
                     </form>
                 </div>
                 <div className="flex3Column" />

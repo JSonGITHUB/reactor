@@ -16,14 +16,14 @@ class SignUpDialog extends React.Component {
 
     render() {
         return (
-            <div className="App-content flexContainer fadeIn">
+            <div className="App-content flexContainer width-100-percent fadeIn">
                 <div className="flex3Column" />
                 <div className="flex3Column" >
                     <Dialog title={this.state.title}
                             message={this.state.message}>
-                        <input value={this.state.login}
-                                onChange={this.handleChange} />
-                        <button onClick={this.handleSignUp}>
+                        <input value={this.state.login} placeholder="Enter here..."
+                                onChange={this.handleChange} className="greet p-20 r-10 w-200 brdr-green"/>
+                        <button onClick={this.handleSignUp} className="ml-5 greet p-20 r-10 w-200 bg-green brdr-green">
                             Sign Me Up!
                         </button>
                     </Dialog>              

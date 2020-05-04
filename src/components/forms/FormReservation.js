@@ -22,7 +22,7 @@ class Reservation extends React.Component {
 
     render() {
         return (
-            <div className="App-content flexContainer fadeIn">
+            <div className="App-content flexContainer width-100-percent fadeIn">
                 <div className="flex3Column" />
                 <div className="flex3Column" >
                 <form className="neumorphism p-20">
@@ -32,19 +32,18 @@ class Reservation extends React.Component {
                             name="isGoing"
                             type="checkbox"
                             checked={this.state.isGoing}
-                            onChange={this.handleInputChange} 
+                            onChange={this.handleInputChange}
                         />
                     </label>
                     <br />
                     <br />
                     <label>
                         Number of guests:<br/>
-                        <input
+                        <input className="mt-10 greet p-10 r-10 brdr-green"
                             name="numberOfGuests"
                             type="number"
                             value={this.state.numberOfGuests}
-                            onChange={this.handleInputChange} 
-                        />
+                            onChange={this.handleInputChange}/>
                     </label>
                 </form>                    
                 </div>

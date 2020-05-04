@@ -38,9 +38,9 @@ class FormLogin extends React.Component {
         let button;
 
         if (isLoggedIn) {
-            button = <LogoutButton type="submit" value={this.state.value} handleChange={this.handleChange} className="ml-2" onClick={this.handleLogoutClick} />;
+            button = <LogoutButton type="submit" value={this.state.value} handleChange={this.handleChange} className="greet p-20 r-10 w-200 bg-green brdr-green ml-2" onClick={this.handleLogoutClick} />;
         } else {
-            button = <LoginButton type="submit" value={this.state.value} handleChange={this.handleChange} className="ml-2" onClick={this.handleLoginClick} />;
+            button = <LoginButton type="submit" value={this.state.value} handleChange={this.handleChange} className="greet p-20 r-10 w-200 bg-green brdr-green ml-2" onClick={this.handleLoginClick} />;
         }
 
         return (

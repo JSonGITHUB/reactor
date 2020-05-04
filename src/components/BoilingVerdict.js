@@ -23,9 +23,9 @@ class BoilingVerdict extends React.Component {
         return (celsius * 9 / 5) + 32;
     }
     render() {
-        if (this.props.celsius >= 100) { return <p>Water will boil...</p> }
-        if (this.props.celsius <= 0) { return <p>Water will freeze...</p> }
-        return <p>The water would not boil.</p>;
+        if (this.props.celsius >= 100) { return <p>water is boiling...</p> }
+        if (this.props.celsius <= 0) { return <p>water is freezing...</p> }
+        return <p>water is not boiling or freezing...</p>;
     }
 }
 
