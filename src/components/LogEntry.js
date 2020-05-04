@@ -26,7 +26,7 @@ class LogEntry extends React.Component {
         this.title = props.title;
         this.message = props.message;
         this.logId = props.logId;
-        this.log = {};
+        this.logData.init();
         if (props.logId !== undefined && props.logId !== "" ) {
             this.lastPostId = props.logId;
             console.log(`$$ logId1: ${props.logId}`);
@@ -62,15 +62,6 @@ class LogEntry extends React.Component {
     }
     updateNotes(event) {
         this.handleSelection("Comments", "notes", event.target.value);
-    }
-    getRecordId = () => {
-        const date = new Date()
-        const log = (this.state.log !== undefined && JSON.stringify(this.state.log, null, 2) !== "{}") ? JSON.stringify(this.state.log, null, 2) : JSON.stringify(this.log, null, 2);
-        const st = date.toDateString().replace(/ /g,"");
-        const nd = date.toLocaleTimeString().replace(/ /g,"");
-        //console.log(`${st}${nd}: ${log}`)
-        localStorage.setItem("lastPostId", `${st}${nd}`);
-        return `${st}${nd}`;
     }
     handleSubmit(event) {
         const log = (this.state.log !== undefined && JSON.stringify(this.state.log, null, 2) !== "{}") ? this.state.log : this.log;
