@@ -64,6 +64,7 @@ class Logger extends React.Component {
         } else {
             this.log = JSON.parse(localStorage.getItem(this.getLogId()));
         }
+        console.log(`Logger => constructor -> log: ${JSON.stringify(this.log,null,2)}`)
         this.state = {
             date: new Date(),
             log: this.log,
