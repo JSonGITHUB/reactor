@@ -61,8 +61,10 @@ class Logger extends React.Component {
         console.log(`Logger => constructor -> localStorage.getItem: ${this.getLogId()} ====> ${localStorage.getItem(this.getLogId())}`)
         if (localStorage.getItem(this.getLogId()) === null) {
             this.log = this.templateData;
+            this.lodId = this.generateNewLogId();
         } else {
             this.log = JSON.parse(localStorage.getItem(this.getLogId()));
+            this.logId = this.getLogId()
         }
         console.log(`Logger => constructor -> log: ${JSON.stringify(this.log,null,2)}`)
         this.state = {
@@ -70,7 +72,7 @@ class Logger extends React.Component {
             log: this.log,
             items: [],
             isLoaded: false,
-            logId: this.getLogId()
+            logId: this.logId
         };
         this.updateLog = this.updateLog.bind(this);
         this.getStateLog = this.getStateLog.bind(this);
