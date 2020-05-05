@@ -35,17 +35,31 @@ class Logger extends React.Component {
             "notes": "Biggest crowd but plenty of sick ones..."
         }
     };
+    generateNewLogId = () => {
+        const date = new Date()
+        const st = date.toDateString().replace(/ /g,"");
+        const nd = date.toLocaleTimeString().replace(/ /g,"");
+        //localStorage.setItem("lastPostId", `${st}${nd}`);
+        const newId = `${st}${nd}`;
+        console.log(`LogId: generateNewLogId => this.state.logId: ${newId}`);
+        /*
+        this.setState({
+            logId: newId
+        });
+        */
+        return newId;
+    }
     getLocalLastRecordId = () => localStorage.getItem("lastPostId");
     lastRecordIdExists = () => (this.getLocalLastRecordId() === null) ? false : true; 
     lastRecordExists = () => (this.lastRecordIdExists() === true && localStorage.getItem(this.getLocalLastRecordId()) !== null) ? true : false
-    getLastRecordId = localStorage.getItem("lastPostId")
-    getLogId = () => (this.props.location.state === undefined || this.props.location.state === "") ? localStorage.getItem("lastPostId") : this.props.location.state.logId.item;
-    
+    getLastRecordId = () => (localStorage.getItem("lastPostId") === null) ? this.generateNewLogId() : localStorage.getItem("lastPostId");
+    getLogId = () => (this.props.location.state === undefined || this.props.location.state === "") ? this.getLastRecordId() : this.props.location.state.logId.item;
+
     constructor(props) {
         super(props);
         console.log(`Logger => constructor -> props.logId: ${this.getLogId()}`)
         console.log(`Logger => constructor -> localStorage.getItem: ${this.getLogId()} ====> ${localStorage.getItem(this.getLogId())}`)
-        if (this.getLogId() === null) {
+        if (localStorage.getItem(this.getLogId()) === null) {
             this.log = this.templateData;
         } else {
             this.log = JSON.parse(localStorage.getItem(this.getLogId()));
