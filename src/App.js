@@ -39,7 +39,7 @@ class App extends React.Component {
   }
   setIt = () => (this.widthChanged() || this.heightChanged()) ? this.updateState() : false;
   components = {
-    surflog: <SurfLog logId="FriMay0120207:10:29PM"/>,
+    surflog: <SurfLog />,
     guestlist: <SignUpDialog title="Guest List" message="Sign up" />,
     reservation: <Reservation />,
     essay: <FormEssay className='mt-40' />,

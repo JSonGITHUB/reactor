@@ -26,31 +26,35 @@ class LogEntry extends React.Component {
         this.title = props.title;
         this.message = props.message;
         this.logId = props.logId;
-        this.logData.init();
+        //this.logData.init();
+        console.log(`LogEntry => props.logId: ${props.logId}`)
         if (props.logId !== undefined && props.logId !== "" ) {
             this.lastPostId = props.logId;
             console.log(`$$ logId1: ${props.logId}`);
             this.log = (localStorage.getItem(props.logId) === null) ? this.posts.getLastItem() : JSON.parse(localStorage.getItem(props.logId));
         } else {
-            this.lastPostId = "ThuApr3020207:03:14PM";
+            this.lastPostId = "ThuApr3020209:19:28PM";
             console.log(`logId2: ${this.lastPostId}`)
-            this.log = JSON.parse(localStorage.getItem("ThuApr3020207:03:14PM"))
+            this.log = JSON.parse(localStorage.getItem("ThuApr3020209:19:28PM"))
         }
         this.state = {
             date: new Date(),
             items: props.items,
             log: this.log,
-            lastPostId: props.logId
+            lastPostId: props.logId,
+            change: false
         };
         this.handleSelection = this.handleSelection.bind(this);
         this.updateNotes = this.updateNotes.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleSave = this.handleSave.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
         this.onDateChange = this.onDateChange.bind(this);
     }
     setLogState() {
         this.setState({
-            log: this.log
+            log: this.log,
+            change: true
         });
     }
     handleSelection(groupTitle, label, selected) {
@@ -66,7 +70,7 @@ class LogEntry extends React.Component {
     handleSubmit(event) {
         const log = (this.state.log !== undefined && JSON.stringify(this.state.log, null, 2) !== "{}") ? this.state.log : this.log;
         console.log(`handleSubmit: ${log}`)
-        const recordId = this.getRecordId();
+        const recordId = this.logData.getRecordId();
         let postDirectory = this.posts.getDirectory();
         let post = "";
         const logIt = () => {
@@ -101,7 +105,7 @@ class LogEntry extends React.Component {
     }
     handleDelete(event) {
         const recordId = this.state.lastPostId;
-        console.log(`delete record: ${recordId} ${this.state.log.Location.Break}`);
+        //console.log(`delete record: ${recordId} ${this.state.log.Location.Break}`);
         //localStorage.setItem("postDirectory", JSON.stringify(this.postDirectory));
         this.posts.delete(recordId);
     }
@@ -186,10 +190,11 @@ class LogEntry extends React.Component {
         this.selectorStatus = [];
         return <div className='description'>{this.groups()}</div>;
     }
+    getLogObject = () => this.state.log;
     dateEntry = () => {
-
             const logExists = (this.state.log !== undefined && JSON.stringify(this.state.log, null, 2) !== "{}") ? true : false;
-            const stateLogDate = () => new Date(this.state.log.Day.Date);
+            console.log(`LogEntry => this.state.log: ${JSON.stringify(this.state.log, null, 2)}`)
+            const stateLogDate = () => new Date(this.getLogObject().Day.Date);
             const getDate = () => (logExists === true) ? new Date(stateLogDate()) : new Date(this.state.date);
             const getTodaysDate = () => new Date();
             const getStateDate = () => this.state.date;

@@ -4,24 +4,55 @@ import Loader from './utils/Loader.js';
 class Logger extends React.Component {
 
     templateData = {
-        Day: {},
-        Location: {},
-        Swell: {},
-        Wind: {},
-        Tide: {},
-        Conditions: {},
-        Comments: {}
+        Day: {
+            Date: "2020-01-17T08:00:00.000Z",
+            Day: 17,
+            Month: 1,
+            Year: 2020
+        },
+        Location: {
+            Break: "Notch"
+        },
+        Swell: {
+            Direction: "NW",
+            Height: "head high",
+            Report: "4ft"
+        },
+        Tide: {
+            Phase: "High => Low",
+            Height: "2ft"
+        },
+        Wind: {
+            Direction: "NW",
+            Orientation: "Offshore",
+            MPH: "5mph",
+            Surface: "Glassy"
+        },
+        Conditions: {
+            Conditions: "Firing"
+        },
+        Comments: {
+            "notes": "Biggest crowd but plenty of sick ones..."
+        }
     };
-    getLogId = () => (this.props.location.state === undefined) ? localStorage.getItem("lastPostId") : this.props.location.state.logId.item;
+    getLocalLastRecordId = () => localStorage.getItem("lastPostId");
+    lastRecordIdExists = () => (this.getLocalLastRecordId() === null) ? false : true; 
+    lastRecordExists = () => (this.lastRecordIdExists() === true && localStorage.getItem(this.getLocalLastRecordId()) !== null) ? true : false
+    getLastRecordId = localStorage.getItem("lastPostId")
+    getLogId = () => (this.props.location.state === undefined || this.props.location.state === "") ? localStorage.getItem("lastPostId") : this.props.location.state.logId.item;
     
     constructor(props) {
         super(props);
-        this.log = this.templateData;
         console.log(`Logger => constructor -> props.logId: ${this.getLogId()}`)
         console.log(`Logger => constructor -> localStorage.getItem: ${this.getLogId()} ====> ${localStorage.getItem(this.getLogId())}`)
+        if (this.getLogId() === null) {
+            this.log = this.templateData;
+        } else {
+            this.log = JSON.parse(localStorage.getItem(this.getLogId()));
+        }
         this.state = {
             date: new Date(),
-            log: {},
+            log: this.log,
             items: [],
             isLoaded: false,
             logId: this.getLogId()

@@ -24,7 +24,7 @@ class LogDirectory extends React.Component {
     conditions = ["Firing", "Good", "Bad"];
     posts = new PostDirectory();
     items = () => this.posts.getDirectory();
-    logEntry = (logId) => {
+    getLogData = (logId) => {
         if (localStorage.getItem(logId) === null) {
           console.log(`${logId} is null`);
           return false;
