@@ -7,9 +7,10 @@ import getKey from './utils/KeyGenerator.js';
 import PostDirectory from './PostDirectory.js';
 import LogData from './LogData.js';
 import {BrowserRouter as Router, Switch, Link, Route} from 'react-router-dom';
+import LogId from './LogId.js';
 
 class LogEntry extends React.Component {
-   //log = JSON.parse(localStorage.getItem("ThuApr3020207:03:14PM"));
+    //log = JSON.parse(localStorage.getItem("ThuApr3020207:03:14PM"));
     posts = new PostDirectory();
     postDirectory = this.posts.getDirectory();
     setDefaultLastId = () => {
@@ -18,7 +19,56 @@ class LogEntry extends React.Component {
     }
     lastPostId = (localStorage.getItem("lastPostId") === null) ? this.posts.getLastItem() : localStorage.getItem("lastPostId");
     logData = new LogData({recordId: this.lastPostId});
-
+    templateData = {
+        Day: {
+            Date: "2020-01-17T08:00:00.000Z",
+            Day: 17,
+            Month: 1,
+            Year: 2020
+        },
+        Location: {
+            Break: "Notch"
+        },
+        Surf: {
+            Height: "head high",
+            Report: "4ft",
+            Shape: "Close-outs"
+        },
+        Swell1: {
+            Height: "4ft",
+            Direction: "NW",
+            Angle: "280",
+            Interval: "18 seconds",
+        },
+        Swell2: {
+            Height: "1ft",
+            Direction: "NW",
+            Angle: "270",
+            Interval: "8 seconds",
+        },
+        Swell3: {
+            Height: "1ft",
+            Direction: "NW",
+            Angle: "180",
+            Interval: "6 seconds",
+        },
+        Tide: {
+            Phase: "High => Low",
+            Height: "2ft"
+        },
+        Wind: {
+            Direction: "NW",
+            Orientation: "Offshore",
+            MPH: "5mph",
+            Surface: "Glassy"
+        },
+        Conditions: {
+            Conditions: "Firing"
+        },
+        Comments: {
+            "notes": "Biggest crowd but plenty of sick ones..."
+        }
+    };
     constructor(props) {
         super(props);
         this.selectorStatus = [];
@@ -28,15 +78,25 @@ class LogEntry extends React.Component {
         this.logId = props.logId;
         //this.logData.init();
         console.log(`LogEntry => props.logId: ${props.logId}`)
+        /*
+        if (localStorage.getItem(this.logIdComponent.getLogId()) === null) {
+            this.log = this.logIdComponent.templateData;
+            this.lodId = this.logIdComponent.generateNewLogId();
+        } else {
+            this.log = JSON.parse(localStorage.getItem(this.logIdComponent.getLogId()));
+            this.logId = this.logIdComponent.getLogId()
+        }
+        */
         if (props.logId !== undefined && props.logId !== "" ) {
             this.lastPostId = props.logId;
             console.log(`$$ logId1: ${props.logId}`);
-            this.log = (localStorage.getItem(props.logId) === null) ? this.posts.getLastItem() : JSON.parse(localStorage.getItem(props.logId));
+            this.log = (localStorage.getItem(props.logId) === null) ? this.templateData : JSON.parse(localStorage.getItem(props.logId));
         } else {
             this.lastPostId = "ThuApr3020209:19:28PM";
             console.log(`logId2: ${this.lastPostId}`)
             this.log = JSON.parse(localStorage.getItem("ThuApr3020209:19:28PM"))
         }
+        this.logIdComponent = new LogId({logId: this.props.logId, log: this.log});
         this.state = {
             date: new Date(),
             items: props.items,
@@ -69,8 +129,9 @@ class LogEntry extends React.Component {
     }
     handleSubmit(event) {
         const log = (this.state.log !== undefined && JSON.stringify(this.state.log, null, 2) !== "{}") ? this.state.log : this.log;
-        console.log(`handleSubmit: ${log}`)
-        const recordId = this.logData.getRecordId();
+        console.log(`handleSubmit: ${JSON.stringify(log, null, 2)}`)
+        const recordId = this.logIdComponent.generateNewLogId();
+        console.log(`handleSubmit: recordId: ${recordId}`)
         let postDirectory = this.posts.getDirectory();
         let post = "";
         const logIt = () => {
@@ -145,6 +206,7 @@ class LogEntry extends React.Component {
             
             return <div className={this.selectorColor(item,groupTitle) + " r-vw p-vw bg-green"}>
                 <div className="mb-5">{item.description}: </div>
+                {console.log(`item: ${JSON.stringify(item, null, 2)} - groupTitle: ${groupTitle}`)}
                 <div className="mb-5">
                     <Selector 
                         groupTitle={groupTitle} 
@@ -192,9 +254,10 @@ class LogEntry extends React.Component {
     }
     getLogObject = () => this.state.log;
     dateEntry = () => {
-            const logExists = (this.state.log !== undefined && JSON.stringify(this.state.log, null, 2) !== "{}") ? true : false;
-            console.log(`LogEntry => this.state.log: ${JSON.stringify(this.state.log, null, 2)}`)
-            const stateLogDate = () => new Date(this.getLogObject().Day.Date);
+            console.log(`this.state.log: ${this.state.log}`)
+            const logExists = (this.state.log !== undefined && this.state.log !== null && JSON.stringify(this.state.log, null, 2) !== "{}") ? true : false;
+            //console.log(`LogEntry => this.state.log: ${JSON.stringify(this.state.log, null, 2)}`)
+            const stateLogDate = () => this.getLogObject().Day.Date;
             const getDate = () => (logExists === true) ? new Date(stateLogDate()) : new Date(this.state.date);
             const getTodaysDate = () => new Date();
             const getStateDate = () => this.state.date;

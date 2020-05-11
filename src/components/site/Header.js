@@ -25,11 +25,16 @@ class Header extends React.Component {
         this.displayMenu();
     };
     goHome = () => window.location.pathname = "/reactor/Home";
-    navButton = (label) => <Link key={getKey("link")} to={label}>
-                                <div key={getKey(label)} className="button greet m-1 p-15 color-yellow r-5 width-100-percent bg-dkGreen" onClick={this.siteNavClick}>
-                                    {label}
-                                </div>
-                            </Link>;
+    landscapeButton = (label) => <Link className="fl-left" key={getKey("link")} to={label}>
+            <div key={getKey(label)} className="button greet m-1 mt-5 pl-10 pr-10 pt-10 pb-15 color-yellow r-5 width-110-percent" onClick={this.siteNavClick}>
+                {label}
+            </div>
+        </Link>;
+    portraitButton = (label) => <Link key={getKey("link")} to={label}>
+            <div key={getKey(label)} className="button greet m-1 p-15 color-yellow r-5 width-100-percent bg-dkGreen" onClick={this.siteNavClick}>
+                {label}
+            </div>
+        </Link>;
     displayMenu = (event) => {
         this.setState({
             menu: !this.state.menu,
@@ -51,10 +56,11 @@ class Header extends React.Component {
         'Reservation',
         'GuestList',
         'LogDirectory',
-        'SurfLog'
+        'SurfLog',
+        'Swell'
     ];
-    wideNav = (item) => this.navButton(item);
-    portraitNav = (item) => <div key={getKey("nav")}>{this.navButton(item)}</div>;
+    wideNav = (item) => this.landscapeButton(item);
+    portraitNav = (item) => <div key={getKey("nav")}>{this.portraitButton(item)}</div>;
 
     render() {
         const isWideScreen = (this.props.width >= 1080) ? true : false;
@@ -101,6 +107,8 @@ class Header extends React.Component {
                             
         const hamburgerNav = (this.state.menu === true) ? hamburgerOpen : hamburgerClosed;
         const getNavigation = (isWideScreen) ? navigation : hamburgerNav;
+        
+        console.log(`this.state.menu: ${this.state.menu}`);
         
         return (
             <div className="App-header">

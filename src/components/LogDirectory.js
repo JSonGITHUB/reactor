@@ -24,18 +24,12 @@ class LogDirectory extends React.Component {
     conditions = ["Firing", "Good", "Bad"];
     posts = new PostDirectory();
     items = () => this.posts.getDirectory();
-    getLogData = (logId) => {
-        if (localStorage.getItem(logId) === null) {
-          console.log(`${logId} is null`);
-          return false;
-        }
-        return JSON.parse(localStorage.getItem(logId));
-    }
+    
     sessions = () => this.items().map((item) => {
         const itemObj = JSON.parse(localStorage.getItem(item));
         
         if (itemObj !== null) {
-            console.log(`ITEM: ${item} ====> ${JSON.stringify(itemObj, null, 2)}`)
+            //console.log(`ITEM: ${item} ====> ${JSON.stringify(itemObj, null, 2)}`)
             const conditionsIndex = this.conditions.indexOf(itemObj.Conditions.Conditions);
             const conditions = this.conditions[conditionsIndex];
             const spot = itemObj.Location.Break;
@@ -45,7 +39,7 @@ class LogDirectory extends React.Component {
             const conditionDescription = itemObj.Conditions.Conditions;
             const condition = this.icons[conditionsIndex];
 
-            return <Link to={{
+            return <Link key={getKey("link")} to={{
                 pathname: '/SurfLog',
                 state: {
                 logId: {item}
@@ -72,7 +66,7 @@ class LogDirectory extends React.Component {
         return "";
     })
     render() {
-        console.log(`postssssss=>${JSON.stringify(this.posts.getDirectory(),null,2)}`)
+        //console.log(`postssssss=>${JSON.stringify(this.posts.getDirectory(),null,2)}`)
         return (
             <div className="App-content fadeIn">
                 <Dialog title="Log Directory" message="Review sessions">

@@ -10,6 +10,7 @@ import Calculator from './components/Calculator.js';
 import BowlBuilder from './components/BowlBuilder.js';
 import LogDirectory from './components/LogDirectory.js';
 import SurfLog from './components/Logger.js';
+import SlideShow from './components/SlideShow.js';
 import './assets/css/App.css';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 import ScrollToTop from './components/utils/ScrollToTop.js';
@@ -50,6 +51,7 @@ class App extends React.Component {
   
   render() {
     window.addEventListener('resize', debounce(this.setIt, 250));
+    /*
     const componentTag = (current) => <div className="App">
             <Header company={this.company} width={this.state.width} isMotionOn={this.state.isMotionOn}/>
               <div className="fadeIn">
@@ -57,8 +59,8 @@ class App extends React.Component {
               </div>
             <Footer isMotionOn={this.state.isMotionOn} setMotion={this.setMotion}/>
           </div>;
-
-    let AppComponent = () => componentTag(this.currentComponent);
+    */
+    //let AppComponent = () => componentTag(this.currentComponent);
     const logIdExists = (window.location.search.includes("logId")) ? true : false;
     const startIndex = () => window.location.search.indexOf("logId=")+6;
     const endIndex = () => window.location.search.length;
@@ -84,6 +86,7 @@ class App extends React.Component {
                   {/*<Route path="/SurfLog" component={SurfLog} />*/}
                   <Route path='/SurfLog' render={(props) => <SurfLog {...props} logId={logId} />}/>
                   <Route path="/LogDirectory" component={LogDirectory} />
+                  <Route path="/Swell" component={SlideShow} />
                 </Switch>
               </div>
             <Switch>

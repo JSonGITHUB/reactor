@@ -1,72 +1,23 @@
 import React from 'react';
 import LogEntry from './LogEntry.js';
 import Loader from './utils/Loader.js';
+import LogId from './LogId.js';
 class Logger extends React.Component {
 
-    templateData = {
-        Day: {
-            Date: "2020-01-17T08:00:00.000Z",
-            Day: 17,
-            Month: 1,
-            Year: 2020
-        },
-        Location: {
-            Break: "Notch"
-        },
-        Swell: {
-            Direction: "NW",
-            Height: "head high",
-            Report: "4ft"
-        },
-        Tide: {
-            Phase: "High => Low",
-            Height: "2ft"
-        },
-        Wind: {
-            Direction: "NW",
-            Orientation: "Offshore",
-            MPH: "5mph",
-            Surface: "Glassy"
-        },
-        Conditions: {
-            Conditions: "Firing"
-        },
-        Comments: {
-            "notes": "Biggest crowd but plenty of sick ones..."
-        }
-    };
-    generateNewLogId = () => {
-        const date = new Date()
-        const st = date.toDateString().replace(/ /g,"");
-        const nd = date.toLocaleTimeString().replace(/ /g,"");
-        //localStorage.setItem("lastPostId", `${st}${nd}`);
-        const newId = `${st}${nd}`;
-        console.log(`LogId: generateNewLogId => this.state.logId: ${newId}`);
-        /*
-        this.setState({
-            logId: newId
-        });
-        */
-        return newId;
-    }
-    getLocalLastRecordId = () => localStorage.getItem("lastPostId");
-    lastRecordIdExists = () => (this.getLocalLastRecordId() === null) ? false : true; 
-    lastRecordExists = () => (this.lastRecordIdExists() === true && localStorage.getItem(this.getLocalLastRecordId()) !== null) ? true : false
-    getLastRecordId = () => (localStorage.getItem("lastPostId") === null) ? this.generateNewLogId() : localStorage.getItem("lastPostId");
-    getLogId = () => (this.props.location.state === undefined || this.props.location.state === "") ? this.getLastRecordId() : this.props.location.state.logId.item;
-
+    logIdComponent = new LogId(this.props.logId);
+    
     constructor(props) {
         super(props);
-        console.log(`Logger => constructor -> props.logId: ${this.getLogId()}`)
-        console.log(`Logger => constructor -> localStorage.getItem: ${this.getLogId()} ====> ${localStorage.getItem(this.getLogId())}`)
-        if (localStorage.getItem(this.getLogId()) === null) {
-            this.log = this.templateData;
-            this.lodId = this.generateNewLogId();
+//        console.log(`Logger => constructor -> props.logId: ${this.logIdComponent.getLogId()}`)
+//        console.log(`Logger => constructor -> localStorage.getItem: ${this.logIdComponent.getLogId()} ====> ${localStorage.getItem(this.logIdComponent.getLogId())}`)
+        if (localStorage.getItem(this.logIdComponent.getLogId()) === null) {
+            this.log = this.logIdComponent.templateData;
+            this.lodId = this.logIdComponent.generateNewLogId();
         } else {
-            this.log = JSON.parse(localStorage.getItem(this.getLogId()));
-            this.logId = this.getLogId()
+            this.log = JSON.parse(localStorage.getItem(this.logIdComponent.getLogId()));
+            this.logId = this.logIdComponent.getLogId()
         }
-        console.log(`Logger => constructor -> log: ${JSON.stringify(this.log,null,2)}`)
+//        console.log(`Logger => constructor -> log: ${JSON.stringify(this.log,null,2)}`)
         this.state = {
             date: new Date(),
             log: this.log,
@@ -78,13 +29,24 @@ class Logger extends React.Component {
         this.getStateLog = this.getStateLog.bind(this);
     }
     componentDidMount() {
-        //const getLastId = () => (localStorage.getItem(localStorage.getItem("lastPostId")) === null) ? this.postDirectory[this.postDirectory.length-1] : localStorage.getItem("lastPostId");
-        //const logId = (this.props.location.state === undefined) ? getLastId() : this.props.location.state.logId.item;
+        //const logId = (this.props.location.state === undefined) ? this.logIdComponent.getLastRecordId() : this.props.location.state.logId.item;
+        //console.log(`Logger => componentDidMount -> this.props.location.state: ${JSON.stringify(this.props.location.state, null, 2)}`);
+        const logId = (this.props.location.state === undefined) ? this.logIdComponent.generateNewLogId() : this.props.location.state.logId.item;
         //console.log(`Logger => componentDidMount -> logId: ${logId}`)
+        if (localStorage.getItem(this.logIdComponent.getLogId()) === null) {
+            this.log = this.logIdComponent.templateData;
+            this.lodId = this.logIdComponent.generateNewLogId();
+        } else {
+            this.log = JSON.parse(localStorage.getItem(this.logIdComponent.getLogId()));
+            this.logId = this.logIdComponent.getLogId()
+        }
+//        console.log(`Logger => constructor -> log: ${JSON.stringify(this.log,null,2)}`)
+        
         let data;
         const returnJSON = (response) => response.json();
         const returnRejection = (response) => Promise.reject({status: response.status, data});
         const validate = (response) => (response.ok) ? returnJSON(response) : returnRejection(response);
+        /*
         const requestInit = {
             method:'GET',
             headers: {
@@ -93,6 +55,7 @@ class Logger extends React.Component {
             mode: 'cors',
             cache: 'default'
         };
+        */
         //const uri = new Request('https://jsongithub.github.io/portfolio/assets/data/appData.json', requestInit);
         //GOOD const uri = 'https://jsongithub.github.io/portfolio/assets/data/appData.json';
         const uri = 'https://jsongithub.github.io/portfolio/assets/data/appData.json';
@@ -103,7 +66,8 @@ class Logger extends React.Component {
                 this.setState({
                     isLoaded: true,
                     items: data,
-                    logId: this.getLogId()
+                    //logId: this.logIdComponent.getLogId()
+                    logId: logId
                 })
             })
             .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
@@ -133,7 +97,8 @@ class Logger extends React.Component {
                 <div className="flex3Column"></div>
                 <div className="flex3Column">
                     <LogEntry
-                        logId={this.getLogId()}
+                       // logId={this.logIdComponent.getLogId()}
+                        logId={this.state.logId}
                         onChange={this.updateLog} 
                         getStateLog={this.getStateLog} 
                         title="Session Log" 
