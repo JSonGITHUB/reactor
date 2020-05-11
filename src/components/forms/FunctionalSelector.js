@@ -9,12 +9,14 @@ function FormSelector(props) {
     const groupTitle = props.groupTitle;
     const select = props.selected;
     let selected = select;
-    const tagSelected = (item) => <option selected key={getKey(item)} value={item.toString()}>{item}</option>;
+    const setSelected = (item) => {
+        selected = item;
+        return tag(item)
+    }
+    //const tagSelected = (item) => <option selected key={getKey(item)} value={item.toString()}>{item}</option>;
     const tag = (item) => <option key={getKey(item)} value={item.toString()}>{item}</option>;
-    const getTag = (item, index) => (Number(index) === Number(select)) ? tagSelected(item) : tag(item);
-    const selectItems = items.map((item, index) =>
-        getTag(item,index)
-    );
+    const getTag = (item, index) => (Number(index) === Number(select)) ? setSelected(item) : tag(item);
+    const selectItems = items.map((item, index) => getTag(item,index));
     const handleChange = (event) => {
         selected = event.target.value;
         //this.setState({value: e.target.value});
@@ -23,7 +25,7 @@ function FormSelector(props) {
 
     return (
         <label>    
-            <select onChange={handleChange}>
+            <select value={selected} onChange={handleChange}>
                 {selectItems}
             </select>
         </label>
