@@ -1,5 +1,5 @@
 import React from 'react';
-import FormEssay from './components/forms/FormEssay.js';
+import FormNotes from './components/forms/FormEssay.js';
 import Reservation from './components/forms/FormReservation.js';
 import SignUpDialog from './components/utils/SignUpDialog.js';
 import debounce from './components/utils/Debouncer.js';
@@ -43,7 +43,7 @@ class App extends React.Component {
     surflog: <SurfLog />,
     guestlist: <SignUpDialog title="Guest List" message="Sign up" />,
     reservation: <Reservation />,
-    essay: <FormEssay className='mt-40' />,
+    notes: <FormNotes className='mt-40' />,
     tempconverter: <Calculator />,
     bowlbuilder: <BowlBuilder />,
     home: <Home />
@@ -80,7 +80,7 @@ class App extends React.Component {
                   <Route path="/Home" component={Home} />
                   <Route path="/BowlBuilder" component={BowlBuilder} />
                   <Route path="/TempConverter" component={Calculator} />
-                  <Route path="/Essay" component={FormEssay} />
+                  <Route path="/Notes" component={FormNotes} />
                   <Route path="/Reservation" component={Reservation} />
                   <Route path="/GuestList" component={SignUpDialog} />
                   {/*<Route path="/SurfLog" component={SurfLog} />*/}
