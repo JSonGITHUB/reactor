@@ -52,7 +52,7 @@ class Header extends React.Component {
         'Home',
         'BowlBuilder',
         'TempConverter',
-        'Essay',
+        'Notes',
         'Reservation',
         'GuestList',
         'LogDirectory',

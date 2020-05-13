@@ -18,12 +18,12 @@ class FormEssay extends React.Component {
     }
 
     handleSubmit(event) {
-        //alert('An essay was submitted: ' + this.state.value);
+        //alert('Note was submitted: ' + this.state.value);
         localStorage.setItem("notes", this.state.value);
         event.preventDefault();
     }
     clear(event) {
-        //alert('An essay was submitted: ' + this.state.value);
+        //alert('Note was cleared: ' + this.state.value);
         localStorage.setItem("notes", "");
         this.setState({value: ""});
     }
@@ -38,8 +38,8 @@ class FormEssay extends React.Component {
                             <textarea rows="13" cols={window.innerWidth/15} className="mb-30" value={this.state.value} onChange={this.handleChange} />
                         </label><br/>
                         <div className="flexContainer">
-                            <input type="submit" value="Submit" className="flex2Column greet p-20 r-10 w-200 bg-green brdr-green"/>
-                            <div value="Submit" className="flex2Column button greet p-20 r-10 w-200 bg-red brdr-red" onClick={() => this.clear()}>clear</div>
+                            <input type="submit" value="Submit" className="flex2Column greet p-20 r-10 width-100-percent bg-green brdr-green"/>
+                            <div value="Submit" className="flex2Column button greet p-20 r-10 width-100-percent bg-red brdr-red" onClick={() => this.clear()}>clear</div>
                         </div>
                     </form>
                 </div>
