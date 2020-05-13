@@ -263,6 +263,11 @@ select {
   border-style: outset;
   border-color: #ff0000;
 }
+.brdr-light {
+  border: 1px;
+  border-style: outset;
+  border-color: #cccccc;
+}
 input {
   border-radius: 3px;
   /*
@@ -454,6 +459,14 @@ body {
 }
 .r-10 {
   border-radius: 10px;
+}
+.r-10-rt {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+.r-10-lft {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
 }
 .r-5 {
   border-radius: 5px;
@@ -769,6 +782,32 @@ input.error {
 }
 .App-link {
   color: #00FF00;
+}
+.noUnderline {
+  text-decoration:none;
+}
+.myButton {
+	box-shadow:inset 0px 1px 0px 0px #fff6af;
+	background:linear-gradient(to bottom, #ffec64 5%, #ffab23 100%);
+	background-color:#ffec64;
+	border-radius:5px;
+	border:1px solid #ffaa22;
+	cursor:pointer;
+	color:#333333;
+	font-family:Arial;
+	font-size:15px;
+	font-weight:bold;
+	text-decoration:none;
+  text-shadow:0px 1px 0px #ffee66;
+  opacity: .9;
+}
+.myButton:hover {
+	background:linear-gradient(to bottom, #ffab23 5%, #ffec64 100%);
+	background-color:#ffab23;
+}
+.myButton:active {
+	position:relative;
+	top:1px;
 }
 @keyframes topReveal {
   from { top: -500px }

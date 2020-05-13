@@ -1,14 +1,14 @@
 import React from 'react';
 
-export function UserGreeting(props) {
-    return <div className="greet p-5">Welcome back {props.user}!</div>;
-}
+const UserGreeting = props => <div className="greet p-5">
+                                Welcome back {props.user}!
+                            </div>;
   
-export function GuestGreeting(props) {
-    return <div className="greet p-5">Sign up...</div>;
-}
+const GuestGreeting = () => <div className="greet p-5">
+                                Sign up...
+                            </div>;
 
-export default function Greeting(props) {
+const Greeting = props => {
     const isLoggedIn = props.isLoggedIn;
     const user = props.user;
     if (isLoggedIn) {
@@ -16,3 +16,5 @@ export default function Greeting(props) {
     }
     return <GuestGreeting user={user}/>;
 }
+
+export default Greeting;

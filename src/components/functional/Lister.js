@@ -3,7 +3,7 @@ import React from 'react';
 
 //<Lister items={[1,2,3]} />
 
-function Lister(props) {
+const Lister = props => {
     const items = props.items;
     const listItems = items.map((number) =>
         <li key={number.toString()}>{number}</li>

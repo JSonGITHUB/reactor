@@ -27,6 +27,7 @@ class PostDirectory extends React.Component {
     getDirectory = () => this.postDirectory;
     removeLastId = () => this.postDirectory.pop();
     deleteLast = () => {
+        console.log(`PostDirectory => deleteLast()`)
         this.postDirectory = this.removeLastId();
         localStorage.setItem("postDirectory", JSON.stringify(this.postDirectory))
         this.setState({
@@ -34,6 +35,7 @@ class PostDirectory extends React.Component {
         }); 
     }
     add = (id) => {
+        console.log(`PostDirectory => add(${id})`);
         this.postDirectory.push(id);
         localStorage.setItem("postDirectory", JSON.stringify(this.postDirectory))
         /*
@@ -43,6 +45,7 @@ class PostDirectory extends React.Component {
         */
     }
     delete = (id) => {
+        console.log(`PostDirectory => delete(${id})`)
         const index = this.postDirectory.indexOf(String(id));
         console.log(`${index} of ${this.postDirectory.length}`)
         this.postDirectory.splice(index, 1);

@@ -39,13 +39,13 @@ class LogDirectory extends React.Component {
             const conditionDescription = itemObj.Conditions.Conditions;
             const condition = this.icons[conditionsIndex];
 
-            return <Link key={getKey("link")} to={{
+            return <Link className="noUnderline" key={getKey("link")} to={{
                 pathname: '/SurfLog',
                 state: {
                 logId: {item}
                 }
             }}>
-                <div key={getKey("log")} className="flexContainer button bold color-yellow pointer greet m-1 r-10 completedSelector bg-green" onClick={() => this.sessionClick(item)}>
+                <div key={getKey("log")} className="flexContainer button color-graphite pointer greet m-1 r-5 incompletedSelector bold bg-yellow myButton" onClick={() => this.sessionClick(item)}>
                         <div className="flexOneFourthColumn p-10">
                             {/*<img src={this.condition(item)} alt={item} className='shaka' />*/}
                             <img src={condition} alt={conditionDescription} className='shaka' />

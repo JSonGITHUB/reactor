@@ -30,7 +30,7 @@ class Header extends React.Component {
                 {label}
             </div>
         </Link>;
-    portraitButton = (label) => <Link key={getKey("link")} to={label}>
+    portraitButton = (label) => <Link className="noUnderline" key={getKey("link")} to={label}>
             <div key={getKey(label)} className="button greet m-1 p-15 color-yellow r-5 width-100-percent bg-dkGreen" onClick={this.siteNavClick}>
                 {label}
             </div>

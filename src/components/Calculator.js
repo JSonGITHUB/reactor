@@ -1,7 +1,7 @@
 //stateful component
 import React from 'react';
 import TemperatureInput from './TemperatureInput';
-import BoilingVerdict from './BoilingVerdict';
+import BoilingVerdict, {tryConvert, toCelsius, toFahrenheit} from './BoilingVerdict';
 
 class Calculator extends React.Component {
 
@@ -21,11 +21,10 @@ class Calculator extends React.Component {
     }
 
     render() {
-        const boilingVerdict = new BoilingVerdict({'celsius': ''});
         const scale = this.state.scale;
         const temperature = this.state.temperature;
-        const celsius = scale === 'f' ? boilingVerdict.tryConvert(temperature, boilingVerdict.toCelsius) : temperature;
-        const fahrenheit = scale === 'c' ? boilingVerdict.tryConvert(temperature, boilingVerdict.toFahrenheit) : temperature;
+        const celsius = scale === 'f' ? tryConvert(temperature, toCelsius) : temperature;
+        const fahrenheit = scale === 'c' ? tryConvert(temperature, toFahrenheit) : temperature;
         return (
             <div className="p-20 App-content fadeIn">
                 {/*<div className="p-20 neumorphism">*/}
