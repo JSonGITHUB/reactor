@@ -1,18 +1,20 @@
 import React from 'react';
 
-export function UserGreeting(props) {
-    return <h1>Welcome back!</h1>;
-}
+const UserGreeting = () => <h1>Welcome back!</h1>;
 
-export function GuestGreeting(props) {
-    return <h1>Please sign up.</h1>;
-}
+const GuestGreeting = () => <h1>Please sign up.</h1>;
 
-export function Greeting(props) {
+const Greeting = props => {
     const isLoggedIn = props.isLoggedIn;
     console.log(`isLoggedIn: ${isLoggedIn}`)
     if (isLoggedIn === true) {
         return <UserGreeting />;
     }
     return <GuestGreeting />;
+}
+
+export {
+    Greeting, 
+    GuestGreeting, 
+    UserGreeting,
 }

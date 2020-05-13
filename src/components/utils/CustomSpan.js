@@ -1,11 +1,10 @@
 import React from 'react';
 
-export function ColorizedSpan(props) {
-    console.log(`ColorizedSpan: ${props.text}`)
-    return <span className={props.colorClass}>{props.text}</span>;
-}
+const ColorizedSpan = props => <span className={props.colorClass}>
+                                    {props.text}
+                                </span>
 
-export default function CustomSpan(props) {
+const CustomSpan = props => {
     const colors = ["color-green", "color-yellow", "color-red"];
     let colorIndex = -1;
     const getNextIndex = () => { 
@@ -15,3 +14,5 @@ export default function CustomSpan(props) {
     let output = <ColorizedSpan  colorClass={colors[getNextIndex()]} text={props.text}/>
     return output;
 }
+
+export default CustomSpan;

@@ -267,17 +267,17 @@ class LogEntry extends React.Component {
             //console.log(`this.state.date: ${getStateDate()}`)
             //console.log(`this.state.log: ${JSON.stringify(this.state.log, null,2)}`)
             //console.log(`this.lastPostId: ${this.lastPostId}`)
-            return <div>
-                <div className='mb-5 subHeader color-yellow'>Date</div>
-                <div className='flexContainer width-100-percent bg-vdkGreen'>
-                    <DatePicker
-                        onChange={this.onDateChange}
-                        value={getDate()} 
-                        //value={getTodaysDate()} 
-                        className='p-vw bg-green flex3Column r-vw m-vw'
-                    /><br/>
-                </div>
-            </div>
+            return <React.Fragment>
+                        <div className='mb-5 subHeader color-yellow'>Date</div>
+                        <div className='flexContainer width-100-percent bg-vdkGreen'>
+                            <DatePicker
+                                onChange={this.onDateChange}
+                                value={getDate()} 
+                                //value={getTodaysDate()} 
+                                className='p-vw bg-green flex3Column r-vw m-vw'
+                            /><br/>
+                        </div>
+                    </React.Fragment>
     }
     
     render() {
@@ -291,21 +291,21 @@ class LogEntry extends React.Component {
                     
                     <div className="mb-5">Additional Comments: </div>
                     <textarea rows="10" cols={window.innerWidth/15} value={this.state.log.Comments.notes} onChange={this.updateNotes} className="mt-10 greet p-10 r-10 brdr-green"/><br/><br/>
-                    <Link
+                    <Link className="noUnderline color-black"
                         to="/LogDirectory"
                         onClick={() => this.handleSubmit()}>
                         <div onClick={this.handleSubmit} className="button m-1 greet p-20 r-10 bg-green brdr-green">
                             {this.buttonLabel}
                         </div>
                     </Link> 
-                    <Link
+                    <Link className="noUnderline color-black"
                         to="/LogDirectory"
                         onClick={() => this.handleSave()}>
                         <div className="button m-1 greet p-20 r-10 bg-yellow brdr-yellow">
                             save
                         </div>
                     </Link>
-                    <Link
+                    <Link className="noUnderline color-black"
                         to="/LogDirectory"
                         onClick={() => this.handleDelete()}>
                         <div  className="button m-1 greet p-20 r-10 bg-red brdr-red">
