@@ -35,8 +35,6 @@ class Geolocate extends React.Component {
                 <Loader isMotionOn={this.props.isMotionOn}/>
             </div>;
     latlon = () => this.state.latitude + "," + this.state.longitude;
-    imageUrl = () => "https://maps.googleapis.com/maps/api/staticmap?center="+
-                 this.latlon()+"&zoom=14&size=400x300&sensor=false&key=AIzaSyCeOrNWv3lqS4nF4h8ohlHgOAygDNCyIUw";
     
     render() {
         const errorExists = (this.state.errorMessage) ? true : false;
