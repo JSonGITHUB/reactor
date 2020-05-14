@@ -22,7 +22,6 @@ function FormSelector(props) {
         //this.setState({value: e.target.value});
         props.onChange(groupTitle, label, selected);
     }
-
     return (
         <label>    
             <select value={selected} onChange={handleChange}>

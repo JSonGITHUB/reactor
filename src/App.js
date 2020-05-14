@@ -66,6 +66,8 @@ class App extends React.Component {
     const endIndex = () => window.location.search.length;
     const getLogId = () => window.location.search.substring(startIndex(), endIndex());
     const logId = (logIdExists) ? getLogId() : "";
+    const height = this.state.height;
+    const width = this.state.width;
      return (
       //AppComponent();
       <Router basename={this.base}>
@@ -78,7 +80,8 @@ class App extends React.Component {
                 <Switch>
                   <Route exact path="/" exact component={Home} />
                   <Route path="/Home" component={Home} />
-                  <Route path="/BowlBuilder" component={BowlBuilder} />
+                  {/*<Route path="/BowlBuilder" component={BowlBuilder} />*/}
+                  <Route path='/BowlBuilder' render={(props) => <BowlBuilder {...props} width={width} height={height} />}/>
                   <Route path="/TempConverter" component={Calculator} />
                   <Route path="/Notes" component={FormNotes} />
                   <Route path="/Reservation" component={Reservation} />

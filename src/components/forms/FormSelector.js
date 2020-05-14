@@ -62,7 +62,7 @@ class SelectorForm extends React.Component {
         return (
             <form onSubmit={this.handleSubmit} className="neumorphism p-20 mb-30">
                 {this.state.header}<br/><br/>
-                <textarea id="ingredients" rows="11" cols={window.innerWidth/15} className="mb-20" value={this.state.bowlIngredients} /><br/>
+                <textarea id="ingredients" rows="11" cols={this.props.width/15} className="mb-20" value={this.state.bowlIngredients} /><br/>
                 <label>
                     <div className="p-20 bg-yellow r-10 mb-10">
                         <span className="greet color-black bold">select: </span>
@@ -71,9 +71,9 @@ class SelectorForm extends React.Component {
                         </select>
                     </div>
                 </label>
-                <span>
-                    <input type="submit" value="add" onClick={this.add} className="bold greet p-20 r-10 w-200 bg-green brdr-green"/>
-                    <input type="submit" value="remove" onClick={this.remove} className="bold greet ml-2 p-20 r-10 w-200 bg-red brdr-red"/>
+                <span  className="flexContainer">
+                    <input type="submit" value="add" onClick={this.add} className="flex2Column bold greet p-20 r-10 width-100-percent bg-green brdr-green"/>
+                    <input type="submit" value="remove" onClick={this.remove} className="flex2Column bold greet ml-2 p-20 r-10 width-100-percent bg-red brdr-red"/>
                 </span>
             </form>
         );
