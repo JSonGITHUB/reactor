@@ -49,7 +49,7 @@ function FormSelector(props) {
     return (
         <form onSubmit={handleSubmit} className="neumorphism p-20 mb-30">
             {label}<br/><br/>
-            <textarea id="bowl" rows="11" cols={window.innerWidth/15} className="mb-20" value={bowlIngredients} onChange={showBowlIngredients} /><br/>
+            <textarea id="bowl" rows="11" cols={props.width/15} className="mb-20" value={bowlIngredients} onChange={showBowlIngredients} /><br/>
             <label>
                 <div className="p-20 bg-yellow r-10 mb-10">
                     <span className="greet color-black bold">select: </span>
@@ -58,9 +58,9 @@ function FormSelector(props) {
                     </select>
                 </div>
             </label>
-            <span>
-                <input type="submit" value="add" className="bold greet p-20 r-10 w-200 bg-green brdr-green" onClick={add}/>
-                <input type="submit" value="remove" className="bold greet ml-2 p-20 r-10 w-200 bg-red brdr-red" onClick={remove}/>
+            <span className="flexContainer">
+                <input type="submit" value="add" className="flex2Column bold greet p-20 r-10 width-100-percent bg-green brdr-green" onClick={add}/>
+                <input type="submit" value="remove" className="flex2Column bold greet ml-2 p-20 r-10 width-100-percent bg-red brdr-red" onClick={remove}/>
             </span>
         </form>
     );
