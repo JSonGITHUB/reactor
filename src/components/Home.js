@@ -1,6 +1,6 @@
 import React from 'react';
 import Timer from './Timer.js';
-import Geolocator from './utils/Geolocator.js'
+import Geolocator from './utils/Geolocator.js';
 
 class Home extends React.Component {
     
@@ -17,7 +17,8 @@ class Home extends React.Component {
                     </a>
                     {/*<Lister items={[1,2,3]} />*/}
                     <Timer/>
-                    <Geolocator/>
+                    Current position:<br/>
+                    <Geolocator />
                 </header>
             </div>
         );
