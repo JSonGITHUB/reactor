@@ -10,6 +10,7 @@ import Calculator from './components/Calculator.js';
 import BowlBuilder from './components/BowlBuilder.js';
 import LogDirectory from './components/LogDirectory.js';
 import SurfLog from './components/Logger.js';
+import SpotPicker from './components/SpotPicker.js';
 import SlideShow from './components/SlideShow.js';
 import './assets/css/App.css';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
@@ -88,6 +89,7 @@ class App extends React.Component {
                   <Route path="/GuestList" component={SignUpDialog} />
                   {/*<Route path="/SurfLog" component={SurfLog} />*/}
                   <Route path='/SurfLog' render={(props) => <SurfLog {...props} logId={logId} />}/>
+                  <Route path='/SpotPicker' render={(props) => <SpotPicker {...props} tide="medium" swellDirection="NW" windDirection="W" />}/>
                   <Route path="/LogDirectory" component={LogDirectory} />
                   <Route path="/Swell" component={SlideShow} />
                 </Switch>
