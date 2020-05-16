@@ -6,6 +6,9 @@
   text-align: center;
   justify-content: center;
 }
+.maxWidth400{
+  max-width: 400px;
+}
 .w-200 {
   width: 200px;
 }
@@ -237,6 +240,11 @@ select {
   justify-content: left;
   align-items: left;
   text-align: left;
+}
+.columnRight {
+  justify-content: right;
+  align-items: right;
+  text-align: right;
 }
 .completedSelector {
   border: 1px;

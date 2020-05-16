@@ -635,7 +635,7 @@
     "latitude": 28.706507,
     "longitude": -114.288678,
     "swell": ["W", "WNW", "NW"],
-    "wind": ["N","NE", "E", "NW"],
+    "wind": ["N", "NE", "E", "NW"],
     "tide": ["high", "medium", "low"]
 },
 {

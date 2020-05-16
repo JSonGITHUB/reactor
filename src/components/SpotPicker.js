@@ -4,14 +4,19 @@ import Geolocator from './utils/Geolocator.js';
 import Selector from './forms/FunctionalSelector.js';
 
 class SpotPicker extends React.Component {
-
+    
     constructor(props) {
         super(props);
+        const getLocal = (item) => localStorage.getItem(item);
+        const getProps = (item) => props[item];
+        const getDefault = (item) => (getLocal(item) === null) ? getProps(item) : getLocal(item);
         this.state = {
+            pause: false,
             date: new Date(),
-            tide: props.tide,
-            swellDirection: props.swellDirection,
-            windDirection: props.windDirection,
+            tide: getDefault("tide"),
+            swellDirection: getDefault("swellDirection"),
+            windDirection: getDefault("windDirection"),
+            distance: getDefault("distance"),
             locations: [{
                 "name": "HB: 17th St.",
                 "latitude": 33.663781,
@@ -85,25 +90,9 @@ class SpotPicker extends React.Component {
                 "tide": ["medium"]
             },
             {
-                "name": "O-Side: Harbor Middles",
-                "latitude": 33.205139,
-                "longitude": -117.394813,
-                "swell": ["SSW", "SW", "W", "WNW", "SSE"],
-                "wind": ["E"],
-                "tide": ["medium"]
-            },
-            {
                 "name": "O-Side: Harbor South",
                 "latitude": 33.202483,
                 "longitude": -117.392796,
-                "swell": ["SSW", "SW", "W", "WNW"],
-                "wind": ["E", "NE"],
-                "tide": ["medium"]
-            },
-            {
-                "name": "O-Side: Jettie Southside",
-                "latitude": 33.201763,
-                "longitude": -117.392596,
                 "swell": ["SSW", "SW", "W", "WNW"],
                 "wind": ["E", "NE"],
                 "tide": ["medium"]
@@ -125,55 +114,7 @@ class SpotPicker extends React.Component {
                 "tide": ["medium"]
             },
             {
-                "name": "O-Side: Tyson",
-                "latitude": 33.190731,
-                "longitude": -117.381540,
-                "swell": ["SSW", "SW", "W", "WNW"],
-                "wind": ["E", "NE"],
-                "tide": ["medium"]
-            },
-            {
-                "name": "O-Side: Trenchtown",
-                "latitude": 33.186862,
-                "longitude": -117.378257,
-                "swell": ["SSW", "SW", "W", "WNW"],
-                "wind": ["E", "NE"],
-                "tide": ["medium"]
-            },
-            {
-                "name": "O-Side: Blvd",
-                "latitude": 33.181210,
-                "longitude": -117.373200,
-                "swell": ["SSW", "SW", "W", "WNW"],
-                "wind": ["E", "NE"],
-                "tide": ["medium"]
-            },
-            {
-                "name": "O-Side: Rock",
-                "latitude": 33.179439,
-                "longitude": -117.371792,
-                "swell": ["SSW", "SW", "W", "WNW"],
-                "wind": ["E", "NE"],
-                "tide": ["medium"]
-            },
-            {
-                "name": "O-Side: Poo Poos",
-                "latitude": 33.178651,
-                "longitude": -117.371036,
-                "swell": ["SSW", "SW", "W", "WNW"],
-                "wind": ["E", "NE"],
-                "tide": ["medium"]
-            },
-            {
-                "name": "C-Bad: Northend",
-                "latitude": 33.163313,
-                "longitude": -117.358294,
-                "swell": ["WNW", "W", "SW", "SSW"],
-                "wind": ["E", "NE"],
-                "tide": ["low", "medium"]
-            },
-            {
-                "name": "C-Bad: Southside",
+                "name": "Carlsbad",
                 "latitude": 33.144850,
                 "longitude": -117.343638,
                 "swell": ["WNW", "W", "SW", "SSW"],
@@ -181,25 +122,9 @@ class SpotPicker extends React.Component {
                 "tide": ["low", "medium"]
             },
             {
-                "name": "Ponto: North",
-                "latitude": 33.089705,
-                "longitude": -117.314392,
-                "swell": ["W", "NW", "SW"],
-                "wind": ["E", "NE"],
-                "tide": ["low", "medium"]
-            },
-            {
-                "name": "Ponto: Proper",
+                "name": "Ponto: Jetties",
                 "latitude": 33.086801,
                 "longitude": -117.313695,
-                "swell": ["W", "NW", "SW"],
-                "wind": ["E", "NE"],
-                "tide": ["low", "medium"]
-            },
-            {
-                "name": "Ponto: South",
-                "latitude": 33.085351,
-                "longitude": -117.312802,
                 "swell": ["W", "NW", "SW"],
                 "wind": ["E", "NE"],
                 "tide": ["low", "medium"]
@@ -213,15 +138,7 @@ class SpotPicker extends React.Component {
                 "tide": ["low", "medium"]
             },
             {
-                "name": "Sandbags",
-                "latitude": 33.076725,
-                "longitude": -117.310464,
-                "swell": ["W", "NW", "SW", "SSW", "WNW"],
-                "wind": ["E", "NE"],
-                "tide": ["low", "medium"]
-            },
-            {
-                "name": "Grandview: Proper",
+                "name": "Grandview",
                 "latitude": 33.076397,
                 "longitude": -117.310334,
                 "swell": ["W", "NW", "SW", "SSW", "WNW"],
@@ -229,23 +146,7 @@ class SpotPicker extends React.Component {
                 "tide": ["low", "medium"]
             },
             {
-                "name": "Avocados",
-                "latitude": 33.074587,
-                "longitude": -117.309660,
-                "swell": ["W", "NW", "SW", "SSW", "WNW"],
-                "wind": ["E", "NE"],
-                "tide": ["low", "medium"]
-            },
-            {
-                "name": "Beacons: North",
-                "latitude": 33.065709,
-                "longitude": -117.305491,
-                "swell": ["W", "NW", "SW", "SSW"],
-                "wind": ["E", "NE"],
-                "tide": ["low", "medium"]
-            },
-            {
-                "name": "Beacons: Out Front",
+                "name": "Beacons",
                 "latitude": 33.065118,
                 "longitude": -117.305518,
                 "swell": ["W", "NW", "SW", "SSW"],
@@ -253,43 +154,11 @@ class SpotPicker extends React.Component {
                 "tide": ["low", "medium"]
             },
             {
-                "name": "Beacons: Wall",
-                "latitude": 33.064475,
-                "longitude": -117.305172,
-                "swell": ["W", "NW", "SW", "SSW"],
-                "wind": ["E", "NE"],
-                "tide": ["low", "medium"]
-            },
-            {
-                "name": "D Street: North",
+                "name": "D Street",
                 "latitude": 33.046486,
                 "longitude": -117.298161,
                 "swell": ["W", "WNW", "NW", "SW"],
                 "wind": ["E", "NE"],
-                "tide": ["low", "medium"]
-            },
-            {
-                "name": "D Street: Diamond House",
-                "latitude": 33.044860,
-                "longitude": -117.297763,
-                "swell": ["W", "WNW", "NW", "SW"],
-                "wind": ["E", "NE"],
-                "tide": ["low", "medium"]
-            },
-            {
-                "name": "D Street: Hollywood Squares",
-                "latitude": 33.040801,
-                "longitude": -117.296827,
-                "swell": ["W", "WNW", "NW", "SW"],
-                "wind": ["E", "NE"],
-                "tide": ["low", "medium"]
-            },
-            {
-                "name": "Boneyards",
-                "latitude": 33.035698,
-                "longitude": -117.294805,
-                "swell": ["W", "NW"],
-                "wind": ["E"],
                 "tide": ["low", "medium"]
             },
             {
@@ -299,14 +168,6 @@ class SpotPicker extends React.Component {
                 "swell": ["W", "NW"],
                 "wind": ["E"],
                 "tide": ["low", "medium"]
-            },
-            {
-                "name": "Brown House",
-                "latitude": 33.029250,
-                "longitude": -117.289086,
-                "swell": ["W", "NW", "SW"],
-                "wind": ["E", "NE"],
-                "tide": ["low"]
             },
             {
                 "name": "Pipes",
@@ -325,57 +186,9 @@ class SpotPicker extends React.Component {
                 "tide": ["low"]
             },
             {
-                "name": "Barneys",
-                "latitude": 33.024607,
-                "longitude": -117.286618,
-                "swell": ["NW","W"],
-                "wind": ["E"],
-                "tide": ["low"]
-            },
-            {
-                "name": "Turtles",
-                "latitude": 33.024224,
-                "longitude": -117.286431,
-                "swell": ["NW","W"],
-                "wind": ["E"],
-                "tide": ["low"]
-            },
-            {
-                "name": "85s",
-                "latitude": 33.020604,
-                "longitude": -117.284885,
-                "swell": ["NW","W"],
-                "wind": ["E"],
-                "tide": ["low"]
-            },
-            {
-                "name": "Tippers",
-                "latitude": 33.017004,
-                "longitude": -117.282893,
-                "swell": ["NW","W"],
-                "wind": ["E"],
-                "tide": ["low"]
-            },
-            {
-                "name": "Suckouts",
-                "latitude": 33.016164,
-                "longitude": -117.282229,
-                "swell": ["NW","W"],
-                "wind": ["E"],
-                "tide": ["low"]
-            },
-            {
                 "name": "Cardiff Reef",
                 "latitude": 33.015631,
                 "longitude": -117.282085,
-                "swell": ["NW","W"],
-                "wind": ["E"],
-                "tide": ["low", "medium"]
-            },
-            {
-                "name": "Cardiff Reef South",
-                "latitude": 33.014520,
-                "longitude": -117.281458,
                 "swell": ["NW","W"],
                 "wind": ["E"],
                 "tide": ["low", "medium"]
@@ -389,22 +202,6 @@ class SpotPicker extends React.Component {
                 "tide": ["low"]
             },
             {
-                "name": "Bus Stops",
-                "latitude": 33.004533,
-                "longitude": -117.278871,
-                "swell": ["NW","W"],
-                "wind": ["E"],
-                "tide": ["low"]
-            },
-            {
-                "name": "P-Lots",
-                "latitude": 33.002792,
-                "longitude": -117.278704,
-                "swell": ["NW","W"],
-                "wind": ["E"],
-                "tide": ["low"]
-            },
-            {
                 "name": "Seaside Reef",
                 "latitude": 33.001613,
                 "longitude": -117.278393,
@@ -413,39 +210,7 @@ class SpotPicker extends React.Component {
                 "tide": ["low"]
             },
             {
-                "name": "Palis",
-                "latitude": 33.000762,
-                "longitude": -117.278478,
-                "swell": ["NW","W"],
-                "wind": ["E"],
-                "tide": ["low"]
-            },
-            {
-                "name": "Tabletops",
-                "latitude": 32.999399,
-                "longitude": -117.278167,
-                "swell": ["NW","W"],
-                "wind": ["E"],
-                "tide": ["low"]
-            },
-            {
-                "name": "Cherry Hill",
-                "latitude": 32.985469,
-                "longitude": -117.273486,
-                "swell": ["NW","W"],
-                "wind": ["E"],
-                "tide": ["low"]
-            },
-            {
-                "name": "Rock Piles",
-                "latitude": 32.982007,
-                "longitude": -117.273340,
-                "swell": ["NW","W"],
-                "wind": ["E"],
-                "tide": ["low"]
-            },
-            {
-                "name": "Del Mar Rivermouth",
+                "name": "Del Mar",
                 "latitude": 32.976395,
                 "longitude": -117.270974,
                 "swell": ["SW", "W", "NW"],
@@ -453,65 +218,9 @@ class SpotPicker extends React.Component {
                 "tide": ["low", "medium", "high"]
             },
             {
-                "name": "Del Mar: 29th",
-                "latitude": 32.972089,
-                "longitude": -117.269942,
-                "swell": ["SW", "W", "NW"],
-                "wind": ["E"],
-                "tide": ["medium", "high"]
-            },
-            {
-                "name": "Del Mar: 19th",
-                "latitude": 32.964523,
-                "longitude": -117.268745,
-                "swell": ["SW", "W", "NW"],
-                "wind": ["E"],
-                "tide": ["medium", "high"]
-            },
-            {
-                "name": "Del Mar: 15th",
-                "latitude": 32.958995,
-                "longitude": -117.268398,
-                "swell": ["SW", "W", "NW"],
-                "wind": ["E"],
-                "tide": ["low", "medium", "high"]
-            },
-            {
-                "name": "Del Mar: 11th",
-                "latitude": 32.954491,
-                "longitude": -117.267320,
-                "swell": ["SW", "W", "NW"],
-                "wind": ["E"],
-                "tide": ["low", "medium", "high"]
-            },
-            {
-                "name": "Del Mar: 8th",
-                "latitude": 32.951322,
-                "longitude": -117.266138,
-                "swell": ["SW", "W", "NW"],
-                "wind": ["E"],
-                "tide": ["low", "medium", "high"]
-            },
-            {
-                "name": "Del Mar: The Mouse Hole",
-                "latitude": 32.942317,
-                "longitude": -117.262772,
-                "swell": ["SW", "W", "NW"],
-                "wind": ["E"],
-                "tide": ["low", "medium", "high"]
-            },
-            {
-                "name": "Torrey Pines: North",
+                "name": "Torrey Pines",
                 "latitude": 32.938600,
                 "longitude": -117.261978,
-                "swell": ["SW", "WNW", "NW"],
-                "wind": ["NE", "E", "SE"],
-                "tide": ["medium", "high"]
-            },
-            {
-                "name": "Torrey Pines: South",
-                "latitude": 32.925971,
-                "longitude": -117.25968,
                 "swell": ["SW", "WNW", "NW"],
                 "wind": ["NE", "E", "SE"],
                 "tide": ["medium", "high"]
@@ -541,25 +250,9 @@ class SpotPicker extends React.Component {
                 "tide": ["medium"]
             },
             {
-                "name": "Mission Drive",
-                "latitude": 32.790505,
-                "longitude": -117.255297,
-                "swell": ["W", "NW", "SW"],
-                "wind": ["E", "S"],
-                "tide": ["medium"]
-            },
-            {
-                "name": "Mission: San Fernando",
+                "name": "Mission Beach",
                 "latitude": 32.767649,
                 "longitude": -117.252731,
-                "swell": ["W", "NW", "SW"],
-                "wind": ["E", "S"],
-                "tide": ["medium"]
-            },
-            {
-                "name": "South Mission Jetti",
-                "latitude": 32.759582,
-                "longitude": -117.254073,
                 "swell": ["W", "NW", "SW"],
                 "wind": ["E", "S"],
                 "tide": ["medium"]
@@ -589,7 +282,7 @@ class SpotPicker extends React.Component {
                 "tide": ["medium"]
             },
             {
-                "name": "Loscombs",
+                "name": "Sunset Cliffs",
                 "latitude": 32.725570,
                 "longitude": -117.258111,
                 "swell": ["W", "NW", "SW"],
@@ -597,15 +290,7 @@ class SpotPicker extends React.Component {
                 "tide": ["medium"]
             },
             {
-                "name": "Rosarito: Pemex Smoke Stacks",
-                "latitude": 32.370379,
-                "longitude": -117.076403,
-                "swell": ["S", "SW"],
-                "wind": ["E"],
-                "tide": ["medium"]
-            },
-            {
-                "name": "Rosarito: Peir",
+                "name": "Rosarito",
                 "latitude": 32.333760,
                 "longitude": -117.056838,
                 "swell": ["S", "SW"],
@@ -685,22 +370,6 @@ class SpotPicker extends React.Component {
                 "tide": ["high", "medium"]
             },
             {
-                "name": "Abreojos: 3 pole",
-                "latitude": 26.727440,
-                "longitude": -113.545537,
-                "swell": ["S"],
-                "wind": ["N", "NE"],
-                "tide": ["high", "medium"]
-            },
-            {
-                "name": "Abreojos: Razors",
-                "latitude": 26.728834,
-                "longitude": -113.546288,
-                "swell": ["S"],
-                "wind": ["N", "NE"],
-                "tide": ["high", "medium"]
-            },
-            {
                 "name": "Scorpion Bay",
                 "latitude": 26.239488,
                 "longitude": -112.477709,
@@ -725,6 +394,10 @@ class SpotPicker extends React.Component {
                 "tide": ["high", "medium"]
             }]
         };
+        this.handleTideSelection = this.handleTideSelection.bind(this);
+        this.handleWindSelection = this.handleWindSelection.bind(this);
+        this.handleSwellSelection = this.handleSwellSelection.bind(this);
+        this.handleDistanceSelection = this.handleDistanceSelection.bind(this);
     }
     /*
     componentDidMount() {
@@ -757,9 +430,15 @@ class SpotPicker extends React.Component {
         clearInterval(this.timerID);
     }
     tick() {
-        this.setState({
-            date: new Date()
-        });
+        console.log(`this.state.pause: ${this.state.pause}`)
+        console.log(`this.state.tide: ${this.state.tide}`)
+        console.log(`this.state.swellDirection: ${this.state.swellDirection}`)
+        console.log(`this.state.windDirection: ${this.state.windDirection}`)
+        if (this.state.pause === false) {
+            this.setState({
+                date: new Date()
+            });
+        }
     }
     currentPositionExists = () => (this.state.longitude) ? true : false;
     updateCurrentLocation = (longitude, latitude) => {
@@ -769,16 +448,52 @@ class SpotPicker extends React.Component {
             latitude
         })
     }
-    handleSelection = (event) => console.log("Tide: " + event.value);
+    handleTideSelection = (groupTitle, label, selected) => {
+        localStorage.setItem("tide", selected);
+        this.setState({
+            pause: false,
+            tide: selected
+        })
+    }
+    handleSwellSelection = (groupTitle, label, selected) => {
+        localStorage.setItem("swellDirection", selected);
+        this.setState({
+            pause: false,
+            swellDirection: selected
+        })
+    }
+    handleWindSelection = (groupTitle, label, selected) => {
+        localStorage.setItem("windDirection", selected);
+        this.setState({
+            pause: false,
+            windDirection: selected
+        })
+    }
+    handleDistanceSelection = (groupTitle, label, selected) => {
+        localStorage.setItem("distance", selected);
+        this.setState({
+            pause: false,
+            distance: selected
+        })
+    }
+    pause = (event) => this.setState({
+        pause: true
+    })
     render() {
         console.log(`currentPositionExists: ${this.currentPositionExists()}`)
         const {locations, windDirection, swellDirection, tide} = this.state;
         const swellMatch = (item) => (item.swell.indexOf(swellDirection)>-1) ? true : false;
         const windMatch = (item) => (item.wind.indexOf(windDirection)>-1) ? true : false;
         const tideMatch = (item) => (item.tide.indexOf(tide)>-1) ? true : false;
+        const swellDirectionMatch = (direction) => (direction.swell === swellDirection) ? true : false;
+        const windDirectionMatch = (direction) => (direction.wind === windDirection) ? true : false;
+        const tideDirectionMatch = (direction) => (direction.tide === tide) ? true : false;
         const fixTo1 = (number) => Number(number).toFixed(1);
-        const distance = (loc, pos) => Math.abs(fixTo1(loc)-fixTo1(pos));
-        const regionMatch = (item) => (distance(item.latitude, this.state.latitude)<.15) ? true : false
+        //const distance = (loc, pos) => Math.abs(fixTo1(loc)-fixTo1(pos));
+        const distance = (loc, pos) => Math.abs(loc-pos);
+        //.01 - 1 mile
+        const distanceRange = (Number(this.state.distance) * .01);
+        const regionMatch = (item) => (distance(item.latitude, this.state.latitude)<distanceRange) ? true : false
             //console.log(`${fixTo1(item.latitudee)} === ${fixTo1(this.state.latitude)}`)
             //console.log(`${fixTo1(item.latitude)-fixTo1(this.state.latitude)}`)
             
@@ -794,7 +509,7 @@ class SpotPicker extends React.Component {
             //console.log(`${item.name} => matches: ${matches}`)
             return matches;
         }
-        const statusClass = (status) => (status === true) ? "color-neoGreen" : "color-red"; 
+        const statusClass = (status) => (status === true) ? "color-neogreen" : "color-red"; 
         const getMatchingLocation = (item) => {
             //console.log(item.description);
             if (match(item) > 1) {
@@ -802,11 +517,24 @@ class SpotPicker extends React.Component {
                 if (regionMatch(item)) {
                     //console.log(`Match ===> ${item.name}`)
                     count = count + 1;
-                    return <div key={getKey("loc")} className="incompletedSelector r-10 m-10 p-20">
-                            <div className="white bold">{item.name}</div><br/>
-                            <div className={statusClass(swellMatch(item))}>swell: {item.swell.map((swell) => `${swell}, `)}</div>
-                            <div className={statusClass(windMatch(item))}>wind: {item.wind.map((wind) => `${wind}, `)}</div>
-                            <div className={statusClass(tideMatch(item))}>tide: {item.tide.map((tide) => `${tide}, `)}</div>
+                    return <div key={getKey("loc")}>
+                            <div className="r-10 m-10 p-20 neumorphism">
+                                <div className="navBranding white bold">{item.name}</div>
+                                <div className="flexContainer">
+                                    <div className="flexContainer m-auto">
+                                        <div className="columnRight pr-10">
+                                            <div className="color-yellow bold">Swell: </div>
+                                            <div className="color-yellow bold">Wind: </div>
+                                            <div className="color-yellow bold">Tide: </div>
+                                        </div>
+                                        <div className="columnLeft">
+                                            <div className={statusClass(swellMatch(item))}>{item.swell.map((swell) => <span className={statusClass(swellDirectionMatch({swell}))}>{swell}, </span>)}</div>
+                                            <div className={statusClass(windMatch(item))}>{item.wind.map((wind) => <span className={statusClass(windDirectionMatch({wind}))}>{wind}, </span>)}</div>
+                                            <div className={statusClass(tideMatch(item))}>{item.tide.map((tide) => <span className={statusClass(tideDirectionMatch({tide}))}>{tide}, </span>)}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                 }
             }
@@ -817,22 +545,36 @@ class SpotPicker extends React.Component {
         const date = this.state.date.toLocaleTimeString();
         const time = date.replace(" ","").toLocaleLowerCase();
         return (  
-            <div className="color-neogreen">
+            <div className="color-neogreen pointer" onMouseDown={this.pause}>
                 {time}<br/>
                 Current position:<br/>
                 <Geolocator currentPositionExists={this.currentPositionExists} returnCurrentPosition={this.updateCurrentLocation}/><br/>
-                Wind: {this.props.windDirection}<br/>
-                Swell: {this.props.swellDirection}<br/>
-                Tide: {this.props.tide}<br/><br/>
-                {/*<Selector 
+                Wind: <Selector
+                    groupTitle="Wind" 
+                    selected={this.state.windDirection} 
+                    label="Direction"
+                    items={["W", "WSW", "WNW", "E", "ESE", "ENE", "N", "NE", "NNE", "NW", "NNW", "S", "SE", "SSE", "SW", "SSW"]}
+                    onChange={this.handleWindSelection}
+                /> - Swell: <Selector
+                    groupTitle="Swell"
+                    selected={this.state.swellDirection} 
+                    label="Direction" 
+                    items={["W", "WSW", "WNW", "E", "ESE", "ENE", "N", "NE", "NNE", "NW", "NNW", "S", "SE", "SSE", "SW", "SSW"]}
+                    onChange={this.handleSwellSelection}
+                /> - Tide: <Selector 
                     groupTitle="Tide"
-                    selected={this.props.tide} 
+                    selected={this.state.tide} 
                     label="current" 
-                    items=["low", "medium", "hign"]
-                    onChange={this.handleSelection}
+                    items={["low", "medium", "hign"]}
+                    onChange={this.handleTideSelection}
+                /> - Miles: <Selector 
+                    groupTitle="Distance"
+                    selected={this.state.distance} 
+                    label="miles" 
+                    items={[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50]}
+                    onChange={this.handleDistanceSelection}
                 />
-                */}
-                <div className="white">{count} waves in 15 mile radius best for {this.props.swellDirection} swell and {this.props.tide} tide:</div>
+                <div className="white mt-20 mb-20"><span className="color-neogreen bold">{count} waves</span> out of {locations.length} are in a <span className="color-neogreen bold">15 mile radius</span> and prefer <span className="color-neogreen bold">{this.state.swellDirection} swell with {this.state.tide} tide</span>:</div>
                 {/*locations.map((item) => getMatchingLocation(item))*/}
                 {getLocations}
             </div>         
@@ -841,3 +583,6 @@ class SpotPicker extends React.Component {
     
 }
 export default SpotPicker;
+
+
+
