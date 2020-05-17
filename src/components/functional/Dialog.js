@@ -14,7 +14,7 @@ const Dialog = props => (
 );
 
 const FancyBorder = props => (
-    <div className="p-20">
+    <div>
         {props.children}
     </div>
 );
