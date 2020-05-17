@@ -56,9 +56,7 @@ class Geolocate extends React.Component {
             }
         }
         */
-        return <div>
-                <div className="color-yellow greet">{gelocationStatus}</div>
-            </div>
+        return <div className="color-yellow greet">{gelocationStatus}</div>
     };
 }
 
