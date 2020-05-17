@@ -535,7 +535,7 @@ class WaveFinder extends React.Component {
                         <br/>
                         <div className="bg-darker p-15 r-10 m-5">
                             <div className="flexContainer">
-                                <div className="flexOneFourthColumn bg-dkYellow r-10 m-1 p-15">
+                                <div className="flex3Column bg-dkYellow r-10 m-5 p-15">
                                     Wind:<br/>
                                     <Selector
                                         groupTitle="Wind" 
@@ -545,7 +545,7 @@ class WaveFinder extends React.Component {
                                         onChange={this.handleWindSelection}
                                     />
                                 </div>
-                                <div className="flexOneFourthColumn bg-dkYellow r-10 m-1 p-15">
+                                <div className="flex3Column bg-dkYellow r-10 m-5 p-15">
                                     Swell:<br/>
                                     <Selector
                                         groupTitle="Swell"
@@ -555,7 +555,7 @@ class WaveFinder extends React.Component {
                                         onChange={this.handleSwellSelection}
                                     />
                                 </div>
-                                <div className="flexOneFourthColumn bg-dkYellow r-10 m-1 p-15">
+                                <div className="flex3Column bg-dkYellow r-10 m-5 p-15">
                                     Tide:<br/>
                                     <Selector 
                                         groupTitle="Tide"
@@ -565,16 +565,16 @@ class WaveFinder extends React.Component {
                                         onChange={this.handleTideSelection}
                                     />
                                 </div>
-                                <div className="flexOneFourthColumn bg-dkYellow r-10 m-1 p-15">
-                                    <label>
-                                        Miles:<br/>
-                                        <input className="mt-10 p-5 r-10 brdr-green"
-                                            name="distance"
-                                            type="number"
-                                            value={this.state.distance}
-                                            onChange={this.handleDistanceSelection}/>
-                                    </label>
-                                </div>
+                            </div>
+                            <div className="bg-dkYellow r-10 m-5 p-15">
+                                <label>
+                                    Miles:<br/>
+                                    <input className="mt-10 p-5 r-10"
+                                        name="distance"
+                                        type="number"
+                                        value={this.state.distance}
+                                        onChange={this.handleDistanceSelection}/>
+                                </label>
                             </div>
                         </div>
                         <br/>
