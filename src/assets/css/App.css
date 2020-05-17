@@ -12,6 +12,14 @@
 .w-200 {
   width: 200px;
 }
+.height100Percent {
+  height: 100%;
+}
+.height50Percent {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: 50%;
+}
 .fiftyPercent {
   transform: scale(.5);
 }
@@ -417,7 +425,7 @@ body {
 .navigation {
   position: fixed;
   top: 0px;
-  z-index:9996;
+  z-index: 9996;
 }
 .header {
 	position: fixed;
@@ -872,6 +880,9 @@ input.error {
     height: auto;
     min-height: 2px;
     flex-wrap: wrap;
+  }
+  .scroll {
+    overflow-y: scroll;
   }
   .responsiveTopMargin {
     margin-top: -10px;
