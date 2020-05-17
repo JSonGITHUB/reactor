@@ -495,7 +495,7 @@ class WaveFinder extends React.Component {
             matches = (tideMatch(item)) ? matches+1 : matches;
             return matches;
         }
-        const statusClass = (status) => (status === true) ? "color-neogreen" : "color-red"; 
+        const statusClass = (status) => (status === true) ? "color-neogreen" : "color-yellow"; 
         const getMatchingLocation = (item) => {
             if (match(item) > 1) {
                 if (regionMatch(item)) {
@@ -506,9 +506,9 @@ class WaveFinder extends React.Component {
                                 <div className="flexContainer">
                                     <div className="flexContainer m-auto">
                                         <div className="columnRight pr-10">
-                                            <div className="color-yellow bold">Swell: </div>
-                                            <div className="color-yellow bold">Wind: </div>
-                                            <div className="color-yellow bold">Tide: </div>
+                                            <div className="color-neogreen bold">Swell: </div>
+                                            <div className="color-neogreen bold">Wind: </div>
+                                            <div className="color-neogreen bold">Tide: </div>
                                         </div>
                                         <div className="columnLeft">
                                             <div className={statusClass(swellMatch(item))}>{item.swell.map((swell) => <span className={statusClass(swellDirectionMatch({swell}))}>{swell}, </span>)}</div>
