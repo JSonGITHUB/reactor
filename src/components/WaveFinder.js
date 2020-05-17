@@ -458,16 +458,22 @@ class WaveFinder extends React.Component {
             windDirection: selected
         })
     }
-    handleDistanceSelection = (groupTitle, label, selected) => {
-        localStorage.setItem("distance", selected);
+    handleDistanceSelection = (event) => {
+        const target = event.target;
+        localStorage.setItem("distance", target.value);
         this.setState({
             pause: false,
-            distance: selected
+            distance: target.value
         })
     }
     pause = (event) => this.setState({
         pause: true
     })
+    getDistanceMenu = () => {
+        const max = 3500;
+        let menu = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50];
+        return menu
+    }
     render() {
         console.log(`currentPositionExists: ${this.currentPositionExists()}`)
         const {locations, windDirection, swellDirection, tide} = this.state;
@@ -560,14 +566,14 @@ class WaveFinder extends React.Component {
                                     />
                                 </div>
                                 <div className="flexOneFourthColumn bg-dkYellow r-10 m-1 p-15">
-                                    Miles:<br/>
-                                    <Selector 
-                                        groupTitle="Distance"
-                                        selected={this.state.distance} 
-                                        label="miles" 
-                                        items={[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50]}
-                                        onChange={this.handleDistanceSelection}
-                                    />
+                                    <label>
+                                        Miles:<br/>
+                                        <input className="mt-10 p-5 r-10 brdr-green"
+                                            name="distance"
+                                            type="number"
+                                            value={this.state.distance}
+                                            onChange={this.handleDistanceSelection}/>
+                                    </label>
                                 </div>
                             </div>
                         </div>
