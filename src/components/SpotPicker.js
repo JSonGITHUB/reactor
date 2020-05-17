@@ -430,10 +430,6 @@ class SpotPicker extends React.Component {
         clearInterval(this.timerID);
     }
     tick() {
-        console.log(`this.state.pause: ${this.state.pause}`)
-        console.log(`this.state.tide: ${this.state.tide}`)
-        console.log(`this.state.swellDirection: ${this.state.swellDirection}`)
-        console.log(`this.state.windDirection: ${this.state.windDirection}`)
         if (this.state.pause === false) {
             this.setState({
                 date: new Date()
@@ -488,37 +484,25 @@ class SpotPicker extends React.Component {
         const swellDirectionMatch = (direction) => (direction.swell === swellDirection) ? true : false;
         const windDirectionMatch = (direction) => (direction.wind === windDirection) ? true : false;
         const tideDirectionMatch = (direction) => (direction.tide === tide) ? true : false;
-        const fixTo1 = (number) => Number(number).toFixed(1);
-        //const distance = (loc, pos) => Math.abs(fixTo1(loc)-fixTo1(pos));
         const distance = (loc, pos) => Math.abs(loc-pos);
         //.01 - 1 mile
         const distanceRange = (Number(this.state.distance) * .01);
         const regionMatch = (item) => (distance(item.latitude, this.state.latitude)<distanceRange) ? true : false
-            //console.log(`${fixTo1(item.latitudee)} === ${fixTo1(this.state.latitude)}`)
-            //console.log(`${fixTo1(item.latitude)-fixTo1(this.state.latitude)}`)
-            
-            //return (Number(item.latitude).toFixed(0) === Number(this.state.latitude).toFixed(0)) ? true : false;
-            //return (Math.round(Number(item.latitude)) === Math.round(Number(this.state.latitude))) ? true : false;
-        //}
         let count = 0;
         const match = (item) => {
             let matches = 0;
             matches = (swellMatch(item)) ? matches+1 : matches;
             matches = (windMatch(item)) ? matches+1 : matches;
             matches = (tideMatch(item)) ? matches+1 : matches;
-            //console.log(`${item.name} => matches: ${matches}`)
             return matches;
         }
         const statusClass = (status) => (status === true) ? "color-neogreen" : "color-red"; 
         const getMatchingLocation = (item) => {
-            //console.log(item.description);
             if (match(item) > 1) {
-                //console.log(`regions match ? ${regionMatch(item)}`)
                 if (regionMatch(item)) {
-                    //console.log(`Match ===> ${item.name}`)
                     count = count + 1;
                     return <div key={getKey("loc")}>
-                            <div className="r-10 m-10 p-20 neumorphism">
+                            <div className="r-10 m-10 p-20 bg-dkGreen">
                                 <div className="navBranding white bold">{item.name}</div>
                                 <div className="flexContainer">
                                     <div className="flexContainer m-auto">
@@ -541,41 +525,62 @@ class SpotPicker extends React.Component {
         }
         const matchingLocations = () => locations.map((item) => getMatchingLocation(item))
         const getLocations = matchingLocations();
-        //console.log(`Location data: ${JSON.stringify(locations, null, 2)}`)
         const date = this.state.date.toLocaleTimeString();
         const time = date.replace(" ","").toLocaleLowerCase();
         return (  
             <div className="color-neogreen pointer" onMouseDown={this.pause}>
-                {time}<br/>
-                Current position:<br/>
+                <span className="bold">{time}</span>
                 <Geolocator currentPositionExists={this.currentPositionExists} returnCurrentPosition={this.updateCurrentLocation}/><br/>
-                Wind: <Selector
-                    groupTitle="Wind" 
-                    selected={this.state.windDirection} 
-                    label="Direction"
-                    items={["W", "WSW", "WNW", "E", "ESE", "ENE", "N", "NE", "NNE", "NW", "NNW", "S", "SE", "SSE", "SW", "SSW"]}
-                    onChange={this.handleWindSelection}
-                /> - Swell: <Selector
-                    groupTitle="Swell"
-                    selected={this.state.swellDirection} 
-                    label="Direction" 
-                    items={["W", "WSW", "WNW", "E", "ESE", "ENE", "N", "NE", "NNE", "NW", "NNW", "S", "SE", "SSE", "SW", "SSW"]}
-                    onChange={this.handleSwellSelection}
-                /> - Tide: <Selector 
-                    groupTitle="Tide"
-                    selected={this.state.tide} 
-                    label="current" 
-                    items={["low", "medium", "hign"]}
-                    onChange={this.handleTideSelection}
-                /> - Miles: <Selector 
-                    groupTitle="Distance"
-                    selected={this.state.distance} 
-                    label="miles" 
-                    items={[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50]}
-                    onChange={this.handleDistanceSelection}
-                />
-                <div className="white mt-20 mb-20"><span className="color-neogreen bold">{count} waves</span> out of {locations.length} are in a <span className="color-neogreen bold">15 mile radius</span> and prefer <span className="color-neogreen bold">{this.state.swellDirection} swell with {this.state.tide} tide</span>:</div>
-                {/*locations.map((item) => getMatchingLocation(item))*/}
+                <div>
+                    <div className="flexContainer">
+                        <div className="flexOneFourthColumn bg-dkYellow r-10 m-10 p-10">
+                            Wind:<br/>
+                            <Selector
+                                groupTitle="Wind" 
+                                selected={this.state.windDirection} 
+                                label="Direction"
+                                items={["W", "WSW", "WNW", "E", "ESE", "ENE", "N", "NE", "NNE", "NW", "NNW", "S", "SE", "SSE", "SW", "SSW"]}
+                                onChange={this.handleWindSelection}
+                            />
+                        </div>
+                        <div className="flexOneFourthColumn bg-dkYellow r-10 m-10 p-10">
+                            Swell:<br/>
+                            <Selector
+                                groupTitle="Swell"
+                                selected={this.state.swellDirection} 
+                                label="Direction" 
+                                items={["W", "WSW", "WNW", "E", "ESE", "ENE", "N", "NE", "NNE", "NW", "NNW", "S", "SE", "SSE", "SW", "SSW"]}
+                                onChange={this.handleSwellSelection}
+                            />
+                        </div>
+                        <div className="flexOneFourthColumn bg-dkYellow r-10 m-10 p-10">
+                            Tide:<br/>
+                            <Selector 
+                                groupTitle="Tide"
+                                selected={this.state.tide} 
+                                label="current" 
+                                items={["low", "medium", "hign"]}
+                                onChange={this.handleTideSelection}
+                            />
+                        </div>
+                        <div className="flexOneFourthColumn bg-dkYellow r-10 m-10 p-10">
+                            Miles:<br/>
+                            <Selector 
+                                groupTitle="Distance"
+                                selected={this.state.distance} 
+                                label="miles" 
+                                items={[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50]}
+                                onChange={this.handleDistanceSelection}
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div className="white mt-20 mb-5">
+                    <span className="color-neogreen bold">{count} waves</span> out of {locations.length}<br/>
+                    are in a <span className="color-neogreen bold">{this.state.distance} mile radius</span><br/>
+                    and prefer <span className="color-neogreen bold">{this.state.swellDirection} swell with {this.state.tide} tide</span>:
+                </div>
+                <br/>
                 {getLocations}
             </div>         
         )
