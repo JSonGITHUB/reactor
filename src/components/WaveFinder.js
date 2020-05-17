@@ -24,7 +24,7 @@ class WaveFinder extends React.Component {
                 "longitude": -118.013605,
                 "swell": ["SSE", "S", "SW", "WSW", "W", "WNW"],
                 "wind": ["E", "NE"],
-                "tide": ["medium"]
+                "tide": ["low", "medium"]
             },
             {
                 "name": "HB: Taco Bell Reef",
@@ -32,15 +32,7 @@ class WaveFinder extends React.Component {
                 "longitude": -118.006578,
                 "swell": ["SSE", "S", "SW", "WSW", "W", "WNW"],
                 "wind": ["E", "NE"],
-                "tide": ["medium"]
-            },
-            {
-                "name": "HB: Sanchos",
-                "latitude": 33.656320,
-                "longitude": -118.004604,
-                "swell": ["SSE", "S", "SW", "WSW", "W", "WNW"],
-                "wind": ["E", "NE"],
-                "tide": ["medium"]
+                "tide": ["low", "medium"]
             },
             {
                 "name": "HB: North Peir",
@@ -48,7 +40,7 @@ class WaveFinder extends React.Component {
                 "longitude": -118.003874,
                 "swell": ["SSE", "S", "SW", "WSW", "W", "WNW"],
                 "wind": ["E", "NE"],
-                "tide": ["medium"]
+                "tide": ["low", "medium"]
             },
             {
                 "name": "HB: South Peir",
@@ -56,7 +48,7 @@ class WaveFinder extends React.Component {
                 "longitude": -118.003145,
                 "swell": ["SSE", "S", "SW", "WSW", "W", "WNW"],
                 "wind": ["E", "NE"],
-                "tide": ["medium"]
+                "tide": ["low", "medium"]
             },
             {
                 "name": "HB: River Jetties",
@@ -72,7 +64,7 @@ class WaveFinder extends React.Component {
                 "longitude": -117.722133,
                 "swell": ["S", "SW", "W", "WNW"],
                 "wind": ["E", "SE", "S"],
-                "tide": ["medium"]
+                "tide": ["medium", "high"]
             },
             {
                 "name": "Lowers",
@@ -88,7 +80,7 @@ class WaveFinder extends React.Component {
                 "longitude": -117.397452,
                 "swell": ["SSW", "SW", "W", "WNW", "SSE"],
                 "wind": ["E"],
-                "tide": ["medium"]
+                "tide": ["medium", "high"]
             },
             {
                 "name": "O-Side: Harbor South",
@@ -96,7 +88,7 @@ class WaveFinder extends React.Component {
                 "longitude": -117.392796,
                 "swell": ["SSW", "SW", "W", "WNW"],
                 "wind": ["E", "NE"],
-                "tide": ["medium"]
+                "tide": ["medium", "high"]
             },
             {
                 "name": "O-Side: Pier North",
@@ -104,7 +96,7 @@ class WaveFinder extends React.Component {
                 "longitude": -117.385226,
                 "swell": ["SSW", "SW", "W", "WNW"],
                 "wind": ["E", "NE"],
-                "tide": ["medium"]
+                "tide": ["low", "medium"]
             },
             {
                 "name": "O-Side: Pier South",
@@ -112,7 +104,7 @@ class WaveFinder extends React.Component {
                 "longitude": -117.384826,
                 "swell": ["SSW", "SW", "W", "WNW"],
                 "wind": ["E", "NE"],
-                "tide": ["medium"]
+                "tide": ["medium", "high"]
             },
             {
                 "name": "Carlsbad",
@@ -176,7 +168,7 @@ class WaveFinder extends React.Component {
                 "longitude": -117.287915,
                 "swell": ["W", "NW", "SW"],
                 "wind": ["E", "NE"],
-                "tide": ["low"]
+                "tide": ["low", "medium"]
             },
             {
                 "name": "Traps",
@@ -184,7 +176,7 @@ class WaveFinder extends React.Component {
                 "longitude": -117.287165,
                 "swell": ["NW","W"],
                 "wind": ["E"],
-                "tide": ["low"]
+                "tide": ["low", "medium"]
             },
             {
                 "name": "Cardiff Reef",
@@ -200,7 +192,7 @@ class WaveFinder extends React.Component {
                 "longitude": -117.280085,
                 "swell": ["NW","W"],
                 "wind": ["E"],
-                "tide": ["low"]
+                "tide": ["low", "medium"]
             },
             {
                 "name": "Seaside Reef",
@@ -208,7 +200,7 @@ class WaveFinder extends React.Component {
                 "longitude": -117.278393,
                 "swell": ["NW","W"],
                 "wind": ["E"],
-                "tide": ["low"]
+                "tide": ["low", "medium"]
             },
             {
                 "name": "Del Mar",
