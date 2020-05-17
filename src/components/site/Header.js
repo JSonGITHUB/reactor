@@ -31,7 +31,7 @@ class Header extends React.Component {
             </div>
         </Link>;
     portraitButton = (label) => <Link className="noUnderline" key={getKey("link")} to={label}>
-            <div key={getKey(label)} className="button greet m-1 p-15 color-yellow r-5 width-100-percent bg-dkGreen" onClick={this.siteNavClick}>
+            <div key={getKey(label)} className="button greet p-15 color-yellow r-5 bg-dkGreen mr-20 ml-20 mt-1" onClick={this.siteNavClick}>
                 {label}
             </div>
         </Link>;
