@@ -2,8 +2,9 @@ import React from 'react';
 import getKey from './utils/KeyGenerator.js';
 import Geolocator from './utils/Geolocator.js';
 import Selector from './forms/FunctionalSelector.js';
+import Dialog from './functional/Dialog.js';
 
-class SpotPicker extends React.Component {
+class WaveFinder extends React.Component {
     
     constructor(props) {
         super(props);
@@ -527,67 +528,71 @@ class SpotPicker extends React.Component {
         const getLocations = matchingLocations();
         const date = this.state.date.toLocaleTimeString();
         const time = date.replace(" ","").toLocaleLowerCase();
-        return (  
-            <div className="color-neogreen pointer" onMouseDown={this.pause}>
-                <span className="bold">{time}</span>
-                <Geolocator currentPositionExists={this.currentPositionExists} returnCurrentPosition={this.updateCurrentLocation}/><br/>
-                <div>
-                    <div className="flexContainer">
-                        <div className="flexOneFourthColumn bg-dkYellow r-10 m-10 p-10">
-                            Wind:<br/>
-                            <Selector
-                                groupTitle="Wind" 
-                                selected={this.state.windDirection} 
-                                label="Direction"
-                                items={["W", "WSW", "WNW", "E", "ESE", "ENE", "N", "NE", "NNE", "NW", "NNW", "S", "SE", "SSE", "SW", "SSW"]}
-                                onChange={this.handleWindSelection}
-                            />
+        return ( 
+            <div className="App-content fadeIn">
+                <Dialog title="Wave Finder" message="select current conditions:"> 
+                    <div className="white pointer" onMouseDown={this.pause}>   
+                        <span className="bold">{time}</span>
+                        <Geolocator currentPositionExists={this.currentPositionExists} returnCurrentPosition={this.updateCurrentLocation}/>
+                        <br/>
+                        <div className="bg-darker p-15 r-10 m-5">
+                            <div className="flexContainer">
+                                <div className="flexOneFourthColumn bg-dkYellow r-10 m-1 p-15">
+                                    Wind:<br/>
+                                    <Selector
+                                        groupTitle="Wind" 
+                                        selected={this.state.windDirection} 
+                                        label="Direction"
+                                        items={["W", "WSW", "WNW", "E", "ESE", "ENE", "N", "NE", "NNE", "NW", "NNW", "S", "SE", "SSE", "SW", "SSW"]}
+                                        onChange={this.handleWindSelection}
+                                    />
+                                </div>
+                                <div className="flexOneFourthColumn bg-dkYellow r-10 m-1 p-15">
+                                    Swell:<br/>
+                                    <Selector
+                                        groupTitle="Swell"
+                                        selected={this.state.swellDirection} 
+                                        label="Direction" 
+                                        items={["W", "WSW", "WNW", "E", "ESE", "ENE", "N", "NE", "NNE", "NW", "NNW", "S", "SE", "SSE", "SW", "SSW"]}
+                                        onChange={this.handleSwellSelection}
+                                    />
+                                </div>
+                                <div className="flexOneFourthColumn bg-dkYellow r-10 m-1 p-15">
+                                    Tide:<br/>
+                                    <Selector 
+                                        groupTitle="Tide"
+                                        selected={this.state.tide} 
+                                        label="current" 
+                                        items={["low", "medium", "hign"]}
+                                        onChange={this.handleTideSelection}
+                                    />
+                                </div>
+                                <div className="flexOneFourthColumn bg-dkYellow r-10 m-1 p-15">
+                                    Miles:<br/>
+                                    <Selector 
+                                        groupTitle="Distance"
+                                        selected={this.state.distance} 
+                                        label="miles" 
+                                        items={[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50]}
+                                        onChange={this.handleDistanceSelection}
+                                    />
+                                </div>
+                            </div>
                         </div>
-                        <div className="flexOneFourthColumn bg-dkYellow r-10 m-10 p-10">
-                            Swell:<br/>
-                            <Selector
-                                groupTitle="Swell"
-                                selected={this.state.swellDirection} 
-                                label="Direction" 
-                                items={["W", "WSW", "WNW", "E", "ESE", "ENE", "N", "NE", "NNE", "NW", "NNW", "S", "SE", "SSE", "SW", "SSW"]}
-                                onChange={this.handleSwellSelection}
-                            />
-                        </div>
-                        <div className="flexOneFourthColumn bg-dkYellow r-10 m-10 p-10">
-                            Tide:<br/>
-                            <Selector 
-                                groupTitle="Tide"
-                                selected={this.state.tide} 
-                                label="current" 
-                                items={["low", "medium", "hign"]}
-                                onChange={this.handleTideSelection}
-                            />
-                        </div>
-                        <div className="flexOneFourthColumn bg-dkYellow r-10 m-10 p-10">
-                            Miles:<br/>
-                            <Selector 
-                                groupTitle="Distance"
-                                selected={this.state.distance} 
-                                label="miles" 
-                                items={[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50]}
-                                onChange={this.handleDistanceSelection}
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div className="white mt-20 mb-5">
-                    <span className="color-neogreen bold">{count} waves</span> out of {locations.length}<br/>
-                    are in a <span className="color-neogreen bold">{this.state.distance} mile radius</span><br/>
-                    and prefer <span className="color-neogreen bold">{this.state.swellDirection} swell with {this.state.tide} tide</span>:
-                </div>
-                <br/>
-                {getLocations}
-            </div>         
+                        <br/>
+                        <span className="color-neogreen bold">{count} waves</span> out of {locations.length}<br/>
+                        are in a <span className="color-neogreen bold">{this.state.distance} mile radius</span><br/>
+                        and prefer <span className="color-neogreen bold">{this.state.swellDirection} swell with {this.state.tide} tide</span>:
+                        <br/><br/>
+                        {getLocations}
+                    </div>     
+                </Dialog>  
+            </div>  
         )
     }
     
 }
-export default SpotPicker;
+export default WaveFinder;
 
 
 
