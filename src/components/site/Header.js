@@ -95,7 +95,11 @@ class Header extends React.Component {
                                     <div className="flex3Column"></div>
                                     <div className="flex3ColumnRight">{getMenuButton}</div>
                                 </div>
-                                <div className="t-0 navigation width-100-percent bg-dark pb-200">{getMenuItems()}</div>
+                                <div className="t-0 navigation height100Percent width-100-percent bg-dark">
+                                    <div className="height50Percent scroll">
+                                        {getMenuItems()}
+                                    </div>
+                                </div>
                             </div>
         const hamburgerClosed = <div>
                                     <div className="flexContainer width-100-percent">
