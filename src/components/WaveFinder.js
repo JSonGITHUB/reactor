@@ -605,13 +605,12 @@ class WaveFinder extends React.Component {
                                 </label>
                             </div>
                         </div>
-                        <br/>
-                        <div className="ml-20 mr-20">
+                        <div className="m-30">
                             <span className="color-neogreen bold">{count} waves</span> out of {locations.length}<br/>
                             are in a <span className="color-neogreen bold">{this.state.distance}</span> mile radius<br/>
                             and prefer <span className="color-neogreen bold">{swell1Direction} </span>and <span className="color-orange bold ">{swell2Direction} </span>swell with <span className="color-neogreen bold">{tide} </span>tide:
                         </div>
-                        <br/><br/>
+                        <br/>
                         {getLocations}
                     </div>     
                 </Dialog>  
