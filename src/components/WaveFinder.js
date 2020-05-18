@@ -586,12 +586,12 @@ class WaveFinder extends React.Component {
                         <span className="bold">{time}</span>
                         <Geolocator currentPositionExists={this.currentPositionExists} returnCurrentPosition={this.updateCurrentLocation}/>
                         <br/>
-                        <div className="bg-darker p-15 r-10 m-5">
+                        <div className="bg-darker p-5 r-10 m-5">
                             <div className="flexContainer">
-                                {this.swellSelector(1,swell1Direction)}
-                                {this.swellSelector(2,swell2Direction)}
-                                {this.tideSelector(tide)}
-                                {this.windSelector(windDirection)}
+                                    {this.swellSelector(1,swell1Direction)}
+                                    {this.swellSelector(2,swell2Direction)}
+                                    {this.tideSelector(tide)}
+                                    {this.windSelector(windDirection)}
                             </div>
                             <div className="bg-dkYellow r-10 m-5 p-15">
                                 <label>
