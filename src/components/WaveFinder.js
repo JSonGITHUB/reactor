@@ -550,7 +550,8 @@ class WaveFinder extends React.Component {
                                 <div className="r-10 m-10 p-20 bg-dkGreen">
                                     <div className="navBranding white bold">
                                         {this.getStars(matches)}<br/>
-                                        {item.name} {`( ${(regionMatch(item)/.0115).toFixed(0)} miles)`}
+                                        {item.name}
+                                        <div className="greet color-yellow p-5 bg-dkGreen m-5 r-5">{`${(regionMatch(item)/.0115).toFixed(0)} miles`}</div>
                                     </div>
                                     <div className="flexContainer">
                                         <div className="flexContainer m-auto">
