@@ -16,6 +16,7 @@ class WaveFinder extends React.Component {
             pause: false,
             date: new Date(),
             tide: getDefault("tide"),
+            stars: getDefault("stars"),
             swell1Direction: getDefault("swell1Direction"),
             swell2Direction: getDefault("swell2Direction"),
             windDirection: getDefault("windDirection"),
@@ -391,6 +392,7 @@ class WaveFinder extends React.Component {
         };
         this.handleTideSelection = this.handleTideSelection.bind(this);
         this.handleWindSelection = this.handleWindSelection.bind(this);
+        this.handleStarSelection = this.handleStarSelection.bind(this);
         this.handleSwell1Selection = this.handleSwell1Selection.bind(this);
         this.handleSwell2Selection = this.handleSwell2Selection.bind(this);
         this.handleDistanceSelection = this.handleDistanceSelection.bind(this);
@@ -470,6 +472,13 @@ class WaveFinder extends React.Component {
             windDirection: selected
         })
     }
+    handleStarSelection = (groupTitle, label, selected) => {
+        localStorage.setItem("stars", selected);
+        this.setState({
+            pause: false,
+            stars: selected
+        })
+    }
     handleDistanceSelection = (event) => {
         const target = event.target;
         localStorage.setItem("distance", target.value);
@@ -511,11 +520,21 @@ class WaveFinder extends React.Component {
                                 onChange={this.handleWindSelection}
                             />
                         </div>
+    starSelector = (stars) => <div className="flex3Column bg-dkYellow r-10 m-5 p-15">
+                        Stars:<br/>
+                        <Selector
+                            groupTitle="Wind" 
+                            selected={stars} 
+                            label="Quality"
+                            items={[0,1,2,3,4,5]}
+                            onChange={this.handleStarSelection}
+                        />
+                    </div>
 
     getStars = (stars) => stars.map((star) => <span className="navBranding color-orange"> * </span>)
     render() {
         console.log(`currentPositionExists: ${this.currentPositionExists()}`)
-        const {locations, windDirection, swell1Direction, swell2Direction, tide, step} = this.state;
+        const {locations, windDirection, swell1Direction, swell2Direction, tide, stars, step} = this.state;
         const swell1Match = (item) => (item.swell.indexOf(swell1Direction)>-1) ? true : false;
         const swell2Match = (item) => (item.swell.indexOf(swell2Direction)>-1) ? true : false;
         const windMatch = (item) => (item.wind.indexOf(windDirection)>-1) ? true : false;
@@ -544,7 +563,8 @@ class WaveFinder extends React.Component {
             const matches = match(item);
             console.log(`getMatchingLocation => matches:${matches}`);
             if (regionMatch(item) !== false) {
-                if (matches.length > 2) {
+                if (matches.length >= Number(this.state.stars)) {
+                    console.log(`STARS ==================> Matches: ${matches.length} state stars:${this.state.stars}`)
                     count = count + 1;
                     return <div key={getKey("loc")}>
                                 <div className="r-10 m-10 p-20 bg-dkGreen">
@@ -593,6 +613,7 @@ class WaveFinder extends React.Component {
                                     {this.swellSelector(2,swell2Direction)}
                                     {this.tideSelector(tide)}
                                     {this.windSelector(windDirection)}
+                                    {this.starSelector(stars)}
                             </div>
                             <div className="bg-dkYellow r-10 m-5 p-15">
                                 <label>
