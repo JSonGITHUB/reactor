@@ -37,6 +37,7 @@ class Home extends React.Component {
             dist = dist * 60 * 1.1515;
             dist = dist;
             dist = dist*5280
+            dist = dist.toFixed(2)
             if (unit==="Kilometers") { dist = dist * 1.609344 }
             if (unit==="Nautical") { dist = dist * 0.8684 }
             console.log(`DISTANCE => ${dist}`)
