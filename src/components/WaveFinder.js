@@ -420,7 +420,7 @@ class WaveFinder extends React.Component {
    componentDidMount() {
         this.timerID = setInterval(
             () => this.tick(),
-            1000
+            5000
         );
     }
 
