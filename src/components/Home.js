@@ -19,7 +19,7 @@ class Home extends React.Component {
         const lat2 = this.state.latitude;
         const lon1 = this.state.markedLongitude;
         const lon2 = this.state.longitude;
-        const unit = "Miles"
+        const unit = "Feet"
         console.log(`lat1: ${lat1} === lat2: ${lat2}) && (lon1: ${lon1} === lon2: ${lon2}`)
         if (((lat1 === lat2) && (lon1 === lon2)) || (!lat1 || !lat2 || !lon1 || !lon2)) {
             return 0;
