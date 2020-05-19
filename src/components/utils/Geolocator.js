@@ -13,20 +13,25 @@ class Geolocate extends React.Component {
             currentPositionExists: props.currentPositionExists
         }
     }
-    componentDidMount() {
+    getCurrentPosition = () => {
         window.navigator.geolocation.getCurrentPosition(
             //position => console.log(position.coords.longitude),
-            position => {
+           position => {
+
+                this.props.returnCurrentPosition(position.coords.longitude, position.coords.latitude);
+                console.log(`getCurrentPosition => coords ^^^^^^^^^^^ ${position.coords.longitude}, ${position.coords.latitude}`)
                 this.setState({
                     longitude: position.coords.longitude,
                     latitude: position.coords.latitude,
                 });
+                /*
                 try {
-                    if (!this.props.currentPositionExists()) {
-                        this.props.returnCurrentPosition(this.state.longitude, this.state.latitude);
-                    }
+                    //if (!this.props.currentPositionExists()) {
+                        this.props.returnCurrentPosition(position.coords.longitude, position.coords.latitude);
+                    //}
                 }catch(err) {
                 }
+                */
             },
             err => {
                 console.log(err)
@@ -36,6 +41,18 @@ class Geolocate extends React.Component {
 
             }
         )
+    }
+    componentDidMount() {
+        this.timerID = setInterval(
+            () => this.tick(),
+            5000
+        );
+    }
+    tick() {
+        this.getCurrentPosition();
+    }
+    componentWillUnmount() {
+        clearInterval(this.timerID);
     }
     getLocation = () => `${this.state.latitude.toFixed(6)}, ${this.state.longitude.toFixed(6)} `;
     percent = (window.innerWidth < 700) ? 'twentyfivePercent mt--70 mb--70' : 'fiftyPercent mt--40 mb--40';
