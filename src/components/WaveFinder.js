@@ -436,7 +436,6 @@ class WaveFinder extends React.Component {
             });
         }
     }
-    clearList = () => console.log(`${this.state.longitude} - ${this.state.latitude}`);
     currentPositionExists = () => (this.state.longitude) ? true : false;
     updateCurrentLocation = (longitude, latitude) => {
         console.log(`UPDATING CURRENT POSITION ======> longitude: ${longitude} latitude: ${latitude}`)
@@ -544,9 +543,38 @@ class WaveFinder extends React.Component {
         const swell2DirectionMatch = (direction) => (direction===swell2Direction) ? true : false;
         const windDirectionMatch = (direction) => (direction.wind === windDirection) ? true : false;
         const tideDirectionMatch = (direction) => (direction.tide === tide) ? true : false;
-        const distance = (item) => Math.abs(item.latitude - this.state.latitude)+Math.abs(item.longitude - this.state.longitude);
+        const calculateDistance = (item) => {
+                const lat1 = item.latitude;
+                const lat2 = this.state.latitude;
+                const lon1 = item.longitude;
+                const lon2 = this.state.longitude;
+                const unit = "Miles"
+
+                if ((lat1 === lat2) && (lon1 === lon2)) {
+                    return 0;
+                }else {
+                    var radlat1 = Math.PI * lat1/180;
+                    var radlat2 = Math.PI * lat2/180;
+                    var theta = lon1-lon2;
+                    var radtheta = Math.PI * theta/180;
+                    var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+                    if (dist > 1) {
+                        dist = 1;
+                    }
+                    dist = Math.acos(dist);
+                    dist = dist * 180/Math.PI;
+                    dist = dist * 60 * 1.1515;
+                    dist = dist.toFixed(0);
+                    if (unit==="Kilometers") { dist = dist * 1.609344 }
+                    if (unit==="Nautical") { dist = dist * 0.8684 }
+                    console.log(`DISTANCE => ${dist}`)
+                    return dist;
+                }
+        }
+        const distance = (item) => calculateDistance(item);
+        //Math.abs(item.latitude - this.state.latitude)+Math.abs(item.longitude - this.state.longitude);
         //.01 - 1 mile
-        const distanceRange = (Number(this.state.distance) * .01);
+        const distanceRange = Number(this.state.distance);
         const regionMatch = (item) => (distance(item)<distanceRange) ? distance(item) : false
         let count = 0;
         const match = (item) => {
@@ -562,7 +590,7 @@ class WaveFinder extends React.Component {
         const subStatusClass = (status) => (status === true) ? "color-orange" : "color-yellow"; 
         const getMatchingLocation = (item) => {
             const matches = match(item);
-            //console.log(`getMatchingLocation => matches:${matches}`);
+            console.log(`getMatchingLocation => matches:${matches}`);
             if (regionMatch(item) !== false) {
                 if (matches.length >= Number(this.state.stars)) {
                     //console.log(`STARS ==================> Matches: ${matches.length} state stars:${this.state.stars}`)
@@ -572,7 +600,7 @@ class WaveFinder extends React.Component {
                                     <div className="navBranding white bold">
                                         {this.getStars(matches)}<br/>
                                         {item.name}
-                                        <div className="greet color-yellow p-5 bg-dkGreen m-5 r-5">{`${(regionMatch(item)/.0115).toFixed(0)} miles`}</div>
+                                        <div className="greet color-yellow p-5 bg-dkGreen m-5 r-5">{`${regionMatch(item)} miles`}</div>
                                     </div>
                                     <div className="flexContainer">
                                         <div className="flexContainer m-auto">
@@ -636,7 +664,6 @@ class WaveFinder extends React.Component {
                             with <span className="color-neogreen bold">{tide} </span>tide:
                         </div>
                         {getLocations}
-                        <div onClick={this.clearList()} className="button completedSelector p-20 r-5 m-20 bg-neogreen color-black">Clear</div>
                     </div>     
                 </Dialog>  
             </div>  
