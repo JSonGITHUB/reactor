@@ -10,6 +10,7 @@ class Home extends React.Component {
             longitude: null,
             latitude: null,
             distance: 0,
+            tracking: false,
             markedLongitude: null,
             markedLatitude: null
         }
@@ -19,23 +20,24 @@ class Home extends React.Component {
         const lat2 = this.state.latitude;
         const lon1 = this.state.markedLongitude;
         const lon2 = this.state.longitude;
-        const unit = "Feet"
+        let unit = "feet"
         console.log(`lat1: ${lat1} === lat2: ${lat2}) && (lon1: ${lon1} === lon2: ${lon2}`)
         if (((lat1 === lat2) && (lon1 === lon2)) || (!lat1 || !lat2 || !lon1 || !lon2)) {
             return 0;
         }else {
-            var radlat1 = Math.PI * lat1/180;
-            var radlat2 = Math.PI * lat2/180;
-            var theta = lon1-lon2;
-            var radtheta = Math.PI * theta/180;
-            var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+            const radlat1 = Math.PI * lat1/180;
+            const radlat2 = Math.PI * lat2/180;
+            const theta = lon1-lon2;
+            const radtheta = Math.PI * theta/180;
+            const feetOrYards = (dist) => ((dist*5280)>30) ? `${(dist*1760).toFixed(2)} yards` : `${(dist*5280).toFixed(2)} feet`;
+            let dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
             if (dist > 1) {
                 dist = 1;
             }
             dist = Math.acos(dist);
             dist = dist * 180/Math.PI;
             dist = dist * 60 * 1.1515;
-            dist = (dist>.25) ? `${(dist*5280).toFixed(2)} feet` : `${dist.toFixed(2)} miles`;
+            dist = (dist<.25) ? feetOrYards(dist) : `${dist.toFixed(2)} miles`;
             //dist = dist.toFixed(2);
             if (unit==="Kilometers") { dist = dist * 1.609344 }
             if (unit==="Nautical") { dist = dist * 0.8684 }
@@ -53,11 +55,31 @@ class Home extends React.Component {
     }
     startDistance = () => {
         this.setState({
+            tracking: true,
             markedLatitude: this.state.latitude,
             markedLongitude: this.state.longitude
         })
     }
+    stopTracking = () => {
+        this.setState({
+            tracking: false,
+        })
+    }
     getDistance = () => this.state.distance;
+    getTracker = () => {
+        const tracker = (this.state.tracking === true) 
+        ? <div>
+            <div className="color-neogreen p-20 bold greet bg-dkGreen r-5 m-20">{this.getDistance()}</div>
+            <div className="button p-20 r-5 m-20 bg-red incompletedSelector color-black" onClick={this.stopTracking}>Stop Tracking</div>
+        </div>
+        : <div>
+            <div className="color-neogreen p-20 bold greet bg-dkGreen r-5 m-20">{this.state.distance}</div>
+            <div className="button p-20 r-5 m-20 bg-neogreen completedSelector color-black" onClick={this.startDistance}>Start Tracking</div>
+        </div>
+
+        return tracker;
+    }
+                    
     render() {
         return (
             <div className="App fadeIn">
@@ -73,8 +95,7 @@ class Home extends React.Component {
                     <Timer/>
                     Current position:<br/>
                     <Geolocator currentPositionExists="false" returnCurrentPosition={this.updateCurrentLocation}/><br/>
-                    <div className="color-neogreen p-20 bold greet bg-dkGreen r-5 m-20">{this.getDistance()}</div>
-                    <div className="button p-20 r-5 m-20 bg-neogreen completedSelector color-black" onClick={this.startDistance}>Start Distance</div>
+                    {this.getTracker()}
                 </header>
             </div>
         );
