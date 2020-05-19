@@ -70,11 +70,11 @@ class Home extends React.Component {
     getTracker = () => {
         const tracker = (this.state.tracking === true) 
         ? <div>
-            <div className="color-neogreen p-20 bold greet bg-dkGreen r-5 m-20">{this.getDistance()}</div>
-            <div className="button p-20 r-5 m-20 bg-red incompletedSelector color-black" onClick={this.stopTracking}>Stop Tracking</div>
+            <div className="color-neogreen p-20 bold navBranding bg-dkGreen r-5 m-20">{this.getDistance()}</div>
+            <div className="button p-20 r-5 m-20 bg-red incompletedSelector color-yellow" onClick={this.stopTracking}>Stop Tracking</div>
         </div>
         : <div>
-            <div className="color-neogreen p-20 bold greet bg-dkGreen r-5 m-20">{this.state.distance}</div>
+            <div className="color-neogreen p-20 bold navBranding bg-dkGreen r-5 m-20">{this.state.distance}</div>
             <div className="button p-20 r-5 m-20 bg-neogreen completedSelector color-black" onClick={this.startDistance}>Start Tracking</div>
         </div>
 
