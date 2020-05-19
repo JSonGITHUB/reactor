@@ -3,6 +3,7 @@ import getKey from './utils/KeyGenerator.js';
 import Geolocator from './utils/Geolocator.js';
 import Selector from './forms/FunctionalSelector.js';
 import Dialog from './functional/Dialog.js';
+import shakaBlack from '../assets/images/shakaOrange.png'
 
 class WaveFinder extends React.Component {
     
@@ -521,7 +522,7 @@ class WaveFinder extends React.Component {
                             />
                         </div>
     starSelector = (stars) => <div className="flex3Column bg-dkYellow r-10 m-5 p-15">
-                        Stars:<br/>
+                        Shakas:<br/>
                         <Selector
                             groupTitle="Wind" 
                             selected={stars} 
@@ -530,8 +531,8 @@ class WaveFinder extends React.Component {
                             onChange={this.handleStarSelection}
                         />
                     </div>
-
-    getStars = (stars) => stars.map((star) => <span className="navBranding color-orange"> * </span>)
+    star = () => <img src={shakaBlack} className="shaka mt-5 ml-20 mr-20" alt="js" />;
+    getStars = (stars) => stars.map((star) => this.star());
     render() {
         console.log(`currentPositionExists: ${this.currentPositionExists()}`)
         const {locations, windDirection, swell1Direction, swell2Direction, tide, stars, step} = this.state;
@@ -598,9 +599,11 @@ class WaveFinder extends React.Component {
                     return <div key={getKey("loc")}>
                                 <div className="r-10 m-10 p-20 bg-dkGreen">
                                     <div className="navBranding white bold">
-                                        {this.getStars(matches)}<br/>
+                                        <div className="p-5 r-5 mb-10">
+                                            {this.getStars(matches)}<br/>
+                                        </div>
                                         {item.name}
-                                        <div className="greet color-yellow p-5 bg-dkGreen m-5 r-5">{`${regionMatch(item)} miles`}</div>
+                                        <div className="greet color-yellow p-5 bg-dkGreen mt-15 mb-10 r-5">{`${regionMatch(item)} miles`}</div>
                                     </div>
                                     <div className="flexContainer">
                                         <div className="flexContainer m-auto">
