@@ -445,6 +445,31 @@ class WaveFinder extends React.Component {
             latitude
         })
     }
+    /*
+    tideURL = ${`https://tidesandcurrents.noaa.gov/api/datagetter?
+        begin_date=20130101 10:00&
+        end_date=20130101 10:24&
+        station=9410230&
+        product=water_level&
+        datum=mllw&
+        units=metric&
+        time_zone=gmt&
+        application=web_services&
+        format=json`
+    }
+    data = () => {
+        const returnJSON = (response) => response.json();
+        const returnRejection = (response) => Promise.reject({status: response.status, data});
+        const validate = (response) => (response.ok) ? returnJSON(response) : returnRejection(response);
+        const uri = this.tideURL;
+        fetch(uri)
+            .then(response => validate(response))
+            .then(data => {
+                console.log(`data =-=-=-=-=-=-> ${JSON.stringify(data,null,2)}`)
+            })
+            .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
+    }
+    */
     handleTideSelection = (groupTitle, label, selected) => {
         localStorage.setItem("tide", selected);
         this.setState({
