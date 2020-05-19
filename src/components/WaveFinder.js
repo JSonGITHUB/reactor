@@ -436,6 +436,7 @@ class WaveFinder extends React.Component {
             });
         }
     }
+    clearList = () => console.log(`${this.state.longitude} - ${this.state.latitude}`);
     currentPositionExists = () => (this.state.longitude) ? true : false;
     updateCurrentLocation = (longitude, latitude) => {
         console.log(`UPDATING CURRENT POSITION ======> longitude: ${longitude} latitude: ${latitude}`)
@@ -490,7 +491,7 @@ class WaveFinder extends React.Component {
     pause = (event) => this.setState({
         pause: true
     })
-    swellSelector = (id, swellDirection) => <div className="flex3Column bg-dkYellow r-10 m-5 p-15">
+    swellSelector = (id, swellDirection) => <div className="flex2Column bg-dkYellow r-10 m-5 p-15">
                                 Swell{id}:<br/>
                                 <Selector
                                     groupTitle={`Swell${id}`}
@@ -554,17 +555,17 @@ class WaveFinder extends React.Component {
             matchesCount = (swell2Match(item)) ? matches.push("swell2") : matches;
             matchesCount = (windMatch(item)) ? matches.push("wind") : matches;
             matchesCount = (tideMatch(item)) ? matches.push("tide") : matches;
-            console.log(`matches => ${item.name} - ${matches}`)
+            //console.log(`matches => ${item.name} - ${matches}`)
             return matches;
         }
         const statusClass = (status) => (status === true) ? "color-neogreen" : "color-yellow"; 
         const subStatusClass = (status) => (status === true) ? "color-orange" : "color-yellow"; 
         const getMatchingLocation = (item) => {
             const matches = match(item);
-            console.log(`getMatchingLocation => matches:${matches}`);
+            //console.log(`getMatchingLocation => matches:${matches}`);
             if (regionMatch(item) !== false) {
                 if (matches.length >= Number(this.state.stars)) {
-                    console.log(`STARS ==================> Matches: ${matches.length} state stars:${this.state.stars}`)
+                    //console.log(`STARS ==================> Matches: ${matches.length} state stars:${this.state.stars}`)
                     count = count + 1;
                     return <div key={getKey("loc")}>
                                 <div className="r-10 m-10 p-20 bg-dkGreen">
@@ -609,11 +610,13 @@ class WaveFinder extends React.Component {
                         <br/>
                         <div className="bg-darker p-5 r-10 m-5">
                             <div className="flexContainer">
-                                    {this.swellSelector(1,swell1Direction)}
-                                    {this.swellSelector(2,swell2Direction)}
-                                    {this.tideSelector(tide)}
-                                    {this.windSelector(windDirection)}
-                                    {this.starSelector(stars)}
+                                {this.swellSelector(1,swell1Direction)}
+                                {this.swellSelector(2,swell2Direction)}
+                            </div>
+                            <div className="flexContainer">
+                                {this.tideSelector(tide)}
+                                {this.windSelector(windDirection)}
+                                {this.starSelector(stars)} 
                             </div>
                             <div className="bg-dkYellow r-10 m-5 p-15">
                                 <label>
@@ -633,6 +636,7 @@ class WaveFinder extends React.Component {
                             with <span className="color-neogreen bold">{tide} </span>tide:
                         </div>
                         {getLocations}
+                        <div onClick={this.clearList()} className="button completedSelector p-20 r-5 m-20 bg-neogreen color-black">Clear</div>
                     </div>     
                 </Dialog>  
             </div>  
