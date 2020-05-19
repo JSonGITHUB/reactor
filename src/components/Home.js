@@ -24,7 +24,7 @@ class Home extends React.Component {
         console.log(`lat1: ${lat1} === lat2: ${lat2}) && (lon1: ${lon1} === lon2: ${lon2}`)
         if (((lat1 === lat2) && (lon1 === lon2)) || (!lat1 || !lat2 || !lon1 || !lon2)) {
             return 0;
-        }else {
+        } else if (this.state.tracking === true) {
             const radlat1 = Math.PI * lat1/180;
             const radlat2 = Math.PI * lat2/180;
             const theta = lon1-lon2;
@@ -44,6 +44,7 @@ class Home extends React.Component {
             console.log(`DISTANCE => ${dist}`)
             return dist;
         }
+        return this.state.distance;
     }
     updateCurrentLocation = (longitude, latitude) => {
         console.log(`UPDATING CURRENT POSITION ======> longitude: ${longitude} latitude: ${latitude}`)
