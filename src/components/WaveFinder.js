@@ -3,7 +3,10 @@ import getKey from './utils/KeyGenerator.js';
 import Geolocator from './utils/Geolocator.js';
 import Selector from './forms/FunctionalSelector.js';
 import Dialog from './functional/Dialog.js';
-import shakaBlack from '../assets/images/shakaOrange.png'
+import swell1 from '../assets/images/shakaOrange.png'
+import swell2 from '../assets/images/waveSecondaryB.png'
+import wind from '../assets/images/windNW.png'
+import tide from '../assets/images/tide.png'
 
 class WaveFinder extends React.Component {
     
@@ -556,8 +559,27 @@ class WaveFinder extends React.Component {
                             onChange={this.handleStarSelection}
                         />
                     </div>
-    star = () => <img src={shakaBlack} className="shaka mt-5 ml-20 mr-20" alt="js" />;
-    getStars = (stars) => stars.map((star) => this.star());
+    getMatchIcon = (kind) => {
+        let icon = (kind === "swell1") ? "swell1" : "swell2";
+        icon = (kind === "wind") ? "wind" : icon;
+        icon = (kind === "tide") ? "tide" : icon;
+        if (kind === "swell1") {
+            return <img src={swell1} className={this.getStarKind(kind)} alt={kind} />;
+        } else if (kind === "swell2") {
+            return <img src={swell2} className={this.getStarKind(kind)} alt={kind} />;
+        } else if (kind === "tide") {
+            return <img src={tide} className={this.getStarKind(kind)} alt={kind} />;
+        } else if (kind === "wind") {
+            return <img src={wind} className={this.getStarKind(kind)} alt={kind} />;
+        }
+    }
+    getStarKind = (kind) => {
+        let classes = "shaka mt-5 ml-20 mr-20 r-20 p-2";
+        classes = (kind === "wind") ? (classes + " bg-white") : classes; 
+        return classes;
+    }
+    star = (matchKind) => this.getMatchIcon(matchKind);
+    getStars = (stars) => stars.map((star) => this.star(star));
     render() {
         console.log(`currentPositionExists: ${this.currentPositionExists()}`)
         const {locations, windDirection, swell1Direction, swell2Direction, tide, stars, step} = this.state;
@@ -618,7 +640,7 @@ class WaveFinder extends React.Component {
             const matches = match(item);
             console.log(`getMatchingLocation => matches:${matches}`);
             if (regionMatch(item) !== false) {
-                if (matches.length >= Number(this.state.stars)) {
+                if ((matches.length >= Number(this.state.stars)) && (matches.includes("swell1") || matches.includes("swell2"))) {
                     //console.log(`STARS ==================> Matches: ${matches.length} state stars:${this.state.stars}`)
                     count = count + 1;
                     return <div key={getKey("loc")}>
