@@ -14,6 +14,8 @@ import SW from '../assets/images/windSW.png'
 import W from '../assets/images/windW.png'
 import NW from '../assets/images/windNW.png'
 import tide from '../assets/images/tide.png'
+import thumbsUp from '../assets/images/ThumbsUp.png';
+import thumbsDown from '../assets/images/ThumbsDown.png';
 
 class WaveFinder extends React.Component {
     
@@ -558,25 +560,6 @@ class WaveFinder extends React.Component {
         pause: true
     })
     swellSelector = (id, swellDirection) => <div className="flex2Column bg-dkYellow r-10 m-5 p-15">
-        {(id===1) ? 
-            <div className="fl-left">
-                <input
-                    name="isSwell1"
-                    type="checkbox"
-                    checked={this.state.isSwell1}
-                    onChange={this.handleSwell1Check}
-                />
-            </div>
-            :
-            <div className="fl-left">
-                <input
-                    name="isSwell2"
-                    type="checkbox"
-                    checked={this.state.isSwell2}
-                    onChange={this.handleSwell2Check}
-                />
-            </div>
-        }
         Swell{id}:<br/>
         <Selector
             groupTitle={`Swell${id}`}
@@ -585,16 +568,37 @@ class WaveFinder extends React.Component {
             items={["W", "WSW", "WNW", "E", "ESE", "ENE", "N", "NE", "NNE", "NW", "NNW", "S", "SE", "SSE", "SW", "SSW"]}
             onChange={(id === 1) ? this.handleSwell1Selection : this.handleSwell2Selection}
         />
+        {(id===1) ? 
+            /*
+            <div className="fl-left">
+                <input
+                    name="isSwell1"
+                    type="checkbox"
+                    checked={this.state.isSwell1}
+                    onChange={this.handleSwell1Check}
+                />
+            </div>
+            */
+            <div className="button mt-15" onClick={this.handleSwell1Check}>
+                {(this.state.isSwell1) ? <img src={thumbsUp} alt='swell1' className='p-10 r-20 bg-green' /> : <img src={thumbsDown} alt='swell1' className='p-10 r-20 bg-red' /> }
+            </div>
+            :
+            /*
+            <div className="fl-left">
+                <input
+                    name="isSwell2"
+                    type="checkbox"
+                    checked={this.state.isSwell2}
+                    onChange={this.handleSwell2Check}
+                />
+            </div>
+            */
+            <div className="button mt-15" onClick={this.handleSwell2Check}>
+                {(this.state.isSwell2) ? <img src={thumbsUp} alt='swell2' className='p-10 r-20 bg-green' /> : <img src={thumbsDown} alt='swell2' className='p-10 r-20 bg-red' /> }
+            </div>
+        }
     </div>
     tideSelector = (tide) => <div className="flex3Column bg-dkYellow r-10 m-5 p-15">
-                                <div className="fl-left">
-                                    <input
-                                        name="Tide"
-                                        type="checkbox"
-                                        checked={this.state.isTide}
-                                        onChange={this.handleTideCheck}
-                                    />
-                                </div>
                                 Tide:<br/>
                                 <Selector 
                                     groupTitle="Tide"
@@ -603,16 +607,11 @@ class WaveFinder extends React.Component {
                                     items={["low", "medium", "hign"]}
                                     onChange={this.handleTideSelection}
                                 />
+                                <div className="button mt-15" onClick={this.handleTideCheck}>
+                                    {(this.state.isTide) ? <img src={thumbsUp} alt='tide' className='p-10 r-20 bg-green' /> : <img src={thumbsDown} alt='tide' className='p-10 r-20 bg-red' /> }
+                                </div>
                             </div>
     windSelector = (windDirection) => <div className="flex3Column bg-dkYellow r-10 m-5 p-15">
-                            <div className="fl-left">
-                                <input
-                                    name="isWind"
-                                    type="checkbox"
-                                    checked={this.state.isWind}
-                                    onChange={this.handleWindCheck}
-                                />
-                            </div>
                             Wind:<br/>
                             <Selector
                                 groupTitle="Wind" 
@@ -621,6 +620,9 @@ class WaveFinder extends React.Component {
                                 items={["W", "WSW", "WNW", "E", "ESE", "ENE", "N", "NE", "NNE", "NW", "NNW", "S", "SE", "SSE", "SW", "SSW"]}
                                 onChange={this.handleWindSelection}
                             />
+                            <div className="button mt-15" onClick={this.handleWindCheck}>
+                                {(this.state.isWind) ? <img src={thumbsUp} alt='wind' className='p-10 r-20 bg-green' /> : <img src={thumbsDown} alt='wind' className='p-10 r-20 bg-red' /> }
+                            </div>
                         </div>
     starSelector = (stars) => <div className="flex3Column bg-dkYellow r-10 m-5 p-15">
                         Shakas:<br/>
