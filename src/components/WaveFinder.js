@@ -552,7 +552,7 @@ class WaveFinder extends React.Component {
     })
     swellSelector = (id, swellDirection) => <div className="flex2Column bg-dkYellow r-10 m-5 p-15">
         {(id===1) ? 
-            <div className="mt--5 fl-left">
+            <div className="fl-left">
                 <input
                     name="isSwell1"
                     type="checkbox"
@@ -561,7 +561,7 @@ class WaveFinder extends React.Component {
                 />
             </div>
             :
-            <div className="mt--5 fl-left">
+            <div className="fl-left">
                 <input
                     name="isSwell2"
                     type="checkbox"
@@ -580,7 +580,7 @@ class WaveFinder extends React.Component {
         />
     </div>
     tideSelector = (tide) => <div className="flex3Column bg-dkYellow r-10 m-5 p-15">
-                                <div className="mt--5 fl-left">
+                                <div className="fl-left">
                                     <input
                                         name="Tide"
                                         type="checkbox"
@@ -598,7 +598,7 @@ class WaveFinder extends React.Component {
                                 />
                             </div>
     windSelector = (windDirection) => <div className="flex3Column bg-dkYellow r-10 m-5 p-15">
-                            <div className="mt--5 fl-left">
+                            <div className="fl-left">
                                 <input
                                     name="isWind"
                                     type="checkbox"
