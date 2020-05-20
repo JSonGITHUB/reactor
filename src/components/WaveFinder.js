@@ -661,7 +661,6 @@ class WaveFinder extends React.Component {
             } else if ((windDirection === "NW") || (windDirection === "NNW") || (windDirection === "WNW")) {
                 return <img src={NW} className={this.getStarKind(kind)} alt={kind} />;
             }
-            
         }
     }
     getStarKind = (kind) => {
@@ -754,7 +753,7 @@ class WaveFinder extends React.Component {
                                                     <div className="color-neogreen bold">Tide: </div>
                                                 </div>
                                                 <div className="columnLeft">
-                                                    <div>{item.swell.map((swell, i) => <span className={(swell1Match({swell})) ? statusClass(swell1Match(item)) : subStatusClass(swell2DirectionMatch(swell))}>{swell}{((i+1) === item.swell.length)? "" : ", "}</span>)}</div>
+                                                    <div>{item.swell.map((swell, i) => <span className={(swell === this.state.swell1Direction) ? statusClass(swell1Match(item)) : subStatusClass(swell2DirectionMatch(swell))}>{swell}{((i+1) === item.swell.length)? "" : ", "}</span>)}</div>
                                                     <div className={statusClass(windMatch(item))}>
                                                         {item.wind.map((wind, i) => <span className={statusClass(windDirectionMatch({wind}))}>
                                                                                     {wind}{((i+1) === item.wind.length)? "" : ", "}
