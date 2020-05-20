@@ -35,10 +35,10 @@ class WaveFinder extends React.Component {
             swell2Direction: getDefault("swell2Direction"),
             windDirection: getDefault("windDirection"),
             distance: getDefault("distance"),
-            isSwell1: getDefault("isSwell1"),
-            isSwell2: getDefault("isSwell2"),
-            isTide: getDefault("isTide"),
-            isWind: getDefault("isWind"),
+            isSwell1: (getDefault("isSwell1") === "true") ? true : false,
+            isSwell2: (getDefault("isSwell2") === "true") ? true : false,
+            isTide: (getDefault("isTide") === "true") ? true : false,
+            isWind: (getDefault("isWind") === "true") ? true : false,
             locations: [{
                 "name": "HB: 17th St.",
                 "latitude": 33.663781,
@@ -498,28 +498,28 @@ class WaveFinder extends React.Component {
         })
     }
     handleWindCheck = (event) => {
-        const isWind = (this.state.isWind === false || this.state.isWind === "false") ? true : false;
+        const isWind = (!!this.state.isWind === true) ? false : true;
         localStorage.setItem("isWind", isWind);
         this.setState({
             isWind: isWind
         })
     }
     handleTideCheck = (event) => {
-        const isTide = (this.state.isTide === false || this.state.isTide === "false") ? true : false;
+        const isTide = (!!this.state.isTide === true) ? false : true;
         localStorage.setItem("isTide", isTide);
         this.setState({
             isTide: isTide
         })
     }
     handleSwell1Check = (event) => {
-        const isSwell1 = (this.state.isSwell1 === false || this.state.isSwell1 === "false") ? true : false;
+        const isSwell1 = (!!this.state.isSwell1 === true) ? false : true;
         localStorage.setItem("isSwell1", isSwell1);
         this.setState({
             isSwell1: isSwell1
         })
     }
     handleSwell2Check = (event) => {
-        const isSwell2 = (this.state.isSwell2 === false || this.state.isSwell2 === "false") ? true : false;
+        const isSwell2 = (!!this.state.isSwell2 === true) ? false : true;
         localStorage.setItem("isSwell2", isSwell2);
         this.setState({
             isSwell2: isSwell2
@@ -585,7 +585,7 @@ class WaveFinder extends React.Component {
             </div>
             */
             <div className="button mt-15" onClick={this.handleSwell1Check}>
-                {(this.state.isSwell1 === true || this.state.isSwell1 === "true") ? <img src={thumbsUp} alt='swell1' className='p-10 r-20 bg-green' /> : <img src={thumbsDown} alt='swell1' className='p-10 r-20 bg-red' /> }
+                {(this.state.isSwell1 === true) ? <img src={thumbsUp} alt='swell1' className='p-10 r-20 bg-green' /> : <img src={thumbsDown} alt='swell1' className='p-10 r-20 bg-red' /> }
             </div>
             :
             /*
@@ -599,7 +599,7 @@ class WaveFinder extends React.Component {
             </div>
             */
             <div className="button mt-15" onClick={this.handleSwell2Check}>
-                {(this.state.isSwell2 === true || this.state.isSwell2 === "true") ? <img src={thumbsUp} alt='swell2' className='p-10 r-20 bg-green' /> : <img src={thumbsDown} alt='swell2' className='p-10 r-20 bg-red' /> }
+                {(this.state.isSwell2 === true) ? <img src={thumbsUp} alt='swell2' className='p-10 r-20 bg-green' /> : <img src={thumbsDown} alt='swell2' className='p-10 r-20 bg-red' /> }
             </div>
         }
     </div>
@@ -613,7 +613,7 @@ class WaveFinder extends React.Component {
                                     onChange={this.handleTideSelection}
                                 />
                                 <div className="button mt-15" onClick={this.handleTideCheck}>
-                                    {(this.state.isTide === true || this.state.isTide === "true") ? <img src={thumbsUp} alt='tide' className='p-10 r-20 bg-green' /> : <img src={thumbsDown} alt='tide' className='p-10 r-20 bg-red' /> }
+                                    {(this.state.isTide === true) ? <img src={thumbsUp} alt='tide' className='p-10 r-20 bg-green' /> : <img src={thumbsDown} alt='tide' className='p-10 r-20 bg-red' /> }
                                 </div>
                             </div>
     windSelector = (windDirection) => <div className="flex3Column bg-dkYellow r-10 m-5 p-15">
@@ -626,7 +626,7 @@ class WaveFinder extends React.Component {
                                 onChange={this.handleWindSelection}
                             />
                             <div className="button mt-15" onClick={this.handleWindCheck}>
-                                {(this.state.isWind === true || this.state.isWind === "true") ? <img src={thumbsUp} alt='wind' className='p-10 r-20 bg-green' /> : <img src={thumbsDown} alt='wind' className='p-10 r-20 bg-red' /> }
+                                {(this.state.isWind === true) ? <img src={thumbsUp} alt='wind' className='p-10 r-20 bg-green' /> : <img src={thumbsDown} alt='wind' className='p-10 r-20 bg-red' /> }
                             </div>
                         </div>
     starSelector = (stars) => <div className="flex3Column bg-dkYellow r-10 m-5 p-15">
