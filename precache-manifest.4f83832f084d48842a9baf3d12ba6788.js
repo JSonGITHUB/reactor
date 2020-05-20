@@ -1,27 +1,27 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "4d6bd5f33d1c4544da676306f7833f85",
+    "revision": "bbd141c983b8017f23fa88f67dfc02d7",
     "url": "/reactor/index.html"
   },
   {
-    "revision": "e41f23c706e66aa71aff",
+    "revision": "b33e1cec73a60894d33f",
     "url": "/reactor/static/css/2.93b3b32d.chunk.css"
   },
   {
-    "revision": "2a159338138498d4fd45",
+    "revision": "c5fe75d868ce41bca5ba",
     "url": "/reactor/static/css/main.879ca01e.chunk.css"
   },
   {
-    "revision": "e41f23c706e66aa71aff",
-    "url": "/reactor/static/js/2.c2b60e50.chunk.js"
+    "revision": "b33e1cec73a60894d33f",
+    "url": "/reactor/static/js/2.14d15453.chunk.js"
   },
   {
     "revision": "c64c486544348f10a6d6c716950bc223",
-    "url": "/reactor/static/js/2.c2b60e50.chunk.js.LICENSE.txt"
+    "url": "/reactor/static/js/2.14d15453.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "2a159338138498d4fd45",
-    "url": "/reactor/static/js/main.14337989.chunk.js"
+    "revision": "c5fe75d868ce41bca5ba",
+    "url": "/reactor/static/js/main.d1c3098d.chunk.js"
   },
   {
     "revision": "89efb22c44a6ab3e0839",
@@ -56,7 +56,35 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/reactor/static/media/waveSecondaryB.f7bca30f.png"
   },
   {
+    "revision": "9badfd1aa289ac82fa23f6a750f1f479",
+    "url": "/reactor/static/media/windE.9badfd1a.png"
+  },
+  {
+    "revision": "7bc2327a1532fa3b6ae00b2e2dd494d5",
+    "url": "/reactor/static/media/windN.7bc2327a.png"
+  },
+  {
+    "revision": "ea0f8e8226c6518c40810ebae183937d",
+    "url": "/reactor/static/media/windNE.ea0f8e82.png"
+  },
+  {
     "revision": "6c081ea132dfbe9ddad95866f885a9fc",
     "url": "/reactor/static/media/windNW.6c081ea1.png"
+  },
+  {
+    "revision": "ca9c6d0ce655a6e06189eeee99a3ccd8",
+    "url": "/reactor/static/media/windS.ca9c6d0c.png"
+  },
+  {
+    "revision": "aeb7a072870f243851ff16d09c3ede5e",
+    "url": "/reactor/static/media/windSE.aeb7a072.png"
+  },
+  {
+    "revision": "14fea23569b80840e8b42a6541223cd5",
+    "url": "/reactor/static/media/windSW.14fea235.png"
+  },
+  {
+    "revision": "ee91a07b0a5923fcde63c59389e2b263",
+    "url": "/reactor/static/media/windW.ee91a07b.png"
   }
 ]);
