@@ -25,6 +25,10 @@ class WaveFinder extends React.Component {
             swell2Direction: getDefault("swell2Direction"),
             windDirection: getDefault("windDirection"),
             distance: getDefault("distance"),
+            isSwell1: false,
+            isSwell2: false,
+            isTide: false,
+            isWind: false,
             locations: [{
                 "name": "HB: 17th St.",
                 "latitude": 33.663781,
@@ -399,6 +403,9 @@ class WaveFinder extends React.Component {
         this.handleStarSelection = this.handleStarSelection.bind(this);
         this.handleSwell1Selection = this.handleSwell1Selection.bind(this);
         this.handleSwell2Selection = this.handleSwell2Selection.bind(this);
+        this.handleSwell2Selection = this.handleSwell2Selection.bind(this);
+        this.handleSwell1Check = this.handleSwell1Check.bind(this);
+        this.handleTideCheck = this.handleTideCheck.bind(this);
         this.handleDistanceSelection = this.handleDistanceSelection.bind(this);
     }
     /*
@@ -480,6 +487,30 @@ class WaveFinder extends React.Component {
             tide: selected
         })
     }
+    handleWindCheck = (event) => {
+        localStorage.setItem("isWind", !this.state.isWind);
+        this.setState({
+            isWind: !this.state.isWind
+        })
+    }
+    handleTideCheck = (event) => {
+        localStorage.setItem("isTide", !this.state.isTide);
+        this.setState({
+            isTide: !this.state.isTide
+        })
+    }
+    handleSwell1Check = (event) => {
+        localStorage.setItem("isSwell1", !this.state.isSwell1);
+        this.setState({
+            isSwell1: !this.state.isSwell1
+        })
+    }
+    handleSwell2Check = (event) => {
+        localStorage.setItem("isSwell2", !this.state.isSwell2);
+        this.setState({
+            isSwell2: !this.state.isSwell2
+        })
+    }
     handleSwell1Selection = (groupTitle, label, selected) => {
         localStorage.setItem("swell1Direction", selected);
         this.setState({
@@ -520,16 +551,43 @@ class WaveFinder extends React.Component {
         pause: true
     })
     swellSelector = (id, swellDirection) => <div className="flex2Column bg-dkYellow r-10 m-5 p-15">
-                                Swell{id}:<br/>
-                                <Selector
-                                    groupTitle={`Swell${id}`}
-                                    selected={swellDirection} 
-                                    label="Direction" 
-                                    items={["W", "WSW", "WNW", "E", "ESE", "ENE", "N", "NE", "NNE", "NW", "NNW", "S", "SE", "SSE", "SW", "SSW"]}
-                                    onChange={(id === 1) ? this.handleSwell1Selection : this.handleSwell2Selection}
-                                />
-                            </div>
+        {(id===1) ? 
+            <div className="mt--5 fl-left">
+                <input
+                    name="isSwell1"
+                    type="checkbox"
+                    checked={this.state.isSwell1}
+                    onChange={this.handleSwell1Check}
+                />
+            </div>
+            :
+            <div className="mt--5 fl-left">
+                <input
+                    name="isSwell2"
+                    type="checkbox"
+                    checked={this.state.isSwell2}
+                    onChange={this.handleSwell2Check}
+                />
+            </div>
+        }
+        Swell{id}:<br/>
+        <Selector
+            groupTitle={`Swell${id}`}
+            selected={swellDirection} 
+            label="Direction" 
+            items={["W", "WSW", "WNW", "E", "ESE", "ENE", "N", "NE", "NNE", "NW", "NNW", "S", "SE", "SSE", "SW", "SSW"]}
+            onChange={(id === 1) ? this.handleSwell1Selection : this.handleSwell2Selection}
+        />
+    </div>
     tideSelector = (tide) => <div className="flex3Column bg-dkYellow r-10 m-5 p-15">
+                                <div className="mt--5 fl-left">
+                                    <input
+                                        name="Tide"
+                                        type="checkbox"
+                                        checked={this.state.isTide}
+                                        onChange={this.handleTideCheck}
+                                    />
+                                </div>
                                 Tide:<br/>
                                 <Selector 
                                     groupTitle="Tide"
@@ -540,6 +598,14 @@ class WaveFinder extends React.Component {
                                 />
                             </div>
     windSelector = (windDirection) => <div className="flex3Column bg-dkYellow r-10 m-5 p-15">
+                            <div className="mt--5 fl-left">
+                                <input
+                                    name="isWind"
+                                    type="checkbox"
+                                    checked={this.state.isWind}
+                                    onChange={this.handleWindCheck}
+                                />
+                            </div>
                             Wind:<br/>
                             <Selector
                                 groupTitle="Wind" 
@@ -552,7 +618,7 @@ class WaveFinder extends React.Component {
     starSelector = (stars) => <div className="flex3Column bg-dkYellow r-10 m-5 p-15">
                         Shakas:<br/>
                         <Selector
-                            groupTitle="Wind" 
+                            groupTitle="Shakas" 
                             selected={stars} 
                             label="Quality"
                             items={[0,1,2,3,4,5]}
@@ -636,42 +702,47 @@ class WaveFinder extends React.Component {
         }
         const statusClass = (status) => (status === true) ? "color-neogreen" : "color-yellow"; 
         const subStatusClass = (status) => (status === true) ? "color-orange" : "color-yellow"; 
+        const swell1Confirm = (matches) => ((this.state.isSwell1 && matches.includes("swell1")) || this.state.isSwell1 === false) ? true : false;
+        const swell2Confirm = (matches) => ((this.state.isSwell2 && matches.includes("swell2")) || this.state.isSwell2 === false) ? true : false;
+        const tideConfirm = (matches) => ((this.state.isTide && matches.includes("tide")) || this.state.isTide === false) ? true : false;
+        const windConfirm = (matches) => ((this.state.isWind && matches.includes("wind")) || this.state.isWind === false) ? true : false;
         const getMatchingLocation = (item) => {
             const matches = match(item);
-            console.log(`getMatchingLocation => matches:${matches}`);
-            if (regionMatch(item) !== false) {
-                if ((matches.length >= Number(this.state.stars)) && (matches.includes("swell1") || matches.includes("swell2"))) {
-                    //console.log(`STARS ==================> Matches: ${matches.length} state stars:${this.state.stars}`)
-                    count = count + 1;
-                    return <div key={getKey("loc")}>
-                                <div className="r-10 m-10 p-20 bg-dkGreen">
-                                    <div className="navBranding white bold">
-                                        <div className="p-5 r-5 mb-10">
-                                            {this.getStars(matches)}<br/>
-                                        </div>
-                                        {item.name}
-                                        <div className="greet color-yellow p-5 bg-dkGreen mt-15 mb-10 r-5">{`${regionMatch(item)} miles`}</div>
-                                    </div>
-                                    <div className="flexContainer">
-                                        <div className="flexContainer m-auto">
-                                            <div className="columnRight pr-10">
-                                                <div className="color-neogreen bold">Swell: </div>
-                                                <div className="color-neogreen bold">Wind: </div>
-                                                <div className="color-neogreen bold">Tide: </div>
+            if (swell1Confirm(matches) && swell2Confirm(matches) && tideConfirm(matches) && windConfirm(matches)) {
+                if (regionMatch(item) !== false) {
+                    if (matches.length >= Number(this.state.stars)) {
+                        //console.log(`STARS ==================> Matches: ${matches.length} state stars:${this.state.stars}`)
+                        count = count + 1;
+                        return <div key={getKey("loc")}>
+                                    <div className="r-10 m-10 p-20 bg-dkGreen">
+                                        <div className="navBranding white bold">
+                                            <div className="p-5 r-5 mb-10">
+                                                {this.getStars(matches)}<br/>
                                             </div>
-                                            <div className="columnLeft">
-                                                <div>{item.swell.map((swell, i) => <span className={(swell1Match({swell})) ? statusClass(swell1Match(item)) : subStatusClass(swell2DirectionMatch(swell))}>{swell}{((i+1) === item.swell.length)? "" : ", "}</span>)}</div>
-                                                <div className={statusClass(windMatch(item))}>
-                                                    {item.wind.map((wind, i) => <span className={statusClass(windDirectionMatch({wind}))}>
-                                                                                {wind}{((i+1) === item.wind.length)? "" : ", "}
-                                                                            </span>)}
+                                            {item.name}
+                                            <div className="greet color-yellow p-5 bg-dkGreen mt-15 mb-10 r-5">{`${regionMatch(item)} miles`}</div>
+                                        </div>
+                                        <div className="flexContainer">
+                                            <div className="flexContainer m-auto">
+                                                <div className="columnRight pr-10">
+                                                    <div className="color-neogreen bold">Swell: </div>
+                                                    <div className="color-neogreen bold">Wind: </div>
+                                                    <div className="color-neogreen bold">Tide: </div>
                                                 </div>
-                                                <div className={statusClass(tideMatch(item))}>{item.tide.map((tide,i) => <span className={statusClass(tideDirectionMatch({tide}))}>{tide}{((i+1) === item.tide.length)? "" : ", "}</span>)}</div>
+                                                <div className="columnLeft">
+                                                    <div>{item.swell.map((swell, i) => <span className={(swell1Match({swell})) ? statusClass(swell1Match(item)) : subStatusClass(swell2DirectionMatch(swell))}>{swell}{((i+1) === item.swell.length)? "" : ", "}</span>)}</div>
+                                                    <div className={statusClass(windMatch(item))}>
+                                                        {item.wind.map((wind, i) => <span className={statusClass(windDirectionMatch({wind}))}>
+                                                                                    {wind}{((i+1) === item.wind.length)? "" : ", "}
+                                                                                </span>)}
+                                                    </div>
+                                                    <div className={statusClass(tideMatch(item))}>{item.tide.map((tide,i) => <span className={statusClass(tideDirectionMatch({tide}))}>{tide}{((i+1) === item.tide.length)? "" : ", "}</span>)}</div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>   
+                                        </div>   
+                                    </div>
                                 </div>
-                            </div>
+                    }
                 }
             }
         }
