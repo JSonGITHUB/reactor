@@ -89,7 +89,7 @@ class App extends React.Component {
                   <Route path="/GuestList" component={SignUpDialog} />
                   {/*<Route path="/SurfLog" component={SurfLog} />*/}
                   <Route path='/SurfLog' render={(props) => <SurfLog {...props} logId={logId} />}/>
-                  <Route path='/WaveFinder' render={(props) => <WaveFinder {...props} tide="medium" stars="3" swell1Direction="SSW" swell2Direction="W" windDirection="W" distance="10" />}/>
+                  <Route path='/WaveFinder' render={(props) => <WaveFinder {...props} tide="medium" isSwell1="false" isSwell2="false" isTide="false" isWind="false" swell1Direction="SSW" swell2Direction="W" windDirection="W" distance="10" />}/>
                   <Route path="/LogDirectory" component={LogDirectory} />
                   <Route path="/Swell" component={SlideShow} />
                 </Switch>
