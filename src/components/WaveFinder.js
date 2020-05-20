@@ -5,7 +5,14 @@ import Selector from './forms/FunctionalSelector.js';
 import Dialog from './functional/Dialog.js';
 import swell1 from '../assets/images/shakaOrange.png'
 import swell2 from '../assets/images/waveSecondaryB.png'
-import wind from '../assets/images/windNW.png'
+import N from '../assets/images/windN.png'
+import NE from '../assets/images/windNE.png'
+import E from '../assets/images/windE.png'
+import SE from '../assets/images/windSE.png'
+import S from '../assets/images/windS.png'
+import SW from '../assets/images/windSW.png'
+import W from '../assets/images/windW.png'
+import NW from '../assets/images/windNW.png'
 import tide from '../assets/images/tide.png'
 
 class WaveFinder extends React.Component {
@@ -636,7 +643,25 @@ class WaveFinder extends React.Component {
         } else if (kind === "tide") {
             return <img src={tide} className={this.getStarKind(kind)} alt={kind} />;
         } else if (kind === "wind") {
-            return <img src={wind} className={this.getStarKind(kind)} alt={kind} />;
+            const windDirection = this.state.windDirection;
+            if (windDirection === "N") {
+                return <img src={N} className={this.getStarKind(kind)} alt={kind} />;
+            } else if ((windDirection === "NE") || (windDirection === "NNE") || (windDirection === "ENE")) {
+                return <img src={NE} className={this.getStarKind(kind)} alt={kind} />;
+            } else if (windDirection === "E") {
+                return <img src={E} className={this.getStarKind(kind)} alt={kind} />;
+            } else if ((windDirection === "SE") || (windDirection === "SSE") || (windDirection === "ESE")) {
+                return <img src={SE} className={this.getStarKind(kind)} alt={kind} />;
+            } else if (windDirection === "S") {
+                return <img src={S} className={this.getStarKind(kind)} alt={kind} />;
+            } else if ((windDirection === "SW") || (windDirection === "SSW") || (windDirection === "WSW")) {
+                return <img src={SW} className={this.getStarKind(kind)} alt={kind} />;
+            } else if (windDirection === "W") {
+                return <img src={W} className={this.getStarKind(kind)} alt={kind} />;
+            } else if ((windDirection === "NW") || (windDirection === "NNW") || (windDirection === "WNW")) {
+                return <img src={NW} className={this.getStarKind(kind)} alt={kind} />;
+            }
+            
         }
     }
     getStarKind = (kind) => {
@@ -663,10 +688,9 @@ class WaveFinder extends React.Component {
             const lon1 = item.longitude;
             const lon2 = this.state.longitude;
             const unit = "Miles"
-
             if ((lat1 === lat2) && (lon1 === lon2)) {
                 return 0;
-            }else {
+            } else {
                 var radlat1 = Math.PI * lat1/180;
                 var radlat2 = Math.PI * lat2/180;
                 var theta = lon1-lon2;
