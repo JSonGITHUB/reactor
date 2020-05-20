@@ -332,8 +332,14 @@ body {
 .ml--100 {
   margin-left: -100px;
 }
+.bg-white {
+  background-color: #FFFFFF;
+}
 .bg-black {
   background-color: #000000;
+}
+.bg-blue {
+  background-color:#00ffee;
 }
 .bg-dark {
   background-color: #222222;
