@@ -26,7 +26,6 @@ class WaveFinder extends React.Component {
         const getDefault = (item) => (getLocal(item) === null) ? getProps(item) : getLocal(item);
         console.log(`isWind: ${getDefault("isWind")}`)
         this.state = {
-            step: 0,
             pause: false,
             date: new Date(),
             tide: getDefault("tide"),
@@ -441,18 +440,16 @@ class WaveFinder extends React.Component {
    componentDidMount() {
         this.timerID = setInterval(
             () => this.tick(),
-            5000
+            1000
         );
     }
 
     componentWillUnmount() {
         clearInterval(this.timerID);
     }
-    nextStep = () => (this.state.step === 3) ? 0 : this.state.step + 1;
     tick() {
         if (this.state.pause === false) {
             this.setState({
-                step: this.nextStep(),
                 date: new Date()
             });
         }
@@ -693,7 +690,7 @@ class WaveFinder extends React.Component {
     getStars = (stars) => stars.map((star) => this.star(star));
     render() {
         console.log(`currentPositionExists: ${this.currentPositionExists()}`)
-        const {locations, windDirection, swell1Direction, swell2Direction, tide, stars, step} = this.state;
+        const {locations, windDirection, swell1Direction, swell2Direction, tide, stars} = this.state;
         const swell1Match = (item) => (item.swell.indexOf(swell1Direction)>-1) ? true : false;
         const swell2Match = (item) => (item.swell.indexOf(swell2Direction)>-1) ? true : false;
         const windMatch = (item) => (item.wind.indexOf(windDirection)>-1) ? true : false;
@@ -786,7 +783,14 @@ class WaveFinder extends React.Component {
                 }
             }
         }
-        const matchingLocations = () => locations.map((item) => getMatchingLocation(item))
+        const matchingLocations = () => {
+            if (locations.length>0) { 
+                return locations.map((item) => getMatchingLocation(item));
+            } else {
+                return <div className="greet bold color-yellow bg-red p-20 m-20 r-5">No Matches</div>
+            }
+            
+        }
         const getLocations = matchingLocations();
         const date = this.state.date.toLocaleTimeString();
         const time = date.replace(" ","").toLocaleLowerCase();
