@@ -681,7 +681,7 @@ class WaveFinder extends React.Component {
             return this.state.windDirection;
         }
     }
-    star = (matchKind) => <div className="flex3Column">
+    star = (matchKind) => <div className="flex3Column bg-lite mr-5 ml-5 p-10 r-10">
                             {this.getMatchIcon(matchKind)}
                             <div className="copyright">{this.getState(matchKind)}</div>
                         </div>;
@@ -755,7 +755,7 @@ class WaveFinder extends React.Component {
                         return <div key={getKey("loc")}>
                                     <div className="r-10 m-10 p-20 bg-dkGreen">
                                             <div className="width100Percent flexContainer">{this.getStars(matches)}</div>
-                                            <div className="mt-20 navBranding">{item.name}</div>
+                                            <div className="mt-10 navBranding">{item.name}</div>
                                             <div className="greet color-yellow p-5 bg-dkGreen mt-15 mb-10 r-5">{`${regionMatch(item)} miles`}</div>
                                         <div className="flexContainer">
                                             <div className="flexContainer m-auto">
