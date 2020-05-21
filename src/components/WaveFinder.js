@@ -1,6 +1,10 @@
 import React from 'react';
 import getKey from './utils/KeyGenerator.js';
 import Geolocator from './utils/Geolocator.js';
+import Tide from './utils/Tide.js';
+import WaterTemp from './utils/WaterTemp.js';
+import AirTemp from './utils/AirTemp.js';
+import WindDirection from './utils/WindDirection.js';
 import Selector from './forms/FunctionalSelector.js';
 import Dialog from './functional/Dialog.js';
 import swell1 from '../assets/images/wavePrimary.png'
@@ -689,7 +693,7 @@ class WaveFinder extends React.Component {
                         </div>;
     getStars = (stars) => stars.map((star) => this.star(star));
     render() {
-        console.log(`currentPositionExists: ${this.currentPositionExists()}`)
+//        console.log(`currentPositionExists: ${this.currentPositionExists()}`)
         const {locations, windDirection, swell1Direction, swell2Direction, tide, stars} = this.state;
         const swell1Match = (item) => (item.swell.indexOf(swell1Direction)>-1) ? true : false;
         const swell2Match = (item) => (item.swell.indexOf(swell2Direction)>-1) ? true : false;
@@ -722,7 +726,7 @@ class WaveFinder extends React.Component {
                 dist = dist.toFixed(1);
                 if (unit==="Kilometers") { dist = dist * 1.609344 }
                 if (unit==="Nautical") { dist = dist * 0.8684 }
-                console.log(`DISTANCE => ${dist}`)
+                //console.log(`DISTANCE => ${dist}`)
                 return dist;
             }
         }
@@ -783,14 +787,7 @@ class WaveFinder extends React.Component {
                 }
             }
         }
-        const matchingLocations = () => {
-            if (locations.length>0) { 
-                return locations.map((item) => getMatchingLocation(item));
-            } else {
-                return <div className="greet bold color-yellow bg-red p-20 m-20 r-5">No Matches</div>
-            }
-            
-        }
+        const matchingLocations = () => locations.map((item) => getMatchingLocation(item));
         const getLocations = matchingLocations();
         const date = this.state.date.toLocaleTimeString();
         const time = date.replace(" ","").toLocaleLowerCase();
@@ -800,6 +797,10 @@ class WaveFinder extends React.Component {
                     <div className="white pointer" onMouseDown={this.pause}>   
                         <span className="bold">{time}</span>
                         <Geolocator currentPositionExists={this.currentPositionExists} returnCurrentPosition={this.updateCurrentLocation}/>
+                        <Tide/>
+                        <WaterTemp/>
+                        <AirTemp/>
+                        <WindDirection/>
                         <br/>
                         <div className="bg-darker p-5 r-10 m-5">
                             <div className="flexContainer">
