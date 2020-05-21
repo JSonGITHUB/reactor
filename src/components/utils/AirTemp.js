@@ -34,7 +34,7 @@ class AirTemp extends React.Component {
         this.getAirTempData();
         this.timerID = setInterval(
             () => this.tick(),
-            50000
+            5000
         );
     }
     componentWillUnmount() {

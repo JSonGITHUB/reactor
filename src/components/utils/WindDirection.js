@@ -41,7 +41,7 @@ class WindDirection extends React.Component {
         this.getWindData();
         this.timerID = setInterval(
             () => this.tick(),
-            50000
+            5000
         );
     }
     componentWillUnmount() {
