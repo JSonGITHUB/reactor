@@ -55,6 +55,7 @@ class Tide extends React.Component {
     tick() {
         console.log(`getTide ->`);
         this.getTideData();
+        this.props.setTide(this.state.height)
     }
     getCurrentTide = () => <div>Tide: {this.state.height}</div>;
     percent = 'twentyfivePercent mt--70 mb--70';
