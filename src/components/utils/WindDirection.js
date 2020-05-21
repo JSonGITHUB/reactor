@@ -15,7 +15,7 @@ class WindDirection extends React.Component {
         const returnRejection = (response) => Promise.reject({status: response.status, data});
         const validate = (response) => (response.ok) ? returnJSON(response) : returnRejection(response);
         let getCurrentTime = new Date();
-        getCurrentTime = `${(getCurrentTime.getFullYear())}${((getCurrentTime.getMonth()+1)<10) ? `0${(getCurrentTime.getMonth()+1)}` : (getCurrentTime.getMonth()+1)}${(getCurrentTime.getDate()<10)? `0${getCurrentTime.getDate()}` : getCurrentTime.getDate()}%20${(getCurrentTime.getHours())}:00`
+        getCurrentTime = `${(getCurrentTime.getFullYear())}${((getCurrentTime.getMonth()+1)<10) ? `0${(getCurrentTime.getMonth()+1)}` : (getCurrentTime.getMonth()+1)}${(getCurrentTime.getDate()<10)? `0${getCurrentTime.getDate()}` : getCurrentTime.getDate()}%20${((getCurrentTime.getHours())<10) ? `0${(getCurrentTime.getHours())}` : (getCurrentTime.getHours())}:00`
         console.log(`Wind   -      getCurrentTime: ${getCurrentTime} ===> 20200520%2018:24`)
         const uriWind = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime}&end_date=${getCurrentTime}&station=9410230&product=wind&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
         const uriWindTest = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=20200520%2020:00&end_date=20200520%2020:00&station=9410230&product=wind&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
@@ -41,7 +41,7 @@ class WindDirection extends React.Component {
         this.getWindData();
         this.timerID = setInterval(
             () => this.tick(),
-            5000
+            50000
         );
     }
     componentWillUnmount() {
