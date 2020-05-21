@@ -692,6 +692,17 @@ class WaveFinder extends React.Component {
                             <div className="copyright">{this.getState(matchKind)}</div>
                         </div>;
     getStars = (stars) => stars.map((star) => this.star(star));
+    setTide = (tide) => {
+        console.log(`WaveFinder = > setTide(${tide})`)
+        let currentTide = (tide>2) ? "medium" : "low";
+        currentTide = (tide>4) ? "high" : currentTide;
+        this.setState({
+            tide: currentTide,
+        })
+    }
+    setWind = (wind) => this.setState({
+        windDirection: wind,
+    })
     render() {
 //        console.log(`currentPositionExists: ${this.currentPositionExists()}`)
         const {locations, windDirection, swell1Direction, swell2Direction, tide, stars} = this.state;
@@ -797,10 +808,10 @@ class WaveFinder extends React.Component {
                     <div className="white pointer" onMouseDown={this.pause}>   
                         <span className="bold">{time}</span>
                         <Geolocator currentPositionExists={this.currentPositionExists} returnCurrentPosition={this.updateCurrentLocation}/>
-                        <Tide/>
+                        <Tide setTide={this.setTide}/>
                         <WaterTemp/>
                         <AirTemp/>
-                        <WindDirection/>
+                        <WindDirection setWind={this.setWind}/>
                         <br/>
                         <div className="bg-darker p-5 r-10 m-5">
                             <div className="flexContainer">

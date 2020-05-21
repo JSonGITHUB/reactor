@@ -50,6 +50,7 @@ class WindDirection extends React.Component {
     tick() {
         console.log(`getWind ->`);
         this.getWindData();
+        this.props.setWind(this.state.direction)
     }
     getCurrentWind = () => <div>
             <div>{`Wind: ${this.state.direction}`}</div><br/>
