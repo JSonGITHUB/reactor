@@ -16,7 +16,7 @@ class AirTemp extends React.Component {
         const validate = (response) => (response.ok) ? returnJSON(response) : returnRejection(response);
         let getCurrentTime = new Date();//20200520%2018:24
         //getCurrentTime = `${(getCurrentTime.getFullYear())}${((getCurrentTime.getMonth()+1)<10) ? `0${(getCurrentTime.getMonth()+1)}` : (getCurrentTime.getMonth()+1)}${(getCurrentTime.getDate()<10)? `0${getCurrentTime.getDate()}` : getCurrentTime.getDate()}%20${(getCurrentTime.getHours())}:${getCurrentTime.getMinutes()}`
-        getCurrentTime = `${(getCurrentTime.getFullYear())}${((getCurrentTime.getMonth()+1)<10) ? `0${(getCurrentTime.getMonth()+1)}` : (getCurrentTime.getMonth()+1)}${(getCurrentTime.getDate()<10)? `0${getCurrentTime.getDate()}` : getCurrentTime.getDate()}%20${(getCurrentTime.getHours())}:00`
+        getCurrentTime = `${(getCurrentTime.getFullYear())}${((getCurrentTime.getMonth()+1)<10) ? `0${(getCurrentTime.getMonth()+1)}` : (getCurrentTime.getMonth()+1)}${(getCurrentTime.getDate()<10)? `0${getCurrentTime.getDate()}` : getCurrentTime.getDate()}%20${((getCurrentTime.getHours())<10) ? `0${(getCurrentTime.getHours())}` : (getCurrentTime.getHours())}:00`
         //getCurrentTime = "20200520%2018:24";
         console.log(`getCurrentTime: ${getCurrentTime} ===> 20200520%2018:24`)
         const airTempuri = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime}&end_date=${getCurrentTime}&station=9410230&product=air_temperature&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
@@ -34,7 +34,7 @@ class AirTemp extends React.Component {
         this.getAirTempData();
         this.timerID = setInterval(
             () => this.tick(),
-            5000
+            50000
         );
     }
     componentWillUnmount() {
