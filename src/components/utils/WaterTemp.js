@@ -34,7 +34,7 @@ class WaterTemp extends React.Component {
         this.getWaterTempData();
         this.timerID = setInterval(
             () => this.tick(),
-            50000
+            4000
         );
     }
     componentWillUnmount() {
