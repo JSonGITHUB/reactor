@@ -25,7 +25,7 @@ class AirTemp extends React.Component {
             .then(response => validate(response))
             .then(data => {
                 this.setState({
-                    temp: data.data[0].v
+                    temp: Number(data.data[0].v).toFixed(0)
                 })
             })
             .catch(err => console.log(`Something went wrong!\nuri: ${airTempuri} \npath: ${window.location.pathname}\n`, err));
@@ -41,18 +41,15 @@ class AirTemp extends React.Component {
         clearInterval(this.timerID);
     }
     tick() {
-        console.log(`getAirTemp -> ++++++++++++this.state.temp: ${this.state.temp}+++++delay: ${this.delay()}++++++++++++++++++++++++++++`);
-        this.getAirTempData();
+       this.getAirTempData();
     }
-    getCurrentTemp = () => <div className="color-white mt-20">Air Temp: {this.state.temp}</div>;
+    getCurrentTemp = () => <div>{this.state.temp}</div>;
     percent = 'twentyfivePercent mt--70 mb--70';
     loading = () => <div className={this.percent}>
                 <Loader isMotionOn={this.props.isMotionOn}/>
             </div>;
     render() {
-        return <div className="color-yellow greet">
-                {this.getCurrentTemp()}
-            </div>
+        return this.getCurrentTemp()
     };
 }
 

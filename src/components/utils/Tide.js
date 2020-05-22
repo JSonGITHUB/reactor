@@ -35,7 +35,7 @@ class Tide extends React.Component {
                 this.setState({
                     station: data.metadata.name,
                     tide:"HIGH",
-                    height: data.data[0].v
+                    height: Number(data.data[0].v).toFixed(1)
                 })
             })
             .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
@@ -57,15 +57,13 @@ class Tide extends React.Component {
         this.getTideData();
         this.props.setTide(this.state.height)
     }
-    getCurrentTide = () => <div>Tide: {this.state.height}</div>;
+    getCurrentTide = () => <div>{this.state.height}</div>;
     percent = 'twentyfivePercent mt--70 mb--70';
     loading = () => <div className={this.percent}>
                 <Loader isMotionOn={this.props.isMotionOn}/>
             </div>;
     render() {
-        return <div className="color-yellow greet mt-20">
-                {this.getCurrentTide()}
-            </div>
+        return <div>{this.getCurrentTide()}</div>
     };
 }
 

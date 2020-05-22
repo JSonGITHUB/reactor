@@ -806,14 +806,13 @@ class WaveFinder extends React.Component {
             <div className="App-content fadeIn">
                 <Dialog title="Wave Finder" message="select current conditions:"> 
                     <div className="white pointer" onMouseDown={this.pause}>   
-                        <span className="bold">{time}</span>
-                        <Geolocator currentPositionExists={this.currentPositionExists} returnCurrentPosition={this.updateCurrentLocation}/>
-                        <Tide setTide={this.setTide}/>
-                        <WaterTemp/>
-                        <AirTemp/>
-                        <WindDirection setWind={this.setWind}/>
-                        <br/>
                         <div className="bg-darker p-5 r-10 m-5">
+                            <div className="flexContainer">
+                                <span className="flex3Column p-5 r-5 color-orange bg-lite m-5">tide<br/><Tide setTide={this.setTide}/></span>
+                                <span className="flex3Column p-5 r-5 color-yellow bg-lite m-5">wind<br/><WindDirection setWind={this.setWind}/></span>
+                                <span className="flex3Column p-5 r-5 color-blue bg-lite m-5">water<br/><WaterTemp/></span>
+                                <span className="flex3Column p-5 r-5 color-white bg-lite m-5">air<br/><AirTemp/></span>
+                            </div>
                             <div className="flexContainer">
                                 {this.swellSelector(1,swell1Direction)}
                                 {this.swellSelector(2,swell2Direction)}
@@ -835,14 +834,16 @@ class WaveFinder extends React.Component {
                             </div>
                         </div>
                         <div className="mt-10 mb-20">
+                            <span className="bold">{time}</span>
+                            <Geolocator currentPositionExists={this.currentPositionExists} returnCurrentPosition={this.updateCurrentLocation}/>
                             <span className="color-neogreen bold">{count} waves</span> out of {locations.length}<br/>
                             are in a <span className="color-neogreen bold">{this.state.distance}</span> mile radius<br/>
                             and prefer <span className="color-neogreen bold">{swell1Direction} </span>and <span className="color-orange bold ">{swell2Direction} </span>swell <br/>
                             with <span className="color-neogreen bold">{tide} </span>tide:
                         </div>
                         {getLocations}
-                    </div>     
-                </Dialog>  
+                    </div> 
+                </Dialog>
             </div>  
         )
     }

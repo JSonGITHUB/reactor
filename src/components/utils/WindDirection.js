@@ -52,22 +52,13 @@ class WindDirection extends React.Component {
         this.getWindData();
         this.props.setWind(this.state.direction)
     }
-    getCurrentWind = () => <div>
-            <div>{`Wind: ${this.state.direction}`}</div><br/>
-            {/*
-            <div>{`s: ${this.state.s}`}</div>
-            <div>{`angle: ${this.state.d}`}</div>
-            <div>{`g: ${this.state.g}`}</div>
-            */}
-        </div>;
+    getCurrentWind = () => <div>{this.state.direction}</div>
     percent = 'twentyfivePercent mt--70 mb--70';
     loading = () => <div className={this.percent}>
                 <Loader isMotionOn={this.props.isMotionOn}/>
             </div>;
     render() {
-        return <div className="color-yellow greet mt-20">
-                {this.getCurrentWind()}
-            </div>
+        return <div>{this.getCurrentWind()}</div>
     };
 }
 
