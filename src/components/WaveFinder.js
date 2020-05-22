@@ -611,7 +611,7 @@ class WaveFinder extends React.Component {
     isTideSelected = () => (this.state.isTide === true) ? 'bg-green' : 'bg-red';
     tideClass = () => `${this.isTideSelected()} flex2Column r-10 m-5 p-15`;
     tideSelector = (tide) => <div className={this.tideClass()}>
-                                Tide:<br/>
+                                Tide {this.state.height}:<br/>
                                 <Selector 
                                     groupTitle="Tide"
                                     selected={tide} 
@@ -697,7 +697,7 @@ class WaveFinder extends React.Component {
     }
     star = (matchKind) => <div className="flex3Column bg-lite mr-5 ml-5 p-10 r-10">
                             {this.getMatchIcon(matchKind)}
-                            <div className="copyright">{this.getState(matchKind)}</div>
+                            <div className="greet">{this.getState(matchKind)}{(matchKind === "tide") ? ` ${this.state.height}` : ""}</div>
                         </div>;
     getStars = (stars) => stars.map((star) => this.star(star));
     setTide = (tide) => {
@@ -706,14 +706,15 @@ class WaveFinder extends React.Component {
         currentTide = (Number(tide)>4) ? "high" : currentTide;
         this.setState({
             tide: currentTide,
+            height: tide
         })
     }
     setWind = (wind) => this.setState({
-        windDirection: wind,
+        windDirection: wind
     })
     render() {
 //        console.log(`currentPositionExists: ${this.currentPositionExists()}`)
-        const {locations, windDirection, swell1Direction, swell2Direction, tide, stars} = this.state;
+        const {locations, windDirection, swell1Direction, swell2Direction, tide, height, stars} = this.state;
         const swell1Match = (item) => (item.swell.indexOf(swell1Direction)>-1) ? true : false;
         const swell2Match = (item) => (item.swell.indexOf(swell2Direction)>-1) ? true : false;
         const windMatch = (item) => (item.wind.indexOf(windDirection)>-1) ? true : false;
@@ -847,7 +848,7 @@ class WaveFinder extends React.Component {
                             <span className="color-neogreen bold">{count} waves</span> out of {locations.length}<br/>
                             are in a <span className="color-neogreen bold">{this.state.distance}</span> mile radius<br/>
                             and prefer <span className="color-neogreen bold">{swell1Direction} </span>and <span className="color-orange bold ">{swell2Direction} </span>swell <br/>
-                            with <span className="color-neogreen bold">{tide} </span>tide:
+                            with <span className="color-neogreen bold">{this.state.height} {tide}</span>tide:
                         </div>
                         {getLocations}
                     </div> 
