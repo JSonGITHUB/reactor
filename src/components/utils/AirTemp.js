@@ -30,19 +30,18 @@ class AirTemp extends React.Component {
             })
             .catch(err => console.log(`Something went wrong!\nuri: ${airTempuri} \npath: ${window.location.pathname}\n`, err));
     }
-    delay = () => (this.state.temp !== 0) ? 50000 : 1000;
     componentDidMount() {
         this.getAirTempData();
         this.timerID = setInterval(
             () => this.tick(),
-            this.delay()
+            50000
         );
     }
     componentWillUnmount() {
         clearInterval(this.timerID);
     }
     tick() {
-        console.log(`getAirTemp ->`);
+        console.log(`getAirTemp -> ++++++++++++this.state.temp: ${this.state.temp}+++++delay: ${this.delay()}++++++++++++++++++++++++++++`);
         this.getAirTempData();
     }
     getCurrentTemp = () => <div className="color-white mt-20">Air Temp: {this.state.temp}</div>;
