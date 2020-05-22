@@ -839,6 +839,9 @@ input.error {
   color: white;
   padding-bottom: 400px;
 }
+.largScaleFont{
+  font-size: calc(10px + 2vmin);
+}
 .burger {
   height: 50px;
   width: 50px;

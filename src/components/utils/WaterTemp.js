@@ -25,7 +25,7 @@ class WaterTemp extends React.Component {
             .then(response => validate(response))
             .then(data => {
                 this.setState({
-                    temp: data.data[0].v
+                    temp: Number(data.data[0].v).toFixed(0)
                 })
             })
             .catch(err => console.log(`Something went wrong!\nuri: ${waterTempuri} \npath: ${window.location.pathname}\n`, err));
@@ -44,15 +44,13 @@ class WaterTemp extends React.Component {
         console.log(`getWaterTemp ->`);
         this.getWaterTempData();
     }
-    getCurrentTemp = () => <div className="color-blue mt-20">Water Temp: {this.state.temp}</div>;
+    getCurrentTemp = () => <div>{this.state.temp}</div>;
     percent = 'twentyfivePercent mt--70 mb--70';
     loading = () => <div className={this.percent}>
                 <Loader isMotionOn={this.props.isMotionOn}/>
             </div>;
     render() {
-        return <div className="color-yellow greet">
-                {this.getCurrentTemp()}
-            </div>
+        return <div>{this.getCurrentTemp()}</div>
     };
 }
 
