@@ -43,7 +43,7 @@ class AirTemp extends React.Component {
     tick() {
        this.getAirTempData();
     }
-    getCurrentTemp = () => <div>{this.state.temp}</div>;
+    getCurrentTemp = () => <div>{this.state.temp}° F</div>;
     percent = 'twentyfivePercent mt--70 mb--70';
     loading = () => <div className={this.percent}>
                 <Loader isMotionOn={this.props.isMotionOn}/>

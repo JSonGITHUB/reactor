@@ -27,15 +27,35 @@ class WindDirection extends React.Component {
             .then(data => {
                 this.setState({
                     station: data.metadata.name,
-                    s: data.data[0].s,
+                    speed: data.data[0].s,
                     angle: data.data[0].d,
                     direction: data.data[0].dr,
-                    g: data.data[0].g
+                    gusts: data.data[0].g
                 })
             })
             .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
 
     }
+    /*
+    {
+        "metadata":{
+            "id":"9410230",
+            "name":"La Jolla",
+            "lat":"32.8669",
+            "lon":"-117.2571"
+        }, 
+        "data": [
+            {
+                "t":"2020-05-20 20:00", 
+                "s":"5.25", 
+                "d":"313.00",
+                 "dr":"NW", 
+                 "g":"7.39", 
+                 "f":"0,0"
+            }
+        ]
+    }
+    */
     componentDidMount() {
         
         this.getWindData();
@@ -50,9 +70,17 @@ class WindDirection extends React.Component {
     tick() {
         console.log(`getWind ->`);
         this.getWindData();
-        this.props.setWind(this.state.direction)
+        this.props.setWind(this.state.direction, this.state.angle, this.state.speed, this.state.gusts)
     }
-    getCurrentWind = () => <div>{this.state.direction}</div>
+    /*
+    Water Level: 2.01 ft Above MLLW
+    Next Tide at 3:09 PM: Low 1.70 ft
+    Gusting to: 12.3 kts from WSW
+    */
+    getCurrentWind = () => <div className="flexContainer">
+                            <div className="flex3Column">{`${this.state.direction} ${Number(this.state.angle).toFixed(0)}°`}</div>
+                            <div className="flex3Column">{`${Number(this.state.speed).toFixed(0)}-${Number(this.state.gusts).toFixed(0)} knots`}</div>
+                        </div>
     percent = 'twentyfivePercent mt--70 mb--70';
     loading = () => <div className={this.percent}>
                 <Loader isMotionOn={this.props.isMotionOn}/>
