@@ -36,12 +36,13 @@ class WindDirection extends React.Component {
             .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
 
     }
+    delay = () => (this.state.direction !== null) ? 50000 : 1000;
     componentDidMount() {
         
         this.getWindData();
         this.timerID = setInterval(
             () => this.tick(),
-            50000
+            this.delay()
         );
     }
     componentWillUnmount() {
