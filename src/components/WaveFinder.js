@@ -565,7 +565,11 @@ class WaveFinder extends React.Component {
     pause = (event) => this.setState({
         pause: true
     })
-    swellSelector = (id, swellDirection) => <div className="flex2Column bg-dkYellow r-10 m-5 p-15">
+    isSwell1 = () => (this.state.isSwell1 === true) ? true : false;
+    isSwell2 = () => (this.state.isSwell2 === true) ? true : false;
+    isSwellSelected = (id) => ((id === 1 && this.isSwell1() === true) || (id === 2 && this.isSwell2()===true)) ? 'bg-green' : 'bg-red';
+    swellClass = (id) => `${this.isSwellSelected(id)} flex2Column r-10 m-5 p-15`;
+    swellSelector = (id, swellDirection) => <div className={this.swellClass(id)}>
         Swell{id}:<br/>
         <Selector
             groupTitle={`Swell${id}`}
@@ -586,7 +590,7 @@ class WaveFinder extends React.Component {
             </div>
             */
             <div className="button mt-15" onClick={this.handleSwell1Check}>
-                {(this.state.isSwell1 === true) ? <img src={thumbsUp} alt='swell1' className='p-10 r-20 bg-green' /> : <img src={thumbsDown} alt='swell1' className='p-10 r-20 bg-red' /> }
+                {(this.state.isSwell1 === true) ? <img src={thumbsUp} alt='swell1' className='p-10 r-20' /> : <img src={thumbsDown} alt='swell1' className='p-10 r-20' /> }
             </div>
             :
             /*
@@ -600,11 +604,13 @@ class WaveFinder extends React.Component {
             </div>
             */
             <div className="button mt-15" onClick={this.handleSwell2Check}>
-                {(this.state.isSwell2 === true) ? <img src={thumbsUp} alt='swell2' className='p-10 r-20 bg-green' /> : <img src={thumbsDown} alt='swell2' className='p-10 r-20 bg-red' /> }
+                {(this.state.isSwell2 === true) ? <img src={thumbsUp} alt='swell2' className='p-10 r-20' /> : <img src={thumbsDown} alt='swell2' className='p-10 r-20' /> }
             </div>
         }
     </div>
-    tideSelector = (tide) => <div className="flex3Column bg-dkYellow r-10 m-5 p-15">
+    isTideSelected = () => (this.state.isTide === true) ? 'bg-green' : 'bg-red';
+    tideClass = () => `${this.isTideSelected()} flex2Column r-10 m-5 p-15`;
+    tideSelector = (tide) => <div className={this.tideClass()}>
                                 Tide:<br/>
                                 <Selector 
                                     groupTitle="Tide"
@@ -614,10 +620,12 @@ class WaveFinder extends React.Component {
                                     onChange={this.handleTideSelection}
                                 />
                                 <div className="button mt-15" onClick={this.handleTideCheck}>
-                                    {(this.state.isTide === true) ? <img src={thumbsUp} alt='tide' className='p-10 r-20 bg-green' /> : <img src={thumbsDown} alt='tide' className='p-10 r-20 bg-red' /> }
+                                    {(this.state.isTide === true) ? <img src={thumbsUp} alt='tide' className='p-10 r-20' /> : <img src={thumbsDown} alt='tide' className='p-10 r-20' /> }
                                 </div>
                             </div>
-    windSelector = (windDirection) => <div className="flex3Column bg-dkYellow r-10 m-5 p-15">
+    isWindSelected = () => (this.state.isWind === true) ? 'bg-green' : 'bg-red';
+    windClass = () => `${this.isWindSelected()} flex2Column r-10 m-5 p-15`;
+    windSelector = (windDirection) => <div className={this.windClass()}>
                             Wind:<br/>
                             <Selector
                                 groupTitle="Wind" 
@@ -627,7 +635,7 @@ class WaveFinder extends React.Component {
                                 onChange={this.handleWindSelection}
                             />
                             <div className="button mt-15" onClick={this.handleWindCheck}>
-                                {(this.state.isWind === true) ? <img src={thumbsUp} alt='wind' className='p-10 r-20 bg-green' /> : <img src={thumbsDown} alt='wind' className='p-10 r-20 bg-red' /> }
+                                {(this.state.isWind === true) ? <img src={thumbsUp} alt='wind' className='p-10 r-20' /> : <img src={thumbsDown} alt='wind' className='p-10 r-20' /> }
                             </div>
                         </div>
     starSelector = (stars) => <div className="flex3Column bg-dkYellow r-10 m-5 p-15">
@@ -694,8 +702,8 @@ class WaveFinder extends React.Component {
     getStars = (stars) => stars.map((star) => this.star(star));
     setTide = (tide) => {
         console.log(`WaveFinder = > setTide(${tide})`)
-        let currentTide = (tide>2) ? "medium" : "low";
-        currentTide = (tide>4) ? "high" : currentTide;
+        let currentTide = (Number(tide)>2) ? "medium" : "low";
+        currentTide = (Number(tide)>4) ? "high" : currentTide;
         this.setState({
             tide: currentTide,
         })

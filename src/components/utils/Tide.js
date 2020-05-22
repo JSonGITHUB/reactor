@@ -46,7 +46,7 @@ class Tide extends React.Component {
         this.getTideData();
         this.timerID = setInterval(
             () => this.tick(),
-            50000
+            2000
         );
     }
     componentWillUnmount() {
