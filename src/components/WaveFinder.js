@@ -611,7 +611,8 @@ class WaveFinder extends React.Component {
     isTideSelected = () => (this.state.isTide === true) ? 'bg-green' : 'bg-red';
     tideClass = () => `${this.isTideSelected()} flex2Column r-10 m-5 p-15`;
     tideSelector = (tide) => <div className={this.tideClass()}>
-                                Tide {this.state.height}:<br/>
+                                Tide:
+                                <div className="greet">{this.state.height}</div>
                                 <Selector 
                                     groupTitle="Tide"
                                     selected={tide} 
@@ -627,6 +628,8 @@ class WaveFinder extends React.Component {
     windClass = () => `${this.isWindSelected()} flex2Column r-10 m-5 p-15`;
     windSelector = (windDirection) => <div className={this.windClass()}>
                             Wind:<br/>
+                            <div className="greet">{this.state.windAngle}°</div>
+                            <div className="greet">{this.state.windSpeed}-{this.state.windGusts}kts</div>
                             <Selector
                                 groupTitle="Wind" 
                                 selected={windDirection} 
@@ -697,7 +700,7 @@ class WaveFinder extends React.Component {
     }
     star = (matchKind) => <div className="flex3Column bg-lite mr-5 ml-5 p-10 r-10">
                             {this.getMatchIcon(matchKind)}
-                            <div className="greet">{this.getState(matchKind)}{(matchKind === "tide") ? ` ${this.state.height}` : ""}</div>
+                            <div className="greet">{this.getState(matchKind)}{(matchKind === "tide") ? ` ${this.state.height}'` : ""}</div>
                         </div>;
     getStars = (stars) => stars.map((star) => this.star(star));
     setTide = (tide) => {
@@ -709,8 +712,11 @@ class WaveFinder extends React.Component {
             height: tide
         })
     }
-    setWind = (wind) => this.setState({
-        windDirection: wind
+    setWind = (direction, angle, speed, gusts) => this.setState({
+        windDirection: direction,
+        windAngle: Number(angle).toFixed(0),
+        windSpeed: Number(speed).toFixed(0),
+        windGusts: Number(gusts).toFixed(0)
     })
     render() {
 //        console.log(`currentPositionExists: ${this.currentPositionExists()}`)
@@ -820,10 +826,10 @@ class WaveFinder extends React.Component {
                             <Geolocator currentPositionExists={this.currentPositionExists} returnCurrentPosition={this.updateCurrentLocation}/>
                             <div className="flexContainer">
                                 <span className="flex3Column p-5 r-5 color-orange bg-lite m-5">tide<br/><Tide setTide={this.setTide}/></span>
-                                <span className="flex3Column p-5 r-5 color-yellow bg-lite m-5">wind<br/><WindDirection setWind={this.setWind}/></span>
                                 <span className="flex3Column p-5 r-5 color-blue bg-lite m-5">water<br/><WaterTemp/></span>
                                 <span className="flex3Column p-5 r-5 color-white bg-lite m-5">air<br/><AirTemp/></span>
                             </div>
+                            <div className="flex3Column p-5 r-5 color-yellow bg-lite m-5">wind<WindDirection setWind={this.setWind}/></div>
                             <div className="flexContainer">
                                 {this.swellSelector(1,swell1Direction)}
                                 {this.swellSelector(2,swell2Direction)}
