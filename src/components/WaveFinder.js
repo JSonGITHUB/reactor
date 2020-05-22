@@ -807,6 +807,8 @@ class WaveFinder extends React.Component {
                 <Dialog title="Wave Finder" message="select current conditions:"> 
                     <div className="white pointer" onMouseDown={this.pause}>   
                         <div className="bg-darker p-5 r-10 m-5">
+                            <span className="bold">{time}</span>
+                            <Geolocator currentPositionExists={this.currentPositionExists} returnCurrentPosition={this.updateCurrentLocation}/>
                             <div className="flexContainer">
                                 <span className="flex3Column p-5 r-5 color-orange bg-lite m-5">tide<br/><Tide setTide={this.setTide}/></span>
                                 <span className="flex3Column p-5 r-5 color-yellow bg-lite m-5">wind<br/><WindDirection setWind={this.setWind}/></span>
@@ -834,8 +836,6 @@ class WaveFinder extends React.Component {
                             </div>
                         </div>
                         <div className="mt-10 mb-20">
-                            <span className="bold">{time}</span>
-                            <Geolocator currentPositionExists={this.currentPositionExists} returnCurrentPosition={this.updateCurrentLocation}/>
                             <span className="color-neogreen bold">{count} waves</span> out of {locations.length}<br/>
                             are in a <span className="color-neogreen bold">{this.state.distance}</span> mile radius<br/>
                             and prefer <span className="color-neogreen bold">{swell1Direction} </span>and <span className="color-orange bold ">{swell2Direction} </span>swell <br/>
