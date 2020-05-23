@@ -1,31 +1,35 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "9ed756606f7029442da5f73da2a05408",
+    "revision": "c28141a0d253de894cdd47172d6dd928",
     "url": "/reactor/index.html"
   },
   {
-    "revision": "80c87df4e077e0b4f7af",
+    "revision": "c90e8e14b35c7c108213",
     "url": "/reactor/static/css/2.93b3b32d.chunk.css"
   },
   {
-    "revision": "7095d1527b3b381f0af2",
-    "url": "/reactor/static/css/main.f4c3c5c4.chunk.css"
+    "revision": "27523ef7c41ab1ce4f93",
+    "url": "/reactor/static/css/main.2a4828be.chunk.css"
   },
   {
-    "revision": "80c87df4e077e0b4f7af",
-    "url": "/reactor/static/js/2.c921a2dd.chunk.js"
+    "revision": "c90e8e14b35c7c108213",
+    "url": "/reactor/static/js/2.5c1222d5.chunk.js"
   },
   {
     "revision": "c64c486544348f10a6d6c716950bc223",
-    "url": "/reactor/static/js/2.c921a2dd.chunk.js.LICENSE.txt"
+    "url": "/reactor/static/js/2.5c1222d5.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "7095d1527b3b381f0af2",
-    "url": "/reactor/static/js/main.2a4975b1.chunk.js"
+    "revision": "27523ef7c41ab1ce4f93",
+    "url": "/reactor/static/js/main.0a827c9f.chunk.js"
   },
   {
     "revision": "89efb22c44a6ab3e0839",
     "url": "/reactor/static/js/runtime-main.6b8dc200.js"
+  },
+  {
+    "revision": "f3a22065d58a229733d5ccfda874d243",
+    "url": "/reactor/static/media/airTemp.f3a22065.png"
   },
   {
     "revision": "77bfacf1f0153215251a4f8622252106",
@@ -46,6 +50,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "9f80a921b82dc19d825a8365b70ec849",
     "url": "/reactor/static/media/tide.9f80a921.png"
+  },
+  {
+    "revision": "51e6319f3ea67500c1f321f8515a425c",
+    "url": "/reactor/static/media/waterTemp.51e6319f.png"
   },
   {
     "revision": "dba81acc0a9c5955272a6ce13c840f89",
