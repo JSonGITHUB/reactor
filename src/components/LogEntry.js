@@ -6,7 +6,7 @@ import DatePicker from 'react-date-picker';
 import getKey from './utils/KeyGenerator.js';
 import PostDirectory from './PostDirectory.js';
 import LogData from './LogData.js';
-import {BrowserRouter as Link} from 'react-router-dom';
+import {BrowserRouter as Router, Switch, Link, Route} from 'react-router-dom';
 import LogId from './LogId.js';
 
 class LogEntry extends React.Component {
