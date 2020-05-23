@@ -870,9 +870,9 @@ class WaveFinder extends React.Component {
                             <span className="bold">{time}</span>
                             <Geolocator currentPositionExists={this.currentPositionExists} returnCurrentPosition={this.updateCurrentLocation}/>
                             <div className="flexContainer">
-                                <span className="flex3Column p-5 r-5 color-orange bg-lite m-5">{this.getTideIcon} tide<br/><Tide setTide={this.setTide}/></span>
-                                <span className="flex3Column p-5 r-5 color-blue bg-lite m-5">{this.getWaterTempIcon}<span className="ml-2">water</span><br/><WaterTemp/></span>
-                                <span className="flex3Column p-5 r-5 color-white bg-lite m-5">{this.getAirTempIcon}<span className="ml-2">air</span><br/><AirTemp/></span>
+                                <span className="flex3Column p-5 r-5 color-orange bg-lite m-5">{/*this.getTideIcon*/} tide<br/><Tide setTide={this.setTide}/></span>
+                                <span className="flex3Column p-5 r-5 color-blue bg-lite m-5">{/*this.getWaterTempIcon*/}<span className="ml-2">water</span><br/><WaterTemp/></span>
+                                <span className="flex3Column p-5 r-5 color-white bg-lite m-5">{/*this.getAirTempIcon*/}<span className="ml-2">air</span><br/><AirTemp/></span>
                             </div>
                             <div className="flex3Column p-5 r-5 color-yellow bg-lite m-5">{this.getWindIcon()}wind<WindDirection setWind={this.setWind}/></div>
                             <div className="flexContainer">
