@@ -89,6 +89,15 @@
 .mt--5 {
   margin-top: -5px;
 }
+.mb--5 {
+  margin-bottom: -5px;
+}
+.mb--7 {
+  margin-bottom: -7px;
+}
+.mb--10 {
+  margin-bottom: -10px;
+}
 .mb--40 {
   margin-bottom: -40px;
 }

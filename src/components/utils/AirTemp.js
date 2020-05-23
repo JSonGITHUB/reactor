@@ -1,5 +1,4 @@
 import React from 'react';
-import Dialog from '../functional/Dialog.js';
 import Loader from '../utils/Loader.js';
 
 class AirTemp extends React.Component {
@@ -34,7 +33,7 @@ class AirTemp extends React.Component {
         this.getAirTempData();
         this.timerID = setInterval(
             () => this.tick(),
-            5000
+            64000
         );
     }
     componentWillUnmount() {
@@ -43,7 +42,7 @@ class AirTemp extends React.Component {
     tick() {
        this.getAirTempData();
     }
-    getCurrentTemp = () => <div>{this.state.temp}° F</div>;
+    getCurrentTemp = () => <div>{this.state.temp}° <span className="greet">F</span></div>;
     percent = 'twentyfivePercent mt--70 mb--70';
     loading = () => <div className={this.percent}>
                 <Loader isMotionOn={this.props.isMotionOn}/>

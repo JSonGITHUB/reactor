@@ -18,6 +18,8 @@ import SW from '../assets/images/windSW.png'
 import W from '../assets/images/windW.png'
 import NW from '../assets/images/windNW.png'
 import tide from '../assets/images/tide.png'
+import waterTemp from '../assets/images/waterTemp.png'
+import airTemp from '../assets/images/airTemp.png'
 import thumbsUp from '../assets/images/ThumbsUp.png';
 import thumbsDown from '../assets/images/ThumbsDown.png';
 
@@ -491,11 +493,19 @@ class WaveFinder extends React.Component {
             .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
     }
     */
+    getDefaultHeights = (tideSelected) => {
+        if (tideSelected === "high") {
+            return 5;
+        } else if (tideSelected === "medium") {
+            return 3;
+        }
+        return 0;
+    }
     handleTideSelection = (groupTitle, label, selected) => {
         localStorage.setItem("tide", selected);
         this.setState({
-            pause: false,
-            tide: selected
+            tide: selected,
+            height: this.getDefaultHeights(selected)
         })
     }
     handleWindCheck = (event) => {
@@ -529,28 +539,24 @@ class WaveFinder extends React.Component {
     handleSwell1Selection = (groupTitle, label, selected) => {
         localStorage.setItem("swell1Direction", selected);
         this.setState({
-            pause: false,
             swell1Direction: selected
         })
     }
     handleSwell2Selection = (groupTitle, label, selected) => {
         localStorage.setItem("swell2Direction", selected);
         this.setState({
-            pause: false,
             swell2Direction: selected
         })
     }
     handleWindSelection = (groupTitle, label, selected) => {
         localStorage.setItem("windDirection", selected);
         this.setState({
-            pause: false,
             windDirection: selected
         })
     }
     handleStarSelection = (groupTitle, label, selected) => {
         localStorage.setItem("stars", selected);
         this.setState({
-            pause: false,
             stars: selected
         })
     }
@@ -558,19 +564,22 @@ class WaveFinder extends React.Component {
         const target = event.target;
         localStorage.setItem("distance", target.value);
         this.setState({
-            pause: false,
             distance: target.value
         })
     }
     pause = (event) => this.setState({
         pause: true
     })
+    unpause = () => this.setState({
+        pause: false
+    })
     isSwell1 = () => (this.state.isSwell1 === true) ? true : false;
     isSwell2 = () => (this.state.isSwell2 === true) ? true : false;
     isSwellSelected = (id) => ((id === 1 && this.isSwell1() === true) || (id === 2 && this.isSwell2()===true)) ? 'bg-green' : 'bg-red';
     swellClass = (id) => `${this.isSwellSelected(id)} flex2Column r-10 m-5 p-15`;
     swellSelector = (id, swellDirection) => <div className={this.swellClass(id)}>
-        Swell{id}:<br/>
+        {this.getSwellIcon(id)}
+        <span className="ml-5">Swell{id}:</span><br/>
         <Selector
             groupTitle={`Swell${id}`}
             selected={swellDirection} 
@@ -612,7 +621,7 @@ class WaveFinder extends React.Component {
     tideClass = () => `${this.isTideSelected()} flex2Column r-10 m-5 p-15`;
     tideSelector = (tide) => <div className={this.tideClass()}>
                                 Tide:
-                                <div className="greet">{this.state.height}</div>
+                                <div className="greet">{this.state.height} feet</div>
                                 <Selector 
                                     groupTitle="Tide"
                                     selected={tide} 
@@ -707,17 +716,53 @@ class WaveFinder extends React.Component {
         console.log(`WaveFinder = > setTide(${tide})`)
         let currentTide = (Number(tide)>2) ? "medium" : "low";
         currentTide = (Number(tide)>4) ? "high" : currentTide;
-        this.setState({
-            tide: currentTide,
-            height: tide
-        })
+        if (this.state.pause === false) {
+            this.setState({
+                tide: currentTide,
+                height: tide
+            })
+        }
     }
-    setWind = (direction, angle, speed, gusts) => this.setState({
-        windDirection: direction,
-        windAngle: Number(angle).toFixed(0),
-        windSpeed: Number(speed).toFixed(0),
-        windGusts: Number(gusts).toFixed(0)
-    })
+    setWind = (direction, angle, speed, gusts) => {
+        if (this.state.pause === false) {
+            this.setState({
+                windDirection: direction,
+                windAngle: Number(angle).toFixed(0),
+                windSpeed: Number(speed).toFixed(0),
+                windGusts: Number(gusts).toFixed(0)
+            }) 
+        }
+    }
+    getTideIcon = <img src={tide} className={`mb--5 ${this.getStarKind("tide")}`} alt="tide" />;
+    getWaterTempIcon = <img src={waterTemp} className={`mb--7 ${this.getStarKind("tide")}`} alt="water temp" />;
+    getAirTempIcon = <img src={airTemp} className={`mb--7 ${this.getStarKind("tide")}`} alt="air temp" />;
+    getSwellIcon = (id) => {
+        if (id === 1) {
+            return <img src={swell1} className={`mb--5 ${this.getStarKind("tide")}`} alt="swell1" />
+        } else {
+            return <img src={swell2} className={`mb--5 ${this.getStarKind("tide")}`} alt="swell2" />;
+        }
+    }
+    getWindIcon = () => {
+        const windDirection = this.state.windDirection;
+        if (windDirection === "N") {
+            return <img src={N} className={`mb--5 ${this.getStarKind("tide")}`} alt="air temp" />;
+        } else if ((windDirection === "NE") || (windDirection === "NNE") || (windDirection === "ENE")) {
+            return <img src={NE} className={`mb--5 ${this.getStarKind("tide")}`} alt="air temp" />;
+        } else if (windDirection === "E") {
+            return <img src={E} className={`mb--5 ${this.getStarKind("tide")}`} alt="air temp" />;
+        } else if ((windDirection === "SE") || (windDirection === "SSE") || (windDirection === "ESE")) {
+            return <img src={SE} className={`mb--5 ${this.getStarKind("tide")}`} alt="air temp" />;
+        } else if (windDirection === "S") {
+            return <img src={S} className={`mb--5 ${this.getStarKind("tide")}`} alt="air temp" />;
+        } else if ((windDirection === "SW") || (windDirection === "SSW") || (windDirection === "WSW")) {
+            return <img src={SW} className={`mb--5 ${this.getStarKind("tide")}`} alt="air temp" />;
+        } else if (windDirection === "W") {
+            return <img src={W} className={`mb--5 ${this.getStarKind("tide")}`} alt="air temp" />;
+        } else if ((windDirection === "NW") || (windDirection === "NNW") || (windDirection === "WNW")) {
+            return <img src={NW} className={`mb--5 ${this.getStarKind("tide")}`} alt="air temp" />;
+        }
+    }
     render() {
 //        console.log(`currentPositionExists: ${this.currentPositionExists()}`)
         const {locations, windDirection, swell1Direction, swell2Direction, tide, height, stars} = this.state;
@@ -825,11 +870,11 @@ class WaveFinder extends React.Component {
                             <span className="bold">{time}</span>
                             <Geolocator currentPositionExists={this.currentPositionExists} returnCurrentPosition={this.updateCurrentLocation}/>
                             <div className="flexContainer">
-                                <span className="flex3Column p-5 r-5 color-orange bg-lite m-5">tide<br/><Tide setTide={this.setTide}/></span>
-                                <span className="flex3Column p-5 r-5 color-blue bg-lite m-5">water<br/><WaterTemp/></span>
-                                <span className="flex3Column p-5 r-5 color-white bg-lite m-5">air<br/><AirTemp/></span>
+                                <span className="flex3Column p-5 r-5 color-orange bg-lite m-5">{this.getTideIcon} tide<br/><Tide setTide={this.setTide}/></span>
+                                <span className="flex3Column p-5 r-5 color-blue bg-lite m-5">{this.getWaterTempIcon}<span className="ml-2">water</span><br/><WaterTemp/></span>
+                                <span className="flex3Column p-5 r-5 color-white bg-lite m-5">{this.getAirTempIcon}<span className="ml-2">air</span><br/><AirTemp/></span>
                             </div>
-                            <div className="flex3Column p-5 r-5 color-yellow bg-lite m-5">wind<WindDirection setWind={this.setWind}/></div>
+                            <div className="flex3Column p-5 r-5 color-yellow bg-lite m-5">{this.getWindIcon()}wind<WindDirection setWind={this.setWind}/></div>
                             <div className="flexContainer">
                                 {this.swellSelector(1,swell1Direction)}
                                 {this.swellSelector(2,swell2Direction)}
@@ -849,12 +894,13 @@ class WaveFinder extends React.Component {
                                         onChange={this.handleDistanceSelection}/>
                                 </label>
                             </div>
+                            <div className="bg-neogreen r-10 m-5 p-15 color-black bold" onClick={this.unpause}>Use live data</div>
                         </div>
                         <div className="mt-10 mb-20">
                             <span className="color-neogreen bold">{count} waves</span> out of {locations.length}<br/>
                             are in a <span className="color-neogreen bold">{this.state.distance}</span> mile radius<br/>
                             and prefer <span className="color-neogreen bold">{swell1Direction} </span>and <span className="color-orange bold ">{swell2Direction} </span>swell <br/>
-                            with <span className="color-neogreen bold">{this.state.height} {tide}</span>tide:
+                            with <span className="color-neogreen bold">{this.state.height} {tide} </span>tide:
                         </div>
                         {getLocations}
                     </div> 
