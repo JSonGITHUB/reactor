@@ -1,5 +1,4 @@
 import React from 'react';
-import Dialog from '../functional/Dialog.js';
 import Loader from '../utils/Loader.js';
 
 class Geolocate extends React.Component {

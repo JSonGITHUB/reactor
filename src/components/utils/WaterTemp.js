@@ -1,5 +1,4 @@
 import React from 'react';
-import Dialog from '../functional/Dialog.js';
 import Loader from '../utils/Loader.js';
 
 class WaterTemp extends React.Component {
@@ -34,7 +33,7 @@ class WaterTemp extends React.Component {
         this.getWaterTempData();
         this.timerID = setInterval(
             () => this.tick(),
-            4000
+            62000
         );
     }
     componentWillUnmount() {
@@ -44,7 +43,7 @@ class WaterTemp extends React.Component {
         console.log(`getWaterTemp ->`);
         this.getWaterTempData();
     }
-    getCurrentTemp = () => <div>{this.state.temp}° F</div>;
+    getCurrentTemp = () => <div>{this.state.temp}° <span className="greet">F</span></div>;
     percent = 'twentyfivePercent mt--70 mb--70';
     loading = () => <div className={this.percent}>
                 <Loader isMotionOn={this.props.isMotionOn}/>

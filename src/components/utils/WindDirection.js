@@ -1,5 +1,4 @@
 import React from 'react';
-import Dialog from '../functional/Dialog.js';
 import Loader from '../utils/Loader.js';
 
 class WindDirection extends React.Component {
@@ -61,7 +60,7 @@ class WindDirection extends React.Component {
         this.getWindData();
         this.timerID = setInterval(
             () => this.tick(),
-            3000
+            61000
         );
     }
     componentWillUnmount() {
@@ -79,7 +78,7 @@ class WindDirection extends React.Component {
     */
     getCurrentWind = () => <div className="flexContainer">
                             <div className="flex3Column">{`${this.state.direction} ${Number(this.state.angle).toFixed(0)}°`}</div>
-                            <div className="flex3Column">{`${Number(this.state.speed).toFixed(0)}-${Number(this.state.gusts).toFixed(0)} knots`}</div>
+                            <div className="flex3Column">{`${Number(this.state.speed).toFixed(0)}-${Number(this.state.gusts).toFixed(0)}`} <span className="greet">knots</span></div>
                         </div>
     percent = 'twentyfivePercent mt--70 mb--70';
     loading = () => <div className={this.percent}>
