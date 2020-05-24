@@ -84,10 +84,6 @@ class WindDirection extends React.Component {
                             <div className={(this.props.columns > 1) ? "flex3Column": ""}>{`${this.state.direction} ${Number(this.state.angle).toFixed(0)}°`}</div>
                             <div className={(this.props.columns > 1) ? "flex3Column": ""}>{`${Number(this.state.speed).toFixed(0)}-${Number(this.state.gusts).toFixed(0)}`} <span className="greet">knots</span></div>
                         </div>
-    percent = 'twentyfivePercent mt--70 mb--70';
-    loading = () => <div className={this.percent}>
-                <Loader isMotionOn={this.props.isMotionOn}/>
-            </div>;
     render() {
         return <div>{this.getCurrentWind()}</div>
     };

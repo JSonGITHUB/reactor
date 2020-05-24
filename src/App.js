@@ -80,7 +80,7 @@ class App extends React.Component {
             </Switch> 
             <div className="fadeIn">
                 <Switch>
-                  <Route exact path="/" component={Home} />
+                  <Route exact path="/" render={(props) => <WaveFinder {...props} tide="medium" isSwell1="false" isSwell2="false" isTide="false" isWind="false" swell1Direction="SSW" swell2Direction="W" windDirection="W" distance="10" />}/>
                   <Route path="/Home" component={Home} />
                   {/*<Route path="/BowlBuilder" component={BowlBuilder} />*/}
                   <Route path='/BowlBuilder' render={(props) => <BowlBuilder {...props} width={width} height={height} />}/>
