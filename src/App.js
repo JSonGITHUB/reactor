@@ -11,6 +11,7 @@ import BowlBuilder from './components/BowlBuilder.js';
 import LogDirectory from './components/LogDirectory.js';
 import SurfLog from './components/Logger.js';
 import WaveFinder from './components/WaveFinder.js';
+import SurfReports from './components/utils/SurfReports.js';                            
 import SlideShow from './components/SlideShow.js';
 import './assets/css/App.css';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
@@ -90,6 +91,7 @@ class App extends React.Component {
                   {/*<Route path="/SurfLog" component={SurfLog} />*/}
                   <Route path='/SurfLog' render={(props) => <SurfLog {...props} logId={logId} />}/>
                   <Route path='/WaveFinder' render={(props) => <WaveFinder {...props} tide="medium" isSwell1="false" isSwell2="false" isTide="false" isWind="false" swell1Direction="SSW" swell2Direction="W" windDirection="W" distance="10" />}/>
+                  <Route path="/SurfReports" component={SurfReports} />
                   <Route path="/LogDirectory" component={LogDirectory} />
                   <Route path="/Swell" component={SlideShow} />
                 </Switch>

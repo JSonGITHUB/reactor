@@ -646,7 +646,7 @@ input.error {
   animation: topReveal 1s ease;
 }
 .t-collapse {
-  top: -500px;
+  top: -800px;
   position: fixed;
   animation: topCollapse 1s ease;
 }

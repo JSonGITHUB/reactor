@@ -5,7 +5,8 @@ class WindDirection extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            direction: null
+            direction: null,
+            columns: props.columns
         }
     }
     getWindData = () => {
@@ -24,6 +25,8 @@ class WindDirection extends React.Component {
         fetch(uri)
             .then(response => validate(response))
             .then(data => {
+                console.log(`WindDirection => direction: ${data.data[0].dr}`)
+                this.props.setWind(data.data[0].dr, data.data[0].d, data.data[0].s, data.data[0].g)
                 this.setState({
                     station: data.metadata.name,
                     speed: data.data[0].s,
@@ -56,29 +59,30 @@ class WindDirection extends React.Component {
     }
     */
     componentDidMount() {
-        
         this.getWindData();
         this.timerID = setInterval(
             () => this.tick(),
-            61000
+            25000
         );
     }
     componentWillUnmount() {
         clearInterval(this.timerID);
     }
     tick() {
-        console.log(`getWind ->`);
-        this.getWindData();
-        this.props.setWind(this.state.direction, this.state.angle, this.state.speed, this.state.gusts)
+        if (this.state.direction === null) {
+            console.log(`getWind ->`);
+            this.getWindData();
+        }
+        
     }
     /*
     Water Level: 2.01 ft Above MLLW
     Next Tide at 3:09 PM: Low 1.70 ft
     Gusting to: 12.3 kts from WSW
     */
-    getCurrentWind = () => <div className="flexContainer">
-                            <div className="flex3Column">{`${this.state.direction} ${Number(this.state.angle).toFixed(0)}°`}</div>
-                            <div className="flex3Column">{`${Number(this.state.speed).toFixed(0)}-${Number(this.state.gusts).toFixed(0)}`} <span className="greet">knots</span></div>
+    getCurrentWind = () => <div className={(this.props.columns > 1) ? "flexContainer": ""}>
+                            <div className={(this.props.columns > 1) ? "flex3Column": ""}>{`${this.state.direction} ${Number(this.state.angle).toFixed(0)}°`}</div>
+                            <div className={(this.props.columns > 1) ? "flex3Column": ""}>{`${Number(this.state.speed).toFixed(0)}-${Number(this.state.gusts).toFixed(0)}`} <span className="greet">knots</span></div>
                         </div>
     percent = 'twentyfivePercent mt--70 mb--70';
     loading = () => <div className={this.percent}>

@@ -621,10 +621,10 @@ class WaveFinder extends React.Component {
     tideClass = () => `${this.isTideSelected()} flex2Column r-10 m-5 p-15`;
     tideSelector = (tide) => <div className={this.tideClass()}>
                                 Tide:
-                                <div className="greet">{this.state.height} feet</div>
+                                <div className="greet"><Tide setTide={this.setTide}/></div>
                                 <Selector 
                                     groupTitle="Tide"
-                                    selected={tide} 
+                                    selected={this.state.tide} 
                                     label="current" 
                                     items={["low", "medium", "hign"]}
                                     onChange={this.handleTideSelection}
@@ -636,12 +636,12 @@ class WaveFinder extends React.Component {
     isWindSelected = () => (this.state.isWind === true) ? 'bg-green' : 'bg-red';
     windClass = () => `${this.isWindSelected()} flex2Column r-10 m-5 p-15`;
     windSelector = (windDirection) => <div className={this.windClass()}>
+                            {console.log(`windSelector => windDirection: ${this.state.windDirection}`)}
                             Wind:<br/>
-                            <div className="greet">{this.state.windAngle}°</div>
-                            <div className="greet">{this.state.windSpeed}-{this.state.windGusts}kts</div>
+                            <div className="greet"><WindDirection columns="1" setWind={this.setWind}/></div>
                             <Selector
                                 groupTitle="Wind" 
-                                selected={windDirection} 
+                                selected={this.state.windDirection} 
                                 label="Direction"
                                 items={["W", "WSW", "WNW", "E", "ESE", "ENE", "N", "NE", "NNE", "NW", "NNW", "S", "SE", "SSE", "SW", "SSW"]}
                                 onChange={this.handleWindSelection}
@@ -707,9 +707,15 @@ class WaveFinder extends React.Component {
             return this.state.windDirection;
         }
     }
+    getStarDetails = (kind) => {
+        let details = "";
+        details = (kind === "tide") ? <div className="bold color-neogreen">{this.state.height}</div> : details;
+        details = (kind === "wind") ? <div className="bold color-neogreen">{this.state.windSpeed}-{this.state.windGusts}kts</div> : details;
+        return details
+    }
     star = (matchKind) => <div className="flex3Column bg-lite mr-5 ml-5 p-10 r-10">
                             {this.getMatchIcon(matchKind)}
-                            <div className="greet">{this.getState(matchKind)}{(matchKind === "tide") ? ` ${this.state.height}'` : ""}</div>
+                            <div className="greet">{this.getState(matchKind)}{this.getStarDetails(matchKind)}</div>
                         </div>;
     getStars = (stars) => stars.map((star) => this.star(star));
     setTide = (tide) => {
@@ -724,7 +730,8 @@ class WaveFinder extends React.Component {
         }
     }
     setWind = (direction, angle, speed, gusts) => {
-        if (this.state.pause === false) {
+        console.log(`setWind => direction: ${direction}`)
+        if (!this.state.pause) {
             this.setState({
                 windDirection: direction,
                 windAngle: Number(angle).toFixed(0),
@@ -874,7 +881,7 @@ class WaveFinder extends React.Component {
                                 <span className="flex3Column p-5 r-5 color-blue bg-lite m-5">{/*this.getWaterTempIcon*/}<span className="ml-2">water</span><br/><WaterTemp/></span>
                                 <span className="flex3Column p-5 r-5 color-white bg-lite m-5">{/*this.getAirTempIcon*/}<span className="ml-2">air</span><br/><AirTemp/></span>
                             </div>
-                            <div className="flex3Column p-5 r-5 color-yellow bg-lite m-5">{this.getWindIcon()}wind<WindDirection setWind={this.setWind}/></div>
+                            <div className="flex3Column p-5 r-5 color-yellow bg-lite m-5"><span className="bg-white p-3 m-10 r-20">{this.getWindIcon()}</span>wind<WindDirection columns="2" setWind={this.setWind}/></div>
                             <div className="flexContainer">
                                 {this.swellSelector(1,swell1Direction)}
                                 {this.swellSelector(2,swell2Direction)}
