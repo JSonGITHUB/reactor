@@ -753,21 +753,21 @@ class WaveFinder extends React.Component {
     getWindIcon = () => {
         const windDirection = this.state.windDirection;
         if (windDirection === "N") {
-            return <img src={N} className={`mb--5 ${this.getStarKind("tide")}`} alt="air temp" />;
+            return <img src={N} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
         } else if ((windDirection === "NE") || (windDirection === "NNE") || (windDirection === "ENE")) {
-            return <img src={NE} className={`mb--5 ${this.getStarKind("tide")}`} alt="air temp" />;
+            return <img src={NE} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
         } else if (windDirection === "E") {
-            return <img src={E} className={`mb--5 ${this.getStarKind("tide")}`} alt="air temp" />;
+            return <img src={E} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
         } else if ((windDirection === "SE") || (windDirection === "SSE") || (windDirection === "ESE")) {
-            return <img src={SE} className={`mb--5 ${this.getStarKind("tide")}`} alt="air temp" />;
+            return <img src={SE} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
         } else if (windDirection === "S") {
-            return <img src={S} className={`mb--5 ${this.getStarKind("tide")}`} alt="air temp" />;
+            return <img src={S} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
         } else if ((windDirection === "SW") || (windDirection === "SSW") || (windDirection === "WSW")) {
-            return <img src={SW} className={`mb--5 ${this.getStarKind("tide")}`} alt="air temp" />;
+            return <img src={SW} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
         } else if (windDirection === "W") {
-            return <img src={W} className={`mb--5 ${this.getStarKind("tide")}`} alt="air temp" />;
+            return <img src={W} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
         } else if ((windDirection === "NW") || (windDirection === "NNW") || (windDirection === "WNW")) {
-            return <img src={NW} className={`mb--5 ${this.getStarKind("tide")}`} alt="air temp" />;
+            return <img src={NW} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
         }
     }
     render() {
