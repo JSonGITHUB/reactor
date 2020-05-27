@@ -1,9 +1,9 @@
 import React from 'react';
-import Dialog from './functional/Dialog.js';
-import Selector from './forms/FunctionalSelector.js';
-import RadioSelector from './forms/FormRadio.js';
+import Dialog from '../functional/Dialog.js';
+import Selector from '../forms/FunctionalSelector.js';
+import RadioSelector from '../forms/FormRadio.js';
 import DatePicker from 'react-date-picker';
-import getKey from './utils/KeyGenerator.js';
+import getKey from '../utils/KeyGenerator.js';
 import PostDirectory from './PostDirectory.js';
 import LogData from './LogData.js';
 import {BrowserRouter as Router, Switch, Link, Route} from 'react-router-dom';

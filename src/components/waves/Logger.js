@@ -1,6 +1,6 @@
 import React from 'react';
 import LogEntry from './LogEntry.js';
-import Loader from './utils/Loader.js';
+import Loader from '../utils/Loader.js';
 import LogId from './LogId.js';
 class Logger extends React.Component {
 

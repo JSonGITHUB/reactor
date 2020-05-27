@@ -1,27 +1,28 @@
 import React from 'react';
-import getKey from './utils/KeyGenerator.js';
-import Geolocator from './utils/Geolocator.js';
-import Tide from './utils/Tide.js';
-import WaterTemp from './utils/WaterTemp.js';
-import AirTemp from './utils/AirTemp.js';
-import WindDirection from './utils/WindDirection.js';
-import Selector from './forms/FunctionalSelector.js';
-import Dialog from './functional/Dialog.js';
-import swell1 from '../assets/images/wavePrimary.png'
-import swell2 from '../assets/images/waveSecondaryB.png'
-import N from '../assets/images/windN.png'
-import NE from '../assets/images/windNE.png'
-import E from '../assets/images/windE.png'
-import SE from '../assets/images/windSE.png'
-import S from '../assets/images/windS.png'
-import SW from '../assets/images/windSW.png'
-import W from '../assets/images/windW.png'
-import NW from '../assets/images/windNW.png'
-import tide from '../assets/images/tide.png'
-import waterTemp from '../assets/images/waterTemp.png'
-import airTemp from '../assets/images/airTemp.png'
-import thumbsUp from '../assets/images/ThumbsUp.png';
-import thumbsDown from '../assets/images/ThumbsDown.png';
+import getKey from '../utils/KeyGenerator.js';
+import Geolocator from '../utils/Geolocator.js';
+import Tide from './Tide.js';
+import WaterTemp from './WaterTemp.js';
+import AirTemp from './AirTemp.js';
+import WindDirection from './WindDirection.js';
+import Selector from '../forms/FunctionalSelector.js';
+import Dialog from '../functional/Dialog.js';
+import swell1 from '../../assets/images/wavePrimary.png'
+import swell2 from '../../assets/images/waveSecondaryB.png'
+import N from '../../assets/images/windN.png'
+import NE from '../../assets/images/windNE.png'
+import E from '../../assets/images/windE.png'
+import SE from '../../assets/images/windSE.png'
+import S from '../../assets/images/windS.png'
+import SW from '../../assets/images/windSW.png'
+import W from '../../assets/images/windW.png'
+import NW from '../../assets/images/windNW.png'
+import tide from '../../assets/images/tide.png'
+import waterTemp from '../../assets/images/waterTemp.png'
+import airTemp from '../../assets/images/airTemp.png'
+import thumbsUp from '../../assets/images/ThumbsUp.png';
+import thumbsDown from '../../assets/images/ThumbsDown.png';
+import SurfLocation from './SurfLocation.js';
 
 class WaveFinder extends React.Component {
     
@@ -709,7 +710,7 @@ class WaveFinder extends React.Component {
     }
     getStarDetails = (kind) => {
         let details = "";
-        details = (kind === "tide") ? <div className="bold color-neogreen">{this.state.height}</div> : details;
+        details = (kind === "tide") ? <div className="bold color-neogreen">{this.state.height}'</div> : details;
         details = (kind === "wind") ? <div className="bold color-neogreen">{this.state.windSpeed}-{this.state.windGusts}kts</div> : details;
         return details
     }
@@ -831,12 +832,15 @@ class WaveFinder extends React.Component {
         const windConfirm = (matches) => ((this.state.isWind && matches.includes("wind")) || this.state.isWind === false) ? true : false;
         const getMatchingLocation = (item) => {
             const matches = match(item);
+            const inRegion = regionMatch(item);
             if (swell1Confirm(matches) && swell2Confirm(matches) && tideConfirm(matches) && windConfirm(matches)) {
-                if (regionMatch(item) !== false) {
+                if (inRegion !== false) {
                     if (matches.length >= Number(this.state.stars)) {
                         //console.log(`STARS ==================> Matches: ${matches.length} state stars:${this.state.stars}`)
                         count = count + 1;
-                        return <div key={getKey("loc")}>
+                        return <SurfLocation state={this.state} item={item} matches={matches} calculateDistance={calculateDistance} regionMatch={inRegion}></SurfLocation>
+                        /*
+                        <div key={getKey("loc")}>
                                     <div className="r-10 m-10 p-20 bg-dkGreen">
                                             <div className="width100Percent flexContainer">{this.getStars(matches)}</div>
                                             <div className="mt-10 navBranding">{item.name}</div>
@@ -861,6 +865,7 @@ class WaveFinder extends React.Component {
                                         </div>   
                                     </div>
                                 </div>
+                                */
                     }
                 }
             }
@@ -907,7 +912,7 @@ class WaveFinder extends React.Component {
                             <span className="color-neogreen bold">{count} waves</span> out of {locations.length}<br/>
                             are in a <span className="color-neogreen bold">{this.state.distance}</span> mile radius<br/>
                             and prefer <span className="color-neogreen bold">{swell1Direction} </span>and <span className="color-orange bold ">{swell2Direction} </span>swell <br/>
-                            with <span className="color-neogreen bold">{this.state.height} {tide} </span>tide:
+                            with a <span className="color-neogreen bold">{this.state.height}' {tide} </span>tide:
                         </div>
                         {getLocations}
                     </div> 

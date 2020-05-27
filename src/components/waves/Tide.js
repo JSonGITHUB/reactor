@@ -6,19 +6,23 @@ class Tide extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            tide: "low",
-            height: "1'"
+            tide: null,
+            height: null
         }
     }
     getTideData = () => {
+        console.log(`getTide ->`);
         let data;
         const returnJSON = (response) => response.json();
         const returnRejection = (response) => Promise.reject({status: response.status, data});
         const validate = (response) => (response.ok) ? returnJSON(response) : returnRejection(response);
         let getCurrentTime = new Date();
-        getCurrentTime = `${(getCurrentTime.getFullYear())}${((getCurrentTime.getMonth()+1)<10) ? `0${(getCurrentTime.getMonth()+1)}` : (getCurrentTime.getMonth()+1)}${(getCurrentTime.getDate()<10)? `0${getCurrentTime.getDate()}` : getCurrentTime.getDate()}%20${((getCurrentTime.getHours())<10) ? `0${(getCurrentTime.getHours())}` : (getCurrentTime.getHours())}:00`
+        const getEndTime = `${(getCurrentTime.getFullYear())}${((getCurrentTime.getMonth()+1)<10) ? `0${(getCurrentTime.getMonth()+1)}` : (getCurrentTime.getMonth()+1)}${(getCurrentTime.getDate()<10)? `0${getCurrentTime.getDate()}` : getCurrentTime.getDate()}%20${((getCurrentTime.getHours())<10) ? `0${(getCurrentTime.getHours())}` : (getCurrentTime.getHours())}:${((getCurrentTime.getMinutes())<10) ? `0${(getCurrentTime.getMinutes())}` : (getCurrentTime.getMinutes())}`;
+        //getCurrentTime = "20200520%2018:24";
+        const getStartTime = `${(getCurrentTime.getFullYear())}${((getCurrentTime.getMonth()+1)<10) ? `0${(getCurrentTime.getMonth()+1)}` : (getCurrentTime.getMonth()+1)}${(getCurrentTime.getDate()<10)? `0${getCurrentTime.getDate()}` : getCurrentTime.getDate()}%20${((getCurrentTime.getHours())<10) ? `0${(getCurrentTime.getHours())}` : (getCurrentTime.getHours())}:00`;
+        getCurrentTime = `${(getCurrentTime.getFullYear())}${((getCurrentTime.getMonth()+1)<10) ? `0${(getCurrentTime.getMonth()+1)}` : (getCurrentTime.getMonth()+1)}${(getCurrentTime.getDate()<10)? `0${getCurrentTime.getDate()}` : getCurrentTime.getDate()}%20${((getCurrentTime.getHours())<10) ? `0${(getCurrentTime.getHours())}` : (getCurrentTime.getHours())}:${((getCurrentTime.getMinutes())<10) ? `0${(getCurrentTime.getMinutes())}` : (getCurrentTime.getMinutes())}`
         console.log(`Tide   -      getCurrentTime: ${getCurrentTime} ===> 20200520%2018:24`)
-        const uriMLLW = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime}&end_date=${getCurrentTime}&station=9410230&product=water_level&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
+        const uriMLLW = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getStartTime}&end_date=${getEndTime}&station=9410230&product=water_level&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
         const uriMHHW = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime}&end_date=${getCurrentTime}&station=9410230&product=water_level&datum=MHHW&units=english&time_zone=lst_ldt&application=web_services&format=json`;
         const uriMHW = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime}&end_date=${getCurrentTime}&station=9410230&product=water_level&datum=MHW&units=english&time_zone=lst_ldt&application=web_services&format=json`;
         const uriMTL = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime}&end_date=${getCurrentTime}&station=9410230&product=water_level&datum=MTL&units=english&time_zone=lst_ldt&application=web_services&format=json`;
@@ -32,30 +36,25 @@ class Tide extends React.Component {
         fetch(uri)
             .then(response => validate(response))
             .then(data => {
+                const waterLevel = Number(data.data[data.data.length - 1].v).toFixed(1);
+                console.log(`tideData => ${JSON.stringify(data, null, 2)}`)
+                this.props.setTide(waterLevel)
                 this.setState({
                     station: data.metadata.name,
-                    tide:"HIGH",
-                    height: Number(data.data[0].v).toFixed(1)
+                    tide:(waterLevel > 3) ? "high" : (waterLevel < 2) ? "low" : "med",
+                    height: waterLevel
                 })
             })
             .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
 
     }
+    getInterval = () => (this.state.height !== null) ? 150000 : 30000;
     componentDidMount() {
-        
         this.getTideData();
-        this.timerID = setInterval(
-            () => this.tick(),
-            60000
-        );
+        this.timerID = setInterval(() => this.getTideData(), this.getInterval());
     }
     componentWillUnmount() {
         clearInterval(this.timerID);
-    }
-    tick() {
-        console.log(`getTide ->`);
-        this.getTideData();
-        this.props.setTide(this.state.height)
     }
     getCurrentTide = () => <div>{this.state.height} <span className="greet">feet</span></div>;
     percent = 'twentyfivePercent mt--70 mb--70';
