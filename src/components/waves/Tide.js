@@ -17,9 +17,18 @@ class Tide extends React.Component {
         const returnRejection = (response) => Promise.reject({status: response.status, data});
         const validate = (response) => (response.ok) ? returnJSON(response) : returnRejection(response);
         let getCurrentTime = new Date();
-        const getEndTime = `${(getCurrentTime.getFullYear())}${((getCurrentTime.getMonth()+1)<10) ? `0${(getCurrentTime.getMonth()+1)}` : (getCurrentTime.getMonth()+1)}${(getCurrentTime.getDate()<10)? `0${getCurrentTime.getDate()}` : getCurrentTime.getDate()}%20${((getCurrentTime.getHours())<10) ? `0${(getCurrentTime.getHours())}` : (getCurrentTime.getHours())}:${((getCurrentTime.getMinutes())<10) ? `0${(getCurrentTime.getMinutes())}` : (getCurrentTime.getMinutes())}`;
-        const getStartTime = `${(getCurrentTime.getFullYear())}${((getCurrentTime.getMonth()+1)<10) ? `0${(getCurrentTime.getMonth()+1)}` : (getCurrentTime.getMonth()+1)}${(getCurrentTime.getDate()<10)? `0${getCurrentTime.getDate()}` : getCurrentTime.getDate()}%20${((getCurrentTime.getHours())<10) ? `0${(getCurrentTime.getHours())}` : (getCurrentTime.getHours())}:00`;
-        getCurrentTime = `${(getCurrentTime.getFullYear())}${((getCurrentTime.getMonth()+1)<10) ? `0${(getCurrentTime.getMonth()+1)}` : (getCurrentTime.getMonth()+1)}${(getCurrentTime.getDate()<10)? `0${getCurrentTime.getDate()}` : getCurrentTime.getDate()}%20${((getCurrentTime.getHours())<10) ? `0${(getCurrentTime.getHours())}` : (getCurrentTime.getHours())}:${((getCurrentTime.getMinutes())<10) ? `00` : (getCurrentTime.getMinutes())}`
+        const year = getCurrentTime.getFullYear();
+        const currentMonth = getCurrentTime.getMonth()+1;
+        const month = ((currentMonth)<10) ? `0${(currentMonth)}` : currentMonth;
+        const currentDate = getCurrentTime.getDate();
+        const date = (currentDate<10) ? `0${currentDate}` : currentDate;
+        const currentHour = getCurrentTime.getHours();
+        const hours = (currentHour<10) ? `0${currentHour}` : currentHour;
+        const currentMinutes = getCurrentTime.getMinutes();
+        const minutes = (currentMinutes<10) ? `0${currentMinutes}` : currentMinutes;
+        const getEndTime = `${year}${month}${date}%20${hours}:${minutes}`;
+        const getStartTime = `${year}${month}${date}%20${hours-1}:00`;
+        getCurrentTime = `${year}${month}${date}%20${hours}:${minutes}`;
         console.log(`Tide   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
         const uriMLLW = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getStartTime}&end_date=${getEndTime}&station=9410230&product=water_level&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
         const uriMHHW = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime}&end_date=${getCurrentTime}&station=9410230&product=water_level&datum=MHHW&units=english&time_zone=lst_ldt&application=web_services&format=json`;
