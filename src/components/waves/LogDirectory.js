@@ -1,10 +1,10 @@
 import React from 'react';
-import Dialog from './functional/Dialog.js';
-import getKey from './utils/KeyGenerator.js';
+import Dialog from '../functional/Dialog.js';
+import getKey from '../utils/KeyGenerator.js';
 import PostDirectory from './PostDirectory.js';
-import shakaBlack from '../assets/images/shakaBlack.png';
-import thumbsUp from '../assets/images/ThumbsUp.png';
-import thumbsDown from '../assets/images/ThumbsDown.png';
+import shakaBlack from '../../assets/images/shakaBlack.png';
+import thumbsUp from '../../assets/images/ThumbsUp.png';
+import thumbsDown from '../../assets/images/ThumbsDown.png';
 import {BrowserRouter as Router, Switch, Link, Route} from 'react-router-dom';
 
 class LogDirectory extends React.Component {

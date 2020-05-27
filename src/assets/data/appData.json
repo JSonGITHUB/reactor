@@ -194,12 +194,20 @@
                 "",
                 "N",
                 "NE",
+                "ENE",
+                "NNE",
                 "NW",
-                "E",
+                "NNW",
                 "W",
+                "WNW",
+                "E",
+                "ESE",
                 "S",
                 "SE",
-                "SW"
+                "SSE",
+                "WSW",
+                "SW",
+                "SSW"
             ]
         },
         {
@@ -299,12 +307,20 @@
                 "",
                 "N",
                 "NE",
+                "ENE",
+                "NNE",
                 "NW",
-                "E",
+                "NNW",
                 "W",
+                "WNW",
+                "E",
+                "ESE",
                 "S",
                 "SE",
-                "SW"
+                "SSE",
+                "WSW",
+                "SW",
+                "SSW"
             ]
         },
         {
@@ -404,12 +420,20 @@
                 "",
                 "N",
                 "NE",
+                "ENE",
+                "NNE",
                 "NW",
-                "E",
+                "NNW",
                 "W",
+                "WNW",
+                "E",
+                "ESE",
                 "S",
                 "SE",
-                "SW"
+                "SSE",
+                "WSW",
+                "SW",
+                "SSW"
             ]
         },
         {
@@ -484,12 +508,20 @@
                 "",
                 "N",
                 "NE",
+                "ENE",
+                "NNE",
                 "NW",
-                "E",
+                "NNW",
                 "W",
+                "WNW",
+                "E",
+                "ESE",
                 "S",
                 "SE",
-                "SW"
+                "SSE",
+                "WSW",
+                "SW",
+                "SSW"
             ]
         },
         {
