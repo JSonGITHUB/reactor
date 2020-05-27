@@ -30,7 +30,7 @@ class AirTemp extends React.Component {
             })
             .catch(err => console.log(`Something went wrong!\nuri: ${airTempuri} \npath: ${window.location.pathname}\n`, err));
     }
-    getInterval = () => (this.state.temp !== null) ? 150000 : 33000;
+    getInterval = () => 300000;
     componentDidMount() {
         this.getAirTempData()
         this.timerID = setInterval(() => this.getAirTempData(), this.getInterval());

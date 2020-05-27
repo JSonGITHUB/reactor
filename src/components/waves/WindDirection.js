@@ -65,7 +65,7 @@ class WindDirection extends React.Component {
         ]
     }
     */
-    getInterval = () => (this.state.direction !== null) ? 150000 : 32000;
+    getInterval = () => 300000;
     componentDidMount() {
         this.getWindData()
         this.timerID = setInterval(() => this.getWindData(), this.getInterval());

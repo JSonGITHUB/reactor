@@ -47,7 +47,7 @@ class Tide extends React.Component {
             .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
 
     }
-    getInterval = () => (this.state.height !== null) ? 150000 : 30000;
+    getInterval = () => 300000;
     componentDidMount() {
         this.getTideData();
         this.timerID = setInterval(() => this.getTideData(), this.getInterval());

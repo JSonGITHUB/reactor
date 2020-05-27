@@ -30,7 +30,7 @@ class WaterTemp extends React.Component {
             })
             .catch(err => console.log(`Something went wrong!\nuri: ${waterTempuri} \npath: ${window.location.pathname}\n`, err));
     }
-    getInterval = () => (this.state.temp !== null) ? 150000 : 31000;
+    getInterval = () => 300000;
     componentDidMount() {
         this.getWaterTempData()
         this.timerID = setInterval(() => this.getWaterTempData(), this.getInterval());
