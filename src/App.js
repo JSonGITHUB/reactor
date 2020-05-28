@@ -80,7 +80,22 @@ class App extends React.Component {
             </Switch> 
             <div className="fadeIn">
                 <Switch>
-                  <Route exact path="/" render={(props) => <WaveFinder {...props} tide="medium" isSwell1="false" isSwell2="false" isTide="false" isWind="false" swell1Direction="SSW" swell2Direction="W" windDirection="W" distance="10" />}/>
+                  <Route exact path="/" render={(props) => <WaveFinder {...props} 
+                      tide="medium" 
+                      isSwell1="false" 
+                      isSwell2="false" 
+                      isTide="false" 
+                      isWind="false" 
+                      swell1Direction="SSW" 
+                      swell2Direction="W"  
+                      swell1Angle="210" 
+                      swell2Angle="278" 
+                      swell1Height="3" 
+                      swell2Height="2" 
+                      windDirection="W" 
+                      distance="10" 
+                    />}
+                  />
                   <Route path="/Home" component={Home} />
                   {/*<Route path="/BowlBuilder" component={BowlBuilder} />*/}
                   <Route path='/BowlBuilder' render={(props) => <BowlBuilder {...props} width={width} height={height} />}/>
@@ -90,7 +105,7 @@ class App extends React.Component {
                   <Route path="/GuestList" component={SignUpDialog} />
                   {/*<Route path="/SurfLog" component={SurfLog} />*/}
                   <Route path='/SurfLog' render={(props) => <SurfLog {...props} logId={logId} />}/>
-                  <Route path='/WaveFinder' render={(props) => <WaveFinder {...props} tide="medium" isSwell1="false" isSwell2="false" isTide="false" isWind="false" swell1Direction="SSW" swell2Direction="W" windDirection="W" distance="10" />}/>
+                  <Route path='/WaveFinder' render={(props) => <WaveFinder {...props} tide="medium" isSwell1="false" isSwell2="false" isTide="false" isWind="false" swell1Direction="SSW" swell2Direction="W" swell1Angle="210" swell2Angle="278" swell1Height="3" swell2Height="2" windDirection="W" distance="10" />}/>
                   <Route path="/SurfReports" component={SurfReports} />
                   <Route path="/LogDirectory" component={LogDirectory} />
                   <Route path="/Swell" component={SlideShow} />

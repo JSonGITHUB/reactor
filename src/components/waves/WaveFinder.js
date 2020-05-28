@@ -39,6 +39,10 @@ class WaveFinder extends React.Component {
             stars: getDefault("stars"),
             swell1Direction: getDefault("swell1Direction"),
             swell2Direction: getDefault("swell2Direction"),
+            swell1Angle: getDefault("swell1Angle"),
+            swell2Angle: getDefault("swell2Angle"),
+            swell1Height: getDefault("swell1Height"),
+            swell2Height: getDefault("swell2Height"),
             windDirection: getDefault("windDirection"),
             distance: getDefault("distance"),
             isSwell1: (getDefault("isSwell1") === "true") ? true : false,
@@ -419,7 +423,11 @@ class WaveFinder extends React.Component {
         this.handleStarSelection = this.handleStarSelection.bind(this);
         this.handleSwell1Selection = this.handleSwell1Selection.bind(this);
         this.handleSwell2Selection = this.handleSwell2Selection.bind(this);
-        this.handleSwell2Selection = this.handleSwell2Selection.bind(this);
+        this.handleSwell1Angle = this.handleSwell1Angle.bind(this);
+        this.handleSwell2Angle = this.handleSwell2Angle.bind(this);
+        this.handleSwell1Height = this.handleSwell1Height.bind(this);
+        this.handleSwell2Height = this.handleSwell2Height.bind(this);
+        this.handleSwell2Check = this.handleSwell2Check.bind(this);
         this.handleSwell1Check = this.handleSwell1Check.bind(this);
         this.handleTideCheck = this.handleTideCheck.bind(this);
         this.handleDistanceSelection = this.handleDistanceSelection.bind(this);
@@ -463,7 +471,7 @@ class WaveFinder extends React.Component {
     }
     currentPositionExists = () => (this.state.longitude) ? true : false;
     updateCurrentLocation = (longitude, latitude) => {
-        console.log(`UPDATING CURRENT POSITION ======> longitude: ${longitude} latitude: ${latitude}`)
+//        console.log(`UPDATING CURRENT POSITION ======> longitude: ${longitude} latitude: ${latitude}`)
         this.setState({
             longitude,
             latitude
@@ -549,6 +557,30 @@ class WaveFinder extends React.Component {
             swell2Direction: selected
         })
     }
+    handleSwell1Angle = (groupTitle, label, selected) => {
+        localStorage.setItem("swell1Angle", selected);
+        this.setState({
+            swell1Angle: selected
+        })
+    }
+    handleSwell2Angle = (groupTitle, label, selected) => {
+        localStorage.setItem("swell2Angle", selected);
+        this.setState({
+            swell2Angle: selected
+        })
+    }
+    handleSwell1Height = (groupTitle, label, selected) => {
+        localStorage.setItem("swell1Height", selected);
+        this.setState({
+            swell1Height: selected
+        })
+    }
+    handleSwell2Height = (groupTitle, label, selected) => {
+        localStorage.setItem("swell2Height", selected);
+        this.setState({
+            swell2Height: selected
+        })
+    }
     handleWindSelection = (groupTitle, label, selected) => {
         localStorage.setItem("windDirection", selected);
         this.setState({
@@ -580,13 +612,81 @@ class WaveFinder extends React.Component {
     swellClass = (id) => `${this.isSwellSelected(id)} flex2Column r-10 m-5 p-15`;
     swellSelector = (id, swellDirection) => <div className={this.swellClass(id)}>
         {this.getSwellIcon(id)}
-        <span className="ml-5">Swell{id}:</span><br/>
+        <span className="ml-5">Swell{id}</span><br/>
+        <span className="greet ml-5">direction</span><br/>
         <Selector
             groupTitle={`Swell${id}`}
             selected={swellDirection} 
             label="Direction" 
             items={["W", "WSW", "WNW", "E", "ESE", "ENE", "N", "NE", "NNE", "NW", "NNW", "S", "SE", "SSE", "SW", "SSW"]}
             onChange={(id === 1) ? this.handleSwell1Selection : this.handleSwell2Selection}
+        />
+        <br/>
+        <span className="greet ml-5">angle</span><br/>
+        <Selector
+            groupTitle={`SwellAngle${id}`}
+            selected={(id === 1) ? this.state.swell1Angle : this.state.swell2Angle} 
+            label="Angle" 
+            items={[
+                "",
+                "170",
+                "175",
+                "180",
+                "185",
+                "190",
+                "195",
+                "200",
+                "205",
+                "210",
+                "215",
+                "220",
+                "225",
+                "230",
+                "235",
+                "240",
+                "245",
+                "250",
+                "255",
+                "260",
+                "265",
+                "270",
+                "275",
+                "280",
+                "285",
+                "290",
+                "295",
+                "300"
+            ]}
+            onChange={(id === 1) ? this.handleSwell1Angle : this.handleSwell2Angle}
+        />
+        <br/>
+        <span className="greet ml-5">height</span><br/>
+        <Selector
+            groupTitle={`SwellHeight${id}`}
+            selected={(id === 1) ? this.state.swell1Height : this.state.swell2Height} 
+            label="Height" 
+            items={[
+                "",
+                "1ft",
+                "2ft",
+                "3ft",
+                "4ft",
+                "5ft",
+                "6ft",
+                "7ft",
+                "8ft",
+                "9ft",
+                "10ft",
+                "11ft",
+                "12ft",
+                "13ft",
+                "14ft",
+                "15ft",
+                "16ft",
+                "17ft",
+                "18ft"
+            ]}
+            onChange={(id === 1) ? this.handleSwell1Height : this.handleSwell2Height}
         />
         {(id===1) ? 
             /*
@@ -621,7 +721,7 @@ class WaveFinder extends React.Component {
     isTideSelected = () => (this.state.isTide === true) ? 'bg-green' : 'bg-red';
     tideClass = () => `${this.isTideSelected()} flex2Column r-10 m-5 p-15`;
     tideSelector = (tide) => <div className={this.tideClass()}>
-                                Tide:
+                                Tide
                                 <div className="greet"><Tide setTide={this.setTide}/></div>
                                 <Selector 
                                     groupTitle="Tide"
@@ -637,8 +737,8 @@ class WaveFinder extends React.Component {
     isWindSelected = () => (this.state.isWind === true) ? 'bg-green' : 'bg-red';
     windClass = () => `${this.isWindSelected()} flex2Column r-10 m-5 p-15`;
     windSelector = (windDirection) => <div className={this.windClass()}>
-                            {console.log(`windSelector => windDirection: ${this.state.windDirection}`)}
-                            Wind:<br/>
+    {/*console.log(`windSelector => windDirection: ${this.state.windDirection}`)*/}
+                            Wind<br/>
                             <div className="greet"><WindDirection columns="1" setWind={this.setWind}/></div>
                             <Selector
                                 groupTitle="Wind" 
@@ -652,7 +752,7 @@ class WaveFinder extends React.Component {
                             </div>
                         </div>
     starSelector = (stars) => <div className="flex3Column bg-dkYellow r-10 m-5 p-15">
-                        Match:<br/>
+                        Match<br/>
                         <Selector
                             groupTitle="Matches" 
                             selected={stars} 
@@ -720,7 +820,7 @@ class WaveFinder extends React.Component {
                         </div>;
     getStars = (stars) => stars.map((star) => this.star(star));
     setTide = (tide) => {
-        console.log(`WaveFinder = > setTide(${tide})`)
+        //console.log(`WaveFinder = > setTide(${tide})`)
         let currentTide = (Number(tide)>2) ? "medium" : "low";
         currentTide = (Number(tide)>4) ? "high" : currentTide;
         if (this.state.pause === false) {
@@ -731,7 +831,7 @@ class WaveFinder extends React.Component {
         }
     }
     setWind = (direction, angle, speed, gusts) => {
-        console.log(`setWind => direction: ${direction}`)
+        //console.log(`setWind => direction: ${direction}`)
         if (!this.state.pause) {
             this.setState({
                 windDirection: direction,
@@ -898,7 +998,7 @@ class WaveFinder extends React.Component {
                             </div>
                             <div className="bg-dkYellow r-10 m-5 p-15">
                                 <label>
-                                    Miles:<br/>
+                                    Miles<br/>
                                     <input className="mt-10 p-5 r-10"
                                         name="distance"
                                         type="number"

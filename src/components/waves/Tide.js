@@ -45,7 +45,7 @@ class Tide extends React.Component {
             .then(response => validate(response))
             .then(data => {
                 const waterLevel = Number(data.data[data.data.length - 1].v).toFixed(1);
-                console.log(`tideData => ${JSON.stringify(data, null, 2)}`)
+                //console.log(`tideData => ${JSON.stringify(data, null, 2)}`)
                 this.props.setTide(waterLevel)
                 this.setState({
                     station: data.metadata.name,
