@@ -22,15 +22,22 @@ class SurfLocation extends React.Component {
     
     constructor(props) {
         super(props);
-        const {windDirection, swell1Direction, swell2Direction, tide, height, stars} = props.state;
+        const {windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, tide, height, stars} = props.state;
         this.state = {
-            windDirection: windDirection, 
+            windDirection: windDirection,
+            windSpeed: windSpeed, 
+            windGusts: windGusts,
             swell1Direction: swell1Direction, 
-            swell2Direction: swell2Direction, 
+            swell2Direction: swell2Direction,
+            swell1Angle: swell1Angle,
+            swell2Angle: swell2Angle,
+            swell1Height: swell1Height,
+            swell2Height: swell2Height,
             tide: tide, 
             height: height,
             stars: stars
         };
+        this.createLog = this.createLog.bind(this);
     }
     getStarKind = (kind) => {
         let classes = "shaka r-20 p-2";
@@ -100,6 +107,8 @@ class SurfLocation extends React.Component {
         let details = "";
         details = (kind === "tide") ? <div className="bold color-neogreen">{this.state.height}'</div> : details;
         details = (kind === "wind") ? <div className="bold color-neogreen">{this.state.windSpeed}-{this.state.windGusts}kts</div> : details;
+        details = (kind === "swell1") ? <div><div className="bold color-neogreen">{this.state.swell1Angle}</div><div className="bold color-neogreen">{this.state.swell1Height}</div></div> : details;
+        details = (kind === "swell2") ? <div><div className="bold color-neogreen">{this.state.swell2Angle}</div><div className="bold color-neogreen">{this.state.swell2Height}</div></div> : details;
         return details
     }
     getState = (kind) => {
@@ -113,14 +122,81 @@ class SurfLocation extends React.Component {
             return this.state.windDirection;
         }
     }
-    star = (matchKind) => <div className="flex3Column bg-lite mr-5 ml-5 p-10 r-10">
+    star = (matchKind) => <div key={getKey("star")} className="flex3Column bg-lite mr-5 ml-5 p-10 r-10">
                             {this.getMatchIcon(matchKind)}
                             <div className="greet">{this.getState(matchKind)}{this.getStarDetails(matchKind)}</div>
                         </div>;
     getStars = (stars) => stars.map((star) => this.star(star));
+    createLog = (item) => {
+        let getCurrentTime = new Date();
+        const year = getCurrentTime.getFullYear();
+        const currentMonth = getCurrentTime.getMonth()+1;
+        const month = ((currentMonth)<10) ? `0${(currentMonth)}` : currentMonth;
+        const currentDate = getCurrentTime.getDate();
+        const date = (currentDate<10) ? `0${currentDate}` : currentDate;
+        const currentHour = getCurrentTime.getHours();
+        const hours = (currentHour<10) ? `0${currentHour}` : currentHour;
+        const currentMinutes = getCurrentTime.getMinutes();
+        const minutes = (currentMinutes<10) ? `0${currentMinutes}` : currentMinutes;
+        const getEndTime = `${year}${month}${date}%20${hours}:${minutes}`;
+        const getStartTime = `${year}${month}${date}%20${hours-1}:00`;
+        getCurrentTime = `${year}${month}${date}%20${hours}:${minutes}`;
+        const logObj = {
+            Day: {
+                Date: `${year}-${month}-${date}T${hours}:${minutes}:00.000Z`,
+                Day: date,
+                Month: month,
+                Year: year
+            },
+            Location: {
+                Break: item.name
+            },
+            Surf: {
+                Height: "head high",
+                Report: this.state.swell1Height,
+                Shape: "Close-outs"
+            },
+            Swell1: {
+                Height: this.state.swell1Height,
+                Direction: this.state.swell1Direction,
+                Angle: this.state.swell1Angle,
+                Interval: "18 seconds",
+            },
+            Swell2: {
+                Height: this.state.swell2Height,
+                Direction: this.state.swell2Direction,
+                Angle: this.state.swell2Angle,
+                Interval: "8 seconds",
+            },
+            Swell3: {
+                Height: "1ft",
+                Direction: "NW",
+                Angle: "180",
+                Interval: "6 seconds",
+            },
+            Tide: {
+                Phase: this.state.tide,
+                Height: this.state.height
+            },
+            Wind: {
+                Direction: this.state.windDirection,
+                Orientation: "Offshore",
+                MPH: "5mph",
+                Surface: "Glassy"
+            },
+            Conditions: {
+                Conditions: "Firing"
+            },
+            Comments: {
+                "notes": "Biggest crowd but plenty of sick ones..."
+            }
+        }
+        console.log(`LogObject: ${JSON.stringify(logObj, null, 2)}`)
+        return logObj;
+    };
     render() {
         const item = this.props.item;
-        const {windDirection, swell1Direction, swell2Direction, tide, height} = this.props.state;
+        const {windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, tide, height, stars} = this.state;
         const statusClass = (status) => (status === true) ? "color-neogreen" : "color-yellow"; 
         const subStatusClass = (status) => (status === true) ? "color-orange" : "color-yellow"; 
         const swell1Match = (item) => (item.swell.indexOf(swell1Direction)>-1) ? true : false;
@@ -132,7 +208,7 @@ class SurfLocation extends React.Component {
         const tideDirectionMatch = (direction) => (direction.tide === tide) ? true : false;
         
         return (
-            <div key={getKey("loc")}>
+            <div key={getKey("loc")} onClick={() => this.createLog(item)}>
                 <div className="r-10 m-10 p-20 bg-dkGreen">
                         <div className="width100Percent flexContainer">{this.getStars(this.props.matches)}</div>
                         <div className="mt-10 navBranding">{item.name}</div>
@@ -145,13 +221,13 @@ class SurfLocation extends React.Component {
                                 <div className="color-neogreen bold">Tide: </div>
                             </div>
                             <div className="columnLeft">
-                                <div>{item.swell.map((swell, i) => <span className={(swell === this.state.swell1Direction) ? statusClass(swell1Match(item)) : subStatusClass(swell2DirectionMatch(swell))}>{swell}{((i+1) === item.swell.length)? "" : ", "}</span>)}</div>
+                                <div>{item.swell.map((swell, i) => <span key={getKey("swell")} className={(swell === this.state.swell1Direction) ? statusClass(swell1Match(item)) : subStatusClass(swell2DirectionMatch(swell))}>{swell}{((i+1) === item.swell.length)? "" : ", "}</span>)}</div>
                                 <div className={statusClass(windMatch(item))}>
-                                    {item.wind.map((wind, i) => <span className={statusClass(windDirectionMatch({wind}))}>
+                                    {item.wind.map((wind, i) => <span key={getKey("wind")} className={statusClass(windDirectionMatch({wind}))}>
                                                                 {wind}{((i+1) === item.wind.length)? "" : ", "}
                                                             </span>)}
                                 </div>
-                                <div className={statusClass(tideMatch(item))}>{item.tide.map((tide,i) => <span className={statusClass(tideDirectionMatch({tide}))}>{tide}{((i+1) === item.tide.length)? "" : ", "}</span>)}</div>
+                                <div className={statusClass(tideMatch(item))}>{item.tide.map((tide,i) => <span key={getKey("tide")} className={statusClass(tideDirectionMatch({tide}))}>{tide}{((i+1) === item.tide.length)? "" : ", "}</span>)}</div>
                             </div>
                         </div>
                     </div>   
