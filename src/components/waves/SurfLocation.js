@@ -17,6 +17,7 @@ import SW from '../../assets/images/windSW.png'
 import W from '../../assets/images/windW.png'
 import NW from '../../assets/images/windNW.png'
 import tide from '../../assets/images/tide.png'
+import PostDirectory from './PostDirectory.js';
 
 class SurfLocation extends React.Component {
     
@@ -41,6 +42,8 @@ class SurfLocation extends React.Component {
         };
         this.createLog = this.createLog.bind(this);
     }
+
+    posts = new PostDirectory();
     getStarKind = (kind) => {
         let classes = "shaka r-20 p-2";
         classes = (kind === "wind") ? (classes + " bg-white") : classes; 
@@ -140,7 +143,6 @@ class SurfLocation extends React.Component {
         return newId;
     }
     createLog = (item) => {
-        console.log("CREATE LOG");
         const recordId = this.generateNewLogId();
         let getCurrentTime = new Date();
         const year = getCurrentTime.getFullYear();
@@ -206,25 +208,20 @@ class SurfLocation extends React.Component {
                 "notes": "Enter some text here..."
             }
         }
-        console.log(`LogObject: ${JSON.stringify(logObj, null, 2)}`)
         //return logObj;
-        /*let postDirectory = this.posts.getDirectory();
+        let postDirectory = this.posts.getDirectory();
         let post = "";
         const logIt = () => {
             postDirectory.push(recordId);
             postDirectory = JSON.stringify(postDirectory);
             console.log(`postDirectory: ${postDirectory}`)
-            post = JSON.stringify(log, null, 2);
+            post = JSON.stringify(logObj, null, 2);
             console.log(`post: ${post}`)
             localStorage.setItem(recordId, post);
             //localStorage.setItem("postDirectory", postDirectory);
             this.posts.add(recordId);
         }
-        const selectorStatusComplete = (this.selectorStatus.includes(false)) ? window.confirm("Report is incomplete, submit anyway?") : true;
-        if (selectorStatusComplete) {
-            logIt();
-        }
-        */
+        logIt();
     };
     render() {
         const item = this.props.item;
