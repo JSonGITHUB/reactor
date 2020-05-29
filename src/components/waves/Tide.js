@@ -24,10 +24,11 @@ class Tide extends React.Component {
         const date = (currentDate<10) ? `0${currentDate}` : currentDate;
         const currentHour = getCurrentTime.getHours();
         const hours = (currentHour<10) ? `0${currentHour}` : currentHour;
+        const startHour = ((currentHour-1)<10) ? `0${(currentHour-1)}` : (currentHour-1);
         const currentMinutes = getCurrentTime.getMinutes();
         const minutes = (currentMinutes<10) ? `0${currentMinutes}` : currentMinutes;
         const getEndTime = `${year}${month}${date}%20${hours}:${minutes}`;
-        const getStartTime = `${year}${month}${date}%20${hours-1}:00`;
+        const getStartTime = `${year}${month}${date}%20${startHour}:00`;
         getCurrentTime = `${year}${month}${date}%20${hours}:${minutes}`;
         console.log(`Tide   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
         const uriMLLW = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getStartTime}&end_date=${getEndTime}&station=9410230&product=water_level&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;

@@ -22,7 +22,7 @@ class SurfLocation extends React.Component {
     
     constructor(props) {
         super(props);
-        const {windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, tide, height, stars} = props.state;
+        const {windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, swell1Interval, swell2Interval, tide, height, stars} = props.state;
         this.state = {
             windDirection: windDirection,
             windSpeed: windSpeed, 
@@ -33,6 +33,8 @@ class SurfLocation extends React.Component {
             swell2Angle: swell2Angle,
             swell1Height: swell1Height,
             swell2Height: swell2Height,
+            swell1Interval: swell1Interval,
+            swell2Interval: swell2Interval,
             tide: tide, 
             height: height,
             stars: stars
@@ -107,8 +109,8 @@ class SurfLocation extends React.Component {
         let details = "";
         details = (kind === "tide") ? <div className="bold color-neogreen">{this.state.height}'</div> : details;
         details = (kind === "wind") ? <div className="bold color-neogreen">{this.state.windSpeed}-{this.state.windGusts}kts</div> : details;
-        details = (kind === "swell1") ? <div><div className="bold color-neogreen">{this.state.swell1Angle}</div><div className="bold color-neogreen">{this.state.swell1Height}</div></div> : details;
-        details = (kind === "swell2") ? <div><div className="bold color-neogreen">{this.state.swell2Angle}</div><div className="bold color-neogreen">{this.state.swell2Height}</div></div> : details;
+        details = (kind === "swell1") ? <div><div className="bold color-neogreen">{this.state.swell1Angle}°</div><div className="bold color-neogreen">{`${this.state.swell1Height}${(this.state.swell1Height.includes("ft")) ? "" : "'"}`}</div><div className="bold color-neogreen">{this.state.swell1Interval}</div></div> : details;
+        details = (kind === "swell2") ? <div><div className="bold color-neogreen">{this.state.swell2Angle}°</div><div className="bold color-neogreen">{`${this.state.swell2Height}${(this.state.swell2Height.includes("ft")) ? "" : "'"}`}</div><div className="bold color-neogreen">{this.state.swell2Interval}</div></div> : details;
         return details
     }
     getState = (kind) => {
@@ -127,7 +129,18 @@ class SurfLocation extends React.Component {
                             <div className="greet">{this.getState(matchKind)}{this.getStarDetails(matchKind)}</div>
                         </div>;
     getStars = (stars) => stars.map((star) => this.star(star));
+    generateNewLogId = () => {
+        const date = new Date()
+        const st = date.toDateString().replace(/ /g,"");
+        const nd = date.toLocaleTimeString().replace(/ /g,"");
+        localStorage.setItem("lastPostId", `${st}${nd}`);
+        const newId = `${st}${nd}`;
+        console.log(`LogId: generateNewLogId => this.state.logId: ${newId}`);
+        return newId;
+    }
     createLog = (item) => {
+        console.log("CREATE LOG");
+        const recordId = this.generateNewLogId();
         let getCurrentTime = new Date();
         const year = getCurrentTime.getFullYear();
         const currentMonth = getCurrentTime.getMonth()+1;
@@ -136,10 +149,11 @@ class SurfLocation extends React.Component {
         const date = (currentDate<10) ? `0${currentDate}` : currentDate;
         const currentHour = getCurrentTime.getHours();
         const hours = (currentHour<10) ? `0${currentHour}` : currentHour;
+        const startHour = ((currentHour-1)<10) ? `0${(currentHour-1)}` : (currentHour-1);
         const currentMinutes = getCurrentTime.getMinutes();
         const minutes = (currentMinutes<10) ? `0${currentMinutes}` : currentMinutes;
         const getEndTime = `${year}${month}${date}%20${hours}:${minutes}`;
-        const getStartTime = `${year}${month}${date}%20${hours-1}:00`;
+        const getStartTime = `${year}${month}${date}%20${startHour}:00`;
         getCurrentTime = `${year}${month}${date}%20${hours}:${minutes}`;
         const logObj = {
             Day: {
@@ -160,13 +174,13 @@ class SurfLocation extends React.Component {
                 Height: this.state.swell1Height,
                 Direction: this.state.swell1Direction,
                 Angle: this.state.swell1Angle,
-                Interval: "18 seconds",
+                Interval: this.state.swell1Interval,
             },
             Swell2: {
                 Height: this.state.swell2Height,
                 Direction: this.state.swell2Direction,
                 Angle: this.state.swell2Angle,
-                Interval: "8 seconds",
+                Interval: this.state.swell2Interval,
             },
             Swell3: {
                 Height: "1ft",
@@ -185,18 +199,35 @@ class SurfLocation extends React.Component {
                 Surface: "Glassy"
             },
             Conditions: {
-                Conditions: "Firing"
+                Conditions: "Good"
             },
             Comments: {
-                "notes": "Biggest crowd but plenty of sick ones..."
+                "notes": "Enter some text here..."
             }
         }
         console.log(`LogObject: ${JSON.stringify(logObj, null, 2)}`)
-        return logObj;
+        //return logObj;
+        /*let postDirectory = this.posts.getDirectory();
+        let post = "";
+        const logIt = () => {
+            postDirectory.push(recordId);
+            postDirectory = JSON.stringify(postDirectory);
+            console.log(`postDirectory: ${postDirectory}`)
+            post = JSON.stringify(log, null, 2);
+            console.log(`post: ${post}`)
+            localStorage.setItem(recordId, post);
+            //localStorage.setItem("postDirectory", postDirectory);
+            this.posts.add(recordId);
+        }
+        const selectorStatusComplete = (this.selectorStatus.includes(false)) ? window.confirm("Report is incomplete, submit anyway?") : true;
+        if (selectorStatusComplete) {
+            logIt();
+        }
+        */
     };
     render() {
         const item = this.props.item;
-        const {windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, tide, height, stars} = this.state;
+        const {windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, swell1Interval, swell2Interval, tide, height, stars} = this.state;
         const statusClass = (status) => (status === true) ? "color-neogreen" : "color-yellow"; 
         const subStatusClass = (status) => (status === true) ? "color-orange" : "color-yellow"; 
         const swell1Match = (item) => (item.swell.indexOf(swell1Direction)>-1) ? true : false;
