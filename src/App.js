@@ -91,7 +91,9 @@ class App extends React.Component {
                       swell1Angle="210" 
                       swell2Angle="278" 
                       swell1Height="3" 
-                      swell2Height="2" 
+                      swell2Height="2"
+                      swell1Interval="17 seconds" 
+                      swell2Interval="17 seconds"  
                       windDirection="W" 
                       distance="10" 
                     />}
@@ -105,7 +107,7 @@ class App extends React.Component {
                   <Route path="/GuestList" component={SignUpDialog} />
                   {/*<Route path="/SurfLog" component={SurfLog} />*/}
                   <Route path='/SurfLog' render={(props) => <SurfLog {...props} logId={logId} />}/>
-                  <Route path='/WaveFinder' render={(props) => <WaveFinder {...props} tide="medium" isSwell1="false" isSwell2="false" isTide="false" isWind="false" swell1Direction="SSW" swell2Direction="W" swell1Angle="210" swell2Angle="278" swell1Height="3" swell2Height="2" windDirection="W" distance="10" />}/>
+                  <Route path='/WaveFinder' render={(props) => <WaveFinder {...props} tide="medium" isSwell1="false" isSwell2="false" isTide="false" isWind="false" swell1Direction="SSW" swell2Direction="W" swell1Angle="210" swell2Angle="278" swell1Height="3" swell2Height="2" swell1Interval="17 seconds" swell2Interval="17 seconds" windDirection="W" distance="10" />}/>
                   <Route path="/SurfReports" component={SurfReports} />
                   <Route path="/LogDirectory" component={LogDirectory} />
                   <Route path="/Swell" component={SlideShow} />

@@ -78,15 +78,6 @@ class LogEntry extends React.Component {
         this.logId = props.logId;
         //this.logData.init();
         console.log(`LogEntry => props.logId: ${props.logId}`)
-        /*
-        if (localStorage.getItem(this.logIdComponent.getLogId()) === null) {
-            this.log = this.logIdComponent.templateData;
-            this.lodId = this.logIdComponent.generateNewLogId();
-        } else {
-            this.log = JSON.parse(localStorage.getItem(this.logIdComponent.getLogId()));
-            this.logId = this.logIdComponent.getLogId()
-        }
-        */
         if (props.logId !== undefined && props.logId !== "" ) {
             this.lastPostId = props.logId;
             console.log(`$$ logId1: ${props.logId}`);

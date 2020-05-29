@@ -43,6 +43,8 @@ class WaveFinder extends React.Component {
             swell2Angle: getDefault("swell2Angle"),
             swell1Height: getDefault("swell1Height"),
             swell2Height: getDefault("swell2Height"),
+            swell1Interval: getDefault("swell1Interval"),
+            swell2Interval: getDefault("swell2Interval"),
             windDirection: getDefault("windDirection"),
             distance: getDefault("distance"),
             isSwell1: (getDefault("isSwell1") === "true") ? true : false,
@@ -427,6 +429,8 @@ class WaveFinder extends React.Component {
         this.handleSwell2Angle = this.handleSwell2Angle.bind(this);
         this.handleSwell1Height = this.handleSwell1Height.bind(this);
         this.handleSwell2Height = this.handleSwell2Height.bind(this);
+        this.handleSwell1Interval = this.handleSwell1Interval.bind(this);
+        this.handleSwell2Interval = this.handleSwell2Interval.bind(this);
         this.handleSwell2Check = this.handleSwell2Check.bind(this);
         this.handleSwell1Check = this.handleSwell1Check.bind(this);
         this.handleTideCheck = this.handleTideCheck.bind(this);
@@ -463,6 +467,7 @@ class WaveFinder extends React.Component {
         clearInterval(this.timerID);
     }
     tick() {
+        console.log(`pause: ${this.state.pause}`)
         if (this.state.pause === false) {
             this.setState({
                 date: new Date()
@@ -513,6 +518,7 @@ class WaveFinder extends React.Component {
     handleTideSelection = (groupTitle, label, selected) => {
         localStorage.setItem("tide", selected);
         this.setState({
+            pause: false,
             tide: selected,
             height: this.getDefaultHeights(selected)
         })
@@ -521,6 +527,7 @@ class WaveFinder extends React.Component {
         const isWind = (!!this.state.isWind === true) ? false : true;
         localStorage.setItem("isWind", isWind);
         this.setState({
+            pause: false,
             isWind: isWind
         })
     }
@@ -528,6 +535,7 @@ class WaveFinder extends React.Component {
         const isTide = (!!this.state.isTide === true) ? false : true;
         localStorage.setItem("isTide", isTide);
         this.setState({
+            pause: false,
             isTide: isTide
         })
     }
@@ -535,6 +543,7 @@ class WaveFinder extends React.Component {
         const isSwell1 = (!!this.state.isSwell1 === true) ? false : true;
         localStorage.setItem("isSwell1", isSwell1);
         this.setState({
+            pause: false,
             isSwell1: isSwell1
         })
     }
@@ -542,54 +551,77 @@ class WaveFinder extends React.Component {
         const isSwell2 = (!!this.state.isSwell2 === true) ? false : true;
         localStorage.setItem("isSwell2", isSwell2);
         this.setState({
+            pause: false,
             isSwell2: isSwell2
         })
     }
     handleSwell1Selection = (groupTitle, label, selected) => {
         localStorage.setItem("swell1Direction", selected);
         this.setState({
+            pause: false,
             swell1Direction: selected
         })
     }
     handleSwell2Selection = (groupTitle, label, selected) => {
         localStorage.setItem("swell2Direction", selected);
         this.setState({
+            pause: false,
             swell2Direction: selected
         })
     }
     handleSwell1Angle = (groupTitle, label, selected) => {
         localStorage.setItem("swell1Angle", selected);
         this.setState({
+            pause: false,
             swell1Angle: selected
         })
     }
     handleSwell2Angle = (groupTitle, label, selected) => {
         localStorage.setItem("swell2Angle", selected);
         this.setState({
+            pause: false,
             swell2Angle: selected
         })
     }
     handleSwell1Height = (groupTitle, label, selected) => {
         localStorage.setItem("swell1Height", selected);
         this.setState({
+            pause: false,
             swell1Height: selected
         })
     }
     handleSwell2Height = (groupTitle, label, selected) => {
         localStorage.setItem("swell2Height", selected);
         this.setState({
+            pause: false,
             swell2Height: selected
+        })
+    }
+    handleSwell1Interval = (groupTitle, label, selected) => {
+        localStorage.setItem("swell1Interval", selected);
+        this.setState({
+            pause: false,
+            swell1Interval: selected
+        })
+    }
+    handleSwell2Interval = (groupTitle, label, selected) => {
+        localStorage.setItem("swell2Interval", selected);
+        this.setState({
+            pause: false,
+            swell2Interval: selected
         })
     }
     handleWindSelection = (groupTitle, label, selected) => {
         localStorage.setItem("windDirection", selected);
         this.setState({
+            pause: false,
             windDirection: selected
         })
     }
     handleStarSelection = (groupTitle, label, selected) => {
         localStorage.setItem("stars", selected);
         this.setState({
+            pause: false,
             stars: selected
         })
     }
@@ -600,17 +632,23 @@ class WaveFinder extends React.Component {
             distance: target.value
         })
     }
-    pause = (event) => this.setState({
-        pause: true
-    })
-    unpause = () => this.setState({
-        pause: false
-    })
+    pause = (event) => {
+        console.log("PAUSE");
+        this.setState({
+            pause: true
+        })
+    }
+    unpause = () => {
+        console.log("UNPAUSE");
+        this.setState({
+            pause: false
+        })
+    }
     isSwell1 = () => (this.state.isSwell1 === true) ? true : false;
     isSwell2 = () => (this.state.isSwell2 === true) ? true : false;
     isSwellSelected = (id) => ((id === 1 && this.isSwell1() === true) || (id === 2 && this.isSwell2()===true)) ? 'bg-green' : 'bg-red';
     swellClass = (id) => `${this.isSwellSelected(id)} flex2Column r-10 m-5 p-15`;
-    swellSelector = (id, swellDirection) => <div className={this.swellClass(id)}>
+    swellSelector = (id, swellDirection) => <div className={this.swellClass(id)} onMouseDown={this.pause}>
         {this.getSwellIcon(id)}
         <span className="ml-5">Swell{id}</span><br/>
         <span className="greet ml-5">direction</span><br/>
@@ -688,6 +726,36 @@ class WaveFinder extends React.Component {
             ]}
             onChange={(id === 1) ? this.handleSwell1Height : this.handleSwell2Height}
         />
+        <br/>
+        <span className="greet ml-5">interval</span><br/>
+        <Selector
+            groupTitle={`SwellInterval${id}`}
+            selected={(id === 1) ? this.state.swell1Interval : this.state.swell2Interval} 
+            label="interval" 
+            items={[
+                "",
+                "5 seconds",
+                "6 seconds",
+                "7 seconds",
+                "8 seconds",
+                "9 seconds",
+                "10 seconds",
+                "11 seconds",
+                "12 seconds",
+                "13 seconds",
+                "14 seconds",
+                "15 seconds",
+                "16 seconds",
+                "17 seconds",
+                "18 seconds",
+                "19 seconds",
+                "20 seconds",
+                "21 seconds",
+                "22 seconds",
+                "23 seconds"
+            ]}
+            onChange={(id === 1) ? this.handleSwell1Interval : this.handleSwell2Interval}
+        />
         {(id===1) ? 
             /*
             <div className="fl-left">
@@ -720,7 +788,7 @@ class WaveFinder extends React.Component {
     </div>
     isTideSelected = () => (this.state.isTide === true) ? 'bg-green' : 'bg-red';
     tideClass = () => `${this.isTideSelected()} flex2Column r-10 m-5 p-15`;
-    tideSelector = (tide) => <div className={this.tideClass()}>
+    tideSelector = (tide) => <div className={this.tideClass()} onMouseDown={this.pause}>
                                 Tide
                                 <div className="greet"><Tide setTide={this.setTide}/></div>
                                 <Selector 
@@ -736,7 +804,7 @@ class WaveFinder extends React.Component {
                             </div>
     isWindSelected = () => (this.state.isWind === true) ? 'bg-green' : 'bg-red';
     windClass = () => `${this.isWindSelected()} flex2Column r-10 m-5 p-15`;
-    windSelector = (windDirection) => <div className={this.windClass()}>
+    windSelector = (windDirection) => <div className={this.windClass()} onMouseDown={this.pause}>
     {/*console.log(`windSelector => windDirection: ${this.state.windDirection}`)*/}
                             Wind<br/>
                             <div className="greet"><WindDirection columns="1" setWind={this.setWind}/></div>
@@ -751,7 +819,7 @@ class WaveFinder extends React.Component {
                                 {(this.state.isWind === true) ? <img src={thumbsUp} alt='wind' className='p-10 r-20' /> : <img src={thumbsDown} alt='wind' className='p-10 r-20' /> }
                             </div>
                         </div>
-    starSelector = (stars) => <div className="flex3Column bg-dkYellow r-10 m-5 p-15">
+    starSelector = (stars) => <div className="flex3Column bg-dkYellow r-10 m-5 p-15" onMouseDown={this.pause}>
                         Match<br/>
                         <Selector
                             groupTitle="Matches" 
@@ -977,7 +1045,7 @@ class WaveFinder extends React.Component {
         return ( 
             <div className="App-content fadeIn">
                 <Dialog title="Wave Finder" message="select current conditions:"> 
-                    <div className="white pointer" onMouseDown={this.pause}>   
+                    <div className="white pointer">   
                         <div className="bg-darker p-5 r-10 m-5">
                             <span className="bold">{time}</span>
                             <Geolocator currentPositionExists={this.currentPositionExists} returnCurrentPosition={this.updateCurrentLocation}/>
