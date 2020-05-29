@@ -197,7 +197,6 @@ class LogEntry extends React.Component {
             
             return <div className={this.selectorColor(item,groupTitle) + " r-vw p-vw bg-green"}>
                 <div className="mb-5">{item.description}: </div>
-                {console.log(`item: ${JSON.stringify(item, null, 2)} - groupTitle: ${groupTitle}`)}
                 <div className="mb-5">
                     <Selector 
                         groupTitle={groupTitle} 
@@ -245,30 +244,30 @@ class LogEntry extends React.Component {
     }
     getLogObject = () => this.state.log;
     dateEntry = () => {
-            console.log(`this.state.log: ${this.state.log}`)
-            const logExists = (this.state.log !== undefined && this.state.log !== null && JSON.stringify(this.state.log, null, 2) !== "{}") ? true : false;
-            //console.log(`LogEntry => this.state.log: ${JSON.stringify(this.state.log, null, 2)}`)
-            const stateLogDate = () => this.getLogObject().Day.Date;
-            const getDate = () => (logExists === true) ? new Date(stateLogDate()) : new Date(this.state.date);
-            const getTodaysDate = () => new Date();
-            const getStateDate = () => this.state.date;
-            //console.log(`getDate(): ${getDate()}`)
-            //console.log(`getTodaysDate(): ${getTodaysDate()}`)
-            //console.log(`this.state.log.Day.Date: ${this.state.log.Day.Date}`)
-            //console.log(`this.state.date: ${getStateDate()}`)
-            //console.log(`this.state.log: ${JSON.stringify(this.state.log, null,2)}`)
-            //console.log(`this.lastPostId: ${this.lastPostId}`)
-            return <React.Fragment>
-                        <div className='mb-5 subHeader color-yellow'>Date</div>
-                        <div className='flexContainer width-100-percent bg-vdkGreen'>
-                            <DatePicker
-                                onChange={this.onDateChange}
-                                value={getDate()} 
-                                //value={getTodaysDate()} 
-                                className='p-vw bg-green flex3Column r-vw m-vw'
-                            /><br/>
-                        </div>
-                    </React.Fragment>
+        //console.log(`this.state.log: ${this.state.log}`)
+        const logExists = (this.state.log !== undefined && this.state.log !== null && JSON.stringify(this.state.log, null, 2) !== "{}") ? true : false;
+        //console.log(`LogEntry => this.state.log: ${JSON.stringify(this.state.log, null, 2)}`)
+        const stateLogDate = () => this.getLogObject().Day.Date;
+        const getDate = () => (logExists === true) ? new Date(stateLogDate()) : new Date(this.state.date);
+        const getTodaysDate = () => new Date();
+        const getStateDate = () => this.state.date;
+        //console.log(`getDate(): ${getDate()}`)
+        //console.log(`getTodaysDate(): ${getTodaysDate()}`)
+        //console.log(`this.state.log.Day.Date: ${this.state.log.Day.Date}`)
+        //console.log(`this.state.date: ${getStateDate()}`)
+        //console.log(`this.state.log: ${JSON.stringify(this.state.log, null,2)}`)
+        //console.log(`this.lastPostId: ${this.lastPostId}`)
+        return <React.Fragment>
+                    <div className='mb-5 subHeader color-yellow'>Date</div>
+                    <div className='flexContainer width-100-percent bg-vdkGreen'>
+                        <DatePicker
+                            onChange={this.onDateChange}
+                            value={getDate()} 
+                            //value={getTodaysDate()} 
+                            className='p-vw bg-green flex3Column r-vw m-vw'
+                        /><br/>
+                    </div>
+                </React.Fragment>
     }
     
     render() {
