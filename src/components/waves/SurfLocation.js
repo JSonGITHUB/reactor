@@ -110,8 +110,8 @@ class SurfLocation extends React.Component {
         let details = "";
         details = (kind === "tide") ? <div className="bold color-neogreen">{this.state.height}'</div> : details;
         details = (kind === "wind") ? <div className="bold color-neogreen">{this.state.windSpeed}-{this.state.windGusts}kts</div> : details;
-        details = (kind === "swell1") ? <div><div className="bold color-neogreen">{this.state.swell1Angle}°</div><div className="bold color-neogreen">{`${this.state.swell1Height}${(this.state.swell1Height.includes("ft")) ? "" : "'"}`}</div><div className="bold color-neogreen">{this.state.swell1Interval.replace("seconds",this.secondsToSec())}</div></div> : details;
-        details = (kind === "swell2") ? <div><div className="bold color-neogreen">{this.state.swell2Angle}°</div><div className="bold color-neogreen">{`${this.state.swell2Height}${(this.state.swell2Height.includes("ft")) ? "" : "'"}`}</div><div className="bold color-neogreen">{this.state.swell2Interval.replace("seconds",this.secondsToSec())}</div></div> : details;
+        details = (kind === "swell1") ? <div><div className="bold color-neogreen">{`${this.state.swell1Height}${(this.state.swell1Height.includes("ft")) ? "" : "'"}`}</div><div className="bold color-neogreen">{this.state.swell1Angle}°</div><div className="bold color-neogreen">{this.state.swell1Interval.replace(" seconds",this.secondsToSec())}</div></div> : details;
+        details = (kind === "swell2") ? <div><div className="bold color-neogreen">{`${this.state.swell2Height}${(this.state.swell2Height.includes("ft")) ? "" : "'"}`}</div><div className="bold color-neogreen">{this.state.swell2Angle}°</div><div className="bold color-neogreen">{this.state.swell2Interval.replace(" seconds",this.secondsToSec())}</div></div> : details;
         return details
     }
     getState = (kind) => {
