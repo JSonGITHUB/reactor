@@ -107,12 +107,13 @@
             "description": "Height", 
             "selections": [
                 "",
-                "knee high",
-                "waist high",
-                "chest high",
-                "shoulder high",
-                "head high",
-                "over head",
+                "knee high", 
+                "waist high", 
+                "shoulder high", 
+                "head high", 
+                "over head", 
+                "foot over head", 
+                "couple of feet over head", 
                 "double over head",
                 "triple over head"
             ]
@@ -147,14 +148,14 @@
             "description": "Shape", 
             "selections": [
                 "",
-                "Speedy runners",
-                "Peaky",
-                "Bowly",
-                "Close-outs",
-                "Barreling",
-                "Mush burgers",
-                "Slopey",
-                "Slabbing"
+                "speedy runners",
+                "peaky",
+                "bowly",
+                "close-outs",
+                "barreling",
+                "mush burgers",
+                "slopey",
+                "slabbing"
             ]
         }
     ]
@@ -529,10 +530,10 @@
             "description": "Orientation", 
             "selections": [
                 "",
-                "Offshore",
-                "Onshore",
-                "Sideshore => rights",
-                "Sideshore => lefts"
+                "offshore",
+                "onshore",
+                "sideshore => rights",
+                "sideshore => lefts"
             ]
         },
         {
@@ -562,11 +563,11 @@
             "description": "Surface", 
             "selections": [
                 "",
-                "Oily Glass",
-                "Glassy",
-                "Texture",
-                "Choppy",
-                "Victory at sea"
+                "oily glass",
+                "glassy",
+                "textured",
+                "choppy",
+                "victory at sea"
             ]
         }
     ]
@@ -579,10 +580,9 @@
             "description": "Phase", 
             "selections": [
                 "",
-                "High",
-                "High => Low",
-                "Low",
-                "Low => High"
+                "high",
+                "medium",
+                "low"
             ]
         },
         {

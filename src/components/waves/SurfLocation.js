@@ -25,6 +25,7 @@ class SurfLocation extends React.Component {
         super(props);
         const {windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, swell1Interval, swell2Interval, tide, height, stars} = props.state;
         this.state = {
+            logged: false,
             windDirection: windDirection,
             windSpeed: windSpeed, 
             windGusts: windGusts,
@@ -158,6 +159,56 @@ class SurfLocation extends React.Component {
         const getEndTime = `${year}${month}${date}%20${hours}:${minutes}`;
         const getStartTime = `${year}${month}${date}%20${startHour}:00`;
         getCurrentTime = `${year}${month}${date}%20${hours}:${minutes}`;
+        const getWaveHeight = (height) => {
+            const heights = ["knee high", "waist high", "shoulder high", "head high", "over head", "foot over head", "couple of feet over head", "couple of feet over head","couple of feet over head","couple of feet over head","couple of feet overhead","double over head","double over head","double over head","triple over head","triple over head","triple over head","triple over head"]
+            height = height.replace("ft","");     
+            height = Number(height) - 1;
+            height = (height<0) ? heights[0] : heights[height];
+            return height;     
+        }
+        const getWindMPH = () => {
+            let mph = Number(this.state.windGusts)+1;
+            mph = mph + "mph";
+            return mph
+        }
+        const getSurface = () => {
+            const surfaces = ["oily glass", "glassy", "textured", "choppy", "victory at sea"];
+            let surface = Math.floor((Number(this.state.windGusts)+1)/3);
+            surface = (surfaces > 3) ? surfaces[4] : surfaces[surface];
+            return surface;
+        }
+        const getWindOrientation = () => {
+            const directions = {
+                "N": "sideshore => lefts",
+                "NE": "sideshore => lefts",
+                "ENE": "offshore",
+                "NNE": "offshore",
+                "NW": "onshore",
+                "NNW": "sideshore => lefts",
+                "W": "onshore",
+                "WNW": "onshore",
+                "E": "offshore",
+                "ESE": "sideshore => rights",
+                "S": "sideshore => rights",
+                "SE": "sideshore => rights",
+                "SSE": "sideshore => rights",
+                "WSW": "onshore",
+                "SW": "sideshore => rights",
+                "SSW": "sideshore => rights"
+            }
+            return directions[this.state.windDirection]
+        }
+        const getNotes = () => {
+            let notes = `${this.state.swell1Height}(${getWaveHeight(this.state.swell1Height)})`;
+            notes = `${notes} out of the ${this.state.swell1Direction}`;
+            notes = `${notes}(${this.state.swell1Angle})`;
+            notes = `${notes} at ${this.state.swell1Interval}.`;
+            notes = `${notes} It was a ${this.state.tide} tide`;
+            notes = `${notes}(${Number(this.state.height).toFixed(0)}ft).`;
+            notes = `${notes} the wind was ${getWindOrientation()} out of the ${this.state.windDirection} at ${getWindMPH()}.`;
+            notes = `${notes} The conditions were ${getSurface()}.`;
+            return notes;
+        }
         const logObj = {
             Day: {
                 Date: `${year}-${month}-${date}T${hours}:${minutes}:00.000Z`,
@@ -169,9 +220,9 @@ class SurfLocation extends React.Component {
                 Break: item.name
             },
             Surf: {
-                Height: "head high",
+                Height: getWaveHeight(this.state.swell1Height),
                 Report: this.state.swell1Height,
-                Shape: "Close-outs"
+                Shape: "close-outs"
             },
             Swell1: {
                 Height: this.state.swell1Height,
@@ -193,19 +244,19 @@ class SurfLocation extends React.Component {
             },
             Tide: {
                 Phase: this.state.tide,
-                Height: this.state.height
+                Height: Number(this.state.height).toFixed(0)+"ft"
             },
             Wind: {
                 Direction: this.state.windDirection,
-                Orientation: "Offshore",
-                MPH: "5mph",
-                Surface: "Glassy"
+                Orientation: getWindOrientation(),
+                MPH: getWindMPH(),
+                Surface: getSurface()
             },
             Conditions: {
                 Conditions: "Good"
             },
             Comments: {
-                "notes": "Enter some text here..."
+                "notes": getNotes()
             }
         }
         //return logObj;
@@ -222,7 +273,11 @@ class SurfLocation extends React.Component {
             this.posts.add(recordId);
         }
         logIt();
+        this.setState({
+            logged: true
+        })
     };
+    logLocation = (item) => (this.state.logged === true) ? alert("log already exists") : this.createLog(item);
     render() {
         const item = this.props.item;
         const {windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, swell1Interval, swell2Interval, tide, height, stars} = this.state;
@@ -237,7 +292,7 @@ class SurfLocation extends React.Component {
         const tideDirectionMatch = (direction) => (direction.tide === tide) ? true : false;
         
         return (
-            <div key={getKey("loc")} onClick={() => this.createLog(item)}>
+            <div key={getKey("loc")}>
                 <div className="r-10 m-10 p-20 bg-dkGreen">
                         <div className="width100Percent flexContainer">{this.getStars(this.props.matches)}</div>
                         <div className="mt-10 navBranding">{item.name}</div>
@@ -259,7 +314,9 @@ class SurfLocation extends React.Component {
                                 <div className={statusClass(tideMatch(item))}>{item.tide.map((tide,i) => <span key={getKey("tide")} className={statusClass(tideDirectionMatch({tide}))}>{tide}{((i+1) === item.tide.length)? "" : ", "}</span>)}</div>
                             </div>
                         </div>
-                    </div>   
+                        
+                    </div>
+                    <div className="App button bg-yellow color-black p-10 r-10 mt-20" onClick={() => this.logLocation(item)}>{(this.state.logged === true) ? "Edit Log" : "Log Session"}</div>
                 </div>
             </div>
         );

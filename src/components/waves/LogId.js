@@ -51,7 +51,7 @@ class LogId extends React.Component {
         Surf: {
             Height: "head high",
             Report: "4ft",
-            Shape: "Close-outs"
+            Shape: "close-outs"
         },
         Swell1: {
             Height: "4ft",
