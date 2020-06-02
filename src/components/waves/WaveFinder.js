@@ -555,18 +555,44 @@ class WaveFinder extends React.Component {
             isSwell2: isSwell2
         })
     }
+    directionObject = {
+        N: 0,
+        NNE: 25,
+        NE: 45,
+        ENE: 65,
+        E: 90,
+        ESE: 115,
+        SE: 135,
+        SSE: 160,
+        S: 180,
+        SSW: 205,
+        SW: 225,
+        WSW: 250,
+        W: 270,
+        WNW: 295,
+        NW: 315,
+        NNW: 340
+    }
+
     handleSwell1Selection = (groupTitle, label, selected) => {
+        const swell1Angle = this.directionObject[selected];
+        //alert(`swell1Angle: ${swell1Angle}`)
+        localStorage.setItem("swell1Angle", swell1Angle);
         localStorage.setItem("swell1Direction", selected);
         this.setState({
             pause: false,
-            swell1Direction: selected
+            swell1Direction: selected,
+            swell1Angle: swell1Angle
         })
     }
     handleSwell2Selection = (groupTitle, label, selected) => {
+        const swell2Angle = this.directionObject[selected];
+        localStorage.setItem("swell2Angle", swell2Angle);
         localStorage.setItem("swell2Direction", selected);
         this.setState({
             pause: false,
-            swell2Direction: selected
+            swell2Direction: selected,
+            swell2Angle: swell2Angle
         })
     }
     handleSwell1Angle = (groupTitle, label, selected) => {
@@ -666,7 +692,40 @@ class WaveFinder extends React.Component {
             selected={(id === 1) ? this.state.swell1Angle : this.state.swell2Angle} 
             label="Angle" 
             items={[
-                "",
+                "0",
+                "5",
+                "10",
+                "15",
+                "20",
+                "25",
+                "30",
+                "35",
+                "40",
+                "45",
+                "50",
+                "55",
+                "60",
+                "65",
+                "70",
+                "75",
+                "80",
+                "85",
+                "90",
+                "95",
+                "100",
+                "105",
+                "110",
+                "115",
+                "120",
+                "125",
+                "130",
+                "135",
+                "140",
+                "145",
+                "150",
+                "155",
+                "160",
+                "165",
                 "170",
                 "175",
                 "180",
@@ -693,7 +752,15 @@ class WaveFinder extends React.Component {
                 "285",
                 "290",
                 "295",
-                "300"
+                "300",
+                "305",
+                "310",
+                "315",
+                "320",
+                "325",
+                "330",
+                "335",
+                "340"
             ]}
             onChange={(id === 1) ? this.handleSwell1Angle : this.handleSwell2Angle}
         />
