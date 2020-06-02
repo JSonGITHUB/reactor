@@ -1,6 +1,6 @@
 import React from 'react';
-import Loader from '../utils/Loader.js';
-//import tide from '../../assets/images/tide.png'
+//import cheerio from 'cheerio';
+//import got from 'got';
 
 class SurfReports extends React.Component {
     getOside = () => {
@@ -8,13 +8,17 @@ class SurfReports extends React.Component {
         const returnText = (response) => response.text();
         const returnRejection = (response) => Promise.reject({status: response.status, data});
         const validate = (response) => (response.ok) ? returnText(response) : returnRejection(response);
-        const uri = "https://www.ndbc.noaa.gov/data/realtime2/46224.txt";
-                     
+        const myHeaders = new Headers();
+        const uri = new Request('http://localhost:8080/', {
+            method: 'GET',
+            mode: 'no-cors'
+        })
+       //const uri = new Request('http://localhost:8080/');
         fetch(uri)
             .then(response => validate(response))
             .then(data => {
-                console.log(`SurfReport => ${data}`)
-                this.props.setWind(data.data[0].dr, data.data[0].d, data.data[0].s, data.data[0].g)
+                console.log(`SurfReport => ${data.waterTemp}`)
+                /*this.props.setWind(data.data[0].dr, data.data[0].d, data.data[0].s, data.data[0].g)
                 this.setState({
                     station: data.metadata.name,
                     speed: data.data[0].s,
@@ -22,8 +26,9 @@ class SurfReports extends React.Component {
                     direction: data.data[0].dr,
                     gusts: data.data[0].g
                 })
+                */
             })
-            .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
+            .catch(err => console.log(`Something went wrong!\nuri: ${JSON.stringify(uri, null, 2)} \npath: ${window.location.pathname}\n`, err));
 
     }
     getBuoy = () => {
@@ -81,13 +86,42 @@ class SurfReports extends React.Component {
           });
           */
     }
+/*
+    getBuoyData = () => {
+        const buoyUrl= 'https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224';
+        got(buoyUrl).then(response => {
+            const $ = cheerio.load(response.body);
+            const primarySwellHeight = $('p')[3].children[6].data.replace("Swell: ", "").replace(" ft", "");
+            const primarySwellInterval = $('p')[3].children[8].data.replace("Period: ", "").replace(" sec", "");
+            const primarySwellDirection = $('p')[3].children[10].data.replace("Direction: ", "");
+            const secondarySwellHeight = $('p')[3].children[12].data.replace("Wind Wave: ", "").replace(" ft", "");
+            const secondarySwellInterval = $('p')[3].children[14].data.replace("Period: ", "").replace(" sec", "");
+            const secondarySwellDirection = $('p')[3].children[16].data.replace("Direction: ", "");
+            const buoyData = {
+                primarySwellHeight: primarySwellHeight.replace("\n", ""), 
+                primarySwellInterval: primarySwellInterval.replace("\n", ""), 
+                primarySwellDirection: primarySwellDirection.replace("\n", ""), 
+                secondarySwellHeight: secondarySwellHeight.replace("\n", ""), 
+                secondarySwellInterval: secondarySwellInterval.replace("\n", ""),
+                secondarySwellDirection: secondarySwellDirection.replace("\n", "")
+            }
+            console.log(JSON.stringify(buoyData, null, 2));
+        }).catch(err => {
+            console.log(err);
+        });
+    }
+*/
     render() {
-        //this.getOside();
+//        this.getOside();
+//        const osideBuoy = `http://localhost:8080/`;
+
         //this.getBuoy();
         //this.getSwellData();
         //this.getRapidData();
+//        this.getBuoyData();
         return <div>
-            <iframe id="Oside" title="surf report" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224"></iframe><br/>
+            {/*<iframe id="Oside" title="surf report" src={osideBuoy} className="bg-neogreen"></iframe><br/>*/}
+            <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224"></iframe><br/>
             <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46225" ></iframe><br/>
             <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46266"></iframe><br/>
             <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46254"></iframe><br/>
