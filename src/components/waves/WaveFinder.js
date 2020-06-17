@@ -37,14 +37,23 @@ class WaveFinder extends React.Component {
             date: new Date(),
             tide: getDefault("tide"),
             stars: getDefault("stars"),
-            swell1Direction: getDefault("swell1Direction"),
-            swell2Direction: getDefault("swell2Direction"),
-            swell1Angle: getDefault("swell1Angle"),
-            swell2Angle: getDefault("swell2Angle"),
-            swell1Height: getDefault("swell1Height"),
-            swell2Height: getDefault("swell2Height"),
-            swell1Interval: getDefault("swell1Interval"),
-            swell2Interval: getDefault("swell2Interval"),
+            waterTemp: "66.2",
+            swell1Height: "2.0",
+            swell1Interval: "17 seconds",
+            swell1Direction: "SSW",
+            swell2Height: "2.0",
+            swell2Interval: "9 seconds",
+            swell2Direction: "SSW",
+            swell1Angle: this.directionObject["SSW"],
+            swell2Angle: this.directionObject["SSW"],
+            //swell1Direction: getDefault("swell1Direction"),
+            //swell2Direction: getDefault("swell2Direction"),
+            //swell1Angle: getDefault("swell1Angle"),
+            //swell2Angle: getDefault("swell2Angle"),
+            //swell1Height: getDefault("swell1Height"),
+            //swell2Height: getDefault("swell2Height"),
+            //swell1Interval: getDefault("swell1Interval"),
+            //swell2Interval: getDefault("swell2Interval"),
             windDirection: getDefault("windDirection"),
             distance: getDefault("distance"),
             isSwell1: (getDefault("isSwell1") === "true") ? true : false,
@@ -392,7 +401,7 @@ class WaveFinder extends React.Component {
                 "latitude": 26.722327,
                 "longitude": -113.546932,
                 "swell": ["S"],
-                "wind": ["N", "NE"],
+                "wind": ["N", "NE", "NW"],
                 "tide": ["high", "medium"]
             },
             {
@@ -400,7 +409,7 @@ class WaveFinder extends React.Component {
                 "latitude": 26.239488,
                 "longitude": -112.477709,
                 "swell": ["SW","SSW"],
-                "wind": ["N"],
+                "wind": ["N", "NW"],
                 "tide": ["medium", "low"]
             },
             {
@@ -1006,6 +1015,7 @@ class WaveFinder extends React.Component {
             return <img src={NW} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
         }
     }
+    getReport = () => <iframe title="report" id="report" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224"></iframe>
     render() {
 //        console.log(`currentPositionExists: ${this.currentPositionExists()}`)
         const {locations, windDirection, swell1Direction, swell2Direction, tide, height, stars} = this.state;
@@ -1122,7 +1132,7 @@ class WaveFinder extends React.Component {
                                 <span className="flex3Column p-5 r-5 color-white bg-lite m-5">{/*this.getAirTempIcon*/}<span className="ml-2">air</span><br/><AirTemp/></span>
                             </div>
                             <div className="flex3Column p-5 r-5 color-yellow bg-lite m-5"><span className="size25 bg-white p-3 m-10 r-20">{this.getWindIcon()}</span>wind<WindDirection columns="2" setWind={this.setWind}/></div>
-                            <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224"></iframe>
+                            {this.getReport()}
                             <div className="flexContainer">
                                 {this.swellSelector(1,swell1Direction)}
                                 {this.swellSelector(2,swell2Direction)}
