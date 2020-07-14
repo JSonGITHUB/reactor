@@ -18,6 +18,7 @@ import W from '../../assets/images/windW.png'
 import NW from '../../assets/images/windNW.png'
 import tide from '../../assets/images/tide.png'
 import PostDirectory from './PostDirectory.js';
+import {BrowserRouter as Router, Switch, Link, Route} from 'react-router-dom';
 
 class SurfLocation extends React.Component {
     
@@ -274,10 +275,29 @@ class SurfLocation extends React.Component {
         }
         logIt();
         this.setState({
+            recordId: recordId,
             logged: true
         })
     };
     logLocation = (item) => (this.state.logged === true) ? alert("log already exists") : this.createLog(item);
+    logLocationButton = (item) => <div className="App button bg-yellow color-black p-10 r-10 mt-20" onClick={() => this.logLocation(item)}>
+            Log Session
+        </div>
+    editLogButton = () => {
+        return (
+            <Link className="noUnderline" key={getKey("link")} to={{
+                pathname: '/SurfLog?logId=ThuApr3020209:19:28PM',
+                state: {
+                    logId: this.state.recordId
+                }
+            }}>
+                <div className="App button bg-yellow color-black p-10 r-10 mt-20">
+                    Edit Log
+                </div>
+            </Link>
+        );
+    }
+    
     render() {
         const item = this.props.item;
         const {windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, swell1Interval, swell2Interval, tide, height, stars} = this.state;
@@ -316,7 +336,10 @@ class SurfLocation extends React.Component {
                         </div>
                         
                     </div>
-                    <div className="App button bg-yellow color-black p-10 r-10 mt-20" onClick={() => this.logLocation(item)}>{(this.state.logged === true) ? "Edit Log" : "Log Session"}</div>
+                    {
+                        //(this.state.logged) ? this.editLogButton() : this.logLocationButton(item)
+                        this.logLocationButton(item)
+                    }
                 </div>
             </div>
         );

@@ -1,15 +1,28 @@
 import React from 'react';
 //import cheerio from 'cheerio';
 //import got from 'got';
+import axios from 'axios';
 
 class SurfReports extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            oSideBuoyData: {}
+        }
+    }
+    getOsideAxios = async() => {
+        const reponse = await axios.get('https://www.ndbc.noaa.gov/data/realtime2/46224.txt');
+        alert(reponse);
+        this.setState({ oSideBuoyData: reponse });
+    }
     getOside = () => {
         let data;
         const returnText = (response) => response.text();
         const returnRejection = (response) => Promise.reject({status: response.status, data});
         const validate = (response) => (response.ok) ? returnText(response) : returnRejection(response);
         const myHeaders = new Headers();
-        const uri = new Request('http://localhost:8080/', {
+        //const uri = new Request('http://localhost:8080/', {
+        const uri = new Request('https://www.ndbc.noaa.gov/data/realtime2/46224.txt', {
             method: 'GET',
             mode: 'no-cors'
         })
@@ -17,7 +30,7 @@ class SurfReports extends React.Component {
         fetch(uri)
             .then(response => validate(response))
             .then(data => {
-                console.log(`SurfReport => ${data.waterTemp}`)
+                console.log(`SurfReport => `)
                 /*this.props.setWind(data.data[0].dr, data.data[0].d, data.data[0].s, data.data[0].g)
                 this.setState({
                     station: data.metadata.name,
@@ -112,7 +125,8 @@ class SurfReports extends React.Component {
     }
 */
     render() {
-//        this.getOside();
+//        this.getOsideAxios();
+        //this.getOside();
 //        const osideBuoy = `http://localhost:8080/`;
 
         //this.getBuoy();
@@ -120,7 +134,8 @@ class SurfReports extends React.Component {
         //this.getRapidData();
 //        this.getBuoyData();
         return <div>
-            {/*<iframe id="Oside" title="surf report" src={osideBuoy} className="bg-neogreen"></iframe><br/>*/}
+            {/*https://www.ndbc.noaa.gov/data/realtime2/46224.spec
+            <iframe id="Oside" title="surf report" src={osideBuoy} className="bg-neogreen"></iframe><br/>*/}
             <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224"></iframe><br/>
             <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46225" ></iframe><br/>
             <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46266"></iframe><br/>
