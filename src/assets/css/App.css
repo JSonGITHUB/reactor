@@ -248,6 +248,16 @@ select {
   min-height: 2px;
   flex: 75%;
 }
+.flex3Column80Percent {
+  height: auto;
+  min-height: 2px;
+  flex: 80%;
+}
+.flex3Column10Percent {
+  height: auto;
+  min-height: 2px;
+  flex: 10%;
+}
 .m-auto {
   margin:auto;
 }

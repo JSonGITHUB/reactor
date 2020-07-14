@@ -1,7 +1,6 @@
 import React from 'react';
-import getKey from './utils/KeyGenerator.js';
 
-class PhotoBlog extends React.Component {
+class PhotoSequence extends React.Component {
     index = 0;
     constructor(props) {
         super(props);
@@ -34,20 +33,32 @@ class PhotoBlog extends React.Component {
             url1: `https://lh3.googleusercontent.com/${images[0].image}`
         }
     }
-    getID = (index) => `blog${index}`
-    getImages = () => {
-        return this.state.images.map((item, index) =>
-                    <img key={getKey("blog")} id={this.getID(index)} className="width-100-percent bg-black mb-20" src={`https://lh3.googleusercontent.com/${item.image}`} alt={item.image} />  
-        )
+    componentDidMount() {
+        this.timerID = setInterval(
+            () => this.getAnImage(),
+            7000
+        );
+    }
+    componentWillUnmount() {
+        clearInterval(this.timerID);
+    }
+    getAnImage = () => {
+        this.index = (this.index === this.state.images.length-1) ? 0 : this.index+1;
+        const i = this.index;
+        let url1 = `https://lh3.googleusercontent.com/${this.state.images[i].image}`;
+        console.log(`getAnImage => imgArray[${i}].image: ${url1}`)
+        this.setState({
+            url1: url1,
+        });
     }
     
     render() {
-        return <div className="flexContainer fadeIn bg-black">
-            <div className="flex3Column10Percent"></div>
-            <div className="flex3Column80Percent">{this.getImages()}</div>
-            <div className="flex3Column10Percent"></div>
-        </div>
+        return (
+            <div>
+                <img id="photo1" className="width-100-percent" src={this.state.url1} alt={this.state.url1} />
+            </div>
+        )
     }
 }
 
-export default PhotoBlog;
+export default PhotoSequence;
