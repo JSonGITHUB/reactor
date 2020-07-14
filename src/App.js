@@ -14,6 +14,7 @@ import WaveFinder from './components/waves/WaveFinder.js';
 import SurfReports from './components/waves/SurfReports.js';                            
 import SlideShow from './components/SlideShow.js';
 import PhotoBlog from './components/PhotoBlog.js';
+import PhotoSequence from './components/PhotoSequence.js';
 import './assets/css/App.css';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 import ScrollToTop from './components/utils/ScrollToTop.js';
@@ -113,6 +114,7 @@ class App extends React.Component {
                   <Route path="/LogDirectory" component={LogDirectory} />
                   <Route path="/Swell" component={SlideShow} />
                   <Route path="/PhotoBlog" component={PhotoBlog} />
+                  <Route path="/PhotoSequence" component={PhotoSequence} />
                 </Switch>
               </div>
             <Switch>
