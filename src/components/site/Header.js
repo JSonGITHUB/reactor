@@ -59,7 +59,8 @@ class Header extends React.Component {
         'SurfLog',
         'Swell',
         'WaveFinder',
-        'SurfReports'
+        'SurfReports',
+        'PhotoBlog'
     ];
     wideNav = (item) => this.landscapeButton(item);
     portraitNav = (item) => <div key={getKey("nav")}>{this.portraitButton(item)}</div>;

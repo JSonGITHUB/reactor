@@ -29,7 +29,7 @@ class LogDirectory extends React.Component {
         const itemObj = JSON.parse(localStorage.getItem(item));
         
         if (itemObj !== null) {
-            //console.log(`ITEM: ${item} ====> ${JSON.stringify(itemObj, null, 2)}`)
+            console.log(`ITEM: ${item} ====> ${JSON.stringify(itemObj, null, 2)}`)
             const conditionsIndex = this.conditions.indexOf(itemObj.Conditions.Conditions);
             const conditions = this.conditions[conditionsIndex];
             const spot = itemObj.Location.Break;
