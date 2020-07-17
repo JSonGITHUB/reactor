@@ -50,11 +50,11 @@ class Header extends React.Component {
     headerLogo = <TextColorizer class='navBranding mt-7' text={this.props.company}/>;
     navItems = [
         'Home',
-        'BowlBuilder',
+        //'BowlBuilder',
         'TempConverter',
         'Notes',
-        'Reservation',
-        'GuestList',
+        //'Reservation',
+        //'GuestList',
         'LogDirectory',
         'SurfLog',
         'Swell',

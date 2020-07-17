@@ -1,13 +1,13 @@
 import React from 'react';
 import FormNotes from './components/forms/FormEssay.js';
-import Reservation from './components/forms/FormReservation.js';
-import SignUpDialog from './components/utils/SignUpDialog.js';
+//import Reservation from './components/forms/FormReservation.js';
+//import SignUpDialog from './components/utils/SignUpDialog.js';
 import debounce from './components/utils/Debouncer.js';
 import Footer from './components/site/Footer.js';
 import Header from './components/site/Header.js';
 import Home from './components/Home.js';
 import Calculator from './components/Calculator.js';
-import BowlBuilder from './components/BowlBuilder.js';
+//import BowlBuilder from './components/BowlBuilder.js';
 import LogDirectory from './components/waves/LogDirectory.js';
 import SurfLog from './components/waves/Logger.js';
 import WaveFinder from './components/waves/WaveFinder.js';
@@ -45,11 +45,11 @@ class App extends React.Component {
   setIt = () => (this.widthChanged() || this.heightChanged()) ? this.updateState() : false;
   components = {
     surflog: <SurfLog />,
-    guestlist: <SignUpDialog title="Guest List" message="Sign up" />,
-    reservation: <Reservation />,
+    //guestlist: <SignUpDialog title="Guest List" message="Sign up" />,
+    //reservation: <Reservation />,
     notes: <FormNotes className='mt-40' />,
     tempconverter: <Calculator />,
-    bowlbuilder: <BowlBuilder />,
+    //bowlbuilder: <BowlBuilder />,
     home: <Home />
   };
   
@@ -102,11 +102,11 @@ class App extends React.Component {
                   />
                   <Route path="/Home" component={Home} />
                   {/*<Route path="/BowlBuilder" component={BowlBuilder} />*/}
-                  <Route path='/BowlBuilder' render={(props) => <BowlBuilder {...props} width={width} height={height} />}/>
+                  {/*<Route path='/BowlBuilder' render={(props) => <BowlBuilder {...props} width={width} height={height} />}/>*/}
                   <Route path="/TempConverter" component={Calculator} />
                   <Route path="/Notes" component={FormNotes} />
-                  <Route path="/Reservation" component={Reservation} />
-                  <Route path="/GuestList" component={SignUpDialog} />
+                  {/*<Route path="/Reservation" component={Reservation} />*/}
+                  {/*<Route path="/GuestList" component={SignUpDialog} />*/}
                   {/*<Route path="/SurfLog" component={SurfLog} />*/}
                   <Route path='/SurfLog' render={(props) => <SurfLog {...props} logId={logId} />}/>
                   <Route path='/WaveFinder' render={(props) => <WaveFinder {...props} tide="medium" isSwell1="false" isSwell2="false" isTide="false" isWind="false" swell1Direction="SSW" swell2Direction="W" swell1Angle="210" swell2Angle="278" swell1Height="3" swell2Height="2" swell1Interval="17 seconds" swell2Interval="17 seconds" windDirection="W" distance="10" />}/>
