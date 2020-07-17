@@ -65,6 +65,7 @@ class LogDirectory extends React.Component {
         }
         return "";
     })
+    logSession = () => window.location.pathname = "/reactor/SurfLog";
     render() {
         //console.log(`postssssss=>${JSON.stringify(this.posts.getDirectory(),null,2)}`)
         return (
@@ -72,6 +73,7 @@ class LogDirectory extends React.Component {
                 <Dialog title="Log Directory" message="Review sessions">
                     <PostDirectory/>
                     {this.sessions()}
+                    <div className="button p-20 r-5 m-20 bg-neogreen incompletedSelector color-black" onClick={this.logSession}>Add Session</div>
                 </Dialog>
             </div>
         );
