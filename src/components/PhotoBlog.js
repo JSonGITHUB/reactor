@@ -101,6 +101,7 @@ class PhotoBlog extends React.Component {
     }
     
     render() {
+        console.log(`PhotoBlog...`)
         return <div className="flexContainer fadeIn bg-black">
             <div className="flex3Column10Percent"></div>
             <div className="flex3Column80Percent">{this.getImages()}</div>

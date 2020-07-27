@@ -15,6 +15,7 @@ import SurfReports from './components/waves/SurfReports.js';
 import SlideShow from './components/SlideShow.js';
 import PhotoBlog from './components/PhotoBlog.js';
 import PhotoSequence from './components/PhotoSequence.js';
+import Reducer from './components/Reducer.js';
 import './assets/css/App.css';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 import ScrollToTop from './components/utils/ScrollToTop.js';
@@ -115,6 +116,7 @@ class App extends React.Component {
                   <Route path="/Swell" component={SlideShow} />
                   <Route path="/PhotoBlog" component={PhotoBlog} />
                   <Route path="/PhotoSequence" component={PhotoSequence} />
+                  <Route path="/Reducer" component={Reducer} />
                 </Switch>
               </div>
             <Switch>

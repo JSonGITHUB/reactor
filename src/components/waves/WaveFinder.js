@@ -1121,7 +1121,7 @@ class WaveFinder extends React.Component {
         const time = date.replace(" ","").toLocaleLowerCase();
         return ( 
             <div className="App-content fadeIn">
-                <Dialog title="Wave Finder" message="select current conditions:"> 
+                <Dialog title="Wave Finder" message=""> 
                     <div className="white pointer">   
                         <div className="bg-darker p-5 r-10 m-5">
                             <span className="bold">{time}</span>
@@ -1133,6 +1133,7 @@ class WaveFinder extends React.Component {
                             </div>
                             <div className="flex3Column p-5 r-5 color-yellow bg-lite m-5"><span className="size25 bg-white p-3 m-10 r-20">{this.getWindIcon()}</span>wind<WindDirection columns="2" setWind={this.setWind}/></div>
                             {this.getReport()}
+                            <div>select current conditions:</div>
                             <div className="flexContainer">
                                 {this.swellSelector(1,swell1Direction)}
                                 {this.swellSelector(2,swell2Direction)}

@@ -14,6 +14,7 @@ class LogDirectory extends React.Component {
         this.title = props.title;
         this.message = props.message;
         this.sessionClick = this.sessionClick.bind(this);
+        this.logSession = this.logSession.bind(this);
     }
     sessionClick(item) {
         console.log(`sessionClick --> ${item}`);

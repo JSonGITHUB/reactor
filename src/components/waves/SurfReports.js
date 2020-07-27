@@ -21,7 +21,7 @@ class SurfReports extends React.Component {
         const returnRejection = (response) => Promise.reject({status: response.status, data});
         const validate = (response) => (response.ok) ? returnText(response) : returnRejection(response);
         const myHeaders = new Headers();
-        //const uri = new Request('http://localhost:8080/', {
+        //const uri = new Request('localhost:8080/', {
         const uri = new Request('https://www.ndbc.noaa.gov/data/realtime2/46224.txt', {
             method: 'GET',
             mode: 'no-cors'
