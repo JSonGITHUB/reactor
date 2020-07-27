@@ -1,6 +1,5 @@
 import React from 'react';
 import Loader from '../utils/Loader.js';
-import Adder from '../hooks/Adder.js';
 
 class WaterTemp extends React.Component {
     constructor(props) {
@@ -90,7 +89,6 @@ class WaterTemp extends React.Component {
     render() {
         return <div>
                 <div>{this.getCurrentTemp()}</div>
-                <Adder />
             </div>
     };
 }
