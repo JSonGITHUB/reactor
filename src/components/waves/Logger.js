@@ -42,7 +42,6 @@ class Logger extends React.Component {
         }
         console.log(`logId$$$$$$$$$$: ${this.logIdComponent.getLogId()} --- localStorage.${this.logIdComponent.getLogId()} ==== ${JSON.stringify(this.log,null,2)} AND logId::::: ${logId}`)
 //      console.log(`Logger => constructor -> log: ${JSON.stringify(this.log,null,2)}`)
-        
         let data;
         const returnJSON = (response) => response.json();
         const returnRejection = (response) => Promise.reject({status: response.status, data});

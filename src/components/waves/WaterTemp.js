@@ -1,5 +1,6 @@
 import React from 'react';
 import Loader from '../utils/Loader.js';
+import Adder from '../hooks/Adder.js';
 
 class WaterTemp extends React.Component {
     constructor(props) {
@@ -40,9 +41,42 @@ class WaterTemp extends React.Component {
             })
             .catch(err => console.log(`Something went wrong!\nuri: ${waterTempuri} \npath: ${window.location.pathname}\n`, err));
     }
+    getLocalWaterTempData = () => {
+        console.log(`getLocalWaterTemp ->`);
+        let data;
+        const returnJSON = (response) => response.json();
+        const returnRejection = (response) => Promise.reject({status: response.status, data});
+        const validate = (response) => (response.ok) ? returnJSON(response) : returnRejection(response);
+        let getCurrentTime = new Date();
+        const year = getCurrentTime.getFullYear();
+        const currentMonth = getCurrentTime.getMonth()+1;
+        const month = ((currentMonth)<10) ? `0${(currentMonth)}` : currentMonth;
+        const currentDate = getCurrentTime.getDate();
+        const date = (currentDate<10) ? `0${currentDate}` : currentDate;
+        const currentHour = getCurrentTime.getHours();
+        const hours = (currentHour<10) ? `0${currentHour}` : currentHour;
+        const startHour = ((currentHour-1)<10) ? `0${(currentHour-1)}` : (currentHour-1);
+        const currentMinutes = getCurrentTime.getMinutes();
+        const minutes = (currentMinutes<10) ? `0${currentMinutes}` : currentMinutes;
+        const getEndTime = `${year}${month}${date}%20${hours}:${minutes}`;
+        const getStartTime = `${year}${month}${date}%20${startHour}:00`;
+        getCurrentTime = `${year}${month}${date}%20${hours}:${minutes}`;
+        console.log(`LocalWaterTemp   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
+        const localWaterTempURI = `http://192.168.1.8:8080/`;
+        fetch(localWaterTempURI)
+            .then(response => validate(response))
+            .then(data => {
+                console.log(`LocalWaterTemp: ${JSON.stringify(data, 2, null)}`)
+                this.setState({
+                    temp: Number(data.data[data.data.length - 1].v).toFixed(0)
+                })
+            })
+            .catch(err => console.log(`Something went wrong!\nuri: ${localWaterTempURI} \npath: ${window.location.pathname}\n`, err));
+    }
     getInterval = () => 300000;
     componentDidMount() {
-        this.getWaterTempData()
+        this.getWaterTempData();
+        //this.getLocalWaterTempData();
         this.timerID = setInterval(() => this.getWaterTempData(), this.getInterval());
     }
     componentWillUnmount() {
@@ -54,7 +88,10 @@ class WaterTemp extends React.Component {
                 <Loader isMotionOn={this.props.isMotionOn}/>
             </div>;
     render() {
-        return <div>{this.getCurrentTemp()}</div>
+        return <div>
+                <div>{this.getCurrentTemp()}</div>
+                <Adder />
+            </div>
     };
 }
 
