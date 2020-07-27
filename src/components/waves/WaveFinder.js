@@ -40,10 +40,10 @@ class WaveFinder extends React.Component {
             waterTemp: "66.2",
             swell1Height: "2.0",
             swell1Interval: "17 seconds",
-            swell1Direction: "SSW",
+            swell1Direction: localStorage.getItem("swell1Direction") ? localStorage.getItem("swell1Direction") : "SSW",
             swell2Height: "2.0",
             swell2Interval: "9 seconds",
-            swell2Direction: "SSW",
+            swell2Direction: localStorage.getItem("swell2Direction") ? localStorage.getItem("swell2Direction") : "SSW",
             swell1Angle: this.directionObject["SSW"],
             swell2Angle: this.directionObject["SSW"],
             //swell1Direction: getDefault("swell1Direction"),
@@ -564,6 +564,7 @@ class WaveFinder extends React.Component {
             isSwell2: isSwell2
         })
     }
+    directionArray = ["W", "WSW", "WNW", "E", "ESE", "ENE", "N", "NE", "NNE", "NW", "NNW", "S", "SE", "SSE", "SW", "SSW"];
     directionObject = {
         N: 0,
         NNE: 25,
@@ -585,7 +586,7 @@ class WaveFinder extends React.Component {
 
     handleSwell1Selection = (groupTitle, label, selected) => {
         const swell1Angle = this.directionObject[selected];
-        //alert(`swell1Angle: ${swell1Angle}`)
+        //console.log(`swell1Angle: ${swell1Angle}`)
         localStorage.setItem("swell1Angle", swell1Angle);
         localStorage.setItem("swell1Direction", selected);
         this.setState({
@@ -596,6 +597,7 @@ class WaveFinder extends React.Component {
     }
     handleSwell2Selection = (groupTitle, label, selected) => {
         const swell2Angle = this.directionObject[selected];
+        //console.log(`swell2Angle: ${swell2Angle}`)
         localStorage.setItem("swell2Angle", swell2Angle);
         localStorage.setItem("swell2Direction", selected);
         this.setState({
@@ -690,8 +692,9 @@ class WaveFinder extends React.Component {
         <Selector
             groupTitle={`Swell${id}`}
             selected={swellDirection} 
+            //this.getState(`swell1`)
             label="Direction" 
-            items={["W", "WSW", "WNW", "E", "ESE", "ENE", "N", "NE", "NNE", "NW", "NNW", "S", "SE", "SSE", "SW", "SSW"]}
+            items={this.directionArray}
             onChange={(id === 1) ? this.handleSwell1Selection : this.handleSwell2Selection}
         />
         <br/>
@@ -888,7 +891,7 @@ class WaveFinder extends React.Component {
                                 groupTitle="Wind" 
                                 selected={this.state.windDirection} 
                                 label="Direction"
-                                items={["W", "WSW", "WNW", "E", "ESE", "ENE", "N", "NE", "NNE", "NW", "NNW", "S", "SE", "SSE", "SW", "SSW"]}
+                                items={this.directionArray}
                                 onChange={this.handleWindSelection}
                             />
                             <div className="button mt-15" onClick={this.handleWindCheck}>
@@ -1016,6 +1019,33 @@ class WaveFinder extends React.Component {
         }
     }
     getReport = () => <iframe title="report" id="report" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224"></iframe>
+    calculateDistance = (item) => {
+        const lat1 = item.latitude;
+        const lat2 = this.state.latitude;
+        const lon1 = item.longitude;
+        const lon2 = this.state.longitude;
+        const unit = "Miles"
+        if ((lat1 === lat2) && (lon1 === lon2)) {
+            return 0;
+        } else {
+            var radlat1 = Math.PI * lat1/180;
+            var radlat2 = Math.PI * lat2/180;
+            var theta = lon1-lon2;
+            var radtheta = Math.PI * theta/180;
+            var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+            if (dist > 1) {
+                dist = 1;
+            }
+            dist = Math.acos(dist);
+            dist = dist * 180/Math.PI;
+            dist = dist * 60 * 1.1515;
+            dist = dist.toFixed(1);
+            if (unit==="Kilometers") { dist = dist * 1.609344 }
+            if (unit==="Nautical") { dist = dist * 0.8684 }
+            //console.log(`DISTANCE => ${dist}`)
+            return dist;
+        }
+    }
     render() {
 //        console.log(`currentPositionExists: ${this.currentPositionExists()}`)
         const {locations, windDirection, swell1Direction, swell2Direction, tide, height, stars} = this.state;
@@ -1023,37 +1053,11 @@ class WaveFinder extends React.Component {
         const swell2Match = (item) => (item.swell.indexOf(swell2Direction)>-1) ? true : false;
         const windMatch = (item) => (item.wind.indexOf(windDirection)>-1) ? true : false;
         const tideMatch = (item) => (item.tide.indexOf(tide)>-1) ? true : false;
-        const swell1DirectionMatch = (direction) => (direction.swell===swell1Direction) ? true : false;
-        const swell2DirectionMatch = (direction) => (direction===swell2Direction) ? true : false;
-        const windDirectionMatch = (direction) => (direction.wind === windDirection) ? true : false;
-        const tideDirectionMatch = (direction) => (direction.tide === tide) ? true : false;
-        const calculateDistance = (item) => {
-            const lat1 = item.latitude;
-            const lat2 = this.state.latitude;
-            const lon1 = item.longitude;
-            const lon2 = this.state.longitude;
-            const unit = "Miles"
-            if ((lat1 === lat2) && (lon1 === lon2)) {
-                return 0;
-            } else {
-                var radlat1 = Math.PI * lat1/180;
-                var radlat2 = Math.PI * lat2/180;
-                var theta = lon1-lon2;
-                var radtheta = Math.PI * theta/180;
-                var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-                if (dist > 1) {
-                    dist = 1;
-                }
-                dist = Math.acos(dist);
-                dist = dist * 180/Math.PI;
-                dist = dist * 60 * 1.1515;
-                dist = dist.toFixed(1);
-                if (unit==="Kilometers") { dist = dist * 1.609344 }
-                if (unit==="Nautical") { dist = dist * 0.8684 }
-                //console.log(`DISTANCE => ${dist}`)
-                return dist;
-            }
-        }
+        //const swell1DirectionMatch = (direction) => (direction.swell===swell1Direction) ? true : false;
+        //const swell2DirectionMatch = (direction) => (direction===swell2Direction) ? true : false;
+        //const windDirectionMatch = (direction) => (direction.wind === windDirection) ? true : false;
+        //const tideDirectionMatch = (direction) => (direction.tide === tide) ? true : false;
+        const calculateDistance = (item) => this.calculateDistance(item);
         const distance = (item) => calculateDistance(item);
         //Math.abs(item.latitude - this.state.latitude)+Math.abs(item.longitude - this.state.longitude);
         //.01 - 1 mile
