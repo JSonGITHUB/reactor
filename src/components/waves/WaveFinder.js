@@ -31,6 +31,8 @@ class WaveFinder extends React.Component {
         const getLocal = (item) => localStorage.getItem(item);
         const getProps = (item) => props[item];
         const getDefault = (item) => (getLocal(item) === null) ? getProps(item) : getLocal(item);
+        const getSwell1Direction = () => localStorage.getItem("swell1Direction") ? localStorage.getItem("swell1Direction") : "SSW";
+        const getSwell2Direction = () => localStorage.getItem("swell2Direction") ? localStorage.getItem("swell2Direction") : "SSW";
         console.log(`isWind: ${getDefault("isWind")}`)
         this.state = {
             pause: false,
@@ -40,10 +42,10 @@ class WaveFinder extends React.Component {
             waterTemp: "66.2",
             swell1Height: "2.0",
             swell1Interval: "17 seconds",
-            swell1Direction: localStorage.getItem("swell1Direction") ? localStorage.getItem("swell1Direction") : "SSW",
+            swell1Direction: getSwell1Direction(),
             swell2Height: "2.0",
             swell2Interval: "9 seconds",
-            swell2Direction: localStorage.getItem("swell2Direction") ? localStorage.getItem("swell2Direction") : "SSW",
+            swell2Direction: getSwell2Direction(),
             swell1Angle: this.directionObject["SSW"],
             swell2Angle: this.directionObject["SSW"],
             //swell1Direction: getDefault("swell1Direction"),
@@ -586,7 +588,7 @@ class WaveFinder extends React.Component {
 
     handleSwell1Selection = (groupTitle, label, selected) => {
         const swell1Angle = this.directionObject[selected];
-        //console.log(`swell1Angle: ${swell1Angle}`)
+        console.log(`${selected} swell1Angle: ${swell1Angle}`)
         localStorage.setItem("swell1Angle", swell1Angle);
         localStorage.setItem("swell1Direction", selected);
         this.setState({
@@ -597,7 +599,7 @@ class WaveFinder extends React.Component {
     }
     handleSwell2Selection = (groupTitle, label, selected) => {
         const swell2Angle = this.directionObject[selected];
-        //console.log(`swell2Angle: ${swell2Angle}`)
+        console.log(`${selected} swell2Angle: ${swell2Angle}`)
         localStorage.setItem("swell2Angle", swell2Angle);
         localStorage.setItem("swell2Direction", selected);
         this.setState({
