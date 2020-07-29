@@ -30,8 +30,9 @@ class Logger extends React.Component {
     }
     componentDidMount() {
         //const logId = (this.props.location.state === undefined) ? this.logIdComponent.getLastRecordId() : this.props.location.state.logId.item;
-        console.log(`Logger => componentDidMount -> this.props.location.state: ${JSON.stringify(this.props.location.state, null, 2)}`);
-        const logId = (this.props.location.state === undefined) ? this.logIdComponent.getLogId() : this.props.location.state.logId.item;
+        const { state } = this.props.location;
+        console.log(`Logger => componentDidMount -> this.props.location.state: ${JSON.stringify(state, null, 2)}`);
+        const logId = (state === undefined) ? this.logIdComponent.getLogId() : state.logId.item;
         //console.log(`Logger => componentDidMount -> logId: ${logId}`)
         if (localStorage.getItem(this.logIdComponent.getLogId()) === null) {
             this.log = this.logIdComponent.templateData;

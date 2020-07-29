@@ -5,11 +5,9 @@ import getKey from '../utils/KeyGenerator.js';
 
 function FormSelector(props) {
     let action = "";
-    const items = props.items;
-    const label = props.label;
-    const select = props.selected;
+    const { items, label, selected } = props;
+    const select = selected;
     let bowlIngredients = "";
-    let selected = select;
     const tagSelected = (item) => <option selected key={getKey(item)} value={item.toString()}>{item}</option>;
     const tag = (item) => <option key={getKey(item)} value={item.toString()}>{item}</option>;
     const getTag = (item) => (item === select) ? tagSelected(item) : tag(item);

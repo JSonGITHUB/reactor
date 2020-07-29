@@ -64,10 +64,11 @@ export default FormLogin;
 
 
 function LoginButton(props) {
+    const { value, handleChange, onClick } = props;
     return (
         <div>
-            <input type="text" value={props.value} onChange={props.handleChange}/>
-            <button className="button-green" onClick={props.onClick}>
+            <input type="text" value={value} onChange={handleChange}/>
+            <button className="button-green" onClick={onClick}>
                 Login
             </button>
         </div>

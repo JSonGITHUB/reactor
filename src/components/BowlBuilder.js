@@ -67,8 +67,7 @@ const AcaiBowl = (width, height) => {
     );
 }
 const BowlBuilder = (props) => {
-    const width = props.width;
-    const height = props.height;
+    const { width, height } = props;
     return (
         <div className="flexContainer App-content fadeIn">
             <div className="flex5Column"></div>

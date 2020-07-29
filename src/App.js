@@ -71,15 +71,14 @@ class App extends React.Component {
     const endIndex = () => window.location.search.length;
     const getLogId = () => window.location.search.substring(startIndex(), endIndex());
     const logId = (logIdExists) ? getLogId() : "";
-    const height = this.state.height;
-    const width = this.state.width;
+    const { width, height, isMotionOn } = this.state;
      return (
       //AppComponent();
       <Router basename={this.base}>
         <ScrollToTop />
         <div className="App">
             <Switch>
-              <Header company={this.company} menu='false' width={this.state.width} isMotionOn={this.state.isMotionOn}/>
+              <Header company={this.company} menu='false' width={width} isMotionOn={isMotionOn}/>
             </Switch> 
             <div className="fadeIn">
                 <Switch>
@@ -120,7 +119,7 @@ class App extends React.Component {
                 </Switch>
               </div>
             <Switch>
-              <Footer isMotionOn={this.state.isMotionOn} setMotion={this.setMotion}/>
+              <Footer isMotionOn={isMotionOn} setMotion={this.setMotion}/>
             </Switch>
           </div>
       </Router>

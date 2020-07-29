@@ -9,13 +9,14 @@ import React from 'react';
 class SelectorForm extends React.Component {
     action = "YEWW!!!!";
     constructor(props) {
-        super(props); 
-        this.items = props.items;
+        super(props);
+        const {items, selected, header} = props;
+        this.items = items;
         this.state = { 
-            value: props.selected,
-            selected: props.selected,
-            select: props.selected,
-            header: props.header,
+            value: selected,
+            selected: selected,
+            select: selected,
+            header: header,
             bowlIngredients: "",
             selectItems: this.items.map((item) =>
                 <option 
@@ -35,15 +36,16 @@ class SelectorForm extends React.Component {
         });
     };
     handleSubmit(event) {
-        let ingredients = this.state.bowlIngredients;
-        const itemExists = ingredients.includes(this.state.selected);
-        const itemExistsWithComma = ingredients.includes(", " + this.state.selected);
+        const { bowlIngredients, selected } = this.state;
+        let ingredients = bowlIngredients;
+        const itemExists = ingredients.includes(selected);
+        const itemExistsWithComma = ingredients.includes(", " + selected);
         const emptyBowl = (ingredients === "") ? true : false;
-        const addedIngredients = ingredients + ", " + this.state.selected;
-        const setBowlIngredients = (emptyBowl) ? this.state.selected : addedIngredients;
+        const addedIngredients = ingredients + ", " + selected;
+        const setBowlIngredients = (emptyBowl) ? selected : addedIngredients;
         const removeExtra = (ingredients) => ingredients.replace(", ", "");
-        const removeItem = ingredients.replace(this.state.selected, "");
-        const removeItemAndComma = ingredients.replace(", " + this.state.selected, "");
+        const removeItem = ingredients.replace(selected, "");
+        const removeItemAndComma = ingredients.replace(", " + selected, "");
         const hasJunk = (ingredients) => (ingredients.substr(0,2) === ", ") ? true : false; 
         const cleanUpIngredients = (ingredients) => (hasJunk(ingredients)) ? removeExtra(ingredients) : ingredients;
         if (!itemExists && this.action === "add") {
@@ -58,10 +60,11 @@ class SelectorForm extends React.Component {
     remove = (event) => this.action = "remove";
 
     render() {
+        const { value, selectItems } = this.state;
         return (
             <label>
-                <select value={this.state.value} onChange={this.handleChange}>
-                    {this.state.selectItems}
+                <select value={value} onChange={this.handleChange}>
+                    {selectItems}
                 </select>
             </label>
         );

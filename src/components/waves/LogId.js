@@ -8,9 +8,10 @@ class LogId extends React.Component {
         super(props);
         //console.log(`LogId !!!!! props.logId: ${props.logId}`)
         //console.log(`LogId !!!!! postDirectory: ${JSON.stringify(this.postDirectory.getDirectory(),null, 2)}`)
+        const { logId } = props;
         this.state = {
-            logId: (props.logId === null || props.logId === undefined) ? this.postDirectory.getLastId() : props.logId,
-            log: (JSON.parse(localStorage.getItem(props.logId)) === null) ? this.getLogTemplate : JSON.parse(localStorage.getItem(props.logId))
+            logId: (logId === null || logId === undefined) ? this.postDirectory.getLastId() : logId,
+            log: (JSON.parse(localStorage.getItem(logId)) === null) ? this.getLogTemplate : JSON.parse(localStorage.getItem(logId))
         }
     }
     getDate = () => this.state.log.Day.Date;
@@ -89,9 +90,10 @@ class LogId extends React.Component {
         }
     };
     
-    render() {      
-        console.log(`LastLogId => render: this.state.logId: ${this.state.logId} - this.state.log: ${this.state.log}`);
-        return <p>Count: {this.state.postDirectory.length}</p> 
+    render() {   
+        const { logId, log, postDirectory} = this.state;   
+        console.log(`LastLogId => render: this.state.logId: ${logId} - this.state.log: ${log}`);
+        return <p>Count: {postDirectory.length}</p> 
     }
     
 }

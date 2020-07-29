@@ -24,7 +24,7 @@ class SurfLocation extends React.Component {
     
     constructor(props) {
         super(props);
-        const {windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, swell1Interval, swell2Interval, tide, height, stars} = props.state;
+        const { windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, swell1Interval, swell2Interval, tide, height, stars } = props.state;
         this.state = {
             logged: false,
             windDirection: windDirection,
@@ -113,21 +113,23 @@ class SurfLocation extends React.Component {
     secondsToSec = () => "sec"
     getStarDetails = (kind) => {
         let details = "";
-        details = (kind === "tide") ? <div className="bold color-neogreen">{this.state.height}'</div> : details;
-        details = (kind === "wind") ? <div className="bold color-neogreen">{this.state.windSpeed}-{this.state.windGusts}kts</div> : details;
-        details = (kind === "swell1") ? <div><div className="bold color-neogreen">{`${this.state.swell1Height}${(this.state.swell1Height.includes("ft")) ? "" : "'"}`}</div><div className="bold color-neogreen">{this.state.swell1Angle}°</div><div className="bold color-neogreen">{this.state.swell1Interval.replace(" seconds",this.secondsToSec())}</div></div> : details;
-        details = (kind === "swell2") ? <div><div className="bold color-neogreen">{`${this.state.swell2Height}${(this.state.swell2Height.includes("ft")) ? "" : "'"}`}</div><div className="bold color-neogreen">{this.state.swell2Angle}°</div><div className="bold color-neogreen">{this.state.swell2Interval.replace(" seconds",this.secondsToSec())}</div></div> : details;
+        const {height, windSpeed, windGusts, swell1Height, swell1Angle,swell1Interval, swell2Height, swell2Angle, swell2Interval} = this.state;
+        details = (kind === "tide") ? <div className="bold color-neogreen">{height}'</div> : details;
+        details = (kind === "wind") ? <div className="bold color-neogreen">{windSpeed}-{windGusts}kts</div> : details;
+        details = (kind === "swell1") ? <div><div className="bold color-neogreen">{`${swell1Height}${(swell1Height.includes("ft")) ? "" : "'"}`}</div><div className="bold color-neogreen">{swell1Angle}°</div><div className="bold color-neogreen">{swell1Interval.replace(" seconds",this.secondsToSec())}</div></div> : details;
+        details = (kind === "swell2") ? <div><div className="bold color-neogreen">{`${swell2Height}${(swell2Height.includes("ft")) ? "" : "'"}`}</div><div className="bold color-neogreen">{swell2Angle}°</div><div className="bold color-neogreen">{swell2Interval.replace(" seconds",this.secondsToSec())}</div></div> : details;
         return details
     }
     getState = (kind) => {
+        const { swell1Direction, swell2Direction, tide, windDirection } = this.state;
         if (kind === "swell1") {
-            return this.state.swell1Direction;
+            return swell1Direction;
         } else if (kind === "swell2") {
-            return this.state.swell2Direction;
+            return swell2Direction;
         } else if (kind === "tide") {
-            return this.state.tide;
+            return tide;
         } else if (kind === "wind") {
-            return this.state.windDirection;
+            return windDirection;
         }
     }
     star = (matchKind) => <div key={getKey("star")} className="flex3Column bg-lite mr-5 ml-5 p-10 r-10">
@@ -200,13 +202,14 @@ class SurfLocation extends React.Component {
             return directions[this.state.windDirection]
         }
         const getNotes = () => {
-            let notes = `${this.state.swell1Height}(${getWaveHeight(this.state.swell1Height)})`;
-            notes = `${notes} out of the ${this.state.swell1Direction}`;
-            notes = `${notes}(${this.state.swell1Angle})`;
-            notes = `${notes} at ${this.state.swell1Interval}.`;
-            notes = `${notes} It was a ${this.state.tide} tide`;
-            notes = `${notes}(${Number(this.state.height).toFixed(0)}ft).`;
-            notes = `${notes} the wind was ${getWindOrientation()} out of the ${this.state.windDirection} at ${getWindMPH()}.`;
+            const { height, tide, windDirection, swell1Height, swell1Angle, swell1Direction, swell1Interval } = this.state;
+            let notes = `${swell1Height}(${getWaveHeight(swell1Height)})`;
+            notes = `${notes} out of the ${swell1Direction}`;
+            notes = `${notes}(${swell1Angle})`;
+            notes = `${notes} at ${swell1Interval}.`;
+            notes = `${notes} It was a ${tide} tide`;
+            notes = `${notes}(${Number(height).toFixed(0)}ft).`;
+            notes = `${notes} the wind was ${getWindOrientation()} out of the ${windDirection} at ${getWindMPH()}.`;
             notes = `${notes} The conditions were ${getSurface()}.`;
             return notes;
         }
@@ -300,7 +303,7 @@ class SurfLocation extends React.Component {
     
     render() {
         const item = this.props.item;
-        const {windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, swell1Interval, swell2Interval, tide, height, stars} = this.state;
+        const { windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, swell1Interval, swell2Interval, tide, height, stars } = this.state;
         const statusClass = (status) => (status === true) ? "color-neogreen" : "color-yellow"; 
         const subStatusClass = (status) => (status === true) ? "color-orange" : "color-yellow"; 
         const swell1Match = (item) => (item.swell.indexOf(swell1Direction)>-1) ? true : false;
@@ -310,13 +313,13 @@ class SurfLocation extends React.Component {
         const swell2DirectionMatch = (direction) => (direction===swell2Direction) ? true : false;
         const windDirectionMatch = (direction) => (direction.wind === windDirection) ? true : false;
         const tideDirectionMatch = (direction) => (direction.tide === tide) ? true : false;
-        
+        const {matches, regionMatch} = this.props;
         return (
             <div key={getKey("loc")}>
                 <div className="r-10 m-10 p-20 bg-dkGreen">
-                        <div className="width100Percent flexContainer">{this.getStars(this.props.matches)}</div>
+                        <div className="width100Percent flexContainer">{this.getStars(matches)}</div>
                         <div className="mt-10 navBranding">{item.name}</div>
-                        <div className="greet color-yellow p-5 bg-dkGreen mt-15 mb-10 r-5">{`${this.props.regionMatch} miles`}</div>
+                        <div className="greet color-yellow p-5 bg-dkGreen mt-15 mb-10 r-5">{`${regionMatch} miles`}</div>
                     <div className="flexContainer">
                         <div className="flexContainer m-auto">
                             <div className="columnRight pr-10">

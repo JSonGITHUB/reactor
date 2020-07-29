@@ -14,15 +14,16 @@ class FormRadio extends React.Component {
 
     constructor(props) {
         super(props); 
-        this.items = props.items;
+        let { items, selected, header, label, groupTitle } = props;
+        this.items = items;
         this.state = { 
-            value: props.selected,
-            selected: props.selected,
-            select: props.selected,
-            header: props.header,
-            label: props.label,
-            groupTitle: props.groupTitle,
-            items: props.items
+            value: selected,
+            selected: selected,
+            select: selected,
+            header: header,
+            label: label,
+            groupTitle: groupTitle,
+            items: items
         }
     };
 
@@ -63,9 +64,9 @@ class FormRadio extends React.Component {
             iconOut = getIcon(item, index, select);
             return iconOut;
         } 
-        
-        const isSelected = (index) => (Number(this.state.selected) === Number(index)) ? true : false;
-        return this.state.items.map((item, index) =>
+        const { selected, items } = this.state;
+        const isSelected = (index) => (Number(selected) === Number(index)) ? true : false;
+        return items.map((item, index) =>
             <div className="flex3Column" key={item.toString().toLowerCase()+(Math.round(Math.random()*100))} >
                 {icon(item, index, isSelected(index))}
             </div>

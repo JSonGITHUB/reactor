@@ -947,20 +947,22 @@ class WaveFinder extends React.Component {
         return classes;
     }
     getState = (kind) => {
+        const { swell1Direction, swell2Direction, tide, windDirection } = this.state;
         if (kind === "swell1") {
-            return this.state.swell1Direction;
+            return swell1Direction;
         } else if (kind === "swell2") {
-            return this.state.swell2Direction;
+            return swell2Direction;
         } else if (kind === "tide") {
-            return this.state.tide;
+            return tide;
         } else if (kind === "wind") {
-            return this.state.windDirection;
+            return windDirection;
         }
     }
     getStarDetails = (kind) => {
         let details = "";
-        details = (kind === "tide") ? <div className="bold color-neogreen">{this.state.height}'</div> : details;
-        details = (kind === "wind") ? <div className="bold color-neogreen">{this.state.windSpeed}-{this.state.windGusts}kts</div> : details;
+        const { height, windSpeed, windGusts } = this.state;
+        details = (kind === "tide") ? <div className="bold color-neogreen">{height}'</div> : details;
+        details = (kind === "wind") ? <div className="bold color-neogreen">{windSpeed}-{windGusts}kts</div> : details;
         return details
     }
     star = (matchKind) => <div className="flex3Column bg-lite mr-5 ml-5 p-10 r-10">
@@ -1022,10 +1024,11 @@ class WaveFinder extends React.Component {
     }
     getReport = () => <iframe title="report" id="report" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224"></iframe>
     calculateDistance = (item) => {
+        const { latitude, longitude } = this.state;
         const lat1 = item.latitude;
-        const lat2 = this.state.latitude;
+        const lat2 = latitude;
         const lon1 = item.longitude;
-        const lon2 = this.state.longitude;
+        const lon2 = longitude;
         const unit = "Miles"
         if ((lat1 === lat2) && (lon1 === lon2)) {
             return 0;
@@ -1050,7 +1053,7 @@ class WaveFinder extends React.Component {
     }
     render() {
 //        console.log(`currentPositionExists: ${this.currentPositionExists()}`)
-        const {locations, windDirection, swell1Direction, swell2Direction, tide, height, stars} = this.state;
+        const {locations, windDirection, isWind, swell1Direction, swell2Direction, tide, isTide, height, stars, distance, isSwell1, isSwell2} = this.state;
         const swell1Match = (item) => (item.swell.indexOf(swell1Direction)>-1) ? true : false;
         const swell2Match = (item) => (item.swell.indexOf(swell2Direction)>-1) ? true : false;
         const windMatch = (item) => (item.wind.indexOf(windDirection)>-1) ? true : false;
@@ -1060,11 +1063,11 @@ class WaveFinder extends React.Component {
         //const windDirectionMatch = (direction) => (direction.wind === windDirection) ? true : false;
         //const tideDirectionMatch = (direction) => (direction.tide === tide) ? true : false;
         const calculateDistance = (item) => this.calculateDistance(item);
-        const distance = (item) => calculateDistance(item);
+        const getDistance = (item) => calculateDistance(item);
         //Math.abs(item.latitude - this.state.latitude)+Math.abs(item.longitude - this.state.longitude);
         //.01 - 1 mile
-        const distanceRange = Number(this.state.distance);
-        const regionMatch = (item) => (distance(item)<distanceRange) ? distance(item) : false
+        const distanceRange = Number(distance);
+        const regionMatch = (item) => (getDistance(item)<distanceRange) ? getDistance(item) : false
         let count = 0;
         const match = (item) => {
             const matches = [];
@@ -1077,10 +1080,10 @@ class WaveFinder extends React.Component {
         }
         const statusClass = (status) => (status === true) ? "color-neogreen" : "color-yellow"; 
         const subStatusClass = (status) => (status === true) ? "color-orange" : "color-yellow"; 
-        const swell1Confirm = (matches) => ((this.state.isSwell1 && matches.includes("swell1")) || this.state.isSwell1 === false) ? true : false;
-        const swell2Confirm = (matches) => ((this.state.isSwell2 && matches.includes("swell2")) || this.state.isSwell2 === false) ? true : false;
-        const tideConfirm = (matches) => ((this.state.isTide && matches.includes("tide")) || this.state.isTide === false) ? true : false;
-        const windConfirm = (matches) => ((this.state.isWind && matches.includes("wind")) || this.state.isWind === false) ? true : false;
+        const swell1Confirm = (matches) => ((isSwell1 && matches.includes("swell1")) || isSwell1 === false) ? true : false;
+        const swell2Confirm = (matches) => ((isSwell2 && matches.includes("swell2")) || isSwell2 === false) ? true : false;
+        const tideConfirm = (matches) => ((isTide && matches.includes("tide")) || isTide === false) ? true : false;
+        const windConfirm = (matches) => ((isWind && matches.includes("wind")) || isWind === false) ? true : false;
         const getMatchingLocation = (item) => {
             const matches = match(item);
             const inRegion = regionMatch(item);
@@ -1155,7 +1158,7 @@ class WaveFinder extends React.Component {
                                     <input className="mt-10 p-5 r-10"
                                         name="distance"
                                         type="number"
-                                        value={this.state.distance}
+                                        value={distance}
                                         onChange={this.handleDistanceSelection}/>
                                 </label>
                             </div>
@@ -1163,9 +1166,9 @@ class WaveFinder extends React.Component {
                         </div>
                         <div className="mt-10 mb-20">
                             <span className="color-neogreen bold">{(count === 1) ? `1 wave` : `${count} waves`}</span> out of {locations.length}<br/>
-                            are in a <span className="color-neogreen bold">{this.state.distance}</span> mile radius<br/>
+                            are in a <span className="color-neogreen bold">{distance}</span> mile radius<br/>
                             and prefer <span className="color-neogreen bold">{swell1Direction} </span>and <span className="color-orange bold ">{swell2Direction} </span>swell <br/>
-                            with a <span className="color-neogreen bold">{this.state.height}' {tide} </span>tide:
+                            with a <span className="color-neogreen bold">{height}' {tide} </span>tide:
                         </div>
                         {getLocations}
                     </div> 

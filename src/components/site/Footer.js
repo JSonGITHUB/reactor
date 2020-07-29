@@ -9,14 +9,16 @@ class Footer extends React.Component {
 
     constructor(props) {
         super(props);
-        this.isMotionOn = this.props.isMotionOn; 
-        this.setMotion = this.props.setMotion;
+        let { setMotion, isMotionOn } = this.props;
+        this.isMotionOn = isMotionOn; 
+        this.setMotion = setMotion;
     }
     
     render() {
-        const percent = (window.innerWidth < 700) ? 'twentyfivePercent mt--70 mb--70' : 'fiftyPercent mt--40 mb--40';      
+        const percent = (window.innerWidth < 700) ? 'twentyfivePercent mt--70 mb--70' : 'fiftyPercent mt--30 mb--40';      
+        const { isMotionOn, setMotion } = this.props;
         const loaderTag = <div className={percent}>
-                        <Loader isMotionOn={this.props.isMotionOn}/>
+                        <Loader isMotionOn={isMotionOn}/>
                     </div>
         const path = window.location.pathname.toLocaleLowerCase();
         const isPageSurfLog = (path.includes('surflog') || window.innerHeight < 600) ? true : false;
@@ -35,7 +37,7 @@ class Footer extends React.Component {
                         <CopyrightText />
                     </div>
                     <div className="flex3Column responsive bg-dkRed m-1 p-10 color-red">
-                        <Toggle isMotionOn={this.props.isMotionOn} setMotion={this.props.setMotion} id='toggle'/>
+                        <Toggle isMotionOn={isMotionOn} setMotion={setMotion} id='toggle'/>
                     </div>
                 </div>
                 <div className="flexContainer width-100-percent footer fixed">

@@ -4,11 +4,8 @@ import getKey from '../utils/KeyGenerator.js';
 
 function FormSelector(props) {
     //let action = "";
-    const items = props.items;
-    const label = props.label;
-    const groupTitle = props.groupTitle;
-    const select = props.selected;
-    let selected = select;
+    let { items, label, groupTitle, selected } = props;
+    const select = selected;
     const setSelected = (item) => {
         selected = item;
         return tag(item)
