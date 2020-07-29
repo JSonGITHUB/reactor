@@ -47,6 +47,9 @@
 .mb-30 {
   margin-bottom: 30px;
 }
+.mb--70 {
+  margin-bottom: -70px;
+}
 .mb-100-percent {
   margin-bottom: 100%;
 }

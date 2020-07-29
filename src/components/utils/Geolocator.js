@@ -4,24 +4,25 @@ import Loader from '../utils/Loader.js';
 class Geolocate extends React.Component {
     constructor(props) {
         super(props);
+        const { returnCurrentPosition, currentPositionExists } = props;
         this.state = {
             longitude: null,
             latitude: null,
             errorMessage: null,
-            returnCurrentPosition: props.returnCurrentPosition,
-            currentPositionExists: props.currentPositionExists
+            returnCurrentPosition: returnCurrentPosition,
+            currentPositionExists: currentPositionExists
         }
     }
     getCurrentPosition = () => {
         window.navigator.geolocation.getCurrentPosition(
             //position => console.log(position.coords.longitude),
            position => {
-
-                this.props.returnCurrentPosition(position.coords.longitude, position.coords.latitude);
-                console.log(`getCurrentPosition => coords ^^^^^^^^^^^ ${position.coords.longitude}, ${position.coords.latitude}`)
+                const { longitude, latitude } = position.coords;
+                this.props.returnCurrentPosition(longitude, latitude);
+                //console.log(`getCurrentPosition => coords ^^^^^^^^^^^ ${longitude}, ${latitude}`)
                 this.setState({
-                    longitude: position.coords.longitude,
-                    latitude: position.coords.latitude,
+                    longitude: longitude,
+                    latitude: latitude,
                 });
                 /*
                 try {
@@ -60,9 +61,10 @@ class Geolocate extends React.Component {
             </div>;
     latlon = () => this.state.latitude + "," + this.state.longitude;
     render() {
-        const errorExists = (this.state.errorMessage) ? true : false;
-        const latExists = (this.state.latitude) ? true : false;
-        const errMessage = this.state.errorMessage;
+        const { latitude, errorMessage } = this.state;
+        const errorExists = (errorMessage) ? true : false;
+        const latExists = (latitude) ? true : false;
+        const errMessage = errorMessage;
         let gelocationStatus = (latExists) ? this.getLocation() : this.loading();
         gelocationStatus = (errorExists) ? `${errMessage}` : gelocationStatus;
         /*

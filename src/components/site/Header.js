@@ -14,8 +14,9 @@ class Header extends React.Component {
             menu: false,
             initialized: false
         };
-        this.company = this.props.company;
-        this.isMotionOn = this.props.isMotionOn; 
+        const { company, isMotionOn } = this.props;
+        this.company = company;
+        this.isMotionOn = isMotionOn; 
     }
     navClassesClosed = "width-100-percent navigation mt-2 pointer faded bg-dark";
     navClassesOpen = "width-100-percent navigation mt-2 pointer fadeInFaded fadedDark bg-dark";
@@ -67,21 +68,23 @@ class Header extends React.Component {
     portraitNav = (item) => <div key={getKey("nav")}>{this.portraitButton(item)}</div>;
 
     render() {
-        const isWideScreen = (this.props.width >= 1080) ? true : false;
-        const closedClasses = (this.state.initialized) ? this.navClassesClose : this.navClassesClosed;
-        const navClasses = (this.state.menu) ? this.navClassesOpen : closedClasses;
-        const getMenuButton = (this.state.menu) ? this.closeButton : this.burgerButton;
+        const { menu, initialized } = this.state;
+        const { company, width, isMotionOn } = this.props;
+        const isWideScreen = (width >= 1080) ? true : false;
+        const closedClasses = (initialized) ? this.navClassesClose : this.navClassesClosed;
+        const navClasses = (menu) ? this.navClassesOpen : closedClasses;
+        const getMenuButton = (menu) ? this.closeButton : this.burgerButton;
         const path = window.location.pathname.toLocaleLowerCase();
         const isHomePage = (path === '/reactor/home' || path === '/reactor/') ? true : false;
         const homepageHeader = <div className="pt-70">
-                        <Loader isMotionOn={this.props.isMotionOn}/>
-                        <TextColorizer class='bigHeader' text={this.props.company}/>
+                        <Loader isMotionOn={isMotionOn}/>
+                        <TextColorizer class='bigHeader' text={company}/>
                     </div>;
         const Branding = () => {
             if (isHomePage === true) { return homepageHeader }
             return <div className='mt-88'></div>
         };
-        const backgroundClass = (this.props.isMotionOn) ? 'rgb-stripe' : 'rgb-stripeStopped';
+        const backgroundClass = (isMotionOn) ? 'rgb-stripe' : 'rgb-stripeStopped';
         const Background = () => <div className={backgroundClass}></div>;
         const getNavButton = (item) => (isWideScreen) ? this.wideNav(item) : this.portraitNav(item);
         const getMenuItems = () => {
@@ -113,10 +116,10 @@ class Header extends React.Component {
                                 <div className="t-collapse navigation width-100-percent bg-dark">{getMenuItems()}</div>
                             </div>
                             
-        const hamburgerNav = (this.state.menu === true) ? hamburgerOpen : hamburgerClosed;
+        const hamburgerNav = (menu === true) ? hamburgerOpen : hamburgerClosed;
         const getNavigation = (isWideScreen) ? navigation : hamburgerNav;
         
-        console.log(`this.state.menu: ${this.state.menu}`);
+        console.log(`this.state.menu: ${menu}`);
         
         return (
             <div className="App-header">

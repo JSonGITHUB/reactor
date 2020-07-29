@@ -72,16 +72,17 @@ class LogEntry extends React.Component {
     constructor(props) {
         super(props);
         this.selectorStatus = [];
-        this.buttonLabel = props.buttonLabel;
-        this.title = props.title;
-        this.message = props.message;
-        this.logId = props.logId;
+        const { items, buttonLabel, title, message, logId } = props; 
+        this.buttonLabel = buttonLabel;
+        this.title = title;
+        this.message = message;
+        this.logId = logId;
         //this.logData.init();
-        console.log(`LogEntry => props.logId: ${props.logId}`)
-        if (props.logId !== undefined && props.logId !== "" ) {
-            this.lastPostId = props.logId;
-            console.log(`$$ logId1: ${props.logId}`);
-            this.log = (localStorage.getItem(props.logId) === null) ? this.templateData : JSON.parse(localStorage.getItem(props.logId));
+        console.log(`LogEntry => props.logId: ${logId}`)
+        if (logId !== undefined && logId !== "" ) {
+            this.lastPostId = logId;
+            console.log(`$$ logId1: ${logId}`);
+            this.log = (localStorage.getItem(logId) === null) ? this.templateData : JSON.parse(localStorage.getItem(logId));
         } else {
             this.lastPostId = "ThuApr3020209:19:28PM";
             console.log(`logId2: ${this.lastPostId}`)
@@ -90,9 +91,9 @@ class LogEntry extends React.Component {
         this.logIdComponent = new LogId({logId: this.props.logId, log: this.log});
         this.state = {
             date: new Date(),
-            items: props.items,
+            items: items,
             log: this.log,
-            lastPostId: props.logId,
+            lastPostId: logId,
             change: false
         };
         this.handleSelection = this.handleSelection.bind(this);
@@ -119,7 +120,8 @@ class LogEntry extends React.Component {
         this.handleSelection("Comments", "notes", event.target.value);
     }
     handleSubmit(event) {
-        const log = (this.state.log !== undefined && JSON.stringify(this.state.log, null, 2) !== "{}") ? this.state.log : this.log;
+        let { log } = this.state;
+        log = (log !== undefined && JSON.stringify(log, null, 2) !== "{}") ? log : this.log;
         console.log(`handleSubmit: ${JSON.stringify(log, null, 2)}`)
         const recordId = this.logIdComponent.generateNewLogId();
         console.log(`handleSubmit: recordId: ${recordId}`)
@@ -141,9 +143,10 @@ class LogEntry extends React.Component {
         }
     }
     handleSave(event) {
-        const log = (this.state.log !== undefined && JSON.stringify(this.state.log, null, 2) !== "{}") ? this.state.log : this.log;
+        let { log, lastPostId } = this.state;
+        log = (log !== undefined && JSON.stringify(log, null, 2) !== "{}") ? log : this.log;
         console.log(`handleSave: ${log}`)
-        const recordId = this.state.lastPostId;
+        const recordId = lastPostId;
         let post = "";
         const logIt = () => {
             post = JSON.stringify(log, null, 2);
@@ -245,12 +248,13 @@ class LogEntry extends React.Component {
     getLogObject = () => this.state.log;
     dateEntry = () => {
         //console.log(`this.state.log: ${this.state.log}`)
-        const logExists = (this.state.log !== undefined && this.state.log !== null && JSON.stringify(this.state.log, null, 2) !== "{}") ? true : false;
+        const {log, date } = this.state;
+        const logExists = (log !== undefined && log !== null && JSON.stringify(log, null, 2) !== "{}") ? true : false;
         //console.log(`LogEntry => this.state.log: ${JSON.stringify(this.state.log, null, 2)}`)
         const stateLogDate = () => this.getLogObject().Day.Date;
-        const getDate = () => (logExists === true) ? new Date(stateLogDate()) : new Date(this.state.date);
+        const getDate = () => (logExists === true) ? new Date(stateLogDate()) : new Date(date);
         const getTodaysDate = () => new Date();
-        const getStateDate = () => this.state.date;
+        const getStateDate = () => date;
         //console.log(`getDate(): ${getDate()}`)
         //console.log(`getTodaysDate(): ${getTodaysDate()}`)
         //console.log(`this.state.log.Day.Date: ${this.state.log.Day.Date}`)
@@ -280,7 +284,13 @@ class LogEntry extends React.Component {
                     <br/>
                     
                     <div className="mb-5">Additional Comments: </div>
-                    <textarea rows="10" cols={window.innerWidth/15} value={this.state.log.Comments.notes} onChange={this.updateNotes} className="mt-10 greet p-10 r-10 brdr-green"/><br/><br/>
+                    <textarea 
+                        rows="10" 
+                        cols={window.innerWidth/15} 
+                        value={this.state.log.Comments.notes} 
+                        onChange={this.updateNotes} 
+                        className="mt-10 greet p-10 r-10 brdr-green"
+                    /><br/><br/>
                     <Link className="noUnderline color-black"
                         to="/LogDirectory"
                         onClick={() => this.handleSubmit()}>

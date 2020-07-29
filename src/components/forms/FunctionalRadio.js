@@ -4,11 +4,8 @@ import React from 'react';
 
 function FormSelector(props) {
     let action = "";
-    const items = props.items;
-    const label = props.label;
-    const groupTitle = props.groupTitle;
-    let select = props.selected;
-    let selected = select;
+    let { items, groupTitle, label, selected } = props;
+    let select = selected;
     
     const handleChange = (event) => {
         selected = event.target.value;

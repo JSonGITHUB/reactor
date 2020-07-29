@@ -37,10 +37,11 @@ class SlideShow extends React.Component {
         if (this.slideShow) {
             this.index = (this.index === 29) ? 1 : this.index+1;
             const i = this.index;
-            console.log(`getAnImage => imgArray[${i}].image: ${this.state.images[i].image}`)
-            let url1 = this.state.images[i].image;
-            let url2 = this.state.images[i+30].image;
-            let url3 = this.state.images[i+60].image;
+            const images = this.state.images;
+            console.log(`getAnImage => imgArray[${i}].image: ${images[i].image}`)
+            let url1 = images[i].image;
+            let url2 = images[i+30].image;
+            let url3 = images[i+60].image;
             //console.log(url1);
             //console.log(url2);
             //console.log(url3);
@@ -57,13 +58,14 @@ class SlideShow extends React.Component {
     }
     
     render() {
+        const { url1, url2, url3 } = this.state;
         return (
             <div>
-                <img id="slideshow1" className="width-100-percent" src={this.state.url1} onClick={() => this.toggleSlideShow()} alt="California Sur Swell" />
+                <img id="slideshow1" className="width-100-percent" src={url1} onClick={() => this.toggleSlideShow()} alt="California Sur Swell" />
                 <br/>
-                <img id="slideshow1" className="width-100-percent" src={this.state.url2} onClick={() => this.toggleSlideShow()} alt="Baja Norte Swell" />
+                <img id="slideshow1" className="width-100-percent" src={url2} onClick={() => this.toggleSlideShow()} alt="Baja Norte Swell" />
                 <br/>
-                <img id="slideshow1" className="width-100-percent" src={this.state.url3} onClick={() => this.toggleSlideShow()} alt="Baja Sur Swell" />
+                <img id="slideshow1" className="width-100-percent" src={url3} onClick={() => this.toggleSlideShow()} alt="Baja Sur Swell" />
             </div>
         )
     }

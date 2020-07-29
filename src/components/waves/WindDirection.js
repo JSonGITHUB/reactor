@@ -88,10 +88,16 @@ class WindDirection extends React.Component {
     Next Tide at 3:09 PM: Low 1.70 ft
     Gusting to: 12.3 kts from WSW
     */
-    getCurrentWind = () => <div className={(this.props.columns > 1) ? "flexContainer": ""}>
-                            <div className={(this.props.columns > 1) ? "flex3Column": ""}>{`${this.state.direction} ${Number(this.state.angle).toFixed(0)}°`}</div>
-                            <div className={(this.props.columns > 1) ? "flex3Column": ""}>{`${Number(this.state.speed).toFixed(0)}-${Number(this.state.gusts).toFixed(0)}`} <span className="greet">knots</span></div>
-                        </div>
+    getCurrentWind = () => {
+        const { columns } = this.props;
+        const { direction, angle, speed, gusts } = this.state;
+        return (
+            <div className={(columns > 1) ? "flexContainer": ""}>
+                <div className={(columns > 1) ? "flex3Column": ""}>{`${direction} ${Number(angle).toFixed(0)}°`}</div>
+                <div className={(columns > 1) ? "flex3Column": ""}>{`${Number(speed).toFixed(0)}-${Number(gusts).toFixed(0)}`} <span className="greet">knots</span></div>
+            </div>
+        )
+    }
     render() {
         return <div>{this.getCurrentWind()}</div>
     };

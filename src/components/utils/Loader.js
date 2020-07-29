@@ -6,15 +6,15 @@ import logoGreen from '../../assets/images/logoGreen.png';
 import shakaBlack from '../../assets/images/shakaBlack.png';
 
 const Loader = props => {
-
-    let shakaClass = (props.isMotionOn === true) ? "shakingShaka shaka" : "shaka";
+    let isMotionOn = props.isMotionOn;
+    let shakaClass = (isMotionOn) ? "shakingShaka shaka" : "shaka";
     shakaClass += " mt-88 absolute";
     const logoClasses = " absolute logo height200 ml--100";
-    let logo1Class = (props.isMotionOn === true) ? "z3 logo1" : "z3 logo1Stopped";
+    let logo1Class = (isMotionOn) ? "z3 logo1" : "z3 logo1Stopped";
     logo1Class += logoClasses;
-    let logo2Class = (props.isMotionOn === true) ? "z2 logo2" : "z2 logo2Stopped";
+    let logo2Class = (isMotionOn) ? "z2 logo2" : "z2 logo2Stopped";
     logo2Class += logoClasses;
-    let logo3Class = (props.isMotionOn === true) ? "z1 logo3" : "z1 logo3Stopped";
+    let logo3Class = (isMotionOn) ? "z1 logo3" : "z1 logo3Stopped";
     logo3Class += logoClasses;
     return (
         <div>

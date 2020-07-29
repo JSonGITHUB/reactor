@@ -9,8 +9,7 @@ const GuestGreeting = () => <div className="greet p-5">
                             </div>;
 
 const Greeting = props => {
-    const isLoggedIn = props.isLoggedIn;
-    const user = props.user;
+    const {isLoggedIn, user} = props;
     if (isLoggedIn) {
         return <UserGreeting user={user}/>;
     }

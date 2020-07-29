@@ -12,8 +12,9 @@ const tryConvert = (temperature, convert) => {
 };
 const toFahrenheit = (celsius) => (celsius * 9 / 5) + 32;
 const BoilingVerdict = props => {
-    if (props.celsius >= 100) { return <p>water is boiling...</p> }
-    if (props.celsius <= 0) { return <p>water is freezing...</p> }
+    const { celsius } = props;
+    if (celsius >= 100) { return <p>water is boiling...</p> }
+    if (celsius <= 0) { return <p>water is freezing...</p> }
     return <p>water is not boiling or freezing...</p>;
 }
 
