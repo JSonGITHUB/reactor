@@ -42,7 +42,8 @@ class Tide extends React.Component {
         const uri = uriMLLW;
         
         //const waterTempuri = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime}&end_date=${getCurrentTime}&station=9410230&product=water_temperature&datum=mllw&units=english&time_zone=gmt&application=web_services&format=json`;
-        fetch(uri)
+        const proxyurl = "https://cors-anywhere.herokuapp.com/";
+        fetch(proxyurl + uri)
             .then(response => validate(response))
             .then(data => {
                 const waterLevel = Number(data.data[data.data.length - 1].v).toFixed(1);
