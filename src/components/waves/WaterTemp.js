@@ -31,7 +31,8 @@ class WaterTemp extends React.Component {
         console.log(`WaterTemp   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
         const waterTempuri = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getStartTime}&end_date=${getEndTime}&station=9410230&product=water_temperature&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
         //`https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=20200520%2018:24&end_date=20200520%2018:24&station=9410230&product=water_temperature&datum=mllw&units=english&time_zone=gmt&application=web_services&format=json`
-        fetch(waterTempuri)
+        const proxyurl = "https://cors-anywhere.herokuapp.com/";
+        fetch(proxyurl + waterTempuri)
             .then(response => validate(response))
             .then(data => {
                 this.setState({
