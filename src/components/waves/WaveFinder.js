@@ -876,7 +876,7 @@ class WaveFinder extends React.Component {
                                     groupTitle="Tide"
                                     selected={this.state.tide} 
                                     label="current" 
-                                    items={["low", "medium", "hign"]}
+                                    items={["low", "medium", "high"]}
                                     onChange={this.handleTideSelection}
                                 />
                                 <div className="button mt-15" onClick={this.handleTideCheck}>
