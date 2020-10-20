@@ -1,15 +1,15 @@
 import React from 'react';
 import Loader from '../utils/Loader.js';
 
-class WaterTemp extends React.Component {
+class Buoy extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            temp: null,
+            buoy: null,
         }
     }
-    getWaterTempData = () => {
-        console.log(`getWaterTemp ->`);
+    getBuoyData = () => {
+        console.log(`getBuoy ->`);
         let data;
         const returnJSON = (response) => response.json();
         const returnRejection = (response) => Promise.reject({status: response.status, data});
@@ -28,21 +28,22 @@ class WaterTemp extends React.Component {
         const getEndTime = `${year}${month}${date}%20${hours}:${minutes}`;
         const getStartTime = `${year}${month}${date}%20${startHour}:00`;
         getCurrentTime = `${year}${month}${date}%20${hours}:${minutes}`;
-        console.log(`WaterTemp   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
-        const waterTempuri = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getStartTime}&end_date=${getEndTime}&station=9410230&product=water_temperature&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
+        console.log(`Buoy   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
+        const buoyuri = `https://www.ndbc.noaa.gov/data/latest_obs/latest_obs.txt`;
         //`https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=20200520%2018:24&end_date=20200520%2018:24&station=9410230&product=water_temperature&datum=mllw&units=english&time_zone=gmt&application=web_services&format=json`
-        const proxyurl = "https://cors-anywhere.herokuapp.com/";
-        fetch(proxyurl + waterTempuri)
-            .then(response => validate(response))
+        fetch(buoyuri)
+            .then(response => console.log(`YEEEW!!!! -- ${validate(response)}))
+            /*
             .then(data => {
                 this.setState({
-                    temp: Number(data.data[data.data.length - 1].v).toFixed(0)
+                    buoy: Number(data.data[data.data.length - 1].v).toFixed(0)
                 })
             })
-            .catch(err => console.log(`Something went wrong!\nuri: ${waterTempuri} \npath: ${window.location.pathname}\n`, err));
+            */
+            .catch(err => console.log(`Something went wrong!\nbuoyuri: ${buoyuri} \npath: ${window.location.pathname}\n`, err));
     }
-    getLocalWaterTempData = () => {
-        console.log(`getLocalWaterTemp ->`);
+    getLocalBuoyData = () => {
+        console.log(`getLocalBuoy ->`);
         let data;
         const returnJSON = (response) => response.json();
         const returnRejection = (response) => Promise.reject({status: response.status, data});
@@ -61,55 +62,38 @@ class WaterTemp extends React.Component {
         const getEndTime = `${year}${month}${date}%20${hours}:${minutes}`;
         const getStartTime = `${year}${month}${date}%20${startHour}:00`;
         getCurrentTime = `${year}${month}${date}%20${hours}:${minutes}`;
-        console.log(`LocalWaterTemp   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
-        const localWaterTempURI = `http://192.168.1.8:8080/`;
-        fetch(localWaterTempURI)
+        console.log(`LocalBuoy   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
+        
+        const localBuoyURI = `http://192.168.1.8:8080/`;
+        fetch(localBuoyURI)
             .then(response => validate(response))
             .then(data => {
-                console.log(`LocalWaterTemp: ${JSON.stringify(data, 2, null)}`)
+                console.log(`LocalBuoy: ${JSON.stringify(data, 2, null)}`)
                 this.setState({
-                    temp: Number(data.data[data.data.length - 1].v).toFixed(0)
+                    buoy: Number(data.data[data.data.length - 1].v).toFixed(0)
                 })
             })
-            .catch(err => console.log(`Something went wrong!\nuri: ${localWaterTempURI} \npath: ${window.location.pathname}\n`, err));
+            .catch(err => console.log(`Something went wrong!\nuri: ${localBuoyURI} \npath: ${window.location.pathname}\n`, err));
     }
     getInterval = () => 300000;
     componentDidMount() {
-        this.getWaterTempData();
-        //this.getLocalWaterTempData();
-        this.timerID = setInterval(() => this.getWaterTempData(), this.getInterval());
+        this.getBuoyData();
+        //this.getLocalBuoyData();
+        this.timerID = setInterval(() => this.getBuoyData(), this.getInterval());
     }
     componentWillUnmount() {
         clearInterval(this.timerID);
     }
-    getCurrentTemp = () => <div>{this.state.temp}° <span className="greet">F</span></div>;
+    getCurrentBuoy = () => <div>{this.state.buoy}° <span className="greet">F</span></div>;
     percent = 'twentyfivePercent mt--70 mb--70';
     loading = () => <div className={this.percent}>
                 <Loader isMotionOn={this.props.isMotionOn}/>
             </div>;
     render() {
         return <div>
-                <div>{this.getCurrentTemp()}</div>
+                <div>{this.getCurrentBuoy()}</div>
             </div>
     };
 }
 
-export default WaterTemp;
-
-/*
-{
-    "metadata":{
-        "id":"9410230",
-        "name":"La Jolla",
-        "lat":"32.8669",
-        "lon":"-117.2571"
-    }, 
-    "data": [
-        {
-            "t":"2020-05-20 18:24", 
-            "v":"63.7", 
-            "f":"0,0,0"
-        }
-    ]
-}
-*/
+export default Buoy;

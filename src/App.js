@@ -16,9 +16,12 @@ import SlideShow from './components/SlideShow.js';
 import PhotoBlog from './components/PhotoBlog.js';
 import PhotoSequence from './components/PhotoSequence.js';
 import Reducer from './components/Reducer.js';
+import Adder from './components/hooks/Adder.js';
+import Todos from './components/hooks/Todos.js';   
 import './assets/css/App.css';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 import ScrollToTop from './components/utils/ScrollToTop.js';
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -115,6 +118,8 @@ class App extends React.Component {
                   <Route path="/Swell" component={SlideShow} />
                   <Route path="/PhotoBlog" component={PhotoBlog} />
                   <Route path="/PhotoSequence" component={PhotoSequence} />
+                  <Route path="/Adder" render={(props) => <Adder {...props} label="How big was it?" unit="ft" count="10" />}/>
+                  <Route path="/Todos" render={(props) => <Todos />}/>
                   <Route path="/Reducer" component={Reducer} />
                 </Switch>
               </div>
