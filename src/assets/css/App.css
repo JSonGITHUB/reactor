@@ -1,6 +1,9 @@
 .App {
   text-align: center;
 }
+.ht-30 {
+  height: 30px;
+}
 .centeredContent {
   align-items: center;
   text-align: center;
@@ -245,6 +248,12 @@ select {
   min-height: 2px;
   flex: 6;
   margin:auto;
+}
+.flex2Column10Percent {
+  justify-content: center;
+  height: auto;
+  min-height: 2px;
+  flex: 10%;
 }
 .flex3Column {
   height: auto;

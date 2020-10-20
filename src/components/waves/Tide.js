@@ -1,6 +1,7 @@
 import React from 'react';
 import Loader from '../utils/Loader.js';
 //import tide from '../../assets/images/tide.png'
+import axios from 'axios';
 
 class Tide extends React.Component {
     constructor(props) {
@@ -38,15 +39,38 @@ class Tide extends React.Component {
         const uriMSL = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime}&end_date=${getCurrentTime}&station=9410230&product=water_level&datum=MSL&units=english&time_zone=lst_ldt&application=web_services&format=json`;
         const uriNAVD = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime}&end_date=${getCurrentTime}&station=9410230&product=water_level&datum=NAVD&units=english&time_zone=lst_ldt&application=web_services&format=json`;
         const uriSTND = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime}&end_date=${getCurrentTime}&station=9410230&product=water_level&datum=STND&units=english&time_zone=lst_ldt&application=web_services&format=json`;
-
-        const uri = uriMLLW;
+        const uriLaJolla = `https://tidesandcurrents.noaa.gov/api/datagetter?product=predictions&amp;application=NOS.COOPS.TAC.WL&amp;begin_date=20201020&amp;end_date=20201021&amp;datum=MLLW&amp;station=9410230&amp;time_zone=lst_ldt&amp;units=english&amp;interval=hilo&amp;format=json`;
         
+        const uri = uriMLLW;
+        const proxyurl = "https://cors-anywhere.herokuapp.com/";
+
+        const parseTideData = (data) => {
+            console.log(`parseTideData $$$$$$$$$`);
+            const waterLevel = Number(data.data[data.data.length - 1].v).toFixed(1);
+            console.log(`tideData => ${JSON.stringify(data, null, 2)}`)
+            this.props.setTide(waterLevel)
+            this.setState({
+                station: data.metadata.name,
+                tide:(waterLevel > 3) ? "high" : (waterLevel < 2) ? "low" : "med",
+                height: waterLevel
+            })
+        }
+        /*
+        const getTideAxios = async() => {
+            console.log(`getTideAxios $$$$$$$$$ (1)`);
+            const response = await axios.get('https://tidesandcurrents.noaa.gov/api/datagetter?product=predictions&amp;application=NOS.COOPS.TAC.WL&amp;begin_date=20201020&amp;end_date=20201021&amp;datum=MLLW&amp;station=9410230&amp;time_zone=lst_ldt&amp;units=english&amp;interval=hilo&amp;format=json');
+            console.log(`getTideAxios $$$$$$$$$ (2)`);
+            parseTideData(response);
+        }
+        getTideAxios();
+        */
         //const waterTempuri = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime}&end_date=${getCurrentTime}&station=9410230&product=water_temperature&datum=mllw&units=english&time_zone=gmt&application=web_services&format=json`;
-        fetch(uri)
+        
+        fetch(proxyurl + uri)
             .then(response => validate(response))
             .then(data => {
                 const waterLevel = Number(data.data[data.data.length - 1].v).toFixed(1);
-                //console.log(`tideData => ${JSON.stringify(data, null, 2)}`)
+                console.log(`tideData => ${JSON.stringify(data, null, 2)}`)
                 this.props.setTide(waterLevel)
                 this.setState({
                     station: data.metadata.name,
