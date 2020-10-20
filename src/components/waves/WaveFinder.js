@@ -971,9 +971,11 @@ class WaveFinder extends React.Component {
                         </div>;
     getStars = (stars) => stars.map((star) => this.star(star));
     setTide = (tide) => {
-        //console.log(`WaveFinder = > setTide(${tide})`)
+        console.log(`WaveFinder = > setTide(${tide})`)
         let currentTide = (Number(tide)>2) ? "medium" : "low";
+        console.log(`WaveFinder = > ${tide} currentTide(${currentTide})`)
         currentTide = (Number(tide)>4) ? "high" : currentTide;
+        console.log(`WaveFinder = > ${tide} currentTide(${currentTide})`)
         if (this.state.pause === false) {
             this.setState({
                 tide: currentTide,
