@@ -98,11 +98,11 @@ class Tide extends React.Component {
     greaterThan = () => (Number(this.previousTide()) > Number(this.state.height)) ? true : false;
     getDownArrow = () => {
         localStorage.setItem("tideDirection", "DOWN")
-        return <img className='mb--2' src={arrowDown} />
+        return <img className='arrows mb--2' src={arrowDown} />
     }
     getUpArrow = () => { 
         localStorage.setItem("tideDirection", "UP")
-        return <img className='mb--2' src={arrowUp} />
+        return <img className='arrows mb--2' src={arrowUp} />
     }
     getTideDirection = () => (this.state.tideDirection === "DOWN") ? this.getDownArrow() : this.getUpArrow();
     //getTideDirection = () => (this.notEqual() && this.greaterThan()) ? "DOWN" : this.state.tideDirection;

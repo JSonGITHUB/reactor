@@ -1039,7 +1039,7 @@ class WaveFinder extends React.Component {
             return <img src={NW} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
         }
     }
-    getReport = () => <iframe title="report" id="report" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224"></iframe>
+    getReport = () => <iframe className="Percent95 mt-5" title="report" id="report" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224"></iframe>
     calculateDistance = (item) => {
         const { latitude, longitude } = this.state;
         const lat1 = item.latitude;
