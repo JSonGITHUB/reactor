@@ -121,7 +121,7 @@ class Tide extends React.Component {
                     </div>;
 
     render() {
-        console.log(`tide direction: ${this.state.tideDirection} previous height: ${this.previousTide()} height: ${this.state.height} == ${this.previousTide() === Number(this.state.height)}`)
+        //console.log(`tide direction: ${this.state.tideDirection} previous height: ${this.previousTide()} height: ${this.state.height} == ${this.previousTide() === Number(this.state.height)}`)
         this.setLocalTide();
         this.setLocalTideDirection();
         return <div>{this.getCurrentTide()}</div>
