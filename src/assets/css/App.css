@@ -23,6 +23,10 @@
   overflow-x: hidden;
   height: 50%;
 }
+.arrows {
+  height: 20px;
+  width: 17px;
+}
 .fiftyPercent {
   transform: scale(.5);
 }
