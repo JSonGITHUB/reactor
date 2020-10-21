@@ -1,5 +1,7 @@
 import React from 'react';
 import Loader from '../utils/Loader.js';
+//import arrowDown from '../../assets/images/ArrowDown.png';
+//import arrowUp from '../../assets/images/ArrowUp.png';
 
 class WaterTemp extends React.Component {
     constructor(props) {
@@ -77,17 +79,32 @@ class WaterTemp extends React.Component {
     componentDidMount() {
         this.getWaterTempData();
         //this.getLocalWaterTempData();
-        this.timerID = setInterval(() => this.getWaterTempData(), this.getInterval());
+        //this.timerID = setInterval(() => this.getWaterTempData(), this.getInterval());
     }
     componentWillUnmount() {
         clearInterval(this.timerID);
     }
-    getCurrentTemp = () => <div>{this.state.temp}° <span className="greet">F</span></div>;
+
+    //previousWaterTemp = () => (localStorage.getItem("waterTemp")) ? Number(localStorage.getItem("waterTemp")) : 0;
+    //notEqual = () => (this.previousWaterTemp() !== this.state.temp) ? true : false;
+    //greaterThan = () => (this.previousWaterTemp() > this.state.temp) ? true : false;
+    //getWaterTempDirection = () => (this.notEqual() && this.greaterThan()) ? <img className='mb--2' src={arrowDown} /> : <img className='mb--2' src={arrowUp} />;
+    //setLocalWaterTemp = () => localStorage.setItem("waterTemp", this.state.temp);
+    //setLocalWaterTempDirection = () => localStorage.setItem("waterTempDirection", this.state.waterTempDirection);
+
+    getCurrentTemp = () => <div>
+                            {this.state.temp}° 
+                            <span className="greet">F </span>
+                            {/*(this.previousWaterTemp() !== Number(this.state.temp)) ? this.state.waterTempDirection : this.getWaterTempDirection()*/}
+                        </div>;
     percent = 'twentyfivePercent mt--70 mb--70';
     loading = () => <div className={this.percent}>
                 <Loader isMotionOn={this.props.isMotionOn}/>
             </div>;
     render() {
+        //console.log(`previous water temp: ${this.previousWaterTemp()} water temp: ${this.state.temp}`)
+        //this.setLocalWaterTemp();
+        //this.setLocalWaterTempDirection();
         return <div>
                 <div>{this.getCurrentTemp()}</div>
             </div>
