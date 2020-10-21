@@ -1,5 +1,7 @@
 import React from 'react';
 import Loader from '../utils/Loader.js';
+//import arrowDown from '../../assets/images/ArrowDown.png';
+//import arrowUp from '../../assets/images/ArrowUp.png';
 
 class AirTemp extends React.Component {
     constructor(props) {
@@ -44,17 +46,33 @@ class AirTemp extends React.Component {
     getInterval = () => 300000;
     componentDidMount() {
         this.getAirTempData()
-        this.timerID = setInterval(() => this.getAirTempData(), this.getInterval());
+        //this.timerID = setInterval(() => this.getAirTempData(), this.getInterval());
     }
     componentWillUnmount() {
         clearInterval(this.timerID);
     }
-    getCurrentTemp = () => <div>{this.state.temp}° <span className="greet">F</span></div>;
+
+    //previousAirTemp = () => (localStorage.getItem("airTemp")) ? Number(localStorage.getItem("airTemp")) : 0;
+    //notEqual = () => (this.previousAirTemp() !== this.state.temp) ? true : false;
+    //greaterThan = () => (this.previousAirTemp() > this.state.temp) ? true : false;
+    //getAirTempDirection = () => (this.notEqual() && this.greaterThan()) ? <img className='mb--2' src={arrowDown} /> : <img className='mb--2' src={arrowUp} />;
+    //setLocalAirTemp = () => localStorage.setItem("airTemp", this.state.temp);
+    //setLocalAirTempDirection = () => localStorage.setItem("airTempDirection", this.state.airTempDirection);
+
+    getCurrentTemp = () => <div>
+                                {this.state.temp}° 
+                                <span className="greet">F </span>
+{/*(this.previousAirTemp() !== Number(this.state.temp)) ? this.state.airTempDirection : this.getAirTempDirection()*/}
+                            </div>;
     percent = 'twentyfivePercent mt--70 mb--70';
     loading = () => <div className={this.percent}>
                 <Loader isMotionOn={this.props.isMotionOn}/>
             </div>;
     render() {
+        //console.log(`previous air temp: ${this.previousAirTemp()} air temp: ${this.state.temp}`)
+        //this.setLocalAirTemp();
+        //this.setLocalAirTempDirection();
+        
         return this.getCurrentTemp()
     };
 }

@@ -1,13 +1,16 @@
 import React from 'react';
 import Loader from '../utils/Loader.js';
 //import tide from '../../assets/images/tide.png'
-import axios from 'axios';
+//import axios from 'axios';
+import arrowDown from '../../assets/images/ArrowDown.png';
+import arrowUp from '../../assets/images/ArrowUp.png';
 
 class Tide extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             tide: null,
+            tideDirection: localStorage.tideDirection || "?",
             height: null
         }
     }
@@ -45,13 +48,13 @@ class Tide extends React.Component {
         const proxyurl = "https://cors-anywhere.herokuapp.com/";
 
         const parseTideData = (data) => {
-            console.log(`parseTideData $$$$$$$$$`);
             const waterLevel = Number(data.data[data.data.length - 1].v).toFixed(1);
             console.log(`tideData => ${JSON.stringify(data, null, 2)}`)
             this.props.setTide(waterLevel)
             this.setState({
                 station: data.metadata.name,
                 tide:(waterLevel > 3) ? "high" : (waterLevel < 2) ? "low" : "med",
+                tideDirection: "DOWN",
                 height: waterLevel
             })
         }
@@ -70,11 +73,12 @@ class Tide extends React.Component {
             .then(response => validate(response))
             .then(data => {
                 const waterLevel = Number(data.data[data.data.length - 1].v).toFixed(1);
-                console.log(`tideData => ${JSON.stringify(data, null, 2)}`)
+                //console.log(`tideData => ${JSON.stringify(data, null, 2)}`)
                 this.props.setTide(waterLevel)
                 this.setState({
                     station: data.metadata.name,
                     tide:(waterLevel > 3) ? "high" : (waterLevel < 2) ? "low" : "med",
+                    tideDirection: (waterLevel > Number(localStorage.getItem("tide"))) ? "DOWN" : localStorage.getItem("tideDirection") || "UP",
                     height: waterLevel
                 })
             })
@@ -89,12 +93,37 @@ class Tide extends React.Component {
     componentWillUnmount() {
         clearInterval(this.timerID);
     }
-    getCurrentTide = () => <div>{this.state.height} <span className="greet">feet</span></div>;
+    previousTide = () => (localStorage.getItem("tide")) ? Number(localStorage.getItem("tide")) : 0;
+    notEqual = () => (Number(this.previousTide()) !== Number(this.state.height)) ? true : false;
+    greaterThan = () => (Number(this.previousTide()) > Number(this.state.height)) ? true : false;
+    getDownArrow = () => {
+        localStorage.setItem("tideDirection", "DOWN")
+        return <img className='mb--2' src={arrowDown} />
+    }
+    getUpArrow = () => { 
+        localStorage.setItem("tideDirection", "UP")
+        return <img className='mb--2' src={arrowUp} />
+    }
+    getTideDirection = () => (this.state.tideDirection === "DOWN") ? this.getDownArrow() : this.getUpArrow();
+    //getTideDirection = () => (this.notEqual() && this.greaterThan()) ? "DOWN" : this.state.tideDirection;
+    setLocalTide = () => localStorage.setItem("tide", Number(this.state.height));
+    setLocalTideDirection = () => localStorage.setItem("tideDirection", this.state.tideDirection);
+
+    getCurrentTide = () => <div>
+                            {this.state.height} 
+                            <span className="greet"> ft. </span> 
+                            {this.getTideDirection()}
+                        </div>;
+
     percent = 'twentyfivePercent mt--70 mb--70';
     loading = () => <div className={this.percent}>
-                <Loader isMotionOn={this.props.isMotionOn}/>
-            </div>;
+                        <Loader isMotionOn={this.props.isMotionOn}/>
+                    </div>;
+
     render() {
+        console.log(`tide direction: ${this.state.tideDirection} previous height: ${this.previousTide()} height: ${this.state.height} == ${this.previousTide() === Number(this.state.height)}`)
+        this.setLocalTide();
+        this.setLocalTideDirection();
         return <div>{this.getCurrentTide()}</div>
     };
 }

@@ -470,7 +470,7 @@ class WaveFinder extends React.Component {
    componentDidMount() {
         this.timerID = setInterval(
             () => this.tick(),
-            1000
+            5000000
         );
     }
 
@@ -518,6 +518,21 @@ class WaveFinder extends React.Component {
             .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
     }
     */
+
+    data = () => {
+        let data;
+        const returnJSON = (response) => response.json();
+        const returnRejection = (response) => Promise.reject({status: response.status, data});
+        const validate = (response) => (response.ok) ? returnJSON(response) : returnRejection(response);
+        const uri = this.tideURL;
+        fetch("https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224")
+            .then(response => validate(response))
+            .then(data => {
+                console.log(`data =-=-=-=-=-=-> ${JSON.stringify(data,null,2)}`)
+            })
+            .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
+    }
+
     getDefaultHeights = (tideSelected) => {
         if (tideSelected === "high") {
             return 5;
@@ -1095,33 +1110,6 @@ class WaveFinder extends React.Component {
                         //console.log(`STARS ==================> Matches: ${matches.length} state stars:${this.state.stars}`)
                         count = count + 1;
                         return <SurfLocation state={this.state} item={item} matches={matches} calculateDistance={calculateDistance} regionMatch={inRegion}></SurfLocation>
-                        /*
-                        <div key={getKey("loc")}>
-                                    <div className="r-10 m-10 p-20 bg-dkGreen">
-                                            <div className="width100Percent flexContainer">{this.getStars(matches)}</div>
-                                            <div className="mt-10 navBranding">{item.name}</div>
-                                            <div className="greet color-yellow p-5 bg-dkGreen mt-15 mb-10 r-5">{`${regionMatch(item)} miles`}</div>
-                                        <div className="flexContainer">
-                                            <div className="flexContainer m-auto">
-                                                <div className="columnRight pr-10">
-                                                    <div className="color-neogreen bold">Swell: </div>
-                                                    <div className="color-neogreen bold">Wind: </div>
-                                                    <div className="color-neogreen bold">Tide: </div>
-                                                </div>
-                                                <div className="columnLeft">
-                                                    <div>{item.swell.map((swell, i) => <span className={(swell === this.state.swell1Direction) ? statusClass(swell1Match(item)) : subStatusClass(swell2DirectionMatch(swell))}>{swell}{((i+1) === item.swell.length)? "" : ", "}</span>)}</div>
-                                                    <div className={statusClass(windMatch(item))}>
-                                                        {item.wind.map((wind, i) => <span className={statusClass(windDirectionMatch({wind}))}>
-                                                                                    {wind}{((i+1) === item.wind.length)? "" : ", "}
-                                                                                </span>)}
-                                                    </div>
-                                                    <div className={statusClass(tideMatch(item))}>{item.tide.map((tide,i) => <span className={statusClass(tideDirectionMatch({tide}))}>{tide}{((i+1) === item.tide.length)? "" : ", "}</span>)}</div>
-                                                </div>
-                                            </div>
-                                        </div>   
-                                    </div>
-                                </div>
-                                */
                     }
                 }
             }
