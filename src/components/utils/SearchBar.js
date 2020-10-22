@@ -22,9 +22,10 @@ class SearchBar extends React.Component {
         console.log(`Search Term: ${this.state.term}`);
         this.props.onSubmit(this.state.term, 'https://api.unsplash.com/search/photos', 'Client-ID LV6VY88M75l5IvWUJp5aKDIBpB1bI97YIr8PW3h_bas', this.updateArray);
     }
-    getImage = (item) => <div className="m-5">
+    getImage = (item) => <div className="m-5 bg-black">
+                                <div className="color-neogreen p-10 m-auto w-200 mb-5">{item.location}</div>
                                 <img src={item.image}/>
-                                <div className="color-yellow m-auto w-200 mb-5">{item.description}</div>
+                                <div className="white m-auto pt-5 pb-5 w-200 mb-5 description">{item.description}</div>
                         </div>
     render() {
         return <div>
@@ -32,9 +33,10 @@ class SearchBar extends React.Component {
                         <div className='flex3Column'></div>
                         <div className='flex3Column'>
                             <form onSubmit={this.onFormSubmit}>
-                                <div className='searchNav width-100-percent pt-10 pb-10 bg-green'>
+                                <div className='searchNav width-100-percent bg-green'>
                                     <label className='color-yellow'>Image Search: </label>
                                     <input
+                                        className='m-5'
                                         type="text"
                                         value={this.state.term}
                                         onChange={e => this.setState({term: e.target.value})}
