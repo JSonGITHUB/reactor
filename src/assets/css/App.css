@@ -23,6 +23,11 @@
   overflow-x: hidden;
   height: 50%;
 }
+.height75Percent {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: 75%;
+}
 .arrows {
   height: 20px;
   width: 17px;
@@ -129,6 +134,9 @@
 .width-100-percent {
   width: 100%;
 }
+.width-50-percent {
+  width: 50%;
+}
 .width-110-percent {
   width: 110%;
 }
@@ -147,7 +155,13 @@ select {
 .ml-2 {
   margin-left: 2px;
 }
-
+.sides-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+.mr-auto {
+  margin-right: auto;
+}
 .mr-20 {
   margin-right: 20px;
 }
@@ -219,6 +233,12 @@ select {
   margin:auto;
   min-height: 2px;
   flex: 3;
+}
+.flexTwoFourthColumn {
+  height: auto;
+  margin:auto;
+  min-height: 2px;
+  flex: 6;
 }
 .flexThreeFourthColumn {
   justify-content: center;
@@ -488,6 +508,11 @@ body {
 	background: linear-gradient(-45deg, red, yellow,green);
 	background-size: 400% 400%;
 	animation: stripe-anima 15s ease infinite;
+}
+.fixed {
+  position: fixed;
+}
+.searchNav {
 }
 .footer {
 	position: fixed;
