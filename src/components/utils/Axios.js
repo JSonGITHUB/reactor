@@ -20,7 +20,8 @@ class AxiosSearch extends React.Component {
                     console.log(`BOOM!!! ${index} => ${item.urls.thumb}`)
                     images.push({
                         'image': item.urls.thumb,
-                        'description': item.alt_description
+                        'description': item.alt_description,
+                        'location': item.user.location
                     });
                 })
                 return callback(images)
