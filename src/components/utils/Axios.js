@@ -2,24 +2,36 @@ import React from 'react';
 import axios from 'axios';
 import SearchBar from './SearchBar';
 
-class App extends React.Component {
-  async onSearchSubmit(term) {
-      axios
-      .get('https.//api.unsplash.com/search/photos', {
-          params: {query: term},
-          headers: {
-              Authorization: 'Client-ID 34e39e5c2f447ce' //need to get key
-          }
-      })
-      .then (response => {
-          console.log(response.data.results);
-      });
-  }  
-  render() {
-      return (
-          <div className="ui container" style={{ marginTop: '10px'}}>
+class AxiosSearch extends React.Component {
+    async onSearchSubmit(term, url, key, callback) {
+        axios
+            .get(url, {
+                params: {query: term},
+                headers: {
+                    Authorization: key //need to get key
+                }
+            })
+            .then (response => {
+                const images = [];
+                console.log(`onSearchSubmit ${JSON.stringify(response.data.results, null, 2)}`);
+                console.log(`onSearchSubmit ${response.data.results[0].urls.thumb}`);
+                console.log(`onSearchSubmit Length: ${response.data.results.length}`);
+                response.data.results.map((item, index) => {
+                    console.log(`BOOM!!! ${index} => ${item.urls.thumb}`)
+                    images.push({
+                        'image': item.urls.thumb,
+                        'description': item.alt_description
+                    });
+                })
+                return callback(images)
+            });
+    }  
+    render() {
+        return (
+            <div className="ui container" style={{ marginTop: '10px'}}>
             <SearchBar onSubmit={this.onSearchSubmit} />
-          </div>
-      )
-  }
+            </div>
+        )
+    }
 }
+export default AxiosSearch;

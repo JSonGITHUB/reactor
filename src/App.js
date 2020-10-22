@@ -21,6 +21,7 @@ import Todos from './components/hooks/Todos.js';
 import './assets/css/App.css';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 import ScrollToTop from './components/utils/ScrollToTop.js';
+import AxiosSearch from './components/utils/Axios.js';
 
 class App extends React.Component {
   constructor(props) {
@@ -119,6 +120,7 @@ class App extends React.Component {
                   <Route path="/PhotoBlog" component={PhotoBlog} />
                   <Route path="/PhotoSequence" component={PhotoSequence} />
                   <Route path="/Adder" render={(props) => <Adder {...props} label="How big was it?" unit="ft" count="10" />}/>
+                  <Route path="/Search" render={(props) => <AxiosSearch />}/>
                   <Route path="/Todos" render={(props) => <Todos />}/>
                   <Route path="/Reducer" component={Reducer} />
                 </Switch>
