@@ -28,10 +28,12 @@ class Logger extends React.Component {
         this.updateLog = this.updateLog.bind(this);
         this.getStateLog = this.getStateLog.bind(this);
     }
+    //getSpot = () => (this.state.spot) ? this.state.spot : this.log.Location.Break;
+    getSpot = () => localStorage.getItem("spot");
     componentDidMount() {
         //const logId = (this.props.location.state === undefined) ? this.logIdComponent.getLastRecordId() : this.props.location.state.logId.item;
         const { state } = this.props.location;
-        console.log(`Logger => componentDidMount -> this.props.location.state: ${JSON.stringify(state, null, 2)}`);
+        console.log(`Logger => componentDidMount -> SPOT: ${this.getSpot()}`); 
         const logId = (state === undefined) ? this.logIdComponent.getLogId() : state.logId.item;
         //console.log(`Logger => componentDidMount -> logId: ${logId}`)
         if (localStorage.getItem(this.logIdComponent.getLogId()) === null) {
@@ -44,6 +46,7 @@ class Logger extends React.Component {
         console.log(`logId$$$$$$$$$$: ${this.logIdComponent.getLogId()} --- localStorage.${this.logIdComponent.getLogId()} ==== ${JSON.stringify(this.log,null,2)} AND logId::::: ${logId}`)
 //      console.log(`Logger => constructor -> log: ${JSON.stringify(this.log,null,2)}`)
         let data;
+        //localStorage.setItem('spot', this.getSpot());
         const returnJSON = (response) => response.json();
         const returnRejection = (response) => Promise.reject({status: response.status, data});
         const validate = (response) => (response.ok) ? returnJSON(response) : returnRejection(response);
@@ -84,8 +87,8 @@ class Logger extends React.Component {
     getStateLog = () => this.state.log;
     
     render() {      
-        let {isLoaded, items} = this.state;           
-        //console.log(`Logger => ${JSON.stringify(this.state, null, 2)}`);
+        let {isLoaded, items} = this.state;
+//        console.log(`Logger ===> ${JSON.stringify(items[0].group.selections, null, 2)}`);
         let appInterface = <div className="App-content fadeIn">
                                 <div className="flex3Column"></div>
                                 <div className="flex3Column">

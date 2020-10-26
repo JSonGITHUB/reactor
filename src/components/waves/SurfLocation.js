@@ -146,7 +146,9 @@ class SurfLocation extends React.Component {
         console.log(`LogId: generateNewLogId => this.state.logId: ${newId}`);
         return newId;
     }
+    goToLog = () => window.location.pathname = "/reactor/SurfLog"
     createLog = (item) => {
+        localStorage.setItem('spot', item.name);
         const recordId = this.generateNewLogId();
         let getCurrentTime = new Date();
         const year = getCurrentTime.getFullYear();
@@ -169,6 +171,7 @@ class SurfLocation extends React.Component {
             height = (height<0) ? heights[0] : heights[height];
             return height;     
         }
+        
         const getWindMPH = () => {
             let mph = Number(this.state.windGusts)+1;
             mph = mph + "mph";
@@ -277,10 +280,13 @@ class SurfLocation extends React.Component {
             this.posts.add(recordId);
         }
         logIt();
+        this.goToLog();
+        /*
         this.setState({
             recordId: recordId,
             logged: true
         })
+        */
     };
     logLocation = (item) => (this.state.logged === true) ? alert("log already exists") : this.createLog(item);
     logLocationButton = (item) => <div className="App button bg-yellow color-black p-10 r-10 mt-20" onClick={() => this.logLocation(item)}>
