@@ -17,8 +17,9 @@ class LogDirectory extends React.Component {
         this.sessionClick = this.sessionClick.bind(this);
         this.logSession = this.logSession.bind(this);
     }
-    sessionClick(item) {
-        console.log(`sessionClick --> ${item}`);
+    sessionClick(item, spot) {
+        localStorage.setItem("spot", spot)
+        console.log(`sessionClick ${item} --> Spot: ${spot}`);
     }
     months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"]
     suffix = ["th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th"];
@@ -41,29 +42,36 @@ class LogDirectory extends React.Component {
             const conditionDescription = itemObj.Conditions.Conditions;
             const condition = this.icons[conditionsIndex];
 
-            return <Link className="noUnderline" key={getKey("link")} to={{
-                pathname: '/SurfLog',
-                state: {
-                logId: {item}
-                }
-            }}>
-                <div key={getKey("log")} className="flexContainer button color-graphite pointer greet m-1 r-5 incompletedSelector bold bg-yellow myButton" onClick={() => this.sessionClick(item)}>
-                        <div className="flexOneFourthColumn p-10">
-                            {/*<img src={this.condition(item)} alt={item} className='shaka' />*/}
-                            <img src={condition} alt={conditionDescription} className='shaka' />
-                        </div>
-                        <div className="flexThreeFourthColumnLeft pt-10 pb-10">
-                            {month + " " + day + this.suffix[Number(String(day).slice(-1))] /*+ " " + this.year(item)*/ + ": "}
-                            <br/>{spot}
-                        </div>
-                            {
-                                //item.substring(3, 6) + ", " + 
-                                //item.substring(6, item.indexOf("20")) + " " + 
-                                //item.substring(item.indexOf("20"), item.indexOf("20")+4) + " " + 
-                                //item.substring(item.length-2, item.length) + 
-                            }
-                </div>
-            </Link>
+            return (
+                <Link 
+                    className="noUnderline" 
+                    key={getKey("link")} 
+                    to={{
+                        pathname: '/SurfLog', 
+                        state: {
+                            spot: {spot}, 
+                            logId: {item}
+                        }
+                    }}
+                >
+                    <div key={getKey("log")} className="flexContainer button color-graphite pointer greet m-1 r-5 incompletedSelector bg-yellow myButton" onClick={() => this.sessionClick(item, spot)}>
+                            <div className="flexOneFourthColumn p-10">
+                                {/*<img src={this.condition(item)} alt={item} className='shaka' />*/}
+                                <img src={condition} alt={conditionDescription} className='shaka' />
+                            </div>
+                            <div className="flexThreeFourthColumnLeft pt-10 pb-10">
+                                {month + " " + day + this.suffix[Number(String(day).slice(-1))] /*+ " " + this.year(item)*/ + ": "}
+                                <br/>{spot}
+                            </div>
+                                {
+                                    //item.substring(3, 6) + ", " + 
+                                    //item.substring(6, item.indexOf("20")) + " " + 
+                                    //item.substring(item.indexOf("20"), item.indexOf("20")+4) + " " + 
+                                    //item.substring(item.length-2, item.length) + 
+                                }
+                    </div>
+                </Link>
+            )
         }
         return "";
     })
