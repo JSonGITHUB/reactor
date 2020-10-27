@@ -414,6 +414,7 @@ class WaveFinder extends React.Component {
         this.state = {
             pause: false,
             date: new Date(),
+            edit: false,
             tide: getDefault("tide"),
             stars: getDefault("stars"),
             waterTemp: "66.2",
@@ -542,7 +543,6 @@ class WaveFinder extends React.Component {
             })
             .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
     }
-
     getDefaultHeights = (tideSelected) => {
         if (tideSelected === "high") {
             return 5;
@@ -694,6 +694,14 @@ class WaveFinder extends React.Component {
         localStorage.setItem("distance", target.value);
         this.setState({
             distance: target.value
+        })
+    }
+    handleEditToggle = () => {
+        const edit = (!!this.state.edit === true) ? false : true;
+        localStorage.setItem("edit", edit);
+        this.setState({
+            pause: false,
+            edit: edit
         })
     }
     pause = (event) => {
@@ -1114,7 +1122,85 @@ class WaveFinder extends React.Component {
             locations: locations
         })
     }
-    
+    deleteWave = (props) => {
+        const locations = this.state.locations;
+        //console.log(`Props: ${JSON.stringify(props, null, 2)}`)
+        let index = 0;
+        let result = locations.find(obj => {
+            index++
+            return obj.name === props.name
+        })
+        console.log(`delete 1 => index: ${index} result: ${JSON.stringify(result, null, 2)}`)
+        console.log(`delete 2 => locations: [${index}]: ${JSON.stringify(locations[index], null, 2)}`)
+
+        ///////////////
+        locations.splice(index-1, 1);
+        localStorage.setItem('locations', JSON.stringify(locations))
+        console.log(`delete 3 => locations: [${index-1}]: ${locations.map((location, index) => `${index} ${location.name}`)}`)
+        this.setState({
+            locations: locations
+        })
+    }
+    editWaveSave = (location, index) => {
+        console.log(`editWaveSave() => ${JSON.stringify(location,null,2)}`)
+        let locations = this.state.locations;
+        let swells = location.swell;
+        let winds = location.wind;
+        let tides = location.tide;
+        let i=0;
+        let wave = prompt("wave: ", location.name);
+        const swellCount = prompt("swell count: ", swells.length);
+        for (i=0; i<swellCount; i++) {
+            swells[i] = prompt("edit swell direction", swells[i]);
+        }
+        swells = swells.slice(0, swellCount);
+        const windCount = prompt("wind count: ", winds.length);
+        for (i=0; i<windCount; i++) {
+            winds[i] = prompt("edit wind direction", winds[i]);
+        }
+        winds = winds.slice(0, windCount);
+        const tideCount = prompt("tide count: ", tides.length);
+        for (i=0; i<tideCount; i++) {
+            tides[i] = prompt("edit tide direction", tides[i]);
+        }
+        tides = tides.slice(0, tideCount);
+        const getObj = () => {
+            return {
+                name: wave,
+                latitude: location.latitude,
+                longitude: location.longitude,
+                swell: swells,
+                wind: winds,
+                tide: tides
+            }
+        }
+        console.log(`locations: ${JSON.stringify(locations[index],null,2)} => will be ${JSON.stringify(getObj(),null,2)}`)
+        locations[index] = getObj();
+        console.log(`edit a wave saving... ${JSON.stringify(locations[index], null, 2)}`)
+        localStorage.setItem('locations', JSON.stringify(locations))
+        this.setState({
+            locations: locations
+        })
+    }
+    editWave = (props) => {
+        const locations = this.state.locations;
+        
+        if (props.name === "button") {
+            console.log(`edit a wave... ${JSON.stringify(props, null, 2)}`);
+            this.handleEditToggle()
+
+        } else {
+            console.log(`Props: ${JSON.stringify(props, null, 2)}`)
+            let index = 0;
+            let result = locations.find(obj => {
+                index++
+                return obj.name === props.name
+              })
+            console.log(`index: ${index} result: ${JSON.stringify(result, null, 2)}`)
+            console.log(`locations: [${index}]: ${JSON.stringify(locations[index-1], null, 2)}`)
+            this.editWaveSave(result, index-1);
+        }
+    }
     render() {
 //        console.log(`currentPositionExists: ${this.currentPositionExists()}`)
 
@@ -1149,15 +1235,16 @@ class WaveFinder extends React.Component {
         const swell2Confirm = (matches) => ((isSwell2 && matches.includes("swell2")) || isSwell2 === false) ? true : false;
         const tideConfirm = (matches) => ((isTide && matches.includes("tide")) || isTide === false) ? true : false;
         const windConfirm = (matches) => ((isWind && matches.includes("wind")) || isWind === false) ? true : false;
+        let showAll = false;
         const getMatchingLocation = (item) => {
             const matches = match(item);
             const inRegion = regionMatch(item);
-            if (swell1Confirm(matches) && swell2Confirm(matches) && tideConfirm(matches) && windConfirm(matches)) {
+            if ((swell1Confirm(matches) && swell2Confirm(matches) && tideConfirm(matches) && windConfirm(matches)) || showAll) {
                 if (inRegion !== false) {
                     if (matches.length >= Number(this.state.stars)) {
                         //console.log(`STARS ==================> Matches: ${matches.length} state stars:${this.state.stars}`)
                         count = count + 1;
-                        return <SurfLocation state={this.state} item={item} matches={matches} calculateDistance={calculateDistance} regionMatch={inRegion}></SurfLocation>
+                        return <SurfLocation state={this.state} item={item} matches={matches} calculateDistance={calculateDistance} regionMatch={inRegion} editLocation={() => this.editWave(item)} deleteLocation={(item) => this.deleteWave(item)}></SurfLocation>
                     }
                 }
             }
@@ -1209,8 +1296,11 @@ class WaveFinder extends React.Component {
                             with a <span className="color-neogreen bold">{height}' {tide} </span>tide:
                         </div>
                         {matchingLocations()}
-                        <div className="button r-10 p-10 bg-green" onClick={this.addWave}>
+                        <div className="button m-5 r-10 p-10 bg-green" onClick={this.addWave}>
                             Add a wave
+                        </div>
+                        <div className="button m-5 r-10 p-10 bg-green" onClick={() => this.editWave({"name":"button"})}>
+                            {(this.state.edit === true) ? "Save Edits" : "Edit a wave"}
                         </div>
                     </div> 
                 </Dialog>
