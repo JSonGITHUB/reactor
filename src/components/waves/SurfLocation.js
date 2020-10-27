@@ -24,9 +24,10 @@ class SurfLocation extends React.Component {
     
     constructor(props) {
         super(props);
-        const { windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, swell1Interval, swell2Interval, tide, height, stars } = props.state;
+        const { edit, windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, swell1Interval, swell2Interval, tide, height, stars } = props.state;
         this.state = {
             logged: false,
+            edit: edit,
             windDirection: windDirection,
             windSpeed: windSpeed, 
             windGusts: windGusts,
@@ -289,9 +290,26 @@ class SurfLocation extends React.Component {
         */
     };
     logLocation = (item) => (this.state.logged === true) ? alert("log already exists") : this.createLog(item);
-    logLocationButton = (item) => <div className="App button bg-yellow color-black p-10 r-10 mt-20" onClick={() => this.logLocation(item)}>
-            Log Session
-        </div>
+    deleteLocation = () => this.props.deleteLocation();
+    logLocationButton = (item) => <div>
+                                    {
+                                        (this.state.edit === true) ? <div>
+                                                <div className="App button bg-yellow color-black p-10 r-10 mt-20" onClick={() => this.logLocation(item)}>
+                                                    Log Session
+                                                </div>
+                                                <div className="App button bg-red color-black p-10 r-10 mt-20" onClick={() => this.props.editLocation(item)}>
+                                                    Edit Location
+                                                </div>
+                                                <div className="App button bg-red color-black p-10 r-10 mt-20" onClick={() => this.props.deleteLocation(item)}>
+                                                    Delete Location
+                                                </div>
+                                            </div>
+                                        :
+                                        <div className="App button bg-yellow color-black p-10 r-10 mt-20" onClick={() => this.logLocation(item)}>
+                                            Log Session
+                                        </div>
+                                    }
+                                </div>
     editLogButton = () => {
         return (
             <Link className="noUnderline" key={getKey("link")} to={{
@@ -321,7 +339,7 @@ class SurfLocation extends React.Component {
         const tideDirectionMatch = (direction) => (direction.tide === tide) ? true : false;
         const {matches, regionMatch} = this.props;
         return (
-            <div key={getKey("loc")}>
+            <div key={getKey("loc")} /*onClick={() => this.props.editLocation()}*/>
                 <div className="r-10 m-10 p-20 bg-dkGreen">
                         <div className="width100Percent flexContainer">{this.getStars(matches)}</div>
                         <div className="mt-10 navBranding">{item.name}</div>
