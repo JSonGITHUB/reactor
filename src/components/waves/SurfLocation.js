@@ -1,5 +1,6 @@
 import React from 'react';
 import getKey from '../utils/KeyGenerator.js';
+import WaveUtils from '../utils/WaveUtils.js';
 import Tide from './Tide.js';
 import WaterTemp from './WaterTemp.js';
 import AirTemp from './AirTemp.js';
@@ -26,6 +27,7 @@ class SurfLocation extends React.Component {
         super(props);
         const { edit, windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, swell1Interval, swell2Interval, tide, height, stars } = props.state;
         this.state = {
+            module: 'SurfLocation',
             logged: false,
             edit: edit,
             windDirection: windDirection,
@@ -290,26 +292,19 @@ class SurfLocation extends React.Component {
         */
     };
     logLocation = (item) => (this.state.logged === true) ? alert("log already exists") : this.createLog(item);
-    deleteLocation = () => this.props.deleteLocation();
-    logLocationButton = (item) => <div>
-                                    {
-                                        (this.state.edit === true) ? <div>
-                                                <div className="App button bg-yellow color-black p-10 r-10 mt-20" onClick={() => this.logLocation(item)}>
-                                                    Log Session
-                                                </div>
-                                                <div className="App button bg-red color-black p-10 r-10 mt-20" onClick={() => this.props.editLocation(item)}>
-                                                    Edit Location
-                                                </div>
-                                                <div className="App button bg-red color-black p-10 r-10 mt-20" onClick={() => this.props.deleteLocation(item)}>
-                                                    Delete Location
-                                                </div>
-                                            </div>
-                                        :
-                                        <div className="App button bg-yellow color-black p-10 r-10 mt-20" onClick={() => this.logLocation(item)}>
-                                            Log Session
-                                        </div>
-                                    }
-                                </div>
+    logLocationButton = (item) => {
+        return <div>
+                    {
+                        (localStorage.getItem("edit") === "true") ? <div>
+                                <WaveUtils state={this.state} item={item} logLocation={() => this.logLocation(item)}></WaveUtils>
+                            </div>
+                        :
+                        <div className="App button bg-yellow color-black p-10 r-10 mt-20" onClick={() => this.logLocation(item)}>
+                            Log Session
+                        </div>
+                    }
+                </div>
+    }
     editLogButton = () => {
         return (
             <Link className="noUnderline" key={getKey("link")} to={{
