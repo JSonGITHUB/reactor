@@ -1,6 +1,8 @@
 import React from 'react';
 import getKey from '../utils/KeyGenerator.js';
 import Geolocator from '../utils/Geolocator.js';
+import WaveUtils from '../utils/WaveUtils.js';
+import CalculateDistance from '../utils/CalculateDistance.js';
 import Tide from './Tide.js';
 import WaterTemp from './WaterTemp.js';
 import AirTemp from './AirTemp.js';
@@ -412,6 +414,7 @@ class WaveFinder extends React.Component {
             
         }
         this.state = {
+            module: 'WaveFinder',
             pause: false,
             date: new Date(),
             edit: false,
@@ -498,7 +501,9 @@ class WaveFinder extends React.Component {
     }
     currentPositionExists = () => (this.state.longitude) ? true : false;
     updateCurrentLocation = (longitude, latitude) => {
-//        console.log(`UPDATING CURRENT POSITION ======> longitude: ${longitude} latitude: ${latitude}`)
+//      console.log(`UPDATING CURRENT POSITION ======> longitude: ${longitude} latitude: ${latitude}`)
+        localStorage.setItem("longitude", longitude);
+        localStorage.setItem("latitude", latitude);
         this.setState({
             longitude,
             latitude
@@ -694,14 +699,6 @@ class WaveFinder extends React.Component {
         localStorage.setItem("distance", target.value);
         this.setState({
             distance: target.value
-        })
-    }
-    handleEditToggle = () => {
-        const edit = (!!this.state.edit === true) ? false : true;
-        localStorage.setItem("edit", edit);
-        this.setState({
-            pause: false,
-            edit: edit
         })
     }
     pause = (event) => {
@@ -1058,149 +1055,8 @@ class WaveFinder extends React.Component {
         }
     }
     getReport = () => <iframe className="Percent95 mt-5" title="report" id="report" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224"></iframe>
-    calculateDistance = (item) => {
-        const { latitude, longitude } = this.state;
-        const lat1 = item.latitude;
-        const lat2 = latitude;
-        const lon1 = item.longitude;
-        const lon2 = longitude;
-        const unit = "Miles"
-        if ((lat1 === lat2) && (lon1 === lon2)) {
-            return 0;
-        } else {
-            var radlat1 = Math.PI * lat1/180;
-            var radlat2 = Math.PI * lat2/180;
-            var theta = lon1-lon2;
-            var radtheta = Math.PI * theta/180;
-            var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-            if (dist > 1) {
-                dist = 1;
-            }
-            dist = Math.acos(dist);
-            dist = dist * 180/Math.PI;
-            dist = dist * 60 * 1.1515;
-            dist = dist.toFixed(1);
-            if (unit==="Kilometers") { dist = dist * 1.609344 }
-            if (unit==="Nautical") { dist = dist * 0.8684 }
-            //console.log(`DISTANCE => ${dist}`)
-            return dist;
-        }
-    }
-    addWave = () => {
-        const locations = this.state.locations;
-        const swells = [];
-        const winds = [];
-        const tides = [];
-        let i=0;
-        let wave = prompt("wave: ", "enter spot");
-        const swellCount = prompt("swell count: ", "how many directions?");
-        for (i=0; i<swellCount; i++) {
-            swells[i] = prompt("swell direction", "direction");
-        }
-        const windCount = prompt("wind count: ", "how many directions?");
-        for (i=0; i<windCount; i++) {
-            winds[i] = prompt("wind direction", "direction");
-        }
-        const tideCount = prompt("tide count: ", "how many tides?");
-        for (i=0; i<tideCount; i++) {
-            tides[i] = prompt("tide direction", "direction");
-        }
-        const getObj = () => {
-            return {
-                name: wave,
-                latitude: this.state.latitude,
-                longitude: this.state.longitude,
-                swell: swells,
-                wind: winds,
-                tide: tides
-            }
-        }
-        locations.push(getObj());
-        console.log(`add a wave...  winds: ${JSON.stringify(getObj(), null, 2)}`)
-        localStorage.setItem('locations', JSON.stringify(locations))
-        this.setState({
-            locations: locations
-        })
-    }
-    deleteWave = (props) => {
-        const locations = this.state.locations;
-        //console.log(`Props: ${JSON.stringify(props, null, 2)}`)
-        let index = 0;
-        let result = locations.find(obj => {
-            index++
-            return obj.name === props.name
-        })
-        console.log(`delete 1 => index: ${index} result: ${JSON.stringify(result, null, 2)}`)
-        console.log(`delete 2 => locations: [${index}]: ${JSON.stringify(locations[index], null, 2)}`)
-
-        ///////////////
-        locations.splice(index-1, 1);
-        localStorage.setItem('locations', JSON.stringify(locations))
-        console.log(`delete 3 => locations: [${index-1}]: ${locations.map((location, index) => `${index} ${location.name}`)}`)
-        this.setState({
-            locations: locations
-        })
-    }
-    editWaveSave = (location, index) => {
-        console.log(`editWaveSave() => ${JSON.stringify(location,null,2)}`)
-        let locations = this.state.locations;
-        let swells = location.swell;
-        let winds = location.wind;
-        let tides = location.tide;
-        let i=0;
-        let wave = prompt("wave: ", location.name);
-        const swellCount = prompt("swell count: ", swells.length);
-        for (i=0; i<swellCount; i++) {
-            swells[i] = prompt("edit swell direction", swells[i]);
-        }
-        swells = swells.slice(0, swellCount);
-        const windCount = prompt("wind count: ", winds.length);
-        for (i=0; i<windCount; i++) {
-            winds[i] = prompt("edit wind direction", winds[i]);
-        }
-        winds = winds.slice(0, windCount);
-        const tideCount = prompt("tide count: ", tides.length);
-        for (i=0; i<tideCount; i++) {
-            tides[i] = prompt("edit tide direction", tides[i]);
-        }
-        tides = tides.slice(0, tideCount);
-        const getObj = () => {
-            return {
-                name: wave,
-                latitude: location.latitude,
-                longitude: location.longitude,
-                swell: swells,
-                wind: winds,
-                tide: tides
-            }
-        }
-        console.log(`locations: ${JSON.stringify(locations[index],null,2)} => will be ${JSON.stringify(getObj(),null,2)}`)
-        locations[index] = getObj();
-        console.log(`edit a wave saving... ${JSON.stringify(locations[index], null, 2)}`)
-        localStorage.setItem('locations', JSON.stringify(locations))
-        this.setState({
-            locations: locations
-        })
-    }
-    editWave = (props) => {
-        const locations = this.state.locations;
-        
-        if (props.name === "button") {
-            console.log(`edit a wave... ${JSON.stringify(props, null, 2)}`);
-            this.handleEditToggle()
-
-        } else {
-            console.log(`Props: ${JSON.stringify(props, null, 2)}`)
-            let index = 0;
-            let result = locations.find(obj => {
-                index++
-                return obj.name === props.name
-              })
-            console.log(`index: ${index} result: ${JSON.stringify(result, null, 2)}`)
-            console.log(`locations: [${index}]: ${JSON.stringify(locations[index-1], null, 2)}`)
-            this.editWaveSave(result, index-1);
-        }
-    }
+    
+    calculateDistance = new CalculateDistance();
     render() {
 //        console.log(`currentPositionExists: ${this.currentPositionExists()}`)
 
@@ -1213,8 +1069,8 @@ class WaveFinder extends React.Component {
         //const swell2DirectionMatch = (direction) => (direction===swell2Direction) ? true : false;
         //const windDirectionMatch = (direction) => (direction.wind === windDirection) ? true : false;
         //const tideDirectionMatch = (direction) => (direction.tide === tide) ? true : false;
-        const calculateDistance = (item) => this.calculateDistance(item);
-        const getDistance = (item) => calculateDistance(item);
+        const calculateDistance = (item) => this.calculateDistance.calculateDistance(this.state, item);
+        const getDistance = (item) => this.calculateDistance.calculateDistance(this.state, item);
         //Math.abs(item.latitude - this.state.latitude)+Math.abs(item.longitude - this.state.longitude);
         //.01 - 1 mile
         const distanceRange = Number(distance);
@@ -1244,7 +1100,7 @@ class WaveFinder extends React.Component {
                     if (matches.length >= Number(this.state.stars)) {
                         //console.log(`STARS ==================> Matches: ${matches.length} state stars:${this.state.stars}`)
                         count = count + 1;
-                        return <SurfLocation state={this.state} item={item} matches={matches} calculateDistance={calculateDistance} regionMatch={inRegion} editLocation={() => this.editWave(item)} deleteLocation={(item) => this.deleteWave(item)}></SurfLocation>
+                        return <SurfLocation state={this.state} item={item} matches={matches} calculateDistance={calculateDistance} regionMatch={inRegion}></SurfLocation>
                     }
                 }
             }
@@ -1296,12 +1152,7 @@ class WaveFinder extends React.Component {
                             with a <span className="color-neogreen bold">{height}' {tide} </span>tide:
                         </div>
                         {matchingLocations()}
-                        <div className="button m-5 r-10 p-10 bg-green" onClick={this.addWave}>
-                            Add a wave
-                        </div>
-                        <div className="button m-5 r-10 p-10 bg-green" onClick={() => this.editWave({"name":"button"})}>
-                            {(this.state.edit === true) ? "Save Edits" : "Edit a wave"}
-                        </div>
+                        <WaveUtils state={this.state} item={this.state}></WaveUtils>
                     </div> 
                 </Dialog>
             </div>  
