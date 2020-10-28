@@ -487,7 +487,6 @@ class WaveFinder extends React.Component {
             5000000
         );
     }
-
     componentWillUnmount() {
         clearInterval(this.timerID);
     }
@@ -1100,7 +1099,7 @@ class WaveFinder extends React.Component {
                     if (matches.length >= Number(this.state.stars)) {
                         //console.log(`STARS ==================> Matches: ${matches.length} state stars:${this.state.stars}`)
                         count = count + 1;
-                        return <SurfLocation state={this.state} item={item} matches={matches} calculateDistance={calculateDistance} regionMatch={inRegion}></SurfLocation>
+                        return <SurfLocation key={getKey("link")} state={this.state} item={item} matches={matches} calculateDistance={calculateDistance} regionMatch={inRegion}></SurfLocation>
                     }
                 }
             }

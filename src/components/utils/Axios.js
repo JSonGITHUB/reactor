@@ -3,8 +3,8 @@ import axios from 'axios';
 import SearchBar from './SearchBar';
 
 class AxiosSearch extends React.Component {
-    async onSearchSubmit(term, url, key, callback) {
-        axios
+    onSearchSubmit = async (term, url, key, callback) => {
+        const response = await axios
             .get(url, {
                 params: {query: term},
                 headers: {
