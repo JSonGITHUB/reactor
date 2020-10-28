@@ -1109,6 +1109,8 @@ class WaveFinder extends React.Component {
         const date = this.state.date.toLocaleTimeString();
         const time = date.replace(" ","").toLocaleLowerCase();
         //localStorage.setItem('locations', JSON.stringify(locations))
+        
+        const matches = matchingLocations();
         return ( 
             <div className="App-content fadeIn">
                 <Dialog title="Wave Finder" message=""> 
@@ -1151,7 +1153,7 @@ class WaveFinder extends React.Component {
                             and prefer <span className="color-neogreen bold">{swell1Direction} </span>and <span className="color-orange bold ">{swell2Direction} </span>swell <br/>
                             with a <span className="color-neogreen bold">{height}' {tide} </span>tide:
                         </div>
-                        {matchingLocations()}
+                        {matches}
                         <WaveUtils state={this.state} item={this.state}></WaveUtils>
                     </div> 
                 </Dialog>
