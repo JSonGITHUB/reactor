@@ -61,6 +61,8 @@ class Header extends React.Component {
         'Swell',
         'WaveFinder',
         'SurfReports',
+        'Photos',
+        'Videos',
         //'PhotoBlog',
         //'PhotoSequence',
         'Search'

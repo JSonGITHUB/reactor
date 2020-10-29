@@ -1,5 +1,13 @@
 import React from 'react';
 import Loader from '../utils/Loader.js';
+import N from '../../assets/images/windN.png'
+import NE from '../../assets/images/windNE.png'
+import E from '../../assets/images/windE.png'
+import SE from '../../assets/images/windSE.png'
+import S from '../../assets/images/windS.png'
+import SW from '../../assets/images/windSW.png'
+import W from '../../assets/images/windW.png'
+import NW from '../../assets/images/windNW.png'
 
 class WindDirection extends React.Component {
     constructor(props) {
@@ -89,13 +97,35 @@ class WindDirection extends React.Component {
     Next Tide at 3:09 PM: Low 1.70 ft
     Gusting to: 12.3 kts from WSW
     */
+    getWindIcon = () => {
+        const windDirection = this.state.direction;
+        const classes = "shaka r-20 p-2 bg-white";
+        if (windDirection === "N") {
+            return <img src={N} className={classes} alt={windDirection} />;
+        } else if ((windDirection === "NE") || (windDirection === "NNE") || (windDirection === "ENE")) {
+            return <img src={NE} className={classes} alt={windDirection} />;
+        } else if (windDirection === "E") {
+            return <img src={E} className={classes} alt={windDirection} />;
+        } else if ((windDirection === "SE") || (windDirection === "SSE") || (windDirection === "ESE")) {
+            return <img src={SE} className={classes} alt={windDirection} />;
+        } else if (windDirection === "S") {
+            return <img src={S} className={classes} alt={windDirection} />;
+        } else if ((windDirection === "SW") || (windDirection === "SSW") || (windDirection === "WSW")) {
+            return <img src={SW} className={classes} alt={windDirection} />;
+        } else if (windDirection === "W") {
+            return <img src={W} className={classes} alt={windDirection} />;
+        } else if ((windDirection === "NW") || (windDirection === "NNW") || (windDirection === "WNW")) {
+            return <img src={NW} className={classes} alt={windDirection} />;
+        }
+    }
     getCurrentWind = () => {
         const { columns } = this.props;
         const { direction, angle, speed, gusts } = this.state;
         return (
-            <div className={(columns > 1) ? "flexContainer": ""}>
-                <div className={(columns > 1) ? "flex3Column": ""}>{`${direction} ${Number(angle).toFixed(0)}°`}</div>
-                <div className={(columns > 1) ? "flex3Column": ""}>{`${Number(speed).toFixed(0)}-${Number(gusts).toFixed(0)}`} <span className="greet">knots</span></div>
+            <div className="r-10 m-5 p-10 bg-dark">
+                <div>{this.getWindIcon()}</div>
+                <div>{`${direction} ${Number(angle).toFixed(0)}°`}</div>
+                <div>{`${Number(speed).toFixed(0)}-${Number(gusts).toFixed(0)}`} <span className="greet">knots</span></div>
             </div>
         )
     }

@@ -714,158 +714,161 @@ class WaveFinder extends React.Component {
     }
     isSwell1 = () => (this.state.isSwell1 === true) ? true : false;
     isSwell2 = () => (this.state.isSwell2 === true) ? true : false;
-    isSwellSelected = (id) => ((id === 1 && this.isSwell1() === true) || (id === 2 && this.isSwell2()===true)) ? 'bg-green' : 'bg-red';
+    isSwellSelected = (id) => ((id === 1 && this.isSwell1() === true) || (id === 2 && this.isSwell2()===true)) ? 'bg-green' : 'bg-dkGreen';
     swellClass = (id) => `${this.isSwellSelected(id)} flex2Column r-10 m-5 p-15`;
     swellSelector = (id, swellDirection) => <div className={this.swellClass(id)} onMouseDown={this.pause}>
         {this.getSwellIcon(id)}
         <span className="ml-5">Swell{id}</span><br/>
-        <span className="greet ml-5">direction</span><br/>
-        <Selector
-            groupTitle={`Swell${id}`}
-            selected={swellDirection} 
-            //this.getState(`swell1`)
-            label="Direction" 
-            items={this.directionArray}
-            onChange={(id === 1) ? this.handleSwell1Selection : this.handleSwell2Selection}
-        />
-        <br/>
-        <span className="greet ml-5">angle</span><br/>
-        <Selector
-            groupTitle={`SwellAngle${id}`}
-            selected={(id === 1) ? this.state.swell1Angle : this.state.swell2Angle} 
-            label="Angle" 
-            items={[
-                "0",
-                "5",
-                "10",
-                "15",
-                "20",
-                "25",
-                "30",
-                "35",
-                "40",
-                "45",
-                "50",
-                "55",
-                "60",
-                "65",
-                "70",
-                "75",
-                "80",
-                "85",
-                "90",
-                "95",
-                "100",
-                "105",
-                "110",
-                "115",
-                "120",
-                "125",
-                "130",
-                "135",
-                "140",
-                "145",
-                "150",
-                "155",
-                "160",
-                "165",
-                "170",
-                "175",
-                "180",
-                "185",
-                "190",
-                "195",
-                "200",
-                "205",
-                "210",
-                "215",
-                "220",
-                "225",
-                "230",
-                "235",
-                "240",
-                "245",
-                "250",
-                "255",
-                "260",
-                "265",
-                "270",
-                "275",
-                "280",
-                "285",
-                "290",
-                "295",
-                "300",
-                "305",
-                "310",
-                "315",
-                "320",
-                "325",
-                "330",
-                "335",
-                "340"
-            ]}
-            onChange={(id === 1) ? this.handleSwell1Angle : this.handleSwell2Angle}
-        />
-        <br/>
-        <span className="greet ml-5">height</span><br/>
-        <Selector
-            groupTitle={`SwellHeight${id}`}
-            selected={(id === 1) ? this.state.swell1Height : this.state.swell2Height} 
-            label="Height" 
-            items={[
-                "",
-                "1ft",
-                "2ft",
-                "3ft",
-                "4ft",
-                "5ft",
-                "6ft",
-                "7ft",
-                "8ft",
-                "9ft",
-                "10ft",
-                "11ft",
-                "12ft",
-                "13ft",
-                "14ft",
-                "15ft",
-                "16ft",
-                "17ft",
-                "18ft"
-            ]}
-            onChange={(id === 1) ? this.handleSwell1Height : this.handleSwell2Height}
-        />
-        <br/>
-        <span className="greet ml-5">interval</span><br/>
-        <Selector
-            groupTitle={`SwellInterval${id}`}
-            selected={(id === 1) ? this.state.swell1Interval : this.state.swell2Interval} 
-            label="interval" 
-            items={[
-                "",
-                "5 seconds",
-                "6 seconds",
-                "7 seconds",
-                "8 seconds",
-                "9 seconds",
-                "10 seconds",
-                "11 seconds",
-                "12 seconds",
-                "13 seconds",
-                "14 seconds",
-                "15 seconds",
-                "16 seconds",
-                "17 seconds",
-                "18 seconds",
-                "19 seconds",
-                "20 seconds",
-                "21 seconds",
-                "22 seconds",
-                "23 seconds"
-            ]}
-            onChange={(id === 1) ? this.handleSwell1Interval : this.handleSwell2Interval}
-        />
+        <div className='bg-dark r-10 mt-20 pb-15'>
+            <span className="greet ml-5">direction</span><br/>
+            <Selector
+                groupTitle={`Swell${id}`}
+                selected={swellDirection} 
+                //this.getState(`swell1`)
+                label="Direction" 
+                items={this.directionArray}
+                onChange={(id === 1) ? this.handleSwell1Selection : this.handleSwell2Selection}
+            />
+            <br/>
+            <span className="greet ml-5">angle</span><br/>
+            <Selector
+                groupTitle={`SwellAngle${id}`}
+                selected={(id === 1) ? this.state.swell1Angle : this.state.swell2Angle} 
+                label="Angle" 
+                items={[
+                    "0",
+                    "5",
+                    "10",
+                    "15",
+                    "20",
+                    "25",
+                    "30",
+                    "35",
+                    "40",
+                    "45",
+                    "50",
+                    "55",
+                    "60",
+                    "65",
+                    "70",
+                    "75",
+                    "80",
+                    "85",
+                    "90",
+                    "95",
+                    "100",
+                    "105",
+                    "110",
+                    "115",
+                    "120",
+                    "125",
+                    "130",
+                    "135",
+                    "140",
+                    "145",
+                    "150",
+                    "155",
+                    "160",
+                    "165",
+                    "170",
+                    "175",
+                    "180",
+                    "185",
+                    "190",
+                    "195",
+                    "200",
+                    "205",
+                    "210",
+                    "215",
+                    "220",
+                    "225",
+                    "230",
+                    "235",
+                    "240",
+                    "245",
+                    "250",
+                    "255",
+                    "260",
+                    "265",
+                    "270",
+                    "275",
+                    "280",
+                    "285",
+                    "290",
+                    "295",
+                    "300",
+                    "305",
+                    "310",
+                    "315",
+                    "320",
+                    "325",
+                    "330",
+                    "335",
+                    "340"
+                ]}
+                onChange={(id === 1) ? this.handleSwell1Angle : this.handleSwell2Angle}
+            />
+            <br/>
+            <span className="greet ml-5">height</span><br/>
+            <Selector
+                groupTitle={`SwellHeight${id}`}
+                selected={(id === 1) ? this.state.swell1Height : this.state.swell2Height} 
+                label="Height" 
+                items={[
+                    "",
+                    "1ft",
+                    "2ft",
+                    "3ft",
+                    "4ft",
+                    "5ft",
+                    "6ft",
+                    "7ft",
+                    "8ft",
+                    "9ft",
+                    "10ft",
+                    "11ft",
+                    "12ft",
+                    "13ft",
+                    "14ft",
+                    "15ft",
+                    "16ft",
+                    "17ft",
+                    "18ft"
+                ]}
+                onChange={(id === 1) ? this.handleSwell1Height : this.handleSwell2Height}
+            />
+            <br/>
+            <span className="greet ml-5">interval</span><br/>
+            <Selector
+                groupTitle={`SwellInterval${id}`}
+                selected={(id === 1) ? this.state.swell1Interval : this.state.swell2Interval} 
+                label="interval" 
+                items={[
+                    "",
+                    "5 seconds",
+                    "6 seconds",
+                    "7 seconds",
+                    "8 seconds",
+                    "9 seconds",
+                    "10 seconds",
+                    "11 seconds",
+                    "12 seconds",
+                    "13 seconds",
+                    "14 seconds",
+                    "15 seconds",
+                    "16 seconds",
+                    "17 seconds",
+                    "18 seconds",
+                    "19 seconds",
+                    "20 seconds",
+                    "21 seconds",
+                    "22 seconds",
+                    "23 seconds"
+                ]}
+                onChange={(id === 1) ? this.handleSwell1Interval : this.handleSwell2Interval}
+            />
+        </div>
+        
         {(id===1) ? 
             /*
             <div className="fl-left">
@@ -896,11 +899,11 @@ class WaveFinder extends React.Component {
             </div>
         }
     </div>
-    isTideSelected = () => (this.state.isTide === true) ? 'bg-green' : 'bg-red';
+    isTideSelected = () => (this.state.isTide === true) ? 'bg-green' : 'bg-dkGreen';
     tideClass = () => `${this.isTideSelected()} flex2Column r-10 m-5 p-15`;
     tideSelector = (tide) => <div className={this.tideClass()} onMouseDown={this.pause}>
                                 Tide
-                                <div className="greet"><Tide setTide={this.setTide}/></div>
+                                <div className="greet pt-10"><Tide setTide={this.setTide}/></div>
                                 <Selector 
                                     groupTitle="Tide"
                                     selected={this.state.tide} 
@@ -912,12 +915,12 @@ class WaveFinder extends React.Component {
                                     {(this.state.isTide === true) ? <img src={thumbsUp} alt='tide' className='p-10 r-20' /> : <img src={thumbsDown} alt='tide' className='p-10 r-20' /> }
                                 </div>
                             </div>
-    isWindSelected = () => (this.state.isWind === true) ? 'bg-green' : 'bg-red';
+    isWindSelected = () => (this.state.isWind === true) ? 'bg-green' : 'bg-dkGreen';
     windClass = () => `${this.isWindSelected()} flex2Column r-10 m-5 p-15`;
     windSelector = (windDirection) => <div className={this.windClass()} onMouseDown={this.pause}>
     {/*console.log(`windSelector => windDirection: ${this.state.windDirection}`)*/}
                             Wind<br/>
-                            <div className="greet"><WindDirection columns="1" setWind={this.setWind}/></div>
+                            <div className="greet pt-10"><WindDirection columns="1" setWind={this.setWind}/></div>
                             <Selector
                                 groupTitle="Wind" 
                                 selected={this.state.windDirection} 
@@ -998,7 +1001,6 @@ class WaveFinder extends React.Component {
                             {this.getMatchIcon(matchKind)}
                             <div className="greet">{this.getState(matchKind)}{this.getStarDetails(matchKind)}</div>
                         </div>;
-    getStars = (stars) => stars.map((star) => this.star(star));
     setTide = (tide) => {
         console.log(`WaveFinder = > setTide(${tide})`)
         let currentTide = (Number(tide)>2) ? "medium" : "low";
@@ -1033,28 +1035,7 @@ class WaveFinder extends React.Component {
             return <img src={swell2} className={`mb--5 ${this.getStarKind("tide")}`} alt="swell2" />;
         }
     }
-    getWindIcon = () => {
-        const windDirection = this.state.windDirection;
-        if (windDirection === "N") {
-            return <img src={N} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
-        } else if ((windDirection === "NE") || (windDirection === "NNE") || (windDirection === "ENE")) {
-            return <img src={NE} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
-        } else if (windDirection === "E") {
-            return <img src={E} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
-        } else if ((windDirection === "SE") || (windDirection === "SSE") || (windDirection === "ESE")) {
-            return <img src={SE} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
-        } else if (windDirection === "S") {
-            return <img src={S} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
-        } else if ((windDirection === "SW") || (windDirection === "SSW") || (windDirection === "WSW")) {
-            return <img src={SW} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
-        } else if (windDirection === "W") {
-            return <img src={W} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
-        } else if ((windDirection === "NW") || (windDirection === "NNW") || (windDirection === "WNW")) {
-            return <img src={NW} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
-        }
-    }
     getReport = () => <iframe className="Percent95 mt-5" title="report" id="report" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224"></iframe>
-    
     calculateDistance = new CalculateDistance();
     render() {
 //        console.log(`currentPositionExists: ${this.currentPositionExists()}`)
@@ -1118,11 +1099,13 @@ class WaveFinder extends React.Component {
                             <span className="bold">{time}</span>
                             <Geolocator currentPositionExists={this.currentPositionExists} returnCurrentPosition={this.updateCurrentLocation}/>
                             <div className="flexContainer">
-                                <span className="flex3Column p-5 r-5 color-orange bg-lite m-5">{/*this.getTideIcon*/} tide<br/><Tide setTide={this.setTide}/></span>
-                                <span className="flex3Column p-5 r-5 color-blue bg-lite m-5">{/*this.getWaterTempIcon*/}<span className="ml-2">water</span><br/><WaterTemp/></span>
-                                <span className="flex3Column p-5 r-5 color-white bg-lite m-5">{/*this.getAirTempIcon*/}<span className="ml-2">air</span><br/><AirTemp/></span>
+                                <span className="flex3Column p-5 r-10 color-blue bg-lite m-5">{/*this.getWaterTempIcon*/}<span className="ml-2">water</span><br/><WaterTemp/></span>
+                                <span className="flex3Column p-5 r-10 color-white bg-lite m-5">{/*this.getAirTempIcon*/}<span className="ml-2">air</span><br/><AirTemp/></span>
                             </div>
-                            <div className="flex3Column p-5 r-5 color-yellow bg-lite m-5"><span className="size25 bg-white p-3 m-10 r-20">{this.getWindIcon()}</span>wind<WindDirection columns="2" setWind={this.setWind}/></div>
+                            <div className="flexContainer">
+                                <div className="flex3Column p-5 r-10 color-orange bg-lite m-5">{/*this.getTideIcon*/} tide<br/><Tide setTide={this.setTide}/></div>
+                                <div className="flex3Column p-5 r-10 color-yellow bg-lite m-5"><span className="size25 bg-white p-3 m-10 r-20"></span>wind<WindDirection columns="2" setWind={this.setWind}/></div>
+                            </div>
                             {this.getReport()}
                             <div>select current conditions:</div>
                             <div className="flexContainer">
