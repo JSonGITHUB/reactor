@@ -1,4 +1,5 @@
 import React from 'react';
+import GridImage from './GridImage'
 
 class SearchBar extends React.Component {
 
@@ -10,23 +11,21 @@ class SearchBar extends React.Component {
         }
         //this.setIt = this.setIt.bind(this);
     }
-    updateArray = (item) => {
-        this.menuArray = item;
-        console.log(`menuArray: ${JSON.stringify(item, null, 2)}`)
-        this.setState({menuArray: item})
+    updateArray = (array) => {
+        this.menuArray = array;
+        console.log(`menuArray: ${JSON.stringify(array, null, 2)}`)
+        this.setState({menuArray: array})
     }
     clearMenu = () => (this.state.menuArray.length>0) ? this.setState({menuArray: []}) : null;
     onFormSubmit = event =>  {
         event.preventDefault();
         this.clearMenu();
         console.log(`Search Term: ${this.state.term}`);
-        this.props.onSubmit(this.state.term, 'https://api.unsplash.com/search/photos', 'Client-ID LV6VY88M75l5IvWUJp5aKDIBpB1bI97YIr8PW3h_bas', this.updateArray);
+        //this.props.onSubmit(this.state.term, 'https://api.unsplash.com/search/photos', 'Client-ID LV6VY88M75l5IvWUJp5aKDIBpB1bI97YIr8PW3h_bas', this.updateArray);
+        //this.props.onSubmit(this.state.term, 'https://www.googleapis.com/youtube/v3', 'AIzaSyDRsPztCjKmboO5QqAOSzLLn5fJDJCxUD0', this.updateArray);
+        this.props.onSubmit(this.state.term, this.updateArray);
     }
-    getImage = (item) => <div className="m-5 bg-black">
-                                <div className="color-neogreen p-10 m-auto w-200 mb-5">{item.location}</div>
-                                <img src={item.image}/>
-                                <div className="white m-auto pt-5 pb-5 w-200 mb-5 description">{item.description}</div>
-                        </div>
+    getImage = (item) => <GridImage item={item}></GridImage>
     render() {
         return <div>
                     <div className="flexContainer">
@@ -34,7 +33,7 @@ class SearchBar extends React.Component {
                         <div className='flex3Column'>
                             <form onSubmit={this.onFormSubmit}>
                                 <div className='searchNav width-100-percent bg-green'>
-                                    <label className='color-yellow'>Image Search: </label>
+                                    <label className='color-yellow'>Search: </label>
                                     <input
                                         className='m-5'
                                         type="text"

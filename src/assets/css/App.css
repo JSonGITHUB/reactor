@@ -168,6 +168,9 @@ select {
 .mr-auto {
   margin-right: auto;
 }
+.mr-5 {
+  margin-right: 5px;
+}
 .mr-20 {
   margin-right: 20px;
 }
