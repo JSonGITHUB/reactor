@@ -6,7 +6,7 @@ class Videos extends React.Component {
 
     state = { 
         videos: [],
-        KEY: 'AIzaSyBV3ExmMPVf7lZFpAfhFd8-zRUrtkNaavU',
+        KEY: '',
         api: 'https://www.googleapis.com/youtube/v3'
     };
 
