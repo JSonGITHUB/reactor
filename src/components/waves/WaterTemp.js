@@ -105,7 +105,7 @@ class WaterTemp extends React.Component {
         //console.log(`previous water temp: ${this.previousWaterTemp()} water temp: ${this.state.temp}`)
         //this.setLocalWaterTemp();
         //this.setLocalWaterTempDirection();
-        return <div className="r-10 m-5 p-10 bg-dark">
+        return <div className="r-10 m-5 p-10 bg-lite white">
                 <div>{this.getCurrentTemp()}</div>
             </div>
     };

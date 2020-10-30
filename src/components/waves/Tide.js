@@ -175,7 +175,7 @@ class Tide extends React.Component {
     setLocalTideDirection = () => localStorage.setItem("tideDirection", this.state.tideDirection);
     fixHours = () => (this.getCurrentTime().hours>12) ? Number(this.getCurrentTime().hours - 12) : this.getCurrentTime().hours;
 
-    getCurrentTide = () => <div className="r-10 m-5 p-10 bg-dark">
+    getCurrentTide = () => <div className="r-10 m-5 p-10 bg-lite white">
                             <div>{this.getTideDirection()}</div>
                             <div>{this.state.height} <span className="greet"> ft. </span>{this.state.tide}</div>
                             <div className='copyright pt-10'>

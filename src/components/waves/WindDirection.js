@@ -122,7 +122,7 @@ class WindDirection extends React.Component {
         const { columns } = this.props;
         const { direction, angle, speed, gusts } = this.state;
         return (
-            <div className="r-10 m-5 p-10 bg-dark">
+            <div className="r-10 m-5 p-10 bg-lite white">
                 <div>{this.getWindIcon()}</div>
                 <div>{`${direction} ${Number(angle).toFixed(0)}°`}</div>
                 <div>{`${Number(speed).toFixed(0)}-${Number(gusts).toFixed(0)}`} <span className="greet">knots</span></div>
