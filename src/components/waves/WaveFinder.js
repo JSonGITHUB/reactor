@@ -1095,7 +1095,7 @@ class WaveFinder extends React.Component {
             <div className="App-content fadeIn">
                 <Dialog title="Wave Finder" message=""> 
                     <div className="white pointer">   
-                        <div className="bg-darker p-5 r-10 m-5">
+                        <div>
                             <span className="bold">{time}</span>
                             <Geolocator currentPositionExists={this.currentPositionExists} returnCurrentPosition={this.updateCurrentLocation}/>
                             <div className="flexContainer">
@@ -1107,7 +1107,9 @@ class WaveFinder extends React.Component {
                                 <div className="flex3Column p-5 r-10 color-yellow bg-lite m-5"><span className="size25 bg-white p-3 m-10 r-20"></span>wind<WindDirection columns="2" setWind={this.setWind}/></div>
                             </div>
                             {this.getReport()}
-                            <div>select current conditions:</div>
+                            <div className='p-10'>select current conditions:</div>
+                        </div>
+                        <div className="bg-darker p-5 r-10 m-5">
                             <div className="flexContainer">
                                 {this.swellSelector(1,swell1Direction)}
                                 {this.swellSelector(2,swell2Direction)}
