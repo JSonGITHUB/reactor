@@ -59,7 +59,7 @@ class AirTemp extends React.Component {
     //setLocalAirTemp = () => localStorage.setItem("airTemp", this.state.temp);
     //setLocalAirTempDirection = () => localStorage.setItem("airTempDirection", this.state.airTempDirection);
 
-    getCurrentTemp = () => <div className="r-10 m-5 p-10 bg-dark">
+    getCurrentTemp = () => <div className="r-10 m-5 p-10 bg-lite white">
                                 {this.state.temp}° 
                                 <span className="greet">F </span>
 {/*(this.previousAirTemp() !== Number(this.state.temp)) ? this.state.airTempDirection : this.getAirTempDirection()*/}
