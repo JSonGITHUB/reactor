@@ -1107,9 +1107,9 @@ class WaveFinder extends React.Component {
                                 <div className="flex3Column p-5 r-10 color-orange bg-dkGreen m-5">{/*this.getTideIcon*/} tide<br/><Tide setTide={this.setTide}/></div>
                                 <div className="flex3Column p-5 r-10 color-yellow bg-dkGreen m-5"><span className="size25 bg-white p-3 m-10 r-20"></span>wind<WindDirection columns="2" setWind={this.setWind}/></div>
                             </div>
-                            <div className='p-10'>select current conditions:</div>
                         </div>
                         <div className="p-5 r-10 m-5">
+                            <div className='p-10 color-yellow'>select current conditions:</div>
                             <div className="flexContainer">
                                 {this.swellSelector(1,swell1Direction)}
                                 {this.swellSelector(2,swell2Direction)}
