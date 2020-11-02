@@ -126,7 +126,7 @@ class Tide extends React.Component {
                 const nextHeight = heights[nextTideIndex];
                 const lastHeight = heights[nextTideIndex-1];
                 const nextHour = (Number(times[nextTideIndex].split(':')[0])>12) ? (Number(times[nextTideIndex].split(':')[0])-12) : Number(times[nextTideIndex].split(':')[0]);
-                const nextMinutes = (times[nextTideIndex].split(':')[1] === "0") ? "00" : times[nextTideIndex].split(':')[1];
+                const nextMinutes = (times[nextTideIndex].split(':')[1] < 10) ? `0${times[nextTideIndex].split(':')[1]}` : times[nextTideIndex].split(':')[1];
                 const nextTime = `${nextHour}:${nextMinutes}`;
                 const lastTide = tides[nextTideIndex-1];
                 const convertTide = (tide) => (tide === 'L') ? 'low' : 'high';
@@ -178,11 +178,11 @@ class Tide extends React.Component {
     getCurrentTide = () => <div className="r-10 m-5 p-10 bg-lite white">
                             <div>{this.getTideDirection()}</div>
                             <div>{this.state.height} <span className="greet"> ft. </span>{this.state.tide}</div>
-                            <div className='copyright pt-10'>
-                                from: <span className='bold'>{(this.state.previousTide) ? this.state.previousTide.toFixed(1) : ''}' </span>
-                                to: <span className='bold'>{(this.state.nextTide) ? this.state.nextTide.toFixed(1) : ''}'</span><br/>
-                                <span className='bold'>{this.state.nextPhase}</span> in <span className='bold'>{this.state.untilNextTide} hours </span>
-                                at: <span className='bold'>{this.state.nextTime}</span>
+                            <div className='description pt-10'>
+                                from: <span className='greet bold'>{(this.state.previousTide) ? this.state.previousTide.toFixed(1) : ''}' </span>
+                                to: <span className='greet bold'>{(this.state.nextTide) ? this.state.nextTide.toFixed(1) : ''}'</span><br/>
+                                <span className='greet bold'>{this.state.nextPhase} in {this.state.untilNextTide} hour{this.state.untilNextTide === 1 ? '' : 's'} </span><br/>
+                                at: <span className='greet bold'>{this.state.nextTime}</span>
                             </div>
                         </div>;
 

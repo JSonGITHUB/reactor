@@ -186,6 +186,9 @@ select {
 .copyright {
   font-size: 9px;
 }
+.small {
+  font-size: 11px;
+}
 .description {
   font-size: 12px;
 }
