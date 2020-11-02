@@ -180,7 +180,7 @@ class Tide extends React.Component {
                             <div>{this.state.height} <span className="greet"> ft. </span>{this.state.tide}</div>
                             <div className='description pt-10'>
                                 from: <span className='greet bold'>{(this.state.previousTide) ? this.state.previousTide.toFixed(1) : ''}' </span>
-                                to: <span className='greet bold'>{(this.state.nextTide) ? this.state.nextTide.toFixed(1) : ''}'</span><br/>
+                                {(this.props.display === 'narrow') ? <br/> : ''}to: <span className='greet bold'>{(this.state.nextTide) ? this.state.nextTide.toFixed(1) : ''}'</span><br/>
                                 <span className='greet bold'>{this.state.nextPhase} in {this.state.untilNextTide} hour{this.state.untilNextTide === 1 ? '' : 's'} </span><br/>
                                 at: <span className='greet bold'>{this.state.nextTime}</span>
                             </div>

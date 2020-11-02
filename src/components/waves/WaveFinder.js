@@ -911,7 +911,7 @@ class WaveFinder extends React.Component {
     tideClass = () => `${this.isTideSelected()} flex2Column r-10 m-5 p-15`;
     tideSelector = (tide) => <div className={this.tideClass()} onMouseDown={this.pause}>
                                 Tide
-                                <div className="greet pt-10"><Tide setTide={this.setTide}/></div>
+                                <div className="greet pt-10"><Tide setTide={this.setTide} display='narrow'/></div>
                                 <Selector 
                                     groupTitle="Tide"
                                     selected={this.state.tide} 
@@ -1122,7 +1122,7 @@ class WaveFinder extends React.Component {
                                 <span className="flex2Column p-5 r-10 color-white bg-dkGreen m-5">{/*this.getAirTempIcon*/}<span className="ml-2">air</span><br/><AirTemp/></span>
                             </div>
                             <div className="flexContainer">
-                                <div className="flex2Column p-5 r-10 color-orange bg-dkGreen m-5">{/*this.getTideIcon*/} tide<br/><Tide setTide={this.setTide}/></div>
+                                <div className="flex2Column p-5 r-10 color-orange bg-dkGreen m-5">{/*this.getTideIcon*/} tide<br/><Tide setTide={this.setTide} display='wide'/></div>
                                 <div className="flex2Column p-5 r-10 color-yellow bg-dkGreen m-5"><span className="size25 bg-white p-3 m-10 r-20"></span>wind<WindDirection columns="2" setWind={this.setWind}/></div>
                             </div>
                         </div>
