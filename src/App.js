@@ -22,6 +22,8 @@ import './assets/css/App.css';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 import ScrollToTop from './components/utils/ScrollToTop.js';
 import AxiosSearch from './components/utils/Axios.js';
+//import Photos from './components/Photos.js';
+//import Videos from './components/Videos.js';
 
 class App extends React.Component {
   constructor(props) {
