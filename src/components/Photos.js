@@ -6,7 +6,7 @@ class Photos extends React.Component {
 
     state = { 
         photos: [],
-        KEY: 'Client-ID LV6VY88M75l5IvWUJp5aKDIBpB1bI97YIr8PW3h_bas',
+        KEY: '',
         api: 'https://api.unsplash.com/search/photos'
     };
 

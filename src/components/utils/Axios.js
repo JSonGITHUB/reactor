@@ -15,7 +15,7 @@ class AxiosSearch extends React.Component {
             part: "snippet",
             maxResults: 5,
             type: 'video',
-            key: 'AIzaSyDRsPztCjKmboO5QqAOSzLLn5fJDJCxUD0'
+            key: ''
           }
         });
       };

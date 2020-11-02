@@ -407,6 +407,14 @@ class WaveFinder extends React.Component {
                     "swell": ["SW"],
                     "wind": ["E", "NE"],
                     "tide": ["high", "medium"]
+                },
+                {
+                    "name": "Balangan",
+                    "latitude": -8.793402,
+                    "longitude": 115.122438,
+                    "swell": ["S","SW", "W"],
+                    "wind": ["SE"],
+                    "tide": ["low", "medium"]
                 }
             ]
             localStorage.setItem('locations', JSON.stringify(locations));
@@ -932,7 +940,7 @@ class WaveFinder extends React.Component {
                                 {(this.state.isWind === true) ? <img src={thumbsUp} alt='wind' className='p-10 r-20' /> : <img src={thumbsDown} alt='wind' className='p-10 r-20' /> }
                             </div>
                         </div>
-    starSelector = (stars) => <div className="flex3Column bg-dkGreen r-10 m-5 p-15" onMouseDown={this.pause}>
+    starSelector = (stars) => <div className="flex2Column bg-dkGreen r-10 m-5 p-15" onMouseDown={this.pause}>
                         Match<br/>
                         <Selector
                             groupTitle="Matches" 
@@ -942,6 +950,16 @@ class WaveFinder extends React.Component {
                             onChange={this.handleStarSelection}
                         />
                     </div>
+    milesInput = (distance) => <div className="flex2Column bg-dkGreen r-10 m-5 p-10">
+                                <label>
+                                    Miles<br/>
+                                    <input className="mt-10 p-5 r-10"
+                                        name="distance"
+                                        type="number"
+                                        value={distance}
+                                        onChange={this.handleDistanceSelection}/>
+                                </label>
+                            </div>
     getMatchIcon = (kind) => {
         let icon = (kind === "swell1") ? "swell1" : "swell2";
         icon = (kind === "wind") ? "wind" : icon;
@@ -1100,12 +1118,12 @@ class WaveFinder extends React.Component {
                             <Geolocator currentPositionExists={this.currentPositionExists} returnCurrentPosition={this.updateCurrentLocation}/>
                             {this.getReport()}
                             <div className="flexContainer">
-                                <span className="flex3Column p-5 r-10 color-blue bg-dkGreen m-5">{/*this.getWaterTempIcon*/}<span className="ml-2">water</span><br/><WaterTemp/></span>
-                                <span className="flex3Column p-5 r-10 color-white bg-dkGreen m-5">{/*this.getAirTempIcon*/}<span className="ml-2">air</span><br/><AirTemp/></span>
+                                <span className="flex2Column p-5 r-10 color-blue bg-dkGreen m-5">{/*this.getWaterTempIcon*/}<span className="ml-2">water</span><br/><WaterTemp/></span>
+                                <span className="flex2Column p-5 r-10 color-white bg-dkGreen m-5">{/*this.getAirTempIcon*/}<span className="ml-2">air</span><br/><AirTemp/></span>
                             </div>
                             <div className="flexContainer">
-                                <div className="flex3Column p-5 r-10 color-orange bg-dkGreen m-5">{/*this.getTideIcon*/} tide<br/><Tide setTide={this.setTide}/></div>
-                                <div className="flex3Column p-5 r-10 color-yellow bg-dkGreen m-5"><span className="size25 bg-white p-3 m-10 r-20"></span>wind<WindDirection columns="2" setWind={this.setWind}/></div>
+                                <div className="flex2Column p-5 r-10 color-orange bg-dkGreen m-5">{/*this.getTideIcon*/} tide<br/><Tide setTide={this.setTide}/></div>
+                                <div className="flex2Column p-5 r-10 color-yellow bg-dkGreen m-5"><span className="size25 bg-white p-3 m-10 r-20"></span>wind<WindDirection columns="2" setWind={this.setWind}/></div>
                             </div>
                         </div>
                         <div className="p-5 r-10 m-5">
@@ -1117,17 +1135,10 @@ class WaveFinder extends React.Component {
                             <div className="flexContainer">
                                 {this.tideSelector(tide)}
                                 {this.windSelector(windDirection)}
-                                {this.starSelector(stars)} 
                             </div>
-                            <div className="bg-dkGreen r-10 m-5 p-15">
-                                <label>
-                                    Miles<br/>
-                                    <input className="mt-10 p-5 r-10"
-                                        name="distance"
-                                        type="number"
-                                        value={distance}
-                                        onChange={this.handleDistanceSelection}/>
-                                </label>
+                            <div className="flexContainer">
+                                {this.milesInput(distance)}
+                                {this.starSelector(stars)} 
                             </div>
                             <div className="bg-neogreen r-10 m-5 p-15 color-black bold" onClick={this.unpause}>Use live data</div>
                         </div>

@@ -22,8 +22,6 @@ import './assets/css/App.css';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 import ScrollToTop from './components/utils/ScrollToTop.js';
 import AxiosSearch from './components/utils/Axios.js';
-import Photos from './components/Photos.js';
-import Videos from './components/Videos.js';
 
 class App extends React.Component {
   constructor(props) {
@@ -123,8 +121,8 @@ class App extends React.Component {
                   <Route path="/PhotoSequence" component={PhotoSequence} />
                   <Route path="/Adder" render={(props) => <Adder {...props} label="How big was it?" unit="ft" count="10" />}/>
                   <Route path="/Search" render={(props) => <AxiosSearch />}/>
-                  <Route path="/Photos" render={(props) => <Photos />}/>
-                  <Route path="/Videos" render={(props) => <Videos />}/>
+                  {/*<Route path="/Photos" render={(props) => <Photos />}/>
+                  <Route path="/Videos" render={(props) => <Videos />}/>*/}
                   <Route path="/Todos" render={(props) => <Todos />}/>
                   <Route path="/Reducer" component={Reducer} />
                 </Switch>

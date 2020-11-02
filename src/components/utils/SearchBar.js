@@ -27,29 +27,30 @@ class SearchBar extends React.Component {
     }
     getImage = (item) => <GridImage item={item}></GridImage>
     render() {
-        return <div>
-                    <div className="flexContainer">
-                        <div className='flex3Column'></div>
-                        <div className='flex3Column'>
-                            <form onSubmit={this.onFormSubmit}>
-                                <div className='searchNav width-100-percent bg-green'>
-                                    <label className='color-yellow'>Search: </label>
-                                    <input
-                                        className='m-5'
-                                        type="text"
-                                        value={this.state.term}
-                                        onChange={e => this.setState({term: e.target.value})}
-                                    />
-                                </div>
-                                
-                            </form>
-                            <div className='mt-20'>
-                                {this.state.menuArray.map((item) => this.getImage(item))}   
-                            </div>                        
-                        </div>
-                        <div className='flex3Column'></div>
+        return (
+            <div>
+                <div className="flexContainer">
+                    <div className='flex3Column'></div>
+                    <div className='flex3Column'>
+                        <form onSubmit={this.onFormSubmit}>
+                            <div className='searchNav p-10 r-10 width-100-percent bg-lite'>
+                                <label className='color-yellow'>Search: </label>
+                                <input
+                                    className='m-5'
+                                    type="text"
+                                    value={this.state.term}
+                                    onChange={e => this.setState({term: e.target.value})}
+                                />
+                            </div>
+                        </form>
+                        <div className='mt-20'>
+                            {this.state.menuArray.map((item) => this.getImage(item))}   
+                        </div>                        
                     </div>
+                    <div className='flex3Column'></div>
                 </div>
+            </div>
+        )
     }
 }
 
