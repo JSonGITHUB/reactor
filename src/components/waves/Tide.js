@@ -181,7 +181,7 @@ class Tide extends React.Component {
                             <div className='description pt-10'>
                                 from: <span className='greet bold'>{(this.state.previousTide) ? this.state.previousTide.toFixed(1) : ''}' </span>
                                 {(this.props.display === 'narrow') ? <br/> : ''}to: <span className='greet bold'>{(this.state.nextTide) ? this.state.nextTide.toFixed(1) : ''}'</span><br/>
-                                <span className='greet bold'>{this.state.nextPhase} in {this.state.untilNextTide} hour{this.state.untilNextTide === 1 ? '' : 's'} </span><br/>
+                                <span className='greet bold'>{this.state.nextPhase} in {this.state.untilNextTide} {(this.props.display === 'narrow') ? 'hr' : 'hour'}{this.state.untilNextTide === 1 ? '' : 's'} </span><br/>
                                 at: <span className='greet bold'>{this.state.nextTime}</span>
                             </div>
                         </div>;
