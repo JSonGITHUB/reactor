@@ -1,4 +1,4 @@
-import React from 'react';
+import React , { useState } from 'react';
 import Dialog from '../functional/Dialog.js';
 import getKey from '../utils/KeyGenerator.js';
 import PostDirectory from './PostDirectory.js';
@@ -7,40 +7,37 @@ import thumbsUp from '../../assets/images/ThumbsUp.png';
 import thumbsDown from '../../assets/images/ThumbsDown.png';
 import {BrowserRouter as Router, Switch, Link, Route} from 'react-router-dom';
 
-class LogDirectory extends React.Component {
-
-    constructor(props) {
-        super(props);
-        const { title, message }= props;
-        this.title = title;
-        this.message = message;
-        this.sessionClick = this.sessionClick.bind(this);
-        this.logSession = this.logSession.bind(this);
-    }
-    sessionClick(item, spot) {
-        localStorage.setItem("spot", spot)
-        console.log(`sessionClick ${item} --> Spot: ${spot}`);
-    }
-    months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"]
-    suffix = ["th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th"];
-    icons = [shakaBlack, thumbsUp, thumbsDown];
-    conditions = ["Firing", "Good", "Bad"];
-    posts = new PostDirectory();
-    items = () => this.posts.getDirectory();
+const LogDirectory = ({ title, message }) => {
     
-    sessions = () => this.items().map((item) => {
+   const sessionClick = (item, spot) => {
+        localStorage.setItem('spot', spot)
+        localStorage.setItem('logId', item)
+        console.log(`sessionClick \n${item} --> \nSpot: ${spot}`);
+    }
+    
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"]
+    const suffix = ["th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th"];
+    const icons = [shakaBlack, thumbsUp, thumbsDown];
+    const conditions = ["Firing", "Good", "Bad"];
+    const items = () => JSON.parse(localStorage.getItem("postDirectory"));
+    
+    const sessions = () => items().map((item) => {
         const itemObj = JSON.parse(localStorage.getItem(item));
         
         if (itemObj !== null) {
             console.log(`ITEM: ${item} ====> ${JSON.stringify(itemObj, null, 2)}`)
-            const conditionsIndex = this.conditions.indexOf(itemObj.Conditions.Conditions);
-            const conditions = this.conditions[conditionsIndex];
+            const conditionsIndex = conditions.indexOf(itemObj.Conditions.Conditions);
             const spot = itemObj.Location.Break;
             const day = itemObj.Day.Day;
-            const month = this.months[itemObj.Day.Month-1];
+            const month = months[itemObj.Day.Month-1];
             const year = itemObj.Day.Year;
             const conditionDescription = itemObj.Conditions.Conditions;
-            const condition = this.icons[conditionsIndex];
+            const conditionHeight = itemObj.Surf.Height;
+            const height = itemObj.Swell1.Height;
+            const direction = itemObj.Swell1.Direction;            
+            const angle = itemObj.Swell1.Angle;
+            const interval = itemObj.Swell1.Interval;
+            const condition = icons[conditionsIndex];
 
             return (
                 <Link 
@@ -54,14 +51,18 @@ class LogDirectory extends React.Component {
                         }
                     }}
                 >
-                    <div key={getKey("log")} className="flexContainer button color-graphite pointer greet m-1 r-5 incompletedSelector bg-yellow myButton" onClick={() => this.sessionClick(item, spot)}>
+                    <div key={getKey("log")} className="flexContainer button color-graphite pointer greet m-1 r-5 incompletedSelector bg-yellow myButton" onClick={() => sessionClick(item, spot)}>
                             <div className="flexOneFourthColumn p-10">
-                                {/*<img src={this.condition(item)} alt={item} className='shaka' />*/}
+                                {/*<img src={condition(item)} alt={item} className='shaka' />*/}
                                 <img src={condition} alt={conditionDescription} className='shaka' />
                             </div>
                             <div className="flexThreeFourthColumnLeft pt-10 pb-10">
-                                {month + " " + day + this.suffix[Number(String(day).slice(-1))] /*+ " " + this.year(item)*/ + ": "}
-                                <br/>{spot}
+                                {month + " " + day + suffix[Number(String(day).slice(-1))] + " " + year + ": "}
+                                <br/><span className='size20 color-graphite'>{spot}</span>
+                                <br/><span className='color-graphite'>{height}</span>
+                                <span className='color-graphite ml-5'>{direction}</span>
+                                <span className='color-graphite ml-5'>{angle}</span>
+                                <span className='color-graphite ml-5'>{interval}</span>
                             </div>
                                 {
                                     //item.substring(3, 6) + ", " + 
@@ -75,23 +76,20 @@ class LogDirectory extends React.Component {
         }
         return "";
     })
-    logSession = () => window.location.pathname = "/reactor/SurfLog";
-    render() {
-        //console.log(`postssssss=>${JSON.stringify(this.posts.getDirectory(),null,2)}`)
-        return (
-            <div className="App-content fadeIn">
-                <Dialog title="Log Directory" message="Review sessions">
-                    <PostDirectory/>
-                    {this.sessions()}
-                    <div className="button p-20 r-5 m-20 bg-neogreen incompletedSelector color-black" onClick={this.logSession}>Add Session</div>
-                </Dialog>
-            </div>
-        );
-    };
+    const logSession = () => window.location.pathname = "/reactor/SurfLog";
+    //console.log(`postssssss=>${JSON.stringify(posts.getDirectory(),null,2)}`)
+    return (
+        <div className="App-content fadeIn">
+            <Dialog title="Log Directory" message="Review sessions">
+                <PostDirectory/>
+                {sessions()}
+                <div className="button p-20 r-5 m-20 bg-neogreen incompletedSelector color-black" onClick={logSession}>Add Session</div>
+            </Dialog>
+        </div>
+    );
 }
 
 export default LogDirectory;
-
 /*
 "ThuApr3020209:17:44PM",
 "ThuApr3020209:19:28PM",

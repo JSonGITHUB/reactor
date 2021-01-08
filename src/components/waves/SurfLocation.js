@@ -1,12 +1,6 @@
-import React from 'react';
+import React, {useState} from 'react';
 import getKey from '../utils/KeyGenerator.js';
 import WaveUtils from '../utils/WaveUtils.js';
-import Tide from './Tide.js';
-import WaterTemp from './WaterTemp.js';
-import AirTemp from './AirTemp.js';
-import WindDirection from './WindDirection.js';
-import Selector from '../forms/FunctionalSelector.js';
-import Dialog from '../functional/Dialog.js';
 import swell1 from '../../assets/images/wavePrimary.png'
 import swell2 from '../../assets/images/waveSecondaryB.png'
 import N from '../../assets/images/windN.png'
@@ -17,114 +11,110 @@ import S from '../../assets/images/windS.png'
 import SW from '../../assets/images/windSW.png'
 import W from '../../assets/images/windW.png'
 import NW from '../../assets/images/windNW.png'
-import tide from '../../assets/images/tide.png'
+import tideIcon from '../../assets/images/tide.png'
 import PostDirectory from './PostDirectory.js';
 import {BrowserRouter as Router, Switch, Link, Route} from 'react-router-dom';
 
-class SurfLocation extends React.Component {
+const SurfLocation = ({state, item, matches, regionMatch}) => {
     
-    constructor(props) {
-        super(props);
-        const { edit, windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, swell1Interval, swell2Interval, tide, height, stars } = props.state;
-        this.state = {
-            module: 'SurfLocation',
-            logged: false,
-            edit: edit,
-            windDirection: windDirection,
-            windSpeed: windSpeed, 
-            windGusts: windGusts,
-            swell1Direction: swell1Direction, 
-            swell2Direction: swell2Direction,
-            swell1Angle: swell1Angle,
-            swell2Angle: swell2Angle,
-            swell1Height: swell1Height,
-            swell2Height: swell2Height,
-            swell1Interval: swell1Interval,
-            swell2Interval: swell2Interval,
-            tide: tide, 
-            height: height,
-            stars: stars
-        };
-        this.createLog = this.createLog.bind(this);
-    }
+    const { edit, windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, swell1Interval, swell2Interval, tide, height, stars } = state;
+    const [status, setStatus] = useState({
+        module: 'SurfLocation',
+        logged: false,
+        edit: edit,
+        windDirection: windDirection,
+        windSpeed: windSpeed, 
+        windGusts: windGusts,
+        swell1Direction: swell1Direction, 
+        swell2Direction: swell2Direction,
+        swell1Angle: swell1Angle,
+        swell2Angle: swell2Angle,
+        swell1Height: swell1Height,
+        swell2Height: swell2Height,
+        swell1Interval: swell1Interval,
+        swell2Interval: swell2Interval,
+        tide: tide, 
+        height: height,
+        stars: stars
+    });
 
-    posts = new PostDirectory();
-    getStarKind = (kind) => {
+    const posts = new PostDirectory();
+    const getStarKind = (kind) => {
         let classes = "shaka r-20 p-2";
         classes = (kind === "wind") ? (classes + " bg-white") : classes; 
         return classes;
     }
-    getTideIcon = <img src={tide} className={`mb--5 ${this.getStarKind("tide")}`} alt="tide" />;
-    getSwellIcon = (id) => {
+    const getTideIcon = <img src={tideIcon} className={`mb--5 ${getStarKind("tide")}`} alt="tide" />;
+    const getSwellIcon = (id) => {
         if (id === 1) {
-            return <img src={swell1} className={`mb--5 ${this.getStarKind("tide")}`} alt="swell1" />
+            return <img src={swell1} className={`mb--5 ${getStarKind("tide")}`} alt="swell1" />
         } else {
-            return <img src={swell2} className={`mb--5 ${this.getStarKind("tide")}`} alt="swell2" />;
+            return <img src={swell2} className={`mb--5 ${getStarKind("tide")}`} alt="swell2" />;
         }
     }
-    getWindIcon = () => {
-        const windDirection = this.state.windDirection;
+    const getWindIcon = () => {
+        const windDirection = status.windDirection;
         if (windDirection === "N") {
-            return <img src={N} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
+            return <img src={N} className={`mb--5 ${getStarKind("tide")}`} alt={windDirection} />;
         } else if ((windDirection === "NE") || (windDirection === "NNE") || (windDirection === "ENE")) {
-            return <img src={NE} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
+            return <img src={NE} className={`mb--5 ${getStarKind("tide")}`} alt={windDirection} />;
         } else if (windDirection === "E") {
-            return <img src={E} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
+            return <img src={E} className={`mb--5 ${getStarKind("tide")}`} alt={windDirection} />;
         } else if ((windDirection === "SE") || (windDirection === "SSE") || (windDirection === "ESE")) {
-            return <img src={SE} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
+            return <img src={SE} className={`mb--5 ${getStarKind("tide")}`} alt={windDirection} />;
         } else if (windDirection === "S") {
-            return <img src={S} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
+            return <img src={S} className={`mb--5 ${getStarKind("tide")}`} alt={windDirection} />;
         } else if ((windDirection === "SW") || (windDirection === "SSW") || (windDirection === "WSW")) {
-            return <img src={SW} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
+            return <img src={SW} className={`mb--5 ${getStarKind("tide")}`} alt={windDirection} />;
         } else if (windDirection === "W") {
-            return <img src={W} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
+            return <img src={W} className={`mb--5 ${getStarKind("tide")}`} alt={windDirection} />;
         } else if ((windDirection === "NW") || (windDirection === "NNW") || (windDirection === "WNW")) {
-            return <img src={NW} className={`mb--5 ${this.getStarKind("tide")}`} alt={windDirection} />;
+            return <img src={NW} className={`mb--5 ${getStarKind("tide")}`} alt={windDirection} />;
         }
     }
-    getMatchIcon = (kind) => {
+    const getMatchIcon = (kind) => {
         let icon = (kind === "swell1") ? "swell1" : "swell2";
         icon = (kind === "wind") ? "wind" : icon;
         icon = (kind === "tide") ? "tide" : icon;
         if (kind === "swell1") {
-            return <img src={swell1} className={this.getStarKind(kind)} alt={kind} />
+            return <img src={swell1} className={getStarKind(kind)} alt={kind} />
         } else if (kind === "swell2") {
-            return <img src={swell2} className={this.getStarKind(kind)} alt={kind} />;
+            return <img src={swell2} className={getStarKind(kind)} alt={kind} />;
         } else if (kind === "tide") {
-            return <img src={tide} className={this.getStarKind(kind)} alt={kind} />;
+            return <img src={tideIcon} className={getStarKind(kind)} alt={kind} />;
         } else if (kind === "wind") {
-            const windDirection = this.state.windDirection;
+            const windDirection = status.windDirection;
             if (windDirection === "N") {
-                return <img src={N} className={this.getStarKind(kind)} alt={kind} />;
+                return <img src={N} className={getStarKind(kind)} alt={kind} />;
             } else if ((windDirection === "NE") || (windDirection === "NNE") || (windDirection === "ENE")) {
-                return <img src={NE} className={this.getStarKind(kind)} alt={kind} />;
+                return <img src={NE} className={getStarKind(kind)} alt={kind} />;
             } else if (windDirection === "E") {
-                return <img src={E} className={this.getStarKind(kind)} alt={kind} />;
+                return <img src={E} className={getStarKind(kind)} alt={kind} />;
             } else if ((windDirection === "SE") || (windDirection === "SSE") || (windDirection === "ESE")) {
-                return <img src={SE} className={this.getStarKind(kind)} alt={kind} />;
+                return <img src={SE} className={getStarKind(kind)} alt={kind} />;
             } else if (windDirection === "S") {
-                return <img src={S} className={this.getStarKind(kind)} alt={kind} />;
+                return <img src={S} className={getStarKind(kind)} alt={kind} />;
             } else if ((windDirection === "SW") || (windDirection === "SSW") || (windDirection === "WSW")) {
-                return <img src={SW} className={this.getStarKind(kind)} alt={kind} />;
+                return <img src={SW} className={getStarKind(kind)} alt={kind} />;
             } else if (windDirection === "W") {
-                return <img src={W} className={this.getStarKind(kind)} alt={kind} />;
+                return <img src={W} className={getStarKind(kind)} alt={kind} />;
             } else if ((windDirection === "NW") || (windDirection === "NNW") || (windDirection === "WNW")) {
-                return <img src={NW} className={this.getStarKind(kind)} alt={kind} />;
+                return <img src={NW} className={getStarKind(kind)} alt={kind} />;
             }
         }
     }
-    secondsToSec = () => "sec"
-    getStarDetails = (kind) => {
+    const secondsToSec = () => "sec"
+    const getStarDetails = (kind) => {
         let details = "";
-        const {height, windSpeed, windGusts, swell1Height, swell1Angle,swell1Interval, swell2Height, swell2Angle, swell2Interval} = this.state;
+        const {height, windSpeed, windGusts, swell1Height, swell1Angle,swell1Interval, swell2Height, swell2Angle, swell2Interval} = status;
         details = (kind === "tide") ? <div className="bold color-neogreen">{height}'</div> : details;
         details = (kind === "wind") ? <div className="bold color-neogreen">{windSpeed}-{windGusts}kts</div> : details;
-        details = (kind === "swell1") ? <div><div className="bold color-neogreen">{`${swell1Height}${(swell1Height.includes("ft")) ? "" : "'"}`}</div><div className="bold color-neogreen">{swell1Angle}°</div><div className="bold color-neogreen">{swell1Interval.replace(" seconds",this.secondsToSec())}</div></div> : details;
-        details = (kind === "swell2") ? <div><div className="bold color-neogreen">{`${swell2Height}${(swell2Height.includes("ft")) ? "" : "'"}`}</div><div className="bold color-neogreen">{swell2Angle}°</div><div className="bold color-neogreen">{swell2Interval.replace(" seconds",this.secondsToSec())}</div></div> : details;
+        details = (kind === "swell1") ? <div><div className="bold color-neogreen">{`${swell1Height}${(swell1Height.includes("ft")) ? "" : "'"}`}</div><div className="bold color-neogreen">{swell1Angle}°</div><div className="bold color-neogreen">{swell1Interval.replace(" seconds",secondsToSec())}</div></div> : details;
+        details = (kind === "swell2") ? <div><div className="bold color-neogreen">{`${swell2Height}${(swell2Height.includes("ft")) ? "" : "'"}`}</div><div className="bold color-neogreen">{swell2Angle}°</div><div className="bold color-neogreen">{swell2Interval.replace(" seconds",secondsToSec())}</div></div> : details;
         return details
     }
-    getState = (kind) => {
-        const { swell1Direction, swell2Direction, tide, windDirection } = this.state;
+    const getState = (kind) => {
+        const { swell1Direction, swell2Direction, tide, windDirection } = status;
         if (kind === "swell1") {
             return swell1Direction;
         } else if (kind === "swell2") {
@@ -135,24 +125,25 @@ class SurfLocation extends React.Component {
             return windDirection;
         }
     }
-    star = (matchKind) => <div key={getKey("star")} className="flex3Column bg-lite mr-5 ml-5 p-10 r-10">
-                            {this.getMatchIcon(matchKind)}
-                            <div className="greet">{this.getState(matchKind)}{this.getStarDetails(matchKind)}</div>
+    const star = (matchKind) => <div key={getKey("star")} className="flex3Column bg-lite mr-5 ml-5 p-10 r-10">
+                            {getMatchIcon(matchKind)}
+                            <div className="greet">{getState(matchKind)}{getStarDetails(matchKind)}</div>
                         </div>;
-    getStars = (stars) => stars.map((star) => this.star(star));
-    generateNewLogId = () => {
+    const getStars = (stars) => stars.map((currentStar) => star(currentStar));
+    const generateNewLogId = () => {
         const date = new Date()
         const st = date.toDateString().replace(/ /g,"");
         const nd = date.toLocaleTimeString().replace(/ /g,"");
         localStorage.setItem("lastPostId", `${st}${nd}`);
         const newId = `${st}${nd}`;
-        console.log(`LogId: generateNewLogId => this.state.logId: ${newId}`);
+        console.log(`LogId: generateNewLogId => status.logId: ${newId}`);
         return newId;
     }
-    goToLog = () => window.location.pathname = "/reactor/SurfLog"
-    createLog = (item) => {
+    const goToLog = () => window.location.pathname = "/reactor/SurfLog"
+    const createLog = (item) => {
+        console.log(`SurfLocation => createLog`);
         localStorage.setItem('spot', item.name);
-        const recordId = this.generateNewLogId();
+        const recordId = generateNewLogId();
         let getCurrentTime = new Date();
         const year = getCurrentTime.getFullYear();
         const currentMonth = getCurrentTime.getMonth()+1;
@@ -176,13 +167,13 @@ class SurfLocation extends React.Component {
         }
         
         const getWindMPH = () => {
-            let mph = Number(this.state.windGusts)+1;
+            let mph = Number(status.windGusts)+1;
             mph = mph + "mph";
             return mph
         }
         const getSurface = () => {
             const surfaces = ["oily glass", "glassy", "textured", "choppy", "victory at sea"];
-            let surface = Math.floor((Number(this.state.windGusts)+1)/3);
+            let surface = Math.floor((Number(status.windGusts)+1)/3);
             surface = (surfaces > 3) ? surfaces[4] : surfaces[surface];
             return surface;
         }
@@ -205,10 +196,10 @@ class SurfLocation extends React.Component {
                 "SW": "sideshore => rights",
                 "SSW": "sideshore => rights"
             }
-            return directions[this.state.windDirection]
+            return directions[status.windDirection]
         }
         const getNotes = () => {
-            const { height, tide, windDirection, swell1Height, swell1Angle, swell1Direction, swell1Interval } = this.state;
+            const { height, tide, windDirection, swell1Height, swell1Angle, swell1Direction, swell1Interval } = status;
             let notes = `${swell1Height}(${getWaveHeight(swell1Height)})`;
             notes = `${notes} out of the ${swell1Direction}`;
             notes = `${notes}(${swell1Angle})`;
@@ -230,21 +221,21 @@ class SurfLocation extends React.Component {
                 Break: item.name
             },
             Surf: {
-                Height: getWaveHeight(this.state.swell1Height),
-                Report: this.state.swell1Height,
+                Height: getWaveHeight(status.swell1Height),
+                Report: status.swell1Height,
                 Shape: "close-outs"
             },
             Swell1: {
-                Height: this.state.swell1Height,
-                Direction: this.state.swell1Direction,
-                Angle: this.state.swell1Angle,
-                Interval: this.state.swell1Interval,
+                Height: status.swell1Height,
+                Direction: status.swell1Direction,
+                Angle: status.swell1Angle,
+                Interval: status.swell1Interval,
             },
             Swell2: {
-                Height: this.state.swell2Height,
-                Direction: this.state.swell2Direction,
-                Angle: this.state.swell2Angle,
-                Interval: this.state.swell2Interval,
+                Height: status.swell2Height,
+                Direction: status.swell2Direction,
+                Angle: status.swell2Angle,
+                Interval: status.swell2Interval,
             },
             Swell3: {
                 Height: "1ft",
@@ -253,11 +244,11 @@ class SurfLocation extends React.Component {
                 Interval: "6 seconds",
             },
             Tide: {
-                Phase: this.state.tide,
-                Height: Number(this.state.height).toFixed(0)+"ft"
+                Phase: status.tide,
+                Height: Number(status.height).toFixed(0)+"ft"
             },
             Wind: {
-                Direction: this.state.windDirection,
+                Direction: status.windDirection,
                 Orientation: getWindOrientation(),
                 MPH: getWindMPH(),
                 Surface: getSurface()
@@ -270,7 +261,7 @@ class SurfLocation extends React.Component {
             }
         }
         //return logObj;
-        let postDirectory = this.posts.getDirectory();
+        let postDirectory = posts.getDirectory();
         let post = "";
         const logIt = () => {
             postDirectory.push(recordId);
@@ -280,10 +271,10 @@ class SurfLocation extends React.Component {
             console.log(`post: ${post}`)
             localStorage.setItem(recordId, post);
             //localStorage.setItem("postDirectory", postDirectory);
-            this.posts.add(recordId);
+            posts.add(recordId);
         }
         logIt();
-        this.goToLog();
+        goToLog();
         /*
         this.setState({
             recordId: recordId,
@@ -291,26 +282,26 @@ class SurfLocation extends React.Component {
         })
         */
     };
-    logLocation = (item) => (this.state.logged === true) ? alert("log already exists") : this.createLog(item);
-    logLocationButton = (item) => {
+    const logLocation = (item) => (status.logged === true) ? alert("log already exists") : createLog(item);
+    const logLocationButton = (item) => {
         return <div>
                     {
                         (localStorage.getItem("edit") === "true") ? <div>
-                                <WaveUtils state={this.state} item={item} logLocation={() => this.logLocation(item)}></WaveUtils>
+                                <WaveUtils state={status} item={item} logLocation={() => logLocation(item)}></WaveUtils>
                             </div>
                         :
-                        <div className="App button bg-yellow color-black p-10 r-10 mt-20" onClick={() => this.logLocation(item)}>
+                        <div className="App button bg-yellow color-black p-10 r-10 mt-20" onClick={() => logLocation(item)}>
                             Log Session
                         </div>
                     }
                 </div>
     }
-    editLogButton = () => {
+    const editLogButton = () => {
         return (
             <Link className="noUnderline" key={getKey("link")} to={{
                 pathname: '/SurfLog?logId=ThuApr3020209:19:28PM',
                 state: {
-                    logId: this.state.recordId
+                    logId: status.recordId
                 }
             }}>
                 <div className="App button bg-yellow color-black p-10 r-10 mt-20">
@@ -320,51 +311,46 @@ class SurfLocation extends React.Component {
         );
     }
     
-    render() {
-        const item = this.props.item;
-        const { windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, swell1Interval, swell2Interval, tide, height, stars } = this.state;
-        const statusClass = (status) => (status === true) ? "color-neogreen" : "color-yellow"; 
-        const subStatusClass = (status) => (status === true) ? "color-orange" : "color-yellow"; 
-        const swell1Match = (item) => (item.swell.indexOf(swell1Direction)>-1) ? true : false;
-        const swell2Match = (item) => (item.swell.indexOf(swell2Direction)>-1) ? true : false;
-        const windMatch = (item) => (item.wind.indexOf(windDirection)>-1) ? true : false;
-        const tideMatch = (item) => (item.tide.indexOf(tide)>-1) ? true : false;
-        const swell2DirectionMatch = (direction) => (direction===swell2Direction) ? true : false;
-        const windDirectionMatch = (direction) => (direction.wind === windDirection) ? true : false;
-        const tideDirectionMatch = (direction) => (direction.tide === tide) ? true : false;
-        const {matches, regionMatch} = this.props;
-        return (
-            <div key={getKey("loc")} /*onClick={() => this.props.editLocation()}*/>
-                <div className="r-10 m-10 p-20 bg-dkGreen">
-                        <div className="width100Percent flexContainer">{this.getStars(matches)}</div>
-                        <div className="mt-10 navBranding">{item.name}</div>
-                        <div className="greet color-yellow p-5 bg-dkGreen mt-15 mb-10 r-5">{`${regionMatch} miles`}</div>
-                    <div className="flexContainer">
-                        <div className="flexContainer m-auto">
-                            <div className="columnRight pr-10">
-                                <div className="color-neogreen bold">Swell: </div>
-                                <div className="color-neogreen bold">Wind: </div>
-                                <div className="color-neogreen bold">Tide: </div>
-                            </div>
-                            <div className="columnLeft">
-                                <div>{item.swell.map((swell, i) => <span key={getKey("swell")} className={(swell === this.state.swell1Direction) ? statusClass(swell1Match(item)) : subStatusClass(swell2DirectionMatch(swell))}>{swell}{((i+1) === item.swell.length)? "" : ", "}</span>)}</div>
-                                <div className={statusClass(windMatch(item))}>
-                                    {item.wind.map((wind, i) => <span key={getKey("wind")} className={statusClass(windDirectionMatch({wind}))}>
-                                                                {wind}{((i+1) === item.wind.length)? "" : ", "}
-                                                            </span>)}
-                                </div>
-                                <div className={statusClass(tideMatch(item))}>{item.tide.map((tide,i) => <span key={getKey("tide")} className={statusClass(tideDirectionMatch({tide}))}>{tide}{((i+1) === item.tide.length)? "" : ", "}</span>)}</div>
-                            </div>
+    const statusClass = (status) => (status === true) ? "color-neogreen" : "color-yellow"; 
+    const subStatusClass = (status) => (status === true) ? "color-orange" : "color-yellow"; 
+    const swell1Match = (item) => (item.swell.indexOf(swell1Direction)>-1) ? true : false;
+    const swell2Match = (item) => (item.swell.indexOf(swell2Direction)>-1) ? true : false;
+    const windMatch = (item) => (item.wind.indexOf(windDirection)>-1) ? true : false;
+    const tideMatch = (item) => (item.tide.indexOf(tide)>-1) ? true : false;
+    const swell2DirectionMatch = (direction) => (direction===swell2Direction) ? true : false;
+    const windDirectionMatch = (direction) => (direction.wind === windDirection) ? true : false;
+    const tideDirectionMatch = (direction) => (direction.tide === tide) ? true : false;
+    return (
+        <div key={getKey("loc")} /*onClick={() => this.props.editLocation()}*/>
+            <div className="r-10 m-10 p-20 bg-dkGreen">
+                    <div className="width100Percent flexContainer">{getStars(matches)}</div>
+                    <div className="mt-10 navBranding">{item.name}</div>
+                    <div className="greet color-yellow p-5 bg-dkGreen mt-15 mb-10 r-5">{`${regionMatch} miles`}</div>
+                <div className="flexContainer">
+                    <div className="flexContainer m-auto">
+                        <div className="columnRight pr-10">
+                            <div className="color-neogreen bold">Swell: </div>
+                            <div className="color-neogreen bold">Wind: </div>
+                            <div className="color-neogreen bold">Tide: </div>
                         </div>
-                        
+                        <div className="columnLeft">
+                            <div>{item.swell.map((swell, i) => <span key={getKey("swell")} className={(swell === status.swell1Direction) ? statusClass(swell1Match(item)) : subStatusClass(swell2DirectionMatch(swell))}>{swell}{((i+1) === item.swell.length)? "" : ", "}</span>)}</div>
+                            <div className={statusClass(windMatch(item))}>
+                                {item.wind.map((wind, i) => <span key={getKey("wind")} className={statusClass(windDirectionMatch({wind}))}>
+                                                            {wind}{((i+1) === item.wind.length)? "" : ", "}
+                                                        </span>)}
+                            </div>
+                            <div className={statusClass(tideMatch(item))}>{item.tide.map((tide,i) => <span key={getKey("tide")} className={statusClass(tideDirectionMatch({tide}))}>{tide}{((i+1) === item.tide.length)? "" : ", "}</span>)}</div>
+                        </div>
                     </div>
-                    {
-                        //(this.state.logged) ? this.editLogButton() : this.logLocationButton(item)
-                        this.logLocationButton(item)
-                    }
+                    
                 </div>
+                {
+                    //(status.logged) ? editLogButton() : logLocationButton(item)
+                    logLocationButton(item)
+                }
             </div>
-        );
-    }
+        </div>
+    );
 }
 export default SurfLocation;

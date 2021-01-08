@@ -1,17 +1,18 @@
-import React from 'react';
+import React, {useState} from 'react';
 import SearchBar from './utils/SearchBar';
 import YouTube from './utils/YouTube';
 import VideoList from './utils/VideoList';
+import VideoDetail from './utils/VideoDetail';
+import { youtubeAPI_KEY, youtubeAPI_BASE_URL } from '../apis/config';
 
-class Videos extends React.Component {
+const Videos = () => {
 
-  state = { 
-    videos: [],
-    KEY: '',
-    api: 'https://www.googleapis.com/youtube/v3'
-  };
+  const KEY = youtubeAPI_KEY;
+  const api = youtubeAPI_BASE_URL;
+  const [videos, setVideos] = useState([]);
+  const [selectedVideo, setSelectedVideo] = useState(null); 
 
-  onTermSubmit = async term => {
+  const onTermSubmit = async term => {
     console.log(`onTermSubmit =====> ${term}`);
     const response = await YouTube.get("/search", {
       params: {
@@ -19,34 +20,38 @@ class Videos extends React.Component {
         part: "snippet",
         maxResults: 5,
         type: 'video',
-        key: this.state.KEY
+        key: KEY
       }
     });
-    this.setState({ videos: response.data.items});
-    const videos = [
-      {
-        title: 'cars',
-        video: ''
-      },
-      {
-        title: 'monkeys',
-        video: ''
-      }
-    ]
-    //this.setState({ videos: videos});
+    setVideos(response.data.items);
   };
- 
-    render() {
-        return (
-            <div className='flexContainer mt-10'>
-              <div className='flex3Column'></div>
-              <div className='flex3Column'>
-                <SearchBar onSubmit={this.onTermSubmit} KEY={this.state.KEY} api={this.state.api} />
-                <VideoList videos={this.state.videos} />
-              </div>
-              <div className='flex3Column'></div>
+  const onVideoSelect = (video) => {
+    console.log(`video: ${JSON.stringify(video, null, 2)}`)
+    setSelectedVideo(video);
+  }
+  /*
+  componentDidMount() {
+    this.onTermSubmit("Jamie O'Brien")
+  }
+  */
+  return (
+    <div>
+      <SearchBar onSubmit={onTermSubmit} KEY={KEY} api={api} term='Tidal Wave' />
+      <div>
+        <div>
+          <div>
+            <VideoDetail video={selectedVideo} />
+          </div>
+          <div className='flexContainer'>
+            <div className='flex3Column10Percent'></div>
+            <div className='flex3Column80Percent'>
+              <VideoList onVideoSelect={onVideoSelect} videos={videos} />
             </div>
-        )
-    }
+            <div className='flex3Column10Percent'></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 export default Videos;

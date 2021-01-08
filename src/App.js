@@ -9,7 +9,7 @@ import Home from './components/Home.js';
 import Calculator from './components/Calculator.js';
 //import BowlBuilder from './components/BowlBuilder.js';
 import LogDirectory from './components/waves/LogDirectory.js';
-import SurfLog from './components/waves/Logger.js';
+import SurfLog from './components/waves/LoggerFunctional.js';
 import WaveFinder from './components/waves/WaveFinder.js';
 import SurfReports from './components/waves/SurfReports.js';                            
 import SlideShow from './components/SlideShow.js';
@@ -17,13 +17,17 @@ import PhotoBlog from './components/PhotoBlog.js';
 import PhotoSequence from './components/PhotoSequence.js';
 import Reducer from './components/Reducer.js';
 import Adder from './components/hooks/Adder.js';
+import Counter from './components/hooks/Counter.js';
 import Todos from './components/hooks/Todos.js';   
 import './assets/css/App.css';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 import ScrollToTop from './components/utils/ScrollToTop.js';
-import AxiosSearch from './components/utils/Axios.js';
-//import Photos from './components/Photos.js';
-//import Videos from './components/Videos.js';
+import Photos from './components/Photos.js';
+import Videos from './components/Videos.js';
+import WikiSearch from './components/WikiSearch.js';
+import Translator from './components/Translator.js';
+import Accordion from './components/Accordion.js';
+import Weather from './components/weather/Weather.js';
 
 class App extends React.Component {
   constructor(props) {
@@ -50,6 +54,26 @@ class App extends React.Component {
     })
   }
   setIt = () => (this.widthChanged() || this.heightChanged()) ? this.updateState() : false;
+  items = [
+    {
+      title: 'item1',
+      content: 'content 1' 
+    },
+    {
+      title: 'item2',
+      content: 'content 2' 
+    },
+    {
+      title: 'item3',
+      content: 'content 3' 
+    },
+    {
+      title: 'item4',
+      content: 'content 4' 
+    },
+
+  ]
+
   components = {
     surflog: <SurfLog />,
     //guestlist: <SignUpDialog title="Guest List" message="Sign up" />,
@@ -78,13 +102,13 @@ class App extends React.Component {
     const getLogId = () => window.location.search.substring(startIndex(), endIndex());
     const logId = (logIdExists) ? getLogId() : "";
     const { width, height, isMotionOn } = this.state;
-     return (
+    return (
       //AppComponent();
       <Router basename={this.base}>
-        <ScrollToTop />
+        <ScrollToTop loc={window.location}/>
         <div className="App">
             <Switch>
-              <Header company={this.company} menu='false' width={width} isMotionOn={isMotionOn}/>
+              <Header company={this.company} width={width} isMotionOn={isMotionOn}/>
             </Switch> 
             <div className="fadeIn">
                 <Switch>
@@ -116,15 +140,19 @@ class App extends React.Component {
                   {/*<Route path="/SurfLog" component={SurfLog} />*/}
                   <Route path='/SurfLog' render={(props) => <SurfLog {...props} logId={logId} />}/>
                   <Route path='/WaveFinder' render={(props) => <WaveFinder {...props} tide="medium" isSwell1="false" isSwell2="false" isTide="false" isWind="false" swell1Direction="SSW" swell2Direction="W" swell1Angle="210" swell2Angle="278" swell1Height="3" swell2Height="2" swell1Interval="17 seconds" swell2Interval="17 seconds" windDirection="W" distance="10" />}/>
+                  <Route path='/Weather' render={(props) => <Weather />}/>
                   <Route path="/SurfReports" component={SurfReports} />
                   <Route path="/LogDirectory" component={LogDirectory} />
                   <Route path="/Swell" component={SlideShow} />
                   <Route path="/PhotoBlog" component={PhotoBlog} />
                   <Route path="/PhotoSequence" component={PhotoSequence} />
                   <Route path="/Adder" render={(props) => <Adder {...props} label="How big was it?" unit="ft" count="10" />}/>
-                  <Route path="/Search" render={(props) => <AxiosSearch />}/>
-                  {/*<Route path="/Photos" render={(props) => <Photos />}/>
-                  <Route path="/Videos" render={(props) => <Videos />}/>*/}
+                  <Route path="/Counter" render={(props) => <Counter />}/>
+                  <Route path="/Photos" render={(props) => <Photos />}/>
+                  <Route path="/Videos" render={(props) => <Videos />}/>
+                  <Route path="/WikiSearch" render={(props) => <WikiSearch />}/>
+                  <Route path="/Translator" render={(props) => <Translator />}/>
+                  <Route path="/Accordion" render={(props) => <Accordion items={this.items}/>}/>
                   <Route path="/Todos" render={(props) => <Todos />}/>
                   <Route path="/Reducer" component={Reducer} />
                 </Switch>

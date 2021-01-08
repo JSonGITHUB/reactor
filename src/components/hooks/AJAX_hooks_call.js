@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 function AJAX_hooks() {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -40,3 +41,4 @@ function AJAX_hooks() {
     );
   }
 }
+export default AJAX_hooks;

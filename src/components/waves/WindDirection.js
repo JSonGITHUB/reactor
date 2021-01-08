@@ -1,27 +1,25 @@
-import React from 'react';
-import Loader from '../utils/Loader.js';
-import N from '../../assets/images/windN.png'
-import NE from '../../assets/images/windNE.png'
-import E from '../../assets/images/windE.png'
-import SE from '../../assets/images/windSE.png'
-import S from '../../assets/images/windS.png'
-import SW from '../../assets/images/windSW.png'
-import W from '../../assets/images/windW.png'
-import NW from '../../assets/images/windNW.png'
+import React, { useState, useEffect } from 'react';
+import N from '../../assets/images/windN.png';
+import NE from '../../assets/images/windNE.png';
+import E from '../../assets/images/windE.png';
+import SE from '../../assets/images/windSE.png';
+import S from '../../assets/images/windS.png';
+import SW from '../../assets/images/windSW.png';
+import W from '../../assets/images/windW.png';
+import NW from '../../assets/images/windNW.png';
 
-class WindDirection extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            direction: null,
-            columns: props.columns,
-            station: null,
-            speed: null,
-            angle: null,
-            gusts: null
-        }
-    }
-    getWindData = () => {
+const WindDirection = ({columns, setWind}) => {
+    
+    const [status, setStatus] = useState({
+        columns: columns,
+        station: null,
+        speed: null,
+        angle: null,
+        direction: null,
+        gusts: null
+    });
+            
+    const getWindData = () => {
         console.log(`getWind ->`);
         let data;
         const returnJSON = (response) => response.json();
@@ -52,14 +50,15 @@ class WindDirection extends React.Component {
             .then(response => validate(response))
             .then(data => {
                 console.log(`WindDirection => direction: ${JSON.stringify(data.data[data.data.length - 1],null,2)}`)
-                this.props.setWind(data.data[data.data.length - 1].dr, data.data[data.data.length - 1].d, data.data[data.data.length - 1].s, data.data[data.data.length - 1].g)
-                this.setState({
+                setWind(data.data[data.data.length - 1].dr, data.data[data.data.length - 1].d, data.data[data.data.length - 1].s, data.data[data.data.length - 1].g)
+                setStatus(prevState => ({
+                    ...prevState,
                     station: data.metadata.name,
                     speed: data.data[data.data.length - 1].s,
                     angle: data.data[data.data.length - 1].d,
                     direction: data.data[data.data.length - 1].dr,
                     gusts: data.data[data.data.length - 1].g
-                })
+                }))
             })
             .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
 
@@ -84,21 +83,27 @@ class WindDirection extends React.Component {
         ]
     }
     */
-    getInterval = () => 300000;
-    componentDidMount() {
-        this.getWindData()
-        this.timerID = setInterval(() => this.getWindData(), this.getInterval());
-    }
-    componentWillUnmount() {
-        clearInterval(this.timerID);
-    }
+
+    useEffect(() => {   
+        getWindData();  
+        /*		
+        const timerID = setInterval(
+            () => getWindData(),
+            300000
+        );
+        return function cleanUp () {
+            clearInterval(timerID);
+        }
+        */
+    },[]);
+
     /*
     Water Level: 2.01 ft Above MLLW
     Next Tide at 3:09 PM: Low 1.70 ft
     Gusting to: 12.3 kts from WSW
     */
-    getWindIcon = () => {
-        const windDirection = this.state.direction;
+    const getWindIcon = () => {
+        const windDirection = status.direction;
         const classes = "shaka r-20 p-2 bg-white";
         if (windDirection === "N") {
             return <img src={N} className={classes} alt={windDirection} />;
@@ -118,20 +123,16 @@ class WindDirection extends React.Component {
             return <img src={NW} className={classes} alt={windDirection} />;
         }
     }
-    getCurrentWind = () => {
-        const { columns } = this.props;
-        const { direction, angle, speed, gusts } = this.state;
+    const getCurrentWind = () => {
         return (
             <div className="r-10 m-5 p-10 bg-lite white">
-                <div>{this.getWindIcon()}</div>
-                <div>{`${direction} ${Number(angle).toFixed(0)}°`}</div>
-                <div>{`${Number(speed).toFixed(0)}-${Number(gusts).toFixed(0)}`} <span className="greet">knots</span></div>
+                <div>{getWindIcon()}</div>
+                <div>{`${status.direction} ${Number(status.angle).toFixed(0)}°`}</div>
+                <div>{`${Number(status.speed).toFixed(0)}-${Number(status.gusts).toFixed(0)}`} <span className="greet">knots</span></div>
             </div>
         )
     }
-    render() {
-        return <div>{this.getCurrentWind()}</div>
-    };
+    return <div>{getCurrentWind()}</div>
 }
 
 export default WindDirection;
