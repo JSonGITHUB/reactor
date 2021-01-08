@@ -1,75 +1,54 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 //import ReactDOM from 'react-dom';
    
-class Timer extends React.Component {
-    
-    timeItIs = [
-        "shaka time!!!",
-        "get a wave brah!",
-        "keep froth alive...",
-    ];
-    logos = [1,2,3];
-    x = 0;
-    interval = 0;
-    timeItIsNow = this.timeItIs[this.x];
-    stackIndex = 0;
-    logoStacker = (value, index, array) => {
+const Timer = () => {
+    const timeItIs = ["shaka time!!!", "get a wave brah!", "keep froth alive..."];
+    const logos = [1,2,3];
+    let x = 0;
+    let interval = 0;
+    let timeItIsNow = timeItIs[x];
+    const stackIndex = 0;
+    const logoStacker = (value, index, array) => {
         //console.log(`index: ${index} array: ${array} value: ${value}`);
-        let newId = value+this.stackIndex;
+        let newId = value+stackIndex;
         newId = (newId > array.length) ? 1 : newId;
         //console.log(`logo${value} => z${newId}`)
-        document.getElementById('logo'+value).className = "logo"+value+" z"+newId+" absolute logo height200 ml--100";
+        const logoClasses = "logo"+value+" z"+newId+" absolute logo height200 ml--100";
+        document.getElementById('logo'+value).className = logoClasses;
     }
-
-    constructor(props) {
-        super(props);
-        this.state = {date: new Date()};
+    const [date, setDate] = useState(new Date());
+    const tick = () => {
+        console.log(`Tick`);
+        setDate(new Date());
     }
-
-    componentDidMount() {
-        this.timerID = setInterval(
-            () => this.tick(),
+    useEffect(() => {     		
+        const timerID = setInterval(
+            () => tick(),
             1000
         );
-    }
-  
-    componentWillUnmount() {
-        clearInterval(this.timerID);
-    }
-    tick() {
-        this.setState({
-            date: new Date()
-        });
-    }
-    render() {
-        this.interval = (this.interval === 3) ? 0 : (this.interval+1);
-        this.x = (this.x === (this.timeItIs.length-1) && (this.interval === 0)) ? 0 : ((this.interval === 0) ? (this.x+1) : this.x);
-        this.timeItIsNow = this.timeItIs[this.x];
-        /*
-        if (this.interval === 3) {
-            this.stackIndex = (this.stackIndex === 2) ? 0 : (this.stackIndex+1);
-            this.logos.forEach(this.logoStacker);
+        return function cleanUp () {
+            clearInterval(timerID);
         }
-        */
-        const date = this.state.date.toLocaleTimeString();
-        const time = date.replace(" ","").toLocaleLowerCase();
-        return (
-            <div className="time p-20">
-                <div className='color-red'>
-                    do you know what time it is?
-                </div>
-                <br/>
-                <b>
-                    {time}
-                </b>
-                <br/>
-                <br/>
-                <div className='color-green'>
-                    <b>{ this.timeItIsNow }</b>
-                </div>
+    },[]);
+    interval = (interval === 3) ? 0 : (interval+1);
+    x = (x === (timeItIs.length-1) && (interval === 0)) ? 0 : ((interval === 0) ? (x+1) : x);
+    timeItIsNow = timeItIs[x];
+    const localDate = date.toLocaleTimeString();
+    const time = localDate.replace(" ","").toLocaleLowerCase();
+    return (
+        <div className="time p-20">
+            <div className='color-red'>
+                do you know what time it is?
             </div>
-        )
-    }
+            <br/>
+            <b>{time}</b>
+            <br/>
+            <br/>
+            <div className='color-green'>
+                <b>{ timeItIsNow }</b>
+            </div>
+        </div>
+    )
 }
 export default Timer;
 /*

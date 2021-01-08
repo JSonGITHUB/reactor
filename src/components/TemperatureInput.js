@@ -5,25 +5,17 @@ const scaleNames = {
     f: 'Fahrenheit'
 };
 
-class TemperatureInput extends React.Component {
-    constructor(props) {
-        super(props);
-        this.handleChange = this.handleChange.bind(this);
-        this.state = {temperature: props.temperature};
+const TemperatureInput = ({ scale, temperature, onTemperatureChange }) => {
+    const handleChange = (e) => {
+        temperature = e.target.value;
+        onTemperatureChange(e.target.value);
     }
-    handleChange(e) {
-        this.setState({temperature: e.target.value});
-        this.props.onTemperatureChange(e.target.value);
-    }
-    render() {
-        const {temperature, scale} = this.props;
-        return (
-            <fieldset className="r-20">
-                <legend>{scaleNames[scale]}:</legend>
-                <input value={temperature} onChange={this.handleChange} className="greet p-20 r-10 w-200 brdr-red" placeholder="Enter here..."/>
-            </fieldset>
-        );
-    }
+    return (
+        <fieldset className="r-20">
+            <legend>{scaleNames[scale]}:</legend>
+            <input value={temperature} onChange={handleChange} className="greet p-20 r-10 w-200 brdr-red" placeholder="Enter here..."/>
+        </fieldset>
+    );
 }
 
 export default TemperatureInput;

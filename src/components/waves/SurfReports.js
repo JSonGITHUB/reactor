@@ -1,15 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 //import cheerio from 'cheerio';
 //import got from 'got';
 
-class SurfReports extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            oSideBuoyData: {}
-        }
-    }
-    getSwellData = () => {
+const SurfReports = () => {
+    
+    const [oSideBuoyData, setOSideBuoyData] = useState({});
+
+    const getSwellData = () => {
         const unirest = require("unirest");
         const req = unirest("GET", "https://stormglass.p.rapidapi.com/forecast");
         req.headers({
@@ -23,8 +20,8 @@ class SurfReports extends React.Component {
         });
 
     }
-    getRapidData = () => {
-        var settings = {
+    const getRapidData = () => {
+        const settings = {
             "async": true,
             "crossDomain": true,
             "url": "https://community-open-weather-map.p.rapidapi.com/weather?q=san%20francisco%2Cus",
@@ -35,35 +32,33 @@ class SurfReports extends React.Component {
             }
           }
           
-                        var xhttp = new XMLHttpRequest();
-                        xhttp.onreadystatechange = function() {
-                            if (this.readyState === 4 && this.status === 200) {
-                                console.log(`getRapidData: ${this.responseText}`);
-                            } else {
-                                console.log(`getRapidData: ${this.status}`)
-                            }
-                        };
-                        xhttp.open("GET", settings, true);
-                        xhttp.send();
+        const xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState === 4 && this.status === 200) {
+                console.log(`getRapidData: ${this.responseText}`);
+            } else {
+                console.log(`getRapidData: ${this.status}`)
+            }
+        };
+        xhttp.open("GET", settings, true);
+        xhttp.send();
           /*
           $.ajax(settings).done(function (response) {
             console.log(`getRapidData: ${response}`);
           });
           */
     }
-    render() {
         //this.getSwellData();
         //this.getRapidData();
-        return <div>
-                    <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224"></iframe><br/>
-                    <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46225" ></iframe><br/>
-                    <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46266"></iframe><br/>
-                    <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46254"></iframe><br/>
-                    <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=LJAC1"></iframe><br/>
-                    <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=LJPC1"></iframe><br/>
-                    <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46232"></iframe><br/>
-                </div>
-    };
+    return <div>
+            <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224"></iframe><br/>
+            <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46225" ></iframe><br/>
+            <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46266"></iframe><br/>
+            <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46254"></iframe><br/>
+            <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=LJAC1"></iframe><br/>
+            <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=LJPC1"></iframe><br/>
+            <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46232"></iframe><br/>
+        </div>
 }
 
 export default SurfReports;

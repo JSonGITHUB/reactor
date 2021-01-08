@@ -1,18 +1,14 @@
-import React from 'react';
+import React, {useState} from 'react';
 
-class WaveUtils extends React.Component {
+const WaveUtils = ({item, state, logLocation}) => {
     
-    constructor(props) {
-        super(props);
-        this.state = props.state;
-    }
-    
-    addWave = () => {
-
-        const locations = this.state.locations;
+    const [status, setStatus] = useState(state);
+    const [locations, setLocations] = useState(state.locations)
+    const addWave = () => {
         const swells = [];
         const winds = [];
         const tides = [];
+        const waveLocations = locations;
         let i=0;
         let wave = prompt("wave: ", "enter spot");
         const swellCount = prompt("swell count: ", "how many directions?");
@@ -28,7 +24,7 @@ class WaveUtils extends React.Component {
             tides[i] = prompt("tide direction", "direction");
         }
         const getObj = () => {
-            console.log(`getObj => state: ${JSON.stringify(this.state,null,2)}`)
+            console.log(`getObj => state: ${JSON.stringify(status,null,2)}`)
             return {
                 name: wave,
                 latitude: localStorage.getItem("latitude"),
@@ -38,35 +34,31 @@ class WaveUtils extends React.Component {
                 tide: tides
             }
         }
-        locations.push(getObj());
-        console.log(`add a wave... ${JSON.stringify(getObj(), null, 2)}`)
-        localStorage.setItem('locations', JSON.stringify(locations))
-        this.setState({
-            locations: locations
-        })
+        waveLocations.push(getObj());
+        console.log(`add a wave... ${JSON.stringify(getObj(), null, 2)}`);
+        localStorage.setItem('locations', JSON.stringify(waveLocations));
+        setLocations(waveLocations);
     }
-    deleteWave = (props) => {
-        let locations = JSON.parse(localStorage.getItem("locations"));
+    const deleteWave = (props) => {
+        let waveLocations = JSON.parse(localStorage.getItem("locations"));
         console.log(`Props: ${JSON.stringify(props, null, 2)}`)
         let index = 0;
-        let result = locations.find(obj => {
+        let result = waveLocations.find(obj => {
             index++
             return obj.name === props.name
         })
         console.log(`delete 1 => index: ${index-1} result: ${JSON.stringify(result, null, 2)}`)
-        console.log(`delete 2 => locations: [${index-1}]: ${JSON.stringify(locations[index-1], null, 2)}`)
+        console.log(`delete 2 => locations: [${index-1}]: ${JSON.stringify(waveLocations[index-1], null, 2)}`)
 
         ///////////////
-        locations.splice(index-1, 1);
-        localStorage.setItem('locations', JSON.stringify(locations))
-        console.log(`delete 3 => locations: [${index-1}]: ${locations.map((location, index) => `${index} ${location.name}`)}`)
-        this.setState({
-            locations: locations
-        })
+        waveLocations.splice(index-1, 1);
+        localStorage.setItem('locations', JSON.stringify(waveLocations))
+        console.log(`delete 3 => locations: [${index-1}]: ${waveLocations.map((location, index) => `${index} ${location.name}`)}`)
+        setLocations(waveLocations);
     }
-    editWaveSave = (location, index) => {
+    const editWaveSave = (location, index) => {
         console.log(`editWaveSave() => ${JSON.stringify(location,null,2)}`)
-        let locations = JSON.parse(localStorage.getItem("locations"));
+        let waveLocations = JSON.parse(localStorage.getItem("locations"));
         let swells = location.swell;
         let winds = location.wind;
         let tides = location.tide;
@@ -97,63 +89,62 @@ class WaveUtils extends React.Component {
                 tide: tides
             }
         }
-        console.log(`locations: ${JSON.stringify(locations[index],null,2)} => will be ${JSON.stringify(getObj(),null,2)}`)
-        locations[index] = getObj();
-        console.log(`edit a wave saving... ${JSON.stringify(locations[index], null, 2)}`)
-        localStorage.setItem('locations', JSON.stringify(locations))
-        this.setState({
-            locations: locations
-        })
+        console.log(`locations: ${JSON.stringify(waveLocations[index],null,2)} => will be ${JSON.stringify(getObj(),null,2)}`)
+        waveLocations[index] = getObj();
+        console.log(`edit a wave saving... ${JSON.stringify(waveLocations[index], null, 2)}`)
+        localStorage.setItem('locations', JSON.stringify(waveLocations))
+        setLocations(waveLocations);
     }
    
-    editWave = (props) => {
-        const locations = JSON.parse(localStorage.getItem("locations"));
+    const editWave = (props) => {
+        const waveLocations = JSON.parse(localStorage.getItem("locations"));
         
         if (props.name === "button") {
             console.log(`edit(${localStorage.getItem('edit')}) toggle... ${JSON.stringify(props, null, 2)}`);
-            this.handleEditToggle()
+            handleEditToggle()
         } else if (props.name === "edit") {
-            console.log(`edit a wave... ${JSON.stringify(this.props.item, null, 2)}`);
+            console.log(`edit a wave... ${JSON.stringify(item, null, 2)}`);
             console.log(`Props: ${JSON.stringify(props, null, 2)}`)
             let index = 0;
-            let result = locations.find(obj => {
+            let result = waveLocations.find(obj => {
                 index++
-                return obj.name === this.props.item.name
+                return obj.name === item.name
             })
             console.log(`index: ${index} result: ${JSON.stringify(result, null, 2)}`)
-            console.log(`locations: [${index}]: ${JSON.stringify(locations[index-1], null, 2)}`)
-            this.editWaveSave(result, index-1);
+            console.log(`locations: [${index}]: ${JSON.stringify(waveLocations[index-1], null, 2)}`)
+            editWaveSave(result, index-1);
         }
     }
-    handleEditToggle = () => {
+    const handleEditToggle = () => {
         const edit = (localStorage.getItem('edit') === "true") ? false : true;
         localStorage.setItem("edit", edit);
         console.log(`handleEditToggle => EDIT: ${edit}`)
+        /*
         this.setState({
             edit: edit
         })
+        */
     }
-    render() {
-        const menu = <div>
-                        <div className="button m-5 r-10 p-10 bg-green" onClick={() => this.addWave()}>
-                            Add wave
-                        </div>
-                        <div className="button m-5 r-10 p-10 bg-green" onClick={() => this.editWave({"name":"button"})}>
-                            {(localStorage.getItem("edit") === "true") ? "Save" : "Edit wave"}
-                        </div>
-                    </div>;
-        const item = <div>
-                        <div className="App button bg-yellow color-black p-10 r-10 mt-20" onClick={() => this.props.logLocation(this.props.item)}>
-                            Log Session
-                        </div>
-                        <div className="App button bg-red color-black p-10 r-10 mt-20" onClick={() => this.editWave({"name":"edit"})}>
-                            Edit Location
-                        </div>
-                        <div className="App button bg-red color-black p-10 r-10 mt-20" onClick={() => this.deleteWave(this.props.item)}>
-                            Delete Location
-                        </div>
+    const menu = <div>
+                    <div className="button m-5 r-10 p-10 bg-green" onClick={() => addWave()}>
+                        Add wave
                     </div>
-        return (this.state.module === "WaveFinder") ? menu : item;
-    }
+                    <div className="button m-5 r-10 p-10 bg-green" onClick={() => editWave({"name":"button"})}>
+                        {(localStorage.getItem("edit") === "true") ? "Save" : "Edit wave"}
+                    </div>
+                </div>;
+    const itemContainer = <div>
+                    <div className="App button bg-yellow color-black p-10 r-10 mt-20" onClick={() => logLocation(item)}>
+                        Log Session
+                    </div>
+                    <div className="App button bg-red color-black p-10 r-10 mt-20" onClick={() => editWave({"name":"edit"})}>
+                        Edit Location
+                    </div>
+                    <div className="App button bg-red color-black p-10 r-10 mt-20" onClick={() => deleteWave(item)}>
+                        Delete Location
+                    </div>
+                </div>
+    console.log(`status.module: ${status.module}`)
+    return (status.module === "WaveFinder") ? menu : itemContainer;
 }
 export default WaveUtils

@@ -1,20 +1,19 @@
-import React from 'react';
+import React, {useState} from 'react';
 import SearchBar from './utils/SearchBar';
 import UnSplash from './utils/UnSplash';
+import { unsplashAPI_KEY, unsplashAPI_BASE_URL } from '../apis/config';
 
-class Photos extends React.Component {
+const Photos = () => {
 
-    state = { 
-        photos: [],
-        KEY: '',
-        api: 'https://api.unsplash.com/search/photos'
-    };
+    const [photos, setPhotos] = useState([]);
+    const KEY = unsplashAPI_KEY;
+    const api = unsplashAPI_BASE_URL;
 
-    onSearchSubmit = async (term, callback) => {
-        const response = await UnSplash.get(this.state.api, {
+    const onSearchSubmit = async (term, callback) => {
+        const response = await UnSplash.get(api, {
                 params: {query: term},
                 headers: {
-                    Authorization: this.state.KEY//need to get key
+                    Authorization: KEY//need to get key
                 }
             })
             .then (response => {
@@ -26,17 +25,15 @@ class Photos extends React.Component {
                         'location': item.user.location
                     });
                 })
-                this.setState({ photos: images })
+                setPhotos(images);
                 return callback(images)
             });
-    }  
-    render() {
-        return (
-            <div className="ui container" style={{ marginTop: '10px'}}>
-            <SearchBar onSubmit={this.onSearchSubmit} api={this.state.api} KEY={this.state.KEY}/>
-            <div className='white'>{this.state.photos.length} photos.</div>
-            </div>
-        )
     }
+    return (
+        <div className="ui container">
+            <SearchBar onSubmit={onSearchSubmit} api={api} KEY={KEY} term='Wave'/>
+            <div className='white p-10'>{photos.length} photos.</div>
+        </div>
+    )
 }
 export default Photos;

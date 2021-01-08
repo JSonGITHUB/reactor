@@ -1,16 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Loader from '../utils/Loader.js';
-//import arrowDown from '../../assets/images/ArrowDown.png';
-//import arrowUp from '../../assets/images/ArrowUp.png';
 
-class AirTemp extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            temp: null,
-        }
-    }
-    getAirTempData = () => {
+const AirTemp = ({isMotionOn}) => {
+    
+   const [temp, setTemp] = useState(null);
+   const getAirTempData = () => {
         console.log(`getAir ->`);
         let data;
         const returnJSON = (response) => response.json();
@@ -37,44 +31,31 @@ class AirTemp extends React.Component {
         fetch(proxyurl + airTempuri)
             .then(response => validate(response))
             .then(data => {
-                this.setState({
-                    temp: Number(data.data[data.data.length - 1].v).toFixed(0)
-                })
+                setTemp(Number(data.data[data.data.length - 1].v).toFixed(0));
             })
             .catch(err => console.log(`Something went wrong!\nuri: ${airTempuri} \npath: ${window.location.pathname}\n`, err));
     }
-    getInterval = () => 300000;
-    componentDidMount() {
-        this.getAirTempData()
-        //this.timerID = setInterval(() => this.getAirTempData(), this.getInterval());
-    }
-    componentWillUnmount() {
-        clearInterval(this.timerID);
-    }
-
-    //previousAirTemp = () => (localStorage.getItem("airTemp")) ? Number(localStorage.getItem("airTemp")) : 0;
-    //notEqual = () => (this.previousAirTemp() !== this.state.temp) ? true : false;
-    //greaterThan = () => (this.previousAirTemp() > this.state.temp) ? true : false;
-    //getAirTempDirection = () => (this.notEqual() && this.greaterThan()) ? <img className='mb--2' src={arrowDown} /> : <img className='mb--2' src={arrowUp} />;
-    //setLocalAirTemp = () => localStorage.setItem("airTemp", this.state.temp);
-    //setLocalAirTempDirection = () => localStorage.setItem("airTempDirection", this.state.airTempDirection);
-
-    getCurrentTemp = () => <div className="r-10 m-5 p-10 bg-lite white">
-                                {this.state.temp}° 
+    useEffect(() => {     	
+        getAirTempData()
+        /*	
+        const timerID = setInterval(
+            () => getAirTempData(),
+            300000
+        );
+        return function cleanUp () {
+            clearInterval(timerID);
+        }
+        */
+    },[]);
+    const getCurrentTemp = () => <div className="r-10 m-5 p-10 bg-lite white">
+                                {temp}° 
                                 <span className="greet">F </span>
-{/*(this.previousAirTemp() !== Number(this.state.temp)) ? this.state.airTempDirection : this.getAirTempDirection()*/}
                             </div>;
-    percent = 'twentyfivePercent mt--70 mb--70';
-    loading = () => <div className={this.percent}>
-                <Loader isMotionOn={this.props.isMotionOn}/>
+    const percent = 'twentyfivePercent mt--70 mb--70';
+    const loading = () => <div className={percent}>
+                <Loader isMotionOn={isMotionOn}/>
             </div>;
-    render() {
-        //console.log(`previous air temp: ${this.previousAirTemp()} air temp: ${this.state.temp}`)
-        //this.setLocalAirTemp();
-        //this.setLocalAirTempDirection();
-        
-        return this.getCurrentTemp()
-    };
+    return getCurrentTemp();
 }
 
 export default AirTemp;

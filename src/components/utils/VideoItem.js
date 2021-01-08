@@ -1,15 +1,23 @@
 import React from 'react';
 
-const VideoItem = ({channel, thumb, title, published}) => {
+const VideoItem = ({videoObj, onVideoSelect}) => {
+
+    //console.log(`video: ${JSON.stringify(videoObj, null, 2)}`)
+
+    const title = videoObj.snippet.title;
+    const thumb = videoObj.snippet.thumbnails.default.url;
+    const channel = videoObj.snippet.channelTitle;
+    const publishDate = videoObj.snippet.publishedAt.substring(0,10);
+
     return (
-        <div className='flexContainer button p-10 m-1 r-10 bg-lite color-yellow'>
-            <div className="flex2Column">
+        <div className='flexContainer button p-10 lowerBorder pointer color-yellow' onClick={() => onVideoSelect(videoObj)}>
+            <div className="flex2Column columnRight">
                 <img alt={title} src={thumb} />
             </div>
             <div className="flex2Column columnLeft pl-10">
                 <div className='copyright bold'>{channel}</div>
                 <div className='small bold white'>{title}</div>
-                <div className='copyright'>{published.substring(0,10)}</div>
+                <div className='copyright'>{publishDate}</div>
             </div>
         </div>
     ) 

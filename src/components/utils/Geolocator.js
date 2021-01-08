@@ -1,33 +1,34 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import Loader from '../utils/Loader.js';
 
-class Geolocate extends React.Component {
-    constructor(props) {
-        super(props);
-        const { returnCurrentPosition, currentPositionExists } = props;
-        this.state = {
+const Geolocate = ({ isMotionOn, returnCurrentPosition, currentPositionExists }) => {
+
+    const [status, setStatus] = useState({
             longitude: null,
             latitude: null,
             errorMessage: null,
             returnCurrentPosition: returnCurrentPosition,
             currentPositionExists: currentPositionExists
-        }
-    }
-    getCurrentPosition = () => {
+        })
+
+    const getCurrentPosition = () => {
         window.navigator.geolocation.getCurrentPosition(
             //position => console.log(position.coords.longitude),
            position => {
                 const { longitude, latitude } = position.coords;
-                this.props.returnCurrentPosition(longitude, latitude);
+                returnCurrentPosition(longitude, latitude);
                 //console.log(`getCurrentPosition => coords ^^^^^^^^^^^ ${longitude}, ${latitude}`)
-                this.setState({
+                setStatus({
                     longitude: longitude,
                     latitude: latitude,
+                    errorMessage: null,
+                    returnCurrentPosition: returnCurrentPosition,
+                    currentPositionExists: currentPositionExists
                 });
                 /*
                 try {
-                    //if (!this.props.currentPositionExists()) {
-                        this.props.returnCurrentPosition(position.coords.longitude, position.coords.latitude);
+                    //if (!currentPositionExists()) {
+                        returnCurrentPosition(position.coords.longitude, position.coords.latitude);
                     //}
                 }catch(err) {
                 }
@@ -35,47 +36,49 @@ class Geolocate extends React.Component {
             },
             err => {
                 console.log(err)
-                this.setState({
-                    errorMessage: err.message
+                setStatus({
+                    longitude: status.longitude,
+                    latitude: status.latitude,
+                    errorMessage: err.message,
+                    returnCurrentPosition: returnCurrentPosition,
+                    currentPositionExists: currentPositionExists
                 });
 
             }
         )
     }
-    componentDidMount() {
-        this.timerID = setInterval(
-            () => this.tick(),
+    const tick = () => {
+        getCurrentPosition();
+    }
+    useEffect(() => {     		
+        const timerID = setInterval(
+            () => tick(),
             5000
         );
-    }
-    tick() {
-        this.getCurrentPosition();
-    }
-    componentWillUnmount() {
-        clearInterval(this.timerID);
-    }
-    getLocation = () => `${this.state.latitude.toFixed(6)}, ${this.state.longitude.toFixed(6)} `;
-    percent = (window.innerWidth < 700) ? 'twentyfivePercent mt--70 mb--70' : 'fiftyPercent mt--40 mb--40';
-    loading = () => <div className={this.percent}>
-                <Loader isMotionOn={this.props.isMotionOn}/>
-            </div>;
-    latlon = () => this.state.latitude + "," + this.state.longitude;
-    render() {
-        const { latitude, errorMessage } = this.state;
-        const errorExists = (errorMessage) ? true : false;
-        const latExists = (latitude) ? true : false;
-        const errMessage = errorMessage;
-        let gelocationStatus = (latExists) ? this.getLocation() : this.loading();
-        gelocationStatus = (errorExists) ? `${errMessage}` : gelocationStatus;
-        /*
-        if (latExists) {
-            if (!this.props.currentPositionExists()) {
-                this.props.returnCurrentPosition(this.state.longitude, this.state.latitude);
-            }
+        return function cleanUp () {
+            clearInterval(timerID);
         }
-        */
-        return <div className="color-yellow greet">{gelocationStatus}</div>
-    };
+    },[]);
+    const getLocation = () => `${status.latitude.toFixed(6)}, ${status.longitude.toFixed(6)} `;
+    const percent = (window.innerWidth < 700) ? 'twentyfivePercent mt--70 mb--70' : 'fiftyPercent mt--40 mb--40';
+    const loading = () => <div className={percent}>
+                <Loader isMotionOn={isMotionOn}/>
+            </div>;
+    const latlon = () => status.latitude + "," + status.longitude;
+    const { latitude, errorMessage } = status;
+    const errorExists = (errorMessage) ? true : false;
+    const latExists = (latitude) ? true : false;
+    const errMessage = errorMessage;
+    let geolocationStatus = (latExists) ? getLocation() : loading();
+    geolocationStatus = (errorExists) ? `${errMessage}` : geolocationStatus;
+    /*
+    if (latExists) {
+        if (!currentPositionExists()) {
+            returnCurrentPosition(status.longitude, status.latitude);
+        }
+    }
+    */
+    return <div className="color-yellow greet">{geolocationStatus}</div>
 }
 
 export default Geolocate;

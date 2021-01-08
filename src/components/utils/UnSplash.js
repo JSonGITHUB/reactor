@@ -1,9 +1,11 @@
 import axios from "axios";
+import { unsplashAPI_KEY, unsplashAPI_BASE_URL } from '../../apis/config';
 
-const KEY = 'Client-ID LV6VY88M75l5IvWUJp5aKDIBpB1bI97YIr8PW3h_bas'
+
+const KEY = unsplashAPI_KEY;
 
 export default axios.create({
-  baseURL: "https://api.unsplash.com/search/photos",
+  baseURL: unsplashAPI_BASE_URL,
   params: {
       key: KEY
   }
