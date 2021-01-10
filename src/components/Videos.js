@@ -3,12 +3,12 @@ import SearchBar from './utils/SearchBar';
 import YouTube from './utils/YouTube';
 import VideoList from './utils/VideoList';
 import VideoDetail from './utils/VideoDetail';
-import { youtubeAPI_KEY, youtubeAPI_BASE_URL } from '../apis/config';
+import config from '../apis/config';
 
 const Videos = () => {
 
-  const KEY = youtubeAPI_KEY;
-  const api = youtubeAPI_BASE_URL;
+  const KEY = config.youtubeAPI_KEY;
+  const api = config.youtubeAPI_BASE_URL;
   const [videos, setVideos] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(null); 
 
