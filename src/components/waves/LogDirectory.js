@@ -51,18 +51,18 @@ const LogDirectory = ({ title, message }) => {
                         }
                     }}
                 >
-                    <div key={getKey("log")} className="flexContainer button color-graphite pointer greet m-1 r-5 incompletedSelector bg-yellow myButton" onClick={() => sessionClick(item, spot)}>
-                            <div className="flexOneFourthColumn p-10">
+                    <div key={getKey("log")} className="flexContainer greet m-1 incompletedSelector myButton" onClick={() => sessionClick(item, spot)}>
+                            <div className="flexOneFourthColumn pl-10">
                                 {/*<img src={condition(item)} alt={item} className='shaka' />*/}
                                 <img src={condition} alt={conditionDescription} className='shaka' />
+                                <div className='greet'>{height}</div>
                             </div>
-                            <div className="flexThreeFourthColumnLeft pt-10 pb-10">
+                            <div className="flexThreeFourthColumnLeft p-10">
                                 {month + " " + day + suffix[Number(String(day).slice(-1))] + " " + year + ": "}
-                                <br/><span className='size20 color-graphite'>{spot}</span>
-                                <br/><span className='color-graphite'>{height}</span>
-                                <span className='color-graphite ml-5'>{direction}</span>
-                                <span className='color-graphite ml-5'>{angle}</span>
-                                <span className='color-graphite ml-5'>{interval}</span>
+                                <div>{spot}</div>
+                                <span className='description'>{direction}</span>
+                                <span className='ml-5 description'>{angle}°</span>
+                                <span className='ml-5 description'>{interval.replace(' seconds', 'sec')}</span>
                             </div>
                                 {
                                     //item.substring(3, 6) + ", " + 
