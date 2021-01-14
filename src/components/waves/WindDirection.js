@@ -1,19 +1,25 @@
-import React from 'react';
-import Loader from '../utils/Loader.js';
+import React, { useState, useEffect } from 'react';
+import N from '../../assets/images/windN.png';
+import NE from '../../assets/images/windNE.png';
+import E from '../../assets/images/windE.png';
+import SE from '../../assets/images/windSE.png';
+import S from '../../assets/images/windS.png';
+import SW from '../../assets/images/windSW.png';
+import W from '../../assets/images/windW.png';
+import NW from '../../assets/images/windNW.png';
 
-class WindDirection extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            direction: null,
-            columns: props.columns,
-            station: null,
-            speed: null,
-            angle: null,
-            gusts: null
-        }
-    }
-    getWindData = () => {
+const WindDirection = ({columns, setWind}) => {
+    
+    const [status, setStatus] = useState({
+        columns: columns,
+        station: null,
+        speed: null,
+        angle: null,
+        direction: null,
+        gusts: null
+    });
+            
+    const getWindData = () => {
         console.log(`getWind ->`);
         let data;
         const returnJSON = (response) => response.json();
@@ -36,21 +42,23 @@ class WindDirection extends React.Component {
         console.log(`Wind   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
         const uriWind = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getStartTime}&end_date=${getEndTime}&station=9410230&product=wind&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
         const uriWindTest = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=20200520%2020:00&end_date=20200520%2020:00&station=9410230&product=wind&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
-        const uri = uriWind;
+        const tri = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=latest&station=9410230&product=wind&time_zone=lst&units=english&format=json'
+        const uri = tri;
         const proxyurl = "https://cors-anywhere.herokuapp.com/";
         //const waterTempuri = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime}&end_date=${getCurrentTime}&station=9410230&product=water_temperature&datum=mllw&units=english&time_zone=gmt&application=web_services&format=json`;
         fetch(proxyurl + uri)
             .then(response => validate(response))
             .then(data => {
                 console.log(`WindDirection => direction: ${JSON.stringify(data.data[data.data.length - 1],null,2)}`)
-                this.props.setWind(data.data[data.data.length - 1].dr, data.data[data.data.length - 1].d, data.data[data.data.length - 1].s, data.data[data.data.length - 1].g)
-                this.setState({
+                setWind(data.data[data.data.length - 1].dr, data.data[data.data.length - 1].d, data.data[data.data.length - 1].s, data.data[data.data.length - 1].g)
+                setStatus(prevState => ({
+                    ...prevState,
                     station: data.metadata.name,
                     speed: data.data[data.data.length - 1].s,
                     angle: data.data[data.data.length - 1].d,
                     direction: data.data[data.data.length - 1].dr,
                     gusts: data.data[data.data.length - 1].g
-                })
+                }))
             })
             .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
 
@@ -75,32 +83,56 @@ class WindDirection extends React.Component {
         ]
     }
     */
-    getInterval = () => 300000;
-    componentDidMount() {
-        this.getWindData()
-        this.timerID = setInterval(() => this.getWindData(), this.getInterval());
-    }
-    componentWillUnmount() {
-        clearInterval(this.timerID);
-    }
+
+    useEffect(() => {   
+        getWindData();  
+        /*		
+        const timerID = setInterval(
+            () => getWindData(),
+            300000
+        );
+        return function cleanUp () {
+            clearInterval(timerID);
+        }
+        */
+    },[]);
+
     /*
     Water Level: 2.01 ft Above MLLW
     Next Tide at 3:09 PM: Low 1.70 ft
     Gusting to: 12.3 kts from WSW
     */
-    getCurrentWind = () => {
-        const { columns } = this.props;
-        const { direction, angle, speed, gusts } = this.state;
+    const getWindIcon = () => {
+        const windDirection = status.direction;
+        const classes = "shaka r-20 p-2 bg-white";
+        if (windDirection === "N") {
+            return <img src={N} className={classes} alt={windDirection} />;
+        } else if ((windDirection === "NE") || (windDirection === "NNE") || (windDirection === "ENE")) {
+            return <img src={NE} className={classes} alt={windDirection} />;
+        } else if (windDirection === "E") {
+            return <img src={E} className={classes} alt={windDirection} />;
+        } else if ((windDirection === "SE") || (windDirection === "SSE") || (windDirection === "ESE")) {
+            return <img src={SE} className={classes} alt={windDirection} />;
+        } else if (windDirection === "S") {
+            return <img src={S} className={classes} alt={windDirection} />;
+        } else if ((windDirection === "SW") || (windDirection === "SSW") || (windDirection === "WSW")) {
+            return <img src={SW} className={classes} alt={windDirection} />;
+        } else if (windDirection === "W") {
+            return <img src={W} className={classes} alt={windDirection} />;
+        } else if ((windDirection === "NW") || (windDirection === "NNW") || (windDirection === "WNW")) {
+            return <img src={NW} className={classes} alt={windDirection} />;
+        }
+    }
+    const getCurrentWind = () => {
         return (
-            <div className={(columns > 1) ? "flexContainer": ""}>
-                <div className={(columns > 1) ? "flex3Column": ""}>{`${direction} ${Number(angle).toFixed(0)}°`}</div>
-                <div className={(columns > 1) ? "flex3Column": ""}>{`${Number(speed).toFixed(0)}-${Number(gusts).toFixed(0)}`} <span className="greet">knots</span></div>
+            <div className="r-10 m-5 p-10 bg-lite white">
+                <div>{getWindIcon()}</div>
+                <div>{`${status.direction} ${Number(status.angle).toFixed(0)}°`}</div>
+                <div>{`${Number(status.speed).toFixed(0)}-${Number(status.gusts).toFixed(0)}`} <span className="greet">knots</span></div>
             </div>
         )
     }
-    render() {
-        return <div>{this.getCurrentWind()}</div>
-    };
+    return <div>{getCurrentWind()}</div>
 }
 
 export default WindDirection;

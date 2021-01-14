@@ -1,14 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Loader from '../utils/Loader.js';
 
-class AirTemp extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            temp: null,
-        }
-    }
-    getAirTempData = () => {
+const AirTemp = ({isMotionOn}) => {
+    
+   const [temp, setTemp] = useState(null);
+   const getAirTempData = () => {
         console.log(`getAir ->`);
         let data;
         const returnJSON = (response) => response.json();
@@ -35,28 +31,31 @@ class AirTemp extends React.Component {
         fetch(proxyurl + airTempuri)
             .then(response => validate(response))
             .then(data => {
-                this.setState({
-                    temp: Number(data.data[data.data.length - 1].v).toFixed(0)
-                })
+                setTemp(Number(data.data[data.data.length - 1].v).toFixed(0));
             })
             .catch(err => console.log(`Something went wrong!\nuri: ${airTempuri} \npath: ${window.location.pathname}\n`, err));
     }
-    getInterval = () => 300000;
-    componentDidMount() {
-        this.getAirTempData()
-        this.timerID = setInterval(() => this.getAirTempData(), this.getInterval());
-    }
-    componentWillUnmount() {
-        clearInterval(this.timerID);
-    }
-    getCurrentTemp = () => <div>{this.state.temp}° <span className="greet">F</span></div>;
-    percent = 'twentyfivePercent mt--70 mb--70';
-    loading = () => <div className={this.percent}>
-                <Loader isMotionOn={this.props.isMotionOn}/>
+    useEffect(() => {     	
+        getAirTempData()
+        /*	
+        const timerID = setInterval(
+            () => getAirTempData(),
+            300000
+        );
+        return function cleanUp () {
+            clearInterval(timerID);
+        }
+        */
+    },[]);
+    const getCurrentTemp = () => <div className="r-10 m-5 p-10 bg-lite white">
+                                {temp}° 
+                                <span className="greet">F </span>
+                            </div>;
+    const percent = 'twentyfivePercent mt--70 mb--70';
+    const loading = () => <div className={percent}>
+                <Loader isMotionOn={isMotionOn}/>
             </div>;
-    render() {
-        return this.getCurrentTemp()
-    };
+    return getCurrentTemp();
 }
 
 export default AirTemp;
