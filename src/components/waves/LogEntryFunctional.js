@@ -8,7 +8,7 @@ import {BrowserRouter as Link, Route} from 'react-router-dom';
 import selector from './Selector.js';
 import group from './Group.js';
 import templateData from './TemplateData.js';
-import generateNewLogId from './GenerateLogId.js'
+import generateNewLogId from './GenerateLogId.js';
 
 const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, items }) => {
 
