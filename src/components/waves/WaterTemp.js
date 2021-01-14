@@ -1,14 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Loader from '../utils/Loader.js';
 
-class WaterTemp extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            temp: null,
-        }
-    }
-    getWaterTempData = () => {
+const WaterTemp = ({isMotionOn}) => {
+    
+    const [temp, setTemp] = useState(null);
+    const getWaterTempData = () => {
         console.log(`getWaterTemp ->`);
         let data;
         const returnJSON = (response) => response.json();
@@ -35,13 +31,11 @@ class WaterTemp extends React.Component {
         fetch(proxyurl + waterTempuri)
             .then(response => validate(response))
             .then(data => {
-                this.setState({
-                    temp: Number(data.data[data.data.length - 1].v).toFixed(0)
-                })
+                setTemp(Number(data.data[data.data.length - 1].v).toFixed(0))
             })
             .catch(err => console.log(`Something went wrong!\nuri: ${waterTempuri} \npath: ${window.location.pathname}\n`, err));
     }
-    getLocalWaterTempData = () => {
+    const getLocalWaterTempData = () => {
         console.log(`getLocalWaterTemp ->`);
         let data;
         const returnJSON = (response) => response.json();
@@ -67,31 +61,26 @@ class WaterTemp extends React.Component {
             .then(response => validate(response))
             .then(data => {
                 console.log(`LocalWaterTemp: ${JSON.stringify(data, 2, null)}`)
-                this.setState({
-                    temp: Number(data.data[data.data.length - 1].v).toFixed(0)
-                })
+                setTemp(Number(data.data[data.data.length - 1].v).toFixed(0))
             })
             .catch(err => console.log(`Something went wrong!\nuri: ${localWaterTempURI} \npath: ${window.location.pathname}\n`, err));
     }
-    getInterval = () => 300000;
-    componentDidMount() {
-        this.getWaterTempData();
-        //this.getLocalWaterTempData();
-        this.timerID = setInterval(() => this.getWaterTempData(), this.getInterval());
-    }
-    componentWillUnmount() {
-        clearInterval(this.timerID);
-    }
-    getCurrentTemp = () => <div>{this.state.temp}° <span className="greet">F</span></div>;
-    percent = 'twentyfivePercent mt--70 mb--70';
-    loading = () => <div className={this.percent}>
-                <Loader isMotionOn={this.props.isMotionOn}/>
+    
+    useEffect(() => {   
+        getWaterTempData();		
+    },[]);
+    const getCurrentTemp = () => <div>
+                            {temp}° 
+                            <span className="greet"> F</span>
+                        </div>;
+    const percent = 'twentyfivePercent mt--70 mb--70';
+    const loading = () => <div className={percent}>
+                <Loader isMotionOn={isMotionOn}/>
             </div>;
-    render() {
-        return <div>
-                <div>{this.getCurrentTemp()}</div>
-            </div>
-    };
+
+    return <div className="r-10 m-5 p-10 bg-lite white">
+            <div>{getCurrentTemp()}</div>
+        </div>
 }
 
 export default WaterTemp;

@@ -1,52 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-class FormEssay extends React.Component {
+const FormEssay = () => {
 
-    constructor(props) {
+    const [ value, setValue ] = useState(localStorage.getItem("notes") || null)
 
-        super(props);
-        this.state = {
-            value: (localStorage.getItem("notes")) ? localStorage.getItem("notes") : null
-        };
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+    const handleChange = (event) => setValue(event.target.value);
 
-    }
-
-    handleChange(event) {
-        this.setState({value: event.target.value});
-    }
-
-    handleSubmit(event) {
-        //alert('Note was submitted: ' + this.state.value);
-        localStorage.setItem("notes", this.state.value);
+    const handleSubmit = (event) => {
+        //alert('Note was submitted: ' + value);
+        localStorage.setItem("notes", value);
         event.preventDefault();
     }
-    clear(event) {
-        //alert('Note was cleared: ' + this.state.value);
+    const clear = (event) => {
+        //alert('Note was cleared: ' + value);
         localStorage.setItem("notes", "");
-        this.setState({value: ""});
+        setValue("");
     }
-
-    render() {
-        return (
-            <div className="App-content flexContainer width-100-percent fadeIn">
-                <div className="flex3Column" />
-                <div className="flex3Column" >
-                    <form onSubmit={this.handleSubmit} className="neumorphism p-20">
-                        <label>
-                            <textarea rows="13" cols={window.innerWidth/15} className="mb-30" value={this.state.value} onChange={this.handleChange} />
-                        </label><br/>
-                        <div className="flexContainer">
-                            <input type="submit" value="Submit" className="flex2Column greet p-20 r-10 width-100-percent bg-green brdr-green"/>
-                            <div value="Submit" className="flex2Column button greet p-20 r-10 width-100-percent bg-red brdr-red" onClick={() => this.clear()}>clear</div>
-                        </div>
-                    </form>
-                </div>
-                <div className="flex3Column" />
+    return (
+        <div className="App-content flexContainer width-100-percent fadeIn">
+            <div className="flex3Column" />
+            <div className="flex3Column" >
+                <form onSubmit={handleSubmit} className="neumorphism p-20">
+                    <label>
+                        <textarea rows="13" cols={window.innerWidth/15} className="mb-30" value={value} onChange={handleChange} />
+                    </label><br/>
+                    <div className="flexContainer">
+                        <input type="submit" value="Submit" className="flex2Column greet p-20 r-10 width-100-percent bg-green brdr-green"/>
+                        <div value="Submit" className="flex2Column button greet p-20 r-10 width-100-percent bg-red brdr-red" onClick={() => clear()}>clear</div>
+                    </div>
+                </form>
             </div>
-        );
-    }
+            <div className="flex3Column" />
+        </div>
+    );
 }
 
 export default FormEssay;

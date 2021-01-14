@@ -1,85 +1,51 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-class FormLogin extends React.Component {
+const FormLogin = ({isLoggedIn, user, handleClick}) => {
 
-    constructor(props) {
-        super(props);
-        this.state = {user: props.user};
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleLoginClick = this.handleLoginClick.bind(this);
-        this.handleLogoutClick = this.handleLogoutClick.bind(this);
-        //this.state = {isLoggedIn: false};
-    }
+    const [loggedIn, setLoggedIn] = useState(isLoggedIn);
+    const [value, setValue] = useState('');
 
-    handleChange(event) {
+    const handleChange = (event) => {
         //console.log("value: " + event.target.value)
-        this.setState({value: event.target.value});
-        this.setState({isLoggedIn: true});
+        setValue(event.target.value);
+        //setLoggedIn(true);
     }
 
-    handleSubmit(event) {
-        event.preventDefault();
+    const handleSubmit = (event) => event.preventDefault();
+
+    const handleLoginClick = () => {
+        setLoggedIn(true);
+        handleClick(true, value);
     }
 
-    handleLoginClick() {
-        this.setState({isLoggedIn: true});
-        this.props.handleClick(true, this.state.value);
+    const handleLogoutClick = () => {
+        setValue("")
+        setLoggedIn(false);
+        handleClick(false, "");
     }
-
-    handleLogoutClick() {
-        this.setState({value: "", isLoggedIn: false});
-        this.props.handleClick(false, "");
-    }
-
-    render() {
-
-        const isLoggedIn = this.props.isLoggedIn;
-        let button;
-
-        if (isLoggedIn) {
-            button = <LogoutButton type="submit" value={this.state.value} handleChange={this.handleChange} className="greet p-20 r-10 w-200 bg-green brdr-green ml-2" onClick={this.handleLogoutClick} />;
-        } else {
-            button = <LoginButton type="submit" value={this.state.value} handleChange={this.handleChange} className="greet p-20 r-10 w-200 bg-green brdr-green ml-2" onClick={this.handleLoginClick} />;
-        }
-
-        return (
-            /*
-            <div className='width-100-percent mt-20'>
-                <Greeting isLoggedIn={isLoggedIn} /><br/><br/>
-                {button}
+    const LoginButton = () => <div>
+                <input type="text" value={value} onChange={(e) => setValue(e.target.value)}/>
+                <button className="button-green" onClick={handleLoginClick}>
+                    Login
+                </button>
             </div>
-            */
-            <form onSubmit={this.handleSubmit}>
-                {/*<span>{this.state.value}</span>*/}
-                {/*<input type="text" value={this.state.value} onChange={this.handleChange}/>*/}
-                {/*<button type="submit" value="Sign in" className="ml-2" onClick={this.handleLoginClick}>Sign in</button>*/}
-                {button}
-            </form>            
-        );
+    
+    const LogoutButton = () => <button  className="button-green" onClick={handleLogoutClick}>
+                                    Logout
+                                </button>
+    let button;
+
+    if (loggedIn) {
+        button = <LogoutButton type="submit" value={value} className="greet p-20 r-10 w-200 bg-green brdr-green ml-2" />;
+    } else {
+        button = <LoginButton type="submit" value={value} className="greet p-20 r-10 w-200 bg-green brdr-green ml-2" />;
     }
+
+    return (
+        <form onSubmit={handleSubmit}>
+            {button}
+        </form>            
+    );
 }
 
 export default FormLogin;
-
-
-function LoginButton(props) {
-    const { value, handleChange, onClick } = props;
-    return (
-        <div>
-            <input type="text" value={value} onChange={handleChange}/>
-            <button className="button-green" onClick={onClick}>
-                Login
-            </button>
-        </div>
-        
-    );
-}
-
-function LogoutButton(props) {
-    return (
-        <button  className="button-green" onClick={props.onClick}>
-            Logout
-        </button>
-    );
-}

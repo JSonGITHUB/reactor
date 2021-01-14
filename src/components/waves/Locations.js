@@ -366,5 +366,13 @@ export default function getLocations() {
         "swell": ["SW"],
         "wind": ["E", "NE"],
         "tide": ["high", "medium"]
+    },
+    {
+        "name": "Balangan",
+        "latitude": -8.793402,
+        "longitude": 115.122438,
+        "swell": ["S","SW", "W"],
+        "wind": ["SE"],
+        "tide": ["low", "medium"]
     }]
 }
