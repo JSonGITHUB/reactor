@@ -75,6 +75,8 @@ const Tide = ({setTide, display, isMotionOn}) => {
         const getTideTime = (tide) => `${getTideHour(tide)}:${getTideMinutes(tide)}`;
         const getTideHeight = (tide) => Number(tide.v);
         //const waterTempuri = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime().currentTime}&end_date=${getCurrentTime().currentTime}&station=9410230&product=water_temperature&datum=mllw&units=english&time_zone=gmt&application=web_services&format=json`;
+        //const waterTempuri = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime}&end_date=${getCurrentTime}&station=9410230&product=water_temperature&datum=mllw&units=english&time_zone=gmt&application=web_services&format=json`;
+        const proxyurl = "https://cors-anywhere.herokuapp.com/";
         fetch(proxyurl + uri)
             .then(response => validate(response))
             .then(data => {
