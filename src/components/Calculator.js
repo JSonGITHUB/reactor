@@ -25,11 +25,15 @@ const Calculator = () => {
                 <TemperatureInput
                     scale="c"
                     temperature={celsius}
-                    onTemperatureChange={handleCelsiusChange} id="celsius"/>
+                    onTemperatureChange={handleCelsiusChange} 
+                    id="celsius"
+                />
                 <TemperatureInput
                     scale="f"
                     temperature={fahrenheit}
-                    onTemperatureChange={handleFahrenheitChange} id="fahrenheit"/>
+                    onTemperatureChange={handleFahrenheitChange}
+                    id="fahrenheit"
+                />
                 <BoilingVerdict celsius={parseFloat(celsius)} />
             </div>
         </div>
