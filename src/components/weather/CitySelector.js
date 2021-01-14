@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import getKey from '../utils/KeyGenerator.js';
-import { openweatherAPI_KEY, openweatherAPI_BASE_URL } from '../../apis/config';
+import config from '../../apis/config';
 import getDirectionIcon from './GetDirectionIcon.js';
 import getDirection from './GetDirection.js';
 import weekday from './Weekday.js';
@@ -11,8 +11,8 @@ const CitySelector = () => {
     //api.openweathermap.org/data/2.5/forecast?q=London,us&appid={APIKEY}&units=metric
     //Image Source
     //http://openweathermap.org/img/wn/10d@2x.png
-    const key = openweatherAPI_KEY;
-    const baseUrl = openweatherAPI_BASE_URL;
+    const key = config.openweatherAPI_KEY;
+    const baseUrl = config.openweatherAPI_BASE_URL;
 
     const [city, setCity] = useState('Carlsbad, CA');
     const [results, setResults] = useState('');

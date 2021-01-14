@@ -1,11 +1,11 @@
 import axios from "axios";
-import { unsplashAPI_KEY, unsplashAPI_BASE_URL } from '../../apis/config';
+import config from '../../apis/config';
 
 
-const KEY = unsplashAPI_KEY;
+const KEY = config.unsplashAPI_KEY;
 
 export default axios.create({
-  baseURL: unsplashAPI_BASE_URL,
+  baseURL: config.unsplashAPI_BASE_URL,
   params: {
       key: KEY
   }
