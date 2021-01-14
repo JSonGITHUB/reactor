@@ -1,14 +1,14 @@
 import React, {useState} from 'react';
 import SearchBar from './utils/SearchBar';
 import UnSplash from './utils/UnSplash';
-import { unsplashAPI_KEY, unsplashAPI_BASE_URL } from '../apis/config';
+import config from '../apis/config';
 
 const Photos = () => {
 
     const [photos, setPhotos] = useState([]);
-    const KEY = unsplashAPI_KEY;
-    const api = unsplashAPI_BASE_URL;
-
+    const KEY = 'Client-ID '+config.unsplashAPI_KEY;
+    const api = config.unsplashAPI_BASE_URL;
+    console.log(`KEY: ${KEY}\napi: ${api}`)
     const onSearchSubmit = async (term, callback) => {
         const response = await UnSplash.get(api, {
                 params: {query: term},
@@ -18,6 +18,7 @@ const Photos = () => {
             })
             .then (response => {
                 const images = [];
+                console.log(`response.data.results: ${response.data.results}`)
                 response.data.results.map((item, index) => {
                     images.push({
                         'image': item.urls.thumb,
