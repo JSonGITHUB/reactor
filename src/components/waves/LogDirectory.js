@@ -25,23 +25,25 @@ const LogDirectory = ({ title, message }) => {
         const itemObj = JSON.parse(localStorage.getItem(item));
         
         if (itemObj !== null) {
-            console.log(`ITEM: ${item} ====> ${JSON.stringify(itemObj, null, 2)}`)
-            const conditionsIndex = conditions.indexOf(itemObj.Conditions.Conditions);
-            const spot = itemObj.Location.Break;
-            const day = itemObj.Day.Day;
-            const month = months[itemObj.Day.Month-1];
-            const year = itemObj.Day.Year;
-            const conditionDescription = itemObj.Conditions.Conditions;
-            const conditionHeight = itemObj.Surf.Height;
-            const height = itemObj.Swell1.Height;
-            const direction = itemObj.Swell1.Direction;            
-            const angle = itemObj.Swell1.Angle;
-            const interval = itemObj.Swell1.Interval;
+            
+            //console.log(`ITEM: ${item} ====> ${JSON.stringify(itemObj, null, 2)}`)
+            const { Conditions, Location, Day, Surf, Swell1 } = itemObj;
+            const conditionsIndex = conditions.indexOf(Conditions.Conditions);
+            const spot = Location.Break;
+            const day = Day.Day;
+            const month = months[Day.Month-1];
+            const year = Day.Year;
+            const conditionDescription = Conditions.Conditions;
+            const conditionHeight = Surf.Height;
+            const height = Swell1.Height;
+            const direction = Swell1.Direction;            
+            const angle = Swell1.Angle;
+            const interval = Swell1.Interval.replace('seconds', 'sec');
             const condition = icons[conditionsIndex];
 
             return (
                 <Link 
-                    className="noUnderline" 
+                    className="noUnderline mobileFull m-1" 
                     key={getKey("link")} 
                     to={{
                         pathname: '/SurfLog', 
@@ -51,18 +53,21 @@ const LogDirectory = ({ title, message }) => {
                         }
                     }}
                 >
-                    <div key={getKey("log")} className="flexContainer greet m-1 incompletedSelector myButton" onClick={() => sessionClick(item, spot)}>
-                            <div className="flexOneFourthColumn pl-10">
+                    <div key={getKey("log")} className="flexContainer incompletedSelector myButton pt-10 pb-10 pr-20" onClick={() => sessionClick(item, spot)}>
+                            <div className="flexOneFourthColumn p-10">
                                 {/*<img src={condition(item)} alt={item} className='shaka' />*/}
                                 <img src={condition} alt={conditionDescription} className='shaka' />
-                                <div className='greet'>{height}</div>
+                                <br/>{height}
                             </div>
                             <div className="flexThreeFourthColumnLeft p-10">
                                 {month + " " + day + suffix[Number(String(day).slice(-1))] + " " + year + ": "}
-                                <div>{spot}</div>
-                                <span className='description'>{direction}</span>
-                                <span className='ml-5 description'>{angle}°</span>
-                                <span className='ml-5 description'>{interval.replace(' seconds', 'sec')}</span>
+                                <div className='size20 color-graphite pt-5'>{spot}</div>
+                                <div className='color-graphite'>
+                                    <span>{height}</span>
+                                    <span className='ml-5'>{direction}</span>
+                                    <span className='ml-5'>{angle}</span>
+                                    <span className='ml-5'>{interval}</span>
+                                </div>
                             </div>
                                 {
                                     //item.substring(3, 6) + ", " + 
@@ -80,11 +85,10 @@ const LogDirectory = ({ title, message }) => {
     //console.log(`postssssss=>${JSON.stringify(posts.getDirectory(),null,2)}`)
     return (
         <div className="App-content fadeIn">
-            <Dialog title="Log Directory" message="Review sessions">
-                <PostDirectory/>
-                {sessions()}
-                <div className="button p-20 r-5 m-20 bg-neogreen incompletedSelector color-black" onClick={logSession}>Add Session</div>
-            </Dialog>
+            <h1>Review Sessions</h1>
+            <PostDirectory/>
+            {sessions()}
+            <div className="button p-20 r-5 m-20 bg-neogreen incompletedSelector color-black" onClick={logSession}>Add Session</div>
         </div>
     );
 }

@@ -416,6 +416,11 @@ select {
   border-style: outset;
   border-color: #ff0000;
 }
+.brdr-blue {
+  border: 1px;
+  border-style: outset;
+  border-color: #04d8fd;
+}
 .brdr-light {
   border: 1px;
   border-style: outset;
@@ -1064,7 +1069,17 @@ input.error {
   .shakingShaka { animation: shakingShaka-rotate infinite .15s linear }
   .shakaStopa { animation: shakingShaka-rotate infinite 0s linear }
 }
+@media only screen and (min-width: 701px) {
+  .mobileFull {
+    width: 50%;
+  }
+}
 @media only screen and (max-width: 700px) {
+  .mobileFull {
+    width: 100%;
+    margin-left: 20px;
+    margin-right: 20px;
+  }
   .responsive {
     flex-direction: column;
     justify-content: center;
