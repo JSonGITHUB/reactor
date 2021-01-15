@@ -1,6 +1,6 @@
 import React , { useState } from 'react';
 import Dialog from '../functional/Dialog.js';
-import getKey from '../utils/KeyGenerator.js';
+import getKey from '../../utils/KeyGenerator.js';
 import PostDirectory from './PostDirectory.js';
 import shakaBlack from '../../assets/images/shakaBlack.png';
 import thumbsUp from '../../assets/images/ThumbsUp.png';
