@@ -2,7 +2,7 @@ import React from 'react';
 import FormNotes from './components/forms/FormEssay.js';
 //import Reservation from './components/forms/FormReservation.js';
 //import SignUpDialog from './components/utils/SignUpDialog.js';
-import debounce from './components/utils/Debouncer.js';
+import debounce from './components/utils/DebouncerType.js';
 import Footer from './components/site/Footer.js';
 import Header from './components/site/Header.js';
 import Home from './components/Home.js';
