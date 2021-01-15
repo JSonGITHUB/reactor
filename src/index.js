@@ -4,7 +4,7 @@ import './assets/css/index.css';
 //import App from './AppNoRouter';
 import App from './App';
 
-import * as serviceWorker from './service-worker';
+import * as serviceWorker from '../service-worker';
 
 ReactDOM.render(
   <React.StrictMode>
