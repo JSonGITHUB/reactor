@@ -9,6 +9,7 @@ import selector from './Selector.js';
 import group from './Group.js';
 import templateData from './TemplateData.js';
 import generateNewLogId from './GenerateLogId.js';
+import directionObject from './DirectionObject.js';
 
 const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, items }) => {
 
@@ -20,7 +21,7 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, i
     const getLastPostId = () => (logIdExists()) ? logId : getLocalLastPostId();
     const localLogExists = () => (localStorage.getItem(logId) === null) ? false : true;
     const getLog = () => (localLogExists()) ? JSON.parse(localStorage.getItem(logId)) : templateData;
-
+    
     const [status, setStatus] = useState({
         logId: logId,
         lastPostId: getLastPostId(),
@@ -29,12 +30,16 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, i
         change: false,
         spot: localStorage.getItem('spot')
     });
-
+    //console.log(`LogEntry: ${JSON.stringify(status.log,null,2)}`)
     const handleSelection = (groupTitle, label, selected) => {
-        console.log(`handleSelection => \ngroupTitle: ${groupTitle}\nlabel: ${label}\nselected: ${selected}`)
+        //console.log(`handleSelection => log:\n${console.log(JSON.stringify(status.log,null,2))}`)
         if (typeof groupTitle === "string") {
             const currentLog = status.log;
             currentLog[groupTitle][label] = selected;
+            if (label === 'Direction' && (String(groupTitle).substr(0,5) === 'Swell')) {
+                currentLog[groupTitle]['Angle'] = directionObject[selected];
+            }
+            //console.log(`handleSelection => \ngroupTitle: ${groupTitle}\nlabel: ${label}\nselected: ${selected}\nswell1Angle: ${directionObject[selected]}\nlog:\n${console.log(JSON.stringify(currentLog,null,2))}`)
             setStatus(prevState => ({
                 ...prevState,
                 log: currentLog,
@@ -47,17 +52,17 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, i
         handleSelection("Comments", "notes", event.target.value);
     }
     const handleSubmit = (event) => {
-        console.log(`handleSubmit: ${JSON.stringify(status.log, null, 2)}`)
+        //console.log(`handleSubmit: ${JSON.stringify(status.log, null, 2)}`)
         const recordId = generateNewLogId();
-        console.log(`handleSubmit: recordId: ${recordId}`)
+        //console.log(`handleSubmit: recordId: ${recordId}`)
         let postDirectory = posts.getDirectory();
         let post = "";
         const logIt = () => {
             postDirectory.push(recordId);
             postDirectory = JSON.stringify(postDirectory);
-            console.log(`postDirectory: ${postDirectory}`)
+            //console.log(`postDirectory: ${postDirectory}`)
             post = JSON.stringify(status.log, null, 2);
-            console.log(`post: ${post}`)
+            //console.log(`post: ${post}`)
             localStorage.setItem(recordId, post);
             //localStorage.setItem("postDirectory", postDirectory);
             posts.add(recordId);
@@ -66,21 +71,21 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, i
         window.location.pathname = "/reactor/LogDirectory";
     }
     const handleSave = (event) => {
-        console.log(`handleSave: ${status.log}`)
+        //console.log(`handleSave: ${status.log}`)
         const recordId = logId;
         let post = "";
         const logIt = () => {
             post = JSON.stringify(status.log, null, 2);
-            console.log(`post: ${post}`)
+            //console.log(`post: ${post}`)
             localStorage.setItem(recordId, post);
         }
         logIt();
         window.location.pathname = "/reactor/LogDirectory";
     }
     const handleDelete = () => {
-        console.log(`handleDelete => `)
+        //console.log(`handleDelete => `)
         const recordId = logId;
-        console.log(`handleDelete => recordId: ${recordId}`)
+        //console.log(`handleDelete => recordId: ${recordId}`)
         posts.delete(recordId);
         window.location.pathname = "/reactor/LogDirectory";
     }
@@ -95,7 +100,7 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, i
     }
     const getItems = () => items;
     const selected = (item, groupTitle) => ((item.selections.indexOf(status.log[groupTitle][item.description])) !== -1) ? true : false;
-    const defaultSelection = (item, groupTitle) => (selected(item, groupTitle)) ? (item.selections.indexOf(status.log[groupTitle][item.description])) : 0; 
+    const defaultSelection = (item, groupTitle) => (selected(item, groupTitle)) ? (item.selections.indexOf(status.log[groupTitle][item.description])) : status.log[groupTitle][item.description]; 
     
     const radioItems = (item, groupTitle) => {
         return (
