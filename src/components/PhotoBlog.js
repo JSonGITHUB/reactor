@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import getKey from './utils/KeyGenerator.js';
+import getKey from '../utils/KeyGenerator.js';
 import blogImages from './BlogImages.js';
 
 const PhotoBlog = () => {
