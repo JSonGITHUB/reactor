@@ -1,11 +1,10 @@
-import React , { useState } from 'react';
-import Dialog from '../functional/Dialog.js';
+import React from 'react';
 import getKey from '../utils/KeyGenerator.js';
 import PostDirectory from './PostDirectory.js';
 import shakaBlack from '../../assets/images/shakaBlack.png';
 import thumbsUp from '../../assets/images/ThumbsUp.png';
 import thumbsDown from '../../assets/images/ThumbsDown.png';
-import {BrowserRouter as Router, Switch, Link, Route} from 'react-router-dom';
+import {BrowserRouter as Link} from 'react-router-dom';
 
 const LogDirectory = ({ title, message }) => {
     
