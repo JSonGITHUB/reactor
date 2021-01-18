@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import getKey from '../utils/KeyGenerator.js';
+import getKey from '../../utils/KeyGenerator.js';
 export default function Todos(props) {
     const getLocal = () => localStorage.getItem("todos") ? localStorage.getItem("todos") : [];
     const getLocalTodos = () => JSON.parse(getLocal());
