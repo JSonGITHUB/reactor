@@ -3,7 +3,7 @@ import Loader from '../utils/Loader.js';
 import TextColorizer from '../utils/TextColorizer.js';
 import menu from '../../assets/images/menuYellow.png';
 import close from '../../assets/images/menuClose.png';
-import getKey from '../utils/KeyGenerator.js';
+import getKey from '../../utils/KeyGenerator.js';
 import {BrowserRouter as Router, Switch, Link, Route} from 'react-router-dom';
 import navItems from './NavItems.js';
 import { navClassesClosed, navClassesOpen, navClassesClose } from './NavClasses.js';
