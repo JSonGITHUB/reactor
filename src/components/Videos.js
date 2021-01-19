@@ -3,7 +3,7 @@ import SearchBar from './utils/SearchBar';
 import YouTube from './utils/YouTube';
 import VideoList from './utils/VideoList';
 import VideoDetail from './utils/VideoDetail';
-import config from '../apis/config';
+import config from './apis/config';
 
 const Videos = () => {
 
