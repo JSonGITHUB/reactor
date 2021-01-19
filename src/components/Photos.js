@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import SearchBar from './utils/SearchBar';
 import UnSplash from './utils/UnSplash';
-import config from '../apis/config';
+import config from './apis/config';
 
 const Photos = () => {
 

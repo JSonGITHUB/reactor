@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import getKey from '../utils/KeyGenerator.js';
-import config from '../../apis/config';
+import config from '../apis/config';
 import getDirectionIcon from './GetDirectionIcon.js';
 import getDirection from './GetDirection.js';
 import weekday from './Weekday.js';
