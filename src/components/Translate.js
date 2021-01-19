@@ -13,23 +13,36 @@ const Translate = ({language, text}) => {
             clearTimeout(timerId);
         };
     },[text]);
-    
+
     useEffect(() => {
+        let isCancelled = false;
         const getTranslation = async () => {
-            const { data } = await axios.post(
-                'https://translation.googleapis.com/language/translate/v2', 
-                {}, 
-                {
-                    params: {
-                        q: debouncedText,
-                        target: language.value,
-                        key: 'AIzaSyCHUCmpR7cT_yDFHC98CZJy2LTms-IwDlM'
-                    },
+
+            try {
+                const { data } = await axios.post(
+                    'https://translation.googleapis.com/language/translate/v2', 
+                    {}, 
+                    {
+                        params: {
+                            q: debouncedText,
+                            target: language.value,
+                            key: 'AIzaSyCHUCmpR7cT_yDFHC98CZJy2LTms-IwDlM'
+                        },
+                    }
+                );
+                if (!isCancelled) {
+                    setTranslated(data.data.translations[0].translatedText);
                 }
-            );
-            setTranslated(data.data.translations[0].translatedText);
+            } catch (e) {
+                if (!isCancelled) {
+                    setTranslated({ error: e.message });
+                }
+            }
         };
         getTranslation();
+        return () => {
+          isCancelled = true;
+        };
     }, [language, debouncedText]);
     return (
         <div className='ui bg-dkGreen color-neogreen p-10 r-5 mt-5'>{translated}</div>
