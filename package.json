@@ -28,7 +28,7 @@
     "write": "^2.0.0",
     "yup": "^0.29.3"
   },
-  "homepage": "https://jsongithub.github.io/",
+  "homepage": "https://jsongithub.github.io/reactor/",
   "scripts": {
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
