@@ -18,7 +18,7 @@ const Translator = () => {
     const [language, setLanguage] = useState(options[0]);
     const [term, setTerm] = useState('');
 
-    console.log(`language: ${language.value}`)
+    //console.log(`language: ${language.value}`)
     return (
         <div className="m-20">
             <div className='directory sides-auto'>
