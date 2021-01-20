@@ -114,7 +114,7 @@ const CitySelector = () => {
                 </div>
             )
         })
-        console.log(`display: ${JSON.stringify(results, null, 2)}`)
+        //console.log(`display: ${JSON.stringify(results, null, 2)}`)
         setResults(list)
     }
 
