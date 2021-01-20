@@ -23,6 +23,7 @@ const Translate = ({language, text}) => {
                 {}, 
                 {
                     params: {
+                        client: 'gtx',
                         q: debouncedText,
                         target: language.value,
                         key: config.googleAPI_KEY
