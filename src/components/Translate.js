@@ -19,15 +19,31 @@ const Translate = ({language, text}) => {
         const getTranslation = async () => {
             const proxyurl = "https://cors-anywhere.herokuapp.com/";
             const { data } = await axios.post(
-                proxyurl + config.googleAPI_BASE_URL, 
+                (proxyurl + config.googleAPI_BASE_URL), 
                 {}, 
                 {
                     params: {
                         q: debouncedText,
+                        source: language.source ,
                         target: language.value,
                         key: config.googleAPI_KEY
                     },
                 }
+                /*
+                                headers: {"X-HTTP-Method-Override":"GET"},
+                                url: "https://www.googleapis.com/language/translate/v2",
+                                dataType: "jsonp",
+                                data: { key: config.googleAPI_KEY,
+                                        source: SOURCE_LANGUAGE,
+                                        target: language.value,
+                                        q: debouncedText },
+                                success: function(result){
+                                    if(!result.error){
+                                    // translated text in 
+                                    // result.data.translations[0].translatedText
+                                    }
+                                }
+                */
             );
             setTranslated(data.data.translations[0].translatedText);
         };
