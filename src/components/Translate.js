@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import config from './apis/config';
 
 const Translate = ({language, text}) => {
     const [translated, setTranslated] = useState('');
@@ -13,36 +14,23 @@ const Translate = ({language, text}) => {
             clearTimeout(timerId);
         };
     },[text]);
-
+    
     useEffect(() => {
-        let isCancelled = false;
         const getTranslation = async () => {
-
-            try {
-                const { data } = await axios.post(
-                    'https://translation.googleapis.com/language/translate/v2', 
-                    {}, 
-                    {
-                        params: {
-                            q: debouncedText,
-                            target: language.value,
-                            key: 'AIzaSyCHUCmpR7cT_yDFHC98CZJy2LTms-IwDlM'
-                        },
-                    }
-                );
-                if (!isCancelled) {
-                    setTranslated(data.data.translations[0].translatedText);
+            const { data } = await axios.post(
+                config.googleAPI_BASE_URL, 
+                {}, 
+                {
+                    params: {
+                        q: debouncedText,
+                        target: language.value,
+                        key: config.googleAPI_KEY
+                    },
                 }
-            } catch (e) {
-                if (!isCancelled) {
-                    setTranslated({ error: e.message });
-                }
-            }
+            );
+            setTranslated(data.data.translations[0].translatedText);
         };
         getTranslation();
-        return () => {
-          isCancelled = true;
-        };
     }, [language, debouncedText]);
     return (
         <div className='ui bg-dkGreen color-neogreen p-10 r-5 mt-5'>{translated}</div>
