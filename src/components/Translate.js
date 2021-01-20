@@ -24,7 +24,6 @@ const Translate = ({language, text}) => {
                 {
                     params: {
                         q: debouncedText,
-                        source: language.source ,
                         target: language.value,
                         key: config.googleAPI_KEY
                     },
