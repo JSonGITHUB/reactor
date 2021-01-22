@@ -1,5 +1,5 @@
 import axios from "axios";
-import config from '../../apis/config';
+import config from '../apis/config';
 
 
 const KEY = config.unsplashAPI_KEY;
