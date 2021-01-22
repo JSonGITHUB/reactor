@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import config from './apis/config';
 
 const Translate = ({language, text}) => {
     const [translated, setTranslated] = useState('');
@@ -16,16 +17,33 @@ const Translate = ({language, text}) => {
     
     useEffect(() => {
         const getTranslation = async () => {
+            const proxyurl = "https://cors-anywhere.herokuapp.com/";
             const { data } = await axios.post(
-                'https://translation.googleapis.com/language/translate/v2', 
+                (proxyurl + config.googleAPI_BASE_URL), 
                 {}, 
                 {
                     params: {
+                        client: 'gtx',
                         q: debouncedText,
                         target: language.value,
-                        key: 'AIzaSyCHUCmpR7cT_yDFHC98CZJy2LTms-IwDlM'
+                        key: config.googleAPI_KEY
                     },
                 }
+                /*
+                                headers: {"X-HTTP-Method-Override":"GET"},
+                                url: "https://www.googleapis.com/language/translate/v2",
+                                dataType: "jsonp",
+                                data: { key: config.googleAPI_KEY,
+                                        source: SOURCE_LANGUAGE,
+                                        target: language.value,
+                                        q: debouncedText },
+                                success: function(result){
+                                    if(!result.error){
+                                    // translated text in 
+                                    // result.data.translations[0].translatedText
+                                    }
+                                }
+                */
             );
             setTranslated(data.data.translations[0].translatedText);
         };
