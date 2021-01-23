@@ -60,7 +60,7 @@ const Tide = ({setTide, display, isMotionOn}) => {
         const proxyurl = "https://cors-anywhere.herokuapp.com/";
         const parseTideData = (data) => {
             const waterLevel = Number(data.data[data.data.length - 1].v).toFixed(1) || 1;
-            console.log(`tideData => ${JSON.stringify(data, null, 2)}`)
+            //console.log(`tideData => ${JSON.stringify(data, null, 2)}`)
             setTide(waterLevel)
             setStatus(prevState => ({
                 ...prevState,
@@ -102,7 +102,7 @@ const Tide = ({setTide, display, isMotionOn}) => {
         const tideDaily = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&amp;application=NOS.COOPS.TAC.WL&amp;begin_date=${getCurrentTime().year}${getCurrentTime().month}${getCurrentTime().date}&amp;end_date=${getCurrentTime().year}${getCurrentTime().month}${getCurrentTime().date}&amp;datum=MLLW&amp;station=9410230&amp;time_zone=lst_ldt&amp;units=english&amp;interval=hilo&amp;format=json`;
         const uri = tideDaily;
         const proxyurl = "https://cors-anywhere.herokuapp.com/";
-        console.log(`tideDaily: ${tideDaily}`)
+        //console.log(`tideDaily: ${tideDaily}`)
         const getTideHour = (tide) => Number(tide.t.split(" ")[1].split(":")[0]);
         const getTideMinutes = (tide) => Number(tide.t.split(" ")[1].split(":")[1]);
 //        const getTideTime = (tide) => (getTideHour(tide) === getCurrentTime().hours) ? getTideHour(tide) : tide;
@@ -137,6 +137,7 @@ const Tide = ({setTide, display, isMotionOn}) => {
                 const getCurrentTide = convertTide(tides[closerTideIndex]);
                 const currentTide = ((pastLastTide !== untilNextTide())) ? getCurrentTide : 'medium';
                 console.log(`CURRENT ${currentTide} HOUR: ${getCurrentTime().hours} TIMES: ${hours}\n next ${nextTide} tide in ${untilNextTide()} hours\n previous ${lastTide} tide was ${pastLastTide} hours ago tideMinutes: ${getCurrentTime().minutes}`);
+
                 setStatus(prevState => ({
                     ...prevState,
                     tide: currentTide,

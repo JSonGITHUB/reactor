@@ -11,7 +11,7 @@ function FormSelector(props) {
         return tag(item)
     }
     //const tagSelected = (item) => <option selected key={getKey(item)} value={item.toString()}>{item}</option>;
-    const tag = (item) => <option key={getKey(item)} value={item.toString()}>{item}</option>;
+    const tag = (item) => <option key={getKey(item)} value={(item.toString() ?? "nada")}>{item}</option>;
     const getTag = (item, index) => (Number(index) === Number(select)) ? setSelected(item) : tag(item);
     const selectItems = items.map((item, index) => getTag(item,index));
     const handleChange = (event) => {
