@@ -5,7 +5,7 @@ import PostDirectory from './PostDirectory.js';
 import shakaBlack from '../../assets/images/shakaBlack.png';
 import thumbsUp from '../../assets/images/ThumbsUp.png';
 import thumbsDown from '../../assets/images/ThumbsDown.png';
-import {BrowserRouter as Router, Switch, Link, Route} from 'react-router-dom';
+import {BrowserRouter as Link} from 'react-router-dom';
 
 const LogDirectory = ({ title, message }) => {
     
@@ -26,7 +26,7 @@ const LogDirectory = ({ title, message }) => {
         
         if (itemObj !== null) {
             
-            console.log(`ITEM: ${item} ====> ${JSON.stringify(itemObj, null, 2)}`)
+            //console.log(`ITEM: ${item} ====> ${JSON.stringify(itemObj, null, 2)}`)
             const { Conditions, Location, Day, Surf, Swell1 } = itemObj;
             const conditionsIndex = conditions.indexOf(Conditions.Conditions);
             const spot = Location.Break;
@@ -59,7 +59,7 @@ const LogDirectory = ({ title, message }) => {
                                 <img src={condition} alt={conditionDescription} className='shaka' />
                                 <br/>{height}
                             </div>
-                            <div className="flexThreeFourthColumnLeft pt-10 pb-10">
+                            <div className="flexThreeFourthColumnLeft p-10">
                                 {month + " " + day + suffix[Number(String(day).slice(-1))] + " " + year + ": "}
                                 <div className='size20 color-graphite pt-5'>{spot}</div>
                                 <div className='color-graphite'>
