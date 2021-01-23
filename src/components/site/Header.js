@@ -4,6 +4,7 @@ import TextColorizer from '../utils/TextColorizer.js';
 import menu from '../../assets/images/menuYellow.png';
 import close from '../../assets/images/menuClose.png';
 import getKey from '../utils/KeyGenerator.js';
+// eslint-disable-next-line
 import {BrowserRouter as Router, Switch, Link, Route} from 'react-router-dom';
 import navItems from './NavItems.js';
 import { navClassesClosed, navClassesOpen, navClassesClose } from './NavClasses.js';
@@ -65,6 +66,10 @@ const Header = ({company, width, isMotionOn}) => {
         const menuItems = navItems.map((item) => getNavButton(item));
         return (menuItems);
     }
+    const isPageSurfLog = (path.includes('surflog') || window.innerHeight < 600) ? true : false;
+    const isPageHome = (path.includes('home') || path === "/reactor" || path === "/reactor/") ? true : console.log(`path: ${path}`);
+    const headerClasses = (isPageSurfLog||!isPageHome) ? 'menuHeightExpanded scroll' : 'menuHeight scroll';
+    
     const navigation =  <div>
                             {logoButton(headerLogo)}
                             {getMenuItems()}
@@ -76,7 +81,7 @@ const Header = ({company, width, isMotionOn}) => {
                                 <div className="flex3ColumnRight">{getMenuButton}</div>
                             </div>
                             <div className="t-0 navigation height100Percent width-100-percent bg-dark">
-                                <div className="height50Percent scroll">
+                                <div className={headerClasses}>
                                     {getMenuItems()}
                                 </div>
                             </div>
@@ -87,7 +92,6 @@ const Header = ({company, width, isMotionOn}) => {
                                     <div className="flex3Column"></div>
                                     <div className="flex3ColumnRight">{burgerButton}</div>
                                 </div>
-                            <div className="t-collapse navigation width-100-percent bg-dark">{getMenuItems()}</div>
                         </div>
                             
     const hamburgerNav = (menuOpen === true) ? hamburgerOpen : hamburgerClosed;

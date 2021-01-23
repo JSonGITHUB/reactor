@@ -2,6 +2,7 @@
 import React, {useState} from 'react';
 import TemperatureInput from './TemperatureInput';
 import BoilingVerdict, {tryConvert, toCelsius, toFahrenheit} from './BoilingVerdict';
+// eslint-disable-next-line
 import templateData from './waves/TemplateData';
 
 const Calculator = () => {

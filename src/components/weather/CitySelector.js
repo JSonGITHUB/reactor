@@ -25,7 +25,9 @@ const CitySelector = () => {
             const fahrenheit = (k) => ((k - 273.15) * (9/5) + 32);
             const temp = fahrenheit(main.temp).toFixed(1);
             const temp_min = fahrenheit(main.temp_min).toFixed(1);
+            // eslint-disable-next-line
             const temp_max = fahrenheit(main.temp_max).toFixed(1);
+            // eslint-disable-next-line
             const feels_like = `feels like: ${fahrenheit(main.feels_like).toFixed(1)}°`;
             const temperature = <div>
                             <div className='color-yellow bold mb-10'>temperature: </div>
@@ -44,6 +46,7 @@ const CitySelector = () => {
             const weather = item.weather[0];
             const mainDescription = weather.main;
             const description = weather.description;
+            // eslint-disable-next-line
             const icon = weather.icon;
             const wind = item.wind;
             const windSpeed = () => <div>

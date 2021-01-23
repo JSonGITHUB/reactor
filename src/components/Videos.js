@@ -13,7 +13,7 @@ const Videos = () => {
   const [selectedVideo, setSelectedVideo] = useState(null); 
 
   const onTermSubmit = async term => {
-    console.log(`onTermSubmit =====> ${term}`);
+    //console.log(`onTermSubmit =====> ${term}`);
     const response = await YouTube.get("/search", {
       params: {
         q: term,
@@ -26,7 +26,7 @@ const Videos = () => {
     setVideos(response.data.items);
   };
   const onVideoSelect = (video) => {
-    console.log(`video: ${JSON.stringify(video, null, 2)}`)
+    //console.log(`video: ${JSON.stringify(video, null, 2)}`)
     setSelectedVideo(video);
   }
   /*

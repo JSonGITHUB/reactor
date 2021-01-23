@@ -19,6 +19,7 @@ import S from '../../assets/images/windS.png';
 import SW from '../../assets/images/windSW.png';
 import W from '../../assets/images/windW.png';
 import NW from '../../assets/images/windNW.png';
+// eslint-disable-next-line
 import tide from '../../assets/images/tide.png';
 import waterTemp from '../../assets/images/waterTemp.png';
 import airTemp from '../../assets/images/airTemp.png';
@@ -128,7 +129,7 @@ const WaveFinder = ({
         return function cleanUp () {
             clearInterval(timerID);
         }
-    });
+    },[]);
     const currentPositionExists = () => (status.longitude) ? true : false;
     const updateCurrentLocation = (longitude, latitude) => {
 //      console.log(`UPDATING CURRENT POSITION ======> longitude: ${longitude} latitude: ${latitude}`)
@@ -582,6 +583,7 @@ const WaveFinder = ({
                                 </label>
                             </div>
     const getMatchIcon = (kind) => {
+        // eslint-disable-next-line
         let icon = (kind === "swell1") ? "swell1" : "swell2";
         icon = (kind === "wind") ? "wind" : icon;
         icon = (kind === "tide") ? "tide" : icon;
@@ -636,6 +638,7 @@ const WaveFinder = ({
         details = (kind === "wind") ? <div className="bold color-neogreen">{windSpeed}-{windGusts}kts</div> : details;
         return details
     }
+    // eslint-disable-next-line
     const star = (matchKind) => <div className="flex3Column bg-lite mr-5 ml-5 p-10 r-10">
                             {getMatchIcon(matchKind)}
                             <div className="greet">{getState(matchKind)}{getStarDetails(matchKind)}</div>
@@ -666,8 +669,11 @@ const WaveFinder = ({
             }));
         }
     }
+    // eslint-disable-next-line
     const getTideIcon = <img src={status.tide} className={`mb--5 ${getStarKind("tide")}`} alt="tide" />;
+    // eslint-disable-next-line
     const getWaterTempIcon = <img src={waterTemp} className={`mb--7 ${getStarKind("tide")}`} alt="water temp" />;
+    // eslint-disable-next-line
     const getAirTempIcon = <img src={airTemp} className={`mb--7 ${getStarKind("tide")}`} alt="air temp" />;
     const getSwellIcon = (id) => {
         if (id === 1) {
@@ -695,6 +701,7 @@ const WaveFinder = ({
     let count = 0;
     const match = (item) => {
         const matches = [];
+        // eslint-disable-next-line
         let matchesCount = (swell1Match(item)) ? matches.push("swell1") : matches;
         matchesCount = (swell2Match(item)) ? matches.push("swell2") : matches;
         matchesCount = (windMatch(item)) ? matches.push("wind") : matches;
@@ -702,7 +709,9 @@ const WaveFinder = ({
         //console.log(`matches => ${item.name} - ${matches}`)
         return matches;
     }
+    // eslint-disable-next-line
     const statusClass = (status) => (status === true) ? "color-neogreen" : "color-yellow"; 
+    // eslint-disable-next-line
     const subStatusClass = (status) => (status === true) ? "color-orange" : "color-yellow"; 
     const swell1Confirm = (matches) => ((status.isSwell1 && matches.includes("swell1")) || status.isSwell1 === false) ? true : false;
     const swell2Confirm = (matches) => ((status.isSwell2 && matches.includes("swell2")) || status.isSwell2 === false) ? true : false;

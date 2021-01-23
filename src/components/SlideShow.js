@@ -19,22 +19,22 @@ const SlideShow = () => {
         url2: images[30].image,
         url3: images[60].image
     });
-	const getImage = () => {
-        console.log(`status.index: ${status.index} slideShow: ${status.slideShow}`)
-        if (status.slideShow) {
-            const i = (status.index === 29) ? 1 : status.index+1;
-            console.log(`getImage => imgArray[${i}].image: ${status.images[i].image}`)
-            setStatus({
-                slideShow: status.slideShow,
-                index: i,
-                images: status.images,
-                url1: status.images[i].image,
-                url2: status.images[i+30].image,
-                url3: status.images[i+60].image
-            })
-        }
-    }
-    useEffect(() => {     		
+    useEffect(() => {  
+        const getImage = () => {
+            //console.log(`status.index: ${status.index} slideShow: ${status.slideShow}`)
+            if (status.slideShow) {
+                const i = (status.index === 29) ? 1 : status.index+1;
+                //console.log(`getImage => imgArray[${i}].image: ${status.images[i].image}`)
+                setStatus({
+                    slideShow: status.slideShow,
+                    index: i,
+                    images: status.images,
+                    url1: status.images[i].image,
+                    url2: status.images[i+30].image,
+                    url3: status.images[i+60].image
+                })
+            }
+        }   		
         const timerID = setInterval(
             () => getImage(),
             700
@@ -42,7 +42,7 @@ const SlideShow = () => {
         return function cleanUp () {
             clearInterval(timerID);
         }
-    });
+    },[status]);
     const toggleSlideShow = () => {
         setStatus({
             slideShow: !status.slideShow,

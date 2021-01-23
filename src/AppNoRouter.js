@@ -26,7 +26,6 @@ import WikiSearch from './components/WikiSearch.js';
 import Translator from './components/Translator.js';
 import Accordion from './components/Accordion.js';
 import Route from './components/Route.js';
-import SurfLocation from './components/waves/SurfLocation.js';
 
 export default ({ props }) => {
 
@@ -34,11 +33,7 @@ export default ({ props }) => {
     const [ width, setWidth ] = useState(window.innerWidth);
     const [ height, setHeight ] = useState(window.innerHeight);
 
-    const base = 'reactor/';
     const company = 'KFA';
-    const path = window.location.pathname;
-    const componentId = path.replace('/','').toLocaleLowerCase();
-    const currentComponent = componentId;
 
     const setMotion = () => setIsMotionOn(!isMotionOn);
     const widthChanged = () => (window.innerWidth !== width) ? true : false;
@@ -70,7 +65,6 @@ export default ({ props }) => {
     window.addEventListener('resize', debounce(setIt, 250));
 
     const logIdExists = (window.location.search.includes('logId')) ? true : false;
-    const localLogId = (localStorage.getItem('logId')) ? true : false;
     const startIndex = () => window.location.search.indexOf('logId=')+6;
     const endIndex = () => window.location.search.length;
     const getLogId = () => window.location.search.substring(startIndex(), endIndex());

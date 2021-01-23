@@ -578,6 +578,16 @@ body {
 .fixed {
   position: fixed;
 }
+.menuHeight {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: calc(100% - 250px);
+}
+.menuHeightExpanded {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: calc(100% - 52px);
+}
 .footer {
 	position: fixed;
   bottom: 0px;
@@ -668,9 +678,8 @@ body {
   padding: 8px 22px 8px 32px;
 }
 .logoButton {
-  display: inline-block;
   float: left;
-  padding: 0px 32px;
+  padding: 7px 32px;
 }
 .navButton {
   border: none;
@@ -963,8 +972,10 @@ input.error {
   z-index:9995;
 }
 .shakaStopa {
+  padding: 0px;
 }
 .shakingShaka {
+  padding: 0px;
 }
 
 .App-header {

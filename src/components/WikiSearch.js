@@ -13,6 +13,7 @@ const WikiSearch = () => {
     const [term, setTerm] = useState('');
     const [debouncedTerm, setDebouncedTerm] = useState(term);
     const [results, setResults] = useState([]);
+    // eslint-disable-next-line
     const [bkgColor, setBkgColor] = useState(options[2].value);
 
     //console.log(results);
@@ -58,7 +59,7 @@ const WikiSearch = () => {
         }
     }, [debouncedTerm, results.length]);
     const goToLink = (link) => window.location.href=link;
-    
+    // eslint-disable-next-line
     const renderedLinkResults = results.map((result) => {
         return (
             <a 
@@ -87,7 +88,7 @@ const WikiSearch = () => {
             </div>
         )
     });
-    console.log(`selected: ${selected.value}`)
+    //console.log(`selected: ${selected.value}`)
     const selectedBackground = `bg-${selected.value}`;
     return (
         <div className="m-20">

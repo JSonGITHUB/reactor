@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 //import got from 'got';
 
 const SurfReports = () => {
-    
+    // eslint-disable-next-line
     const [oSideBuoyData, setOSideBuoyData] = useState({});
-
+    // eslint-disable-next-line
     const getSwellData = () => {
         const unirest = require("unirest");
         const req = unirest("GET", "https://stormglass.p.rapidapi.com/forecast");
@@ -20,6 +20,7 @@ const SurfReports = () => {
         });
 
     }
+    // eslint-disable-next-line
     const getRapidData = () => {
         const settings = {
             "async": true,
@@ -51,13 +52,13 @@ const SurfReports = () => {
         //this.getSwellData();
         //this.getRapidData();
     return <div>
-            <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224"></iframe><br/>
-            <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46225" ></iframe><br/>
-            <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46266"></iframe><br/>
-            <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46254"></iframe><br/>
-            <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=LJAC1"></iframe><br/>
-            <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=LJPC1"></iframe><br/>
-            <iframe src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46232"></iframe><br/>
+            <iframe title="Oceanside Offshore" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224"></iframe><br/>
+            <iframe title="Torrey Pines Outer" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46225" ></iframe><br/>
+            <iframe title="Del Mar Nearshore" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46266"></iframe><br/>
+            <iframe title="SCRIPPS Nearshore" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46254"></iframe><br/>
+            <iframe title="La Jolla LJAC1" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=LJAC1"></iframe><br/>
+            <iframe title="La Jolla LJPC1" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=LJPC1"></iframe><br/>
+            <iframe title="Point Loma South" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46232"></iframe><br/>
         </div>
 }
 

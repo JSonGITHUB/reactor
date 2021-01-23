@@ -12,7 +12,9 @@ function useFriendStatus(friendID) {
     return () => {
       ChatAPI.unsubscribeFromFriendStatus(friendID, handleStatusChange);
     };
-  });
+  },[friendID]);
 
   return isOnline;
 }
+
+export default useFriendStatus;

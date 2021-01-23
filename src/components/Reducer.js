@@ -48,7 +48,7 @@ const todoReducer = (state, action) => {
   }
 };
 const App = () => {
-
+  // eslint-disable-next-line
   let [todos, dispatch] = React.useReducer(todoReducer, initialTodos);
   const handleChange = todo => {
     dispatch({

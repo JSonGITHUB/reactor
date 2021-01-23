@@ -8,6 +8,7 @@ const LoginControl = () => {
   
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState("");
+  // eslint-disable-next-line
   const [value, setValue] = useState({});
 
   const handleClick = (isLoggedIn, user) => {

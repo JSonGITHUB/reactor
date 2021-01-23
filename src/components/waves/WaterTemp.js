@@ -35,6 +35,7 @@ const WaterTemp = ({isMotionOn}) => {
             })
             .catch(err => console.log(`Something went wrong!\nuri: ${waterTempuri} \npath: ${window.location.pathname}\n`, err));
     }
+    // eslint-disable-next-line
     const getLocalWaterTempData = () => {
         console.log(`getLocalWaterTemp ->`);
         let data;
@@ -67,13 +68,15 @@ const WaterTemp = ({isMotionOn}) => {
     }
     
     useEffect(() => {   
-        getWaterTempData();		
+        getWaterTempData();	
+        console.log(`getWaterTempData`)
     },[]);
     const getCurrentTemp = () => <div>
                             {temp}° 
                             <span className="greet"> F</span>
                         </div>;
     const percent = 'twentyfivePercent mt--70 mb--70';
+    // eslint-disable-next-line
     const loading = () => <div className={percent}>
                 <Loader isMotionOn={isMotionOn}/>
             </div>;
