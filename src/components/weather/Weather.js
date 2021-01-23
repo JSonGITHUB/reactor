@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import config from '../../apis/config';
+import config from '../apis/config';
 import CitySelector from './CitySelector';
 
 const Weather  = () => {
