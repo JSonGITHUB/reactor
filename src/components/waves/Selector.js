@@ -12,6 +12,7 @@ const getUnique = (array) => {
 const selectorColor = (item, groupTitle, selected) => (selected(item,groupTitle)) ? "completedSelector" : "incompletedSelector";
     
 const selector = (item, groupTitle, spot, defaultSelection, handleSelection, selected) => {
+    //console.log(`selector: \nitem: ${JSON.stringify(item, null,2)}\ngroupTitle: ${groupTitle}\nspot: ${spot}\ndefaultSelection: ${defaultSelection}\nhandleSelection: ${handleSelection}\nselected: ${selected}`)
     const isLocation = (groupTitle === 'Location') ? true : false;
     const localLocations = (localStorage.getItem('spots')) ? true : false;
     let items = item.selections;
