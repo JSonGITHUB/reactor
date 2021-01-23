@@ -6,9 +6,8 @@ import config from './apis/config';
 const Photos = () => {
 
     const [photos, setPhotos] = useState([]);
-    const KEY = 'Client-ID '+config.unsplashAPI_KEY;
+    const KEY = 'Client-ID ' + config.unsplashAPI_KEY;
     const api = config.unsplashAPI_BASE_URL;
-    //console.log(`KEY: ${KEY}\napi: ${api}`)
     const onSearchSubmit = async (term, callback) => {
         const response = await UnSplash.get(api, {
                 params: {query: term},
