@@ -4,10 +4,9 @@ import Loader from '../utils/Loader.js';
 import interfaceData from './InterfaceData.js'
 import templateData from './LogTemplateData.js';
 import generateNewLogId from './GenerateLogId.js';
-import directionObject from './DirectionObject.js';
 
 const Logger = ({logId, location}) => { 
-    //console.log(`Logger => logId: ${logId}\nlocalStorage.getItem('logId'): ${localStorage.getItem('logId')}`); 
+    console.log(`Logger => logId: ${logId}\nlocalStorage.getItem('logId'): ${localStorage.getItem('logId')}`); 
     const logExists = () => (localStorage.getItem(logId) === null) ? false : true;
     const initLogId = () => (logExists()) ? logId : generateNewLogId();
     const initLog = () => (logExists()) ? JSON.parse(localStorage.getItem(logId)) : templateData;
@@ -22,7 +21,7 @@ const Logger = ({logId, location}) => {
     useEffect(() => {
         const { state } = location;
         const logId = localStorage.getItem('logId');
-        //console.log(`LoggerFunctional => componentDidMount -> SPOT: ${getSpot()}\ngetLogId: ${localStorage.getItem('logId')}\nlogId: ${logId}`); 
+        console.log(`LoggerFunctional => componentDidMount -> SPOT: ${getSpot()}\ngetLogId: ${localStorage.getItem('logId')}\nlogId: ${logId}`); 
         
         if (localStorage.getItem(logId) === null) {
             setStatus(prevState => ({
@@ -30,7 +29,7 @@ const Logger = ({logId, location}) => {
                 log: templateData,
                 logID:generateNewLogId()
             }));
-            //console.log(`LoggerFunctional => componentDidMount -> 1\nSPOT: ${getSpot()}\nlogID: ${logId}\nlog: ${JSON.stringify(status.log, null, 2)}`); 
+            console.log(`LoggerFunctional => componentDidMount -> 1\nSPOT: ${getSpot()}\nlogID: ${logId}\nlog: ${JSON.stringify(status.log, null, 2)}`); 
         
         } else {
             setStatus(prevState => ({
@@ -38,7 +37,7 @@ const Logger = ({logId, location}) => {
                 log: JSON.parse(localStorage.getItem(logId)),
                 logID: logId
             }));
-            //console.log(`LoggerFunctional => componentDidMount -> 2\nSPOT: ${getSpot()}\nlogID: ${logId}\nlog: ${JSON.stringify(status.log, null, 2)}`); 
+            console.log(`LoggerFunctional => componentDidMount -> 2\nSPOT: ${getSpot()}\nlogID: ${logId}\nlog: ${JSON.stringify(status.log, null, 2)}`); 
         }
         
         let data = interfaceData;
@@ -79,11 +78,8 @@ const Logger = ({logId, location}) => {
 
     const updateLog = (groupTitle, label, selected, set) => {
         const log = (status.log !== null) ? status.log : templateData;
+        console.log(`updateLog => \ngroupTitle: ${groupTitle} \nlabel: ${label}\nselected: ${selected}\nset: ${set}\nlog: ${JSON.stringify(log, null, 2)}`)
         log[groupTitle][label] = selected;
-        if (label === 'Direction' && groupTitle === ('Swell1' || 'Swell2')) {
-            log[groupTitle]['Angle'] = directionObject[selected];
-        }
-        //console.log(`updateLog => \ngroupTitle: ${groupTitle} \nlabel: ${label}\nselected: ${selected}\nset: ${set}\nlog: ${JSON.stringify(log, null, 2)}`)
         if (groupTitle !== undefined && groupTitle !== 1 && selected !== undefined && set) {
             setStatus(prevState => ({
                 ...prevState,
@@ -102,7 +98,6 @@ const Logger = ({logId, location}) => {
                             <div className="flex3Column"></div>
                         </div>;
     if (status.isLoaded) {
-        //console.log(`LoggerFunctional => log:\n${JSON.stringify(status.log, null, 2)}`)
         appInterface = <div className="App-content fadeIn">
             <div className="flex3Column"></div>
             <div className="flex3Column">

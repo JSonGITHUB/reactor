@@ -60,7 +60,7 @@ const Tide = ({setTide, display, isMotionOn}) => {
         const proxyurl = "https://cors-anywhere.herokuapp.com/";
         const parseTideData = (data) => {
             const waterLevel = Number(data.data[data.data.length - 1].v).toFixed(1) || 1;
-            //console.log(`tideData => ${JSON.stringify(data, null, 2)}`)
+            console.log(`tideData => ${JSON.stringify(data, null, 2)}`)
             setTide(waterLevel)
             setStatus(prevState => ({
                 ...prevState,
@@ -79,8 +79,8 @@ const Tide = ({setTide, display, isMotionOn}) => {
         fetch(proxyurl + uri)
             .then(response => validate(response))
             .then(data => {
+                console.log(`tideData => ${JSON.stringify(data, null, 2)} \ncurrentTime: ${getCurrentTime().hours}:${getCurrentTime().minutes}`);
                 const waterLevel = Number(data.data[data.data.length - 1].v).toFixed(1);
-                console.log(`tideData => ${JSON.stringify(data, null, 2)} \ncurrentTime: ${getCurrentTime().hours}:${getCurrentTime().minutes}\nwaterLever: ${waterLevel}`);
                 setTide(waterLevel);
                 setStatus(prevState => ({
                     ...prevState,
@@ -102,7 +102,7 @@ const Tide = ({setTide, display, isMotionOn}) => {
         const tideDaily = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&amp;application=NOS.COOPS.TAC.WL&amp;begin_date=${getCurrentTime().year}${getCurrentTime().month}${getCurrentTime().date}&amp;end_date=${getCurrentTime().year}${getCurrentTime().month}${getCurrentTime().date}&amp;datum=MLLW&amp;station=9410230&amp;time_zone=lst_ldt&amp;units=english&amp;interval=hilo&amp;format=json`;
         const uri = tideDaily;
         const proxyurl = "https://cors-anywhere.herokuapp.com/";
-        //console.log(`tideDaily: ${tideDaily}`)
+        console.log(`tideDaily: ${tideDaily}`)
         const getTideHour = (tide) => Number(tide.t.split(" ")[1].split(":")[0]);
         const getTideMinutes = (tide) => Number(tide.t.split(" ")[1].split(":")[1]);
 //        const getTideTime = (tide) => (getTideHour(tide) === getCurrentTime().hours) ? getTideHour(tide) : tide;
@@ -114,7 +114,6 @@ const Tide = ({setTide, display, isMotionOn}) => {
             .then(response => validate(response))
             .then(data => {
                 console.log(`tideDirection => ${JSON.stringify(data, null, 2)}`);
-                const minutes = data.predictions.map((tide) => getTideMinutes(tide));
                 const hours = data.predictions.map((tide) => getTideHour(tide));
                 const times = data.predictions.map((tide) => getTideTime(tide));
                 const heights = data.predictions.map((tide) => getTideHeight(tide));
@@ -122,10 +121,9 @@ const Tide = ({setTide, display, isMotionOn}) => {
                 const checkTide = (hour) => hour >= getCurrentTime().hours;
                 const nextTideIndex = hours.findIndex(checkTide);
                 const pastLastTide = Number(getCurrentTime().hours-hours[nextTideIndex-1]);
-                const minutesUntilNextTide = () => Number(minutes[nextTideIndex]-getCurrentTime().minutes);
-                const hoursUntilNextTide = () => Number(hours[nextTideIndex]-getCurrentTime().hours);
-                const untilNextTide = () => (hoursUntilNextTide() < 1) ? minutesUntilNextTide() : hoursUntilNextTide();
-                const closerTideIndex = (pastLastTide >= untilNextTide()) ? nextTideIndex : (nextTideIndex-1);
+                const untilNextTide = Number(hours[nextTideIndex]-getCurrentTime().hours);
+                const untilNextTideMinutes = Number(hours[nextTideIndex]-getCurrentTime().hours);
+                const closerTideIndex = (pastLastTide >= untilNextTide) ? nextTideIndex : (nextTideIndex-1);
                 const nextTide = tides[nextTideIndex];
                 const nextHeight = heights[nextTideIndex];
                 const lastHeight = heights[nextTideIndex-1];
@@ -135,9 +133,8 @@ const Tide = ({setTide, display, isMotionOn}) => {
                 const lastTide = tides[nextTideIndex-1];
                 const convertTide = (tide) => (tide === 'L') ? 'low' : 'high';
                 const getCurrentTide = convertTide(tides[closerTideIndex]);
-                const currentTide = ((pastLastTide !== untilNextTide())) ? getCurrentTide : 'medium';
-                console.log(`CURRENT ${currentTide} HOUR: ${getCurrentTime().hours} TIMES: ${hours}\n next ${nextTide} tide in ${untilNextTide()} hours\n previous ${lastTide} tide was ${pastLastTide} hours ago tideMinutes: ${getCurrentTime().minutes}`);
-
+                const currentTide = ((pastLastTide !== untilNextTide)) ? getCurrentTide : 'medium';
+                console.log(`CURRENT ${currentTide} HOUR: ${getCurrentTime().hours} TIMES: ${hours}\n next ${nextTide} tide in ${untilNextTide} hours\n previous ${lastTide} tide was ${pastLastTide} hours ago tideMinutes: ${getCurrentTime().minutes}`);
                 setStatus(prevState => ({
                     ...prevState,
                     tide: currentTide,
@@ -146,7 +143,7 @@ const Tide = ({setTide, display, isMotionOn}) => {
                     nextTide: nextHeight,
                     nextPhase: convertTide(nextTide),
                     nextTime: nextTime,
-                    untilNextTide: untilNextTide()
+                    untilNextTide
                 }))
             })
             .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
