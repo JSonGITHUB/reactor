@@ -7,7 +7,7 @@ const ScrollToTop = ({ loc }) => {
             console.log(`ScrollToTop =>\nlocation: ${loc.pathname}`);
             window.scrollTo(0, 0);
         }    		
-    },[]);
+    },[loc.location, loc.pathname]);
 
     const resetScroll = () => {
         const body = document.body; // For Safari

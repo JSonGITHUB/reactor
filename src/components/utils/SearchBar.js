@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import GridImage from './GridImage'
 import getKey from './KeyGenerator.js';
 
@@ -8,14 +8,14 @@ const SearchBar = ({term, onSubmit}) => {
     const [menuArray, setMenuArray] = useState([]);
 
     const updateArray = (array) => {
-        console.log(`menuArray: ${JSON.stringify(array, null, 2)}`)
+        //console.log(`menuArray: ${JSON.stringify(array, null, 2)}`)
         setMenuArray(array);
     }
     const clearMenu = () => (menuArray.length>0) ? setMenuArray([]) : null;
     const onFormSubmit = event =>  {
         event.preventDefault();
         clearMenu();
-        console.log(`Search Term: ${keyword}`);
+        //console.log(`Search Term: ${keyword}`);
         onSubmit(keyword, updateArray);
     }
     const getImage = (item) => <GridImage key={getKey("thumb")} item={item}></GridImage>

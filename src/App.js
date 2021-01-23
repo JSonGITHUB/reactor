@@ -101,6 +101,7 @@ class App extends React.Component {
     const endIndex = () => window.location.search.length;
     const getLogId = () => window.location.search.substring(startIndex(), endIndex());
     const logId = (logIdExists) ? getLogId() : "";
+    // eslint-disable-next-line
     const { width, height, isMotionOn } = this.state;
     return (
       //AppComponent();

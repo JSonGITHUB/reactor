@@ -13,11 +13,12 @@ import W from '../../assets/images/windW.png'
 import NW from '../../assets/images/windNW.png'
 import tideIcon from '../../assets/images/tide.png'
 import PostDirectory from './PostDirectory.js';
-import {BrowserRouter as Router, Switch, Link, Route} from 'react-router-dom';
+import {BrowserRouter as Link} from 'react-router-dom';
 
 const SurfLocation = ({state, item, matches, regionMatch}) => {
     
     const { edit, windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, swell1Interval, swell2Interval, tide, height, stars } = state;
+    // eslint-disable-next-line
     const [status, setStatus] = useState({
         module: 'SurfLocation',
         logged: false,
@@ -44,7 +45,9 @@ const SurfLocation = ({state, item, matches, regionMatch}) => {
         classes = (kind === "wind") ? (classes + " bg-white") : classes; 
         return classes;
     }
+    // eslint-disable-next-line
     const getTideIcon = <img src={tideIcon} className={`mb--5 ${getStarKind("tide")}`} alt="tide" />;
+    // eslint-disable-next-line
     const getSwellIcon = (id) => {
         if (id === 1) {
             return <img src={swell1} className={`mb--5 ${getStarKind("tide")}`} alt="swell1" />
@@ -52,6 +55,7 @@ const SurfLocation = ({state, item, matches, regionMatch}) => {
             return <img src={swell2} className={`mb--5 ${getStarKind("tide")}`} alt="swell2" />;
         }
     }
+    // eslint-disable-next-line
     const getWindIcon = () => {
         const windDirection = status.windDirection;
         if (windDirection === "N") {
@@ -73,6 +77,7 @@ const SurfLocation = ({state, item, matches, regionMatch}) => {
         }
     }
     const getMatchIcon = (kind) => {
+        // eslint-disable-next-line
         let icon = (kind === "swell1") ? "swell1" : "swell2";
         icon = (kind === "wind") ? "wind" : icon;
         icon = (kind === "tide") ? "tide" : icon;
@@ -155,7 +160,9 @@ const SurfLocation = ({state, item, matches, regionMatch}) => {
         const startHour = ((currentHour-1)<10) ? `0${(currentHour-1)}` : (currentHour-1);
         const currentMinutes = getCurrentTime.getMinutes();
         const minutes = (currentMinutes<10) ? `0${currentMinutes}` : currentMinutes;
+        // eslint-disable-next-line
         const getEndTime = `${year}${month}${date}%20${hours}:${minutes}`;
+        // eslint-disable-next-line
         const getStartTime = `${year}${month}${date}%20${startHour}:00`;
         getCurrentTime = `${year}${month}${date}%20${hours}:${minutes}`;
         const getWaveHeight = (height) => {
@@ -296,6 +303,7 @@ const SurfLocation = ({state, item, matches, regionMatch}) => {
                     }
                 </div>
     }
+    // eslint-disable-next-line
     const editLogButton = () => {
         return (
             <Link className="noUnderline" key={getKey("link")} to={{
@@ -314,6 +322,7 @@ const SurfLocation = ({state, item, matches, regionMatch}) => {
     const statusClass = (status) => (status === true) ? "color-neogreen" : "color-yellow"; 
     const subStatusClass = (status) => (status === true) ? "color-orange" : "color-yellow"; 
     const swell1Match = (item) => (item.swell.indexOf(swell1Direction)>-1) ? true : false;
+    // eslint-disable-next-line
     const swell2Match = (item) => (item.swell.indexOf(swell2Direction)>-1) ? true : false;
     const windMatch = (item) => (item.wind.indexOf(windDirection)>-1) ? true : false;
     const tideMatch = (item) => (item.tide.indexOf(tide)>-1) ? true : false;

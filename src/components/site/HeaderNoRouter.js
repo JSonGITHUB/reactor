@@ -1,38 +1,21 @@
 import React, { useState } from 'react';
 import Loader from '../utils/Loader.js';
 import TextColorizer from '../utils/TextColorizer.js';
-import menu from '../../assets/images/menuYellow.png';
-import close from '../../assets/images/menuClose.png';
 import getKey from '../utils/KeyGenerator.js';
 import Link from '../Link.js';
 import HamburgerNav from './HamburgerNav';
 
 const Header = ({ company, width, isMotionOn }) => {
-
+    // eslint-disable-next-line
     const [menuOpen, setMenuOpen] = useState(false);
+    // eslint-disable-next-line
     const [initialized, setInitialized] = useState(false);
 
     const navClassesClosed = "width-100-percent navigation mt-2 pointer fadedDark bg-dark";
     const navClassesOpen = "width-100-percent navigation mt-2 pointer fadeInFaded fadedDark bg-dark";
     const navClassesClose = "width-100-percent navigation mt-2 pointer fadeOutFaded faded bg-dark";
-    const isNavButton = (event) => (event.target.nodeName === "BUTTON") ? true : false;
-    const displayMenu = (event) => {
-        setMenuOpen(!menuOpen);
-        setInitialized(true);
-    }
-    const showContent = (event) => {
-        displayMenu();
-    };
-    const goHome = () => window.location.pathname = "/reactor/Home";
-    const getLink = (link) => window.location.pathname = '/'+link;
     const landscapeButton = (label) => <Link label={label} href={label} className="fl-left" key={getKey("link")}></Link>;
-    
-    const menuClick = (event) => (event.target.nodeName === "SPAN") ? goHome() : displayMenu();
-    const siteNavClick = (event) => (isNavButton(event)) ? (showContent(event)) : menuClick(event);
     const logoButton = (label) => <div key={getKey("link")} to="Home"><div className="navButton logoButton">{label}</div></div>;
-    const closeButton = <button className="navButton menuPad" onClick={siteNavClick}><img src={close} alt="close menu" /></button>;
-    const burgerButton = <button className="navButton menuPad" onClick={siteNavClick}><img src={menu} alt="open menu" /></button>;
-    const mobileLogo = <TextColorizer class='navBranding mt-7' text={company}/>;
     const headerLogo = <TextColorizer class='navBranding mt-7' text={company}/>;
     const navItems = [
         //'Home',
@@ -58,7 +41,6 @@ const Header = ({ company, width, isMotionOn }) => {
     const isWideScreen = (width >= 1080) ? true : false;
     const closedClasses = (initialized) ? navClassesClose : navClassesClosed;
     const navClasses = (menuOpen) ? navClassesOpen : closedClasses;
-    const getMenuButton = (menuOpen) ? closeButton : burgerButton;
     const path = window.location.pathname.toLocaleLowerCase();
     const isHomePage = (path === '/reactor/home' || path === '/reactor/') ? true : false;
     const homepageHeader = <div className="pt-70">

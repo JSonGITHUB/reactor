@@ -3,11 +3,13 @@ import React, { useState, useEffect } from 'react';
    
 const Timer = () => {
     const timeItIs = ["shaka time!!!", "get a wave brah!", "keep froth alive..."];
+    // eslint-disable-next-line
     const logos = [1,2,3];
     let x = 0;
     let interval = 0;
     let timeItIsNow = timeItIs[x];
     const stackIndex = 0;
+    // eslint-disable-next-line
     const logoStacker = (value, index, array) => {
         //console.log(`index: ${index} array: ${array} value: ${value}`);
         let newId = value+stackIndex;

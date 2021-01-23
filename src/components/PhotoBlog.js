@@ -3,6 +3,7 @@ import getKey from './utils/KeyGenerator.js';
 import blogImages from './BlogImages.js';
 
 const PhotoBlog = () => {
+    // eslint-disable-next-line
     const [images, setImages] = useState(blogImages);
     const getID = (index) => `blog${index}`
     const getImages = () => {

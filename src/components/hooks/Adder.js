@@ -5,6 +5,7 @@ export default function Adder(props) {
     // Declare a new state variable, which we'll call "count"
     const [ count, setCount ] = useState(props.count ? Number(props.count) : 0);
 	const [ unit, setUnit ] = useState(props.unit ? props.unit : units[0]);
+    // eslint-disable-next-line
     const [ label, setLabel ] = useState(props.label ? props.label : "How many?");
     const getUnitId = () => units.indexOf(unit);
     const getNextUnit = () => ((getUnitId()+1)<units.length) ? getUnitId()+1 : 0;

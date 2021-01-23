@@ -46,12 +46,14 @@ const AirTemp = ({isMotionOn}) => {
             clearInterval(timerID);
         }
         */
+       console.log(`getAirTempData`)
     },[]);
     const getCurrentTemp = () => <div className="r-10 m-5 p-10 bg-lite white">
                                 {temp}° 
                                 <span className="greet">F </span>
                             </div>;
     const percent = 'twentyfivePercent mt--70 mb--70';
+    // eslint-disable-next-line
     const loading = () => <div className={percent}>
                 <Loader isMotionOn={isMotionOn}/>
             </div>;

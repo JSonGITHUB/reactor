@@ -9,21 +9,6 @@ const PhotoSequence = () => {
         control: false,
         url: imagesFolder(`./${images[0]}`)
     });
-    const getImage = () => {
-        //let url = `https://lh3.googleusercontent.com/${this.state.images[i].image}`;
-        console.log(`status.control: ${status.control}\nstatus.play: ${status.play}\nstatus.index: ${status.index}\nimages.length: ${images.length}`)
-        if (status.play || status.control) {
-            const newIndex = ((status.index+1) === images.length) ? 0 : (status.index+1);
-            if (status.play) {
-                setStatus({
-                    index: newIndex,
-                    play: status.play,
-                    control: false,
-                    url: (imagesFolder(`./${images[newIndex]}`))
-                });
-            }  
-        } 
-    }
     const togglePlay = () => {
         setStatus({
             index: status.index,
@@ -50,7 +35,23 @@ const PhotoSequence = () => {
             url: (imagesFolder(`./${images[newIndex]}`))
         });
     }
-    useEffect(() => {     		
+    useEffect(() => { 
+        const imagesFolder = require.context('../../public/images', true);
+        const getImage = () => {
+            //let url = `https://lh3.googleusercontent.com/${this.state.images[i].image}`;
+            console.log(`status.control: ${status.control}\nstatus.play: ${status.play}\nstatus.index: ${status.index}\nimages.length: ${images.length}`)
+            if (status.play || status.control) {
+                const newIndex = ((status.index+1) === images.length) ? 0 : (status.index+1);
+                if (status.play) {
+                    setStatus({
+                        index: newIndex,
+                        play: status.play,
+                        control: false,
+                        url: (imagesFolder(`./${images[newIndex]}`))
+                    });
+                }  
+            } 
+        }    		
         const timerID = setInterval(
             () => getImage(),
             300
@@ -58,7 +59,7 @@ const PhotoSequence = () => {
         return function cleanUp () {
             clearInterval(timerID);
         }
-    });
+    },[status]);
     return (
         <div>
             <div className='flexContainer p-10 r-10 bg-lite ml-20 mr-20 mb-20'>

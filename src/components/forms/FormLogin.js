@@ -5,6 +5,7 @@ const FormLogin = ({isLoggedIn, user, handleClick}) => {
     const [loggedIn, setLoggedIn] = useState(isLoggedIn);
     const [value, setValue] = useState('');
 
+    // eslint-disable-next-line
     const handleChange = (event) => {
         //console.log("value: " + event.target.value)
         setValue(event.target.value);

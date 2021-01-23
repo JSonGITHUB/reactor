@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 
 const WaveUtils = ({item, state, logLocation}) => {
-    
+    // eslint-disable-next-line
     const [status, setStatus] = useState(state);
     const [locations, setLocations] = useState(state.locations)
     const addWave = () => {

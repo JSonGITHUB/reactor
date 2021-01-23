@@ -10,6 +10,7 @@ const Photos = () => {
     const api = config.unsplashAPI_BASE_URL;
     //console.log(`KEY: ${KEY}\napi: ${api}`)
     const onSearchSubmit = async (term, callback) => {
+        // eslint-disable-next-line
         const response = await UnSplash.get(api, {
                 params: {query: term},
                 headers: {
@@ -19,7 +20,7 @@ const Photos = () => {
             .then (response => {
                 const images = [];
                 //console.log(`response.data.results: ${response.data.results}`)
-                response.data.results.map((item, index) => {
+                response.data.results.map(item => {
                     images.push({
                         'image': item.urls.thumb,
                         'description': item.alt_description,

@@ -1,5 +1,3 @@
-import React from 'react';
-
 const CalculateDistance = (state, item) => {
         
     const { latitude, longitude } = state;
