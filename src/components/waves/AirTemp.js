@@ -24,7 +24,7 @@ const AirTemp = ({isMotionOn}) => {
         const getEndTime = `${year}${month}${date}%20${hours}:${minutes}`;
         const getStartTime = `${year}${month}${date}%20${startHour}:00`;
         getCurrentTime = `${year}${month}${date}%20${hours}:${minutes}`;
-        console.log(`Air   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
+        //console.log(`Air   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
         const airTempuri = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getStartTime}&end_date=${getEndTime}&station=9410230&product=air_temperature&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
         //`https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=20200520%2018:24&end_date=20200520%2018:24&station=9410230&product=water_temperature&datum=mllw&units=english&time_zone=gmt&application=web_services&format=json`
         const proxyurl = "https://cors-anywhere.herokuapp.com/";
@@ -46,7 +46,7 @@ const AirTemp = ({isMotionOn}) => {
             clearInterval(timerID);
         }
         */
-       console.log(`getAirTempData`)
+       //console.log(`getAirTempData`)
     },[]);
     const getCurrentTemp = () => <div className="r-10 m-5 p-10 bg-lite white">
                                 {temp}° 

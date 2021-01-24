@@ -48,7 +48,7 @@ const Tide = ({setTide, display, isMotionOn}) => {
             const returnRejection = (response) => Promise.reject({status: response.status, data});
             const validate = (response) => (response.ok) ? returnJSON(response) : returnRejection(response);
             
-            console.log(`Tide   - getStartTime: ${getCurrentTime().startTime} => getEndTime: ${getCurrentTime().endTime}`)
+            //console.log(`Tide   - getStartTime: ${getCurrentTime().startTime} => getEndTime: ${getCurrentTime().endTime}`)
             const uriMLLW = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime().startTime}&end_date=${getCurrentTime().endTime}&station=9410230&product=water_level&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
             /*
             const uriMHHW = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime().currentTime}&end_date=${getCurrentTime().currentTime}&station=9410230&product=water_level&datum=MHHW&units=english&time_zone=lst_ldt&application=web_services&format=json`;
@@ -104,7 +104,7 @@ const Tide = ({setTide, display, isMotionOn}) => {
             const returnJSON = (response) => response.json();
             const returnRejection = (response) => Promise.reject({status: response.status, data});
             const validate = (response) => (response.ok) ? returnJSON(response) : returnRejection(response);
-            console.log(`Tide   - getStartTime: ${getCurrentTime().startTime} => getEndTime: ${getCurrentTime().endTime}`)
+            //console.log(`Tide   - getStartTime: ${getCurrentTime().startTime} => getEndTime: ${getCurrentTime().endTime}`)
             const tideDaily = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&amp;application=NOS.COOPS.TAC.WL&amp;begin_date=${getCurrentTime().year}${getCurrentTime().month}${getCurrentTime().date}&amp;end_date=${getCurrentTime().year}${getCurrentTime().month}${getCurrentTime().date}&amp;datum=MLLW&amp;station=9410230&amp;time_zone=lst_ldt&amp;units=english&amp;interval=hilo&amp;format=json`;
             const uri = tideDaily;
             // eslint-disable-next-line
