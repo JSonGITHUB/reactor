@@ -60,7 +60,7 @@ const WindDirection = ({columns, setWind}) => {
             const getEndTime = `${year}${month}${date}%20${hours}:${minutes}`;
             const getStartTime = `${year}${month}${date}%20${startHour}:00`;
             getCurrentTime = `${year}${month}${date}%20${hours}:${minutes}`;
-            console.log(`Wind   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
+            //console.log(`Wind   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
             // eslint-disable-next-line
             const uriWind = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getStartTime}&end_date=${getEndTime}&station=9410230&product=wind&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
             // eslint-disable-next-line
@@ -72,7 +72,7 @@ const WindDirection = ({columns, setWind}) => {
             fetch(proxyurl + uri)
                 .then(response => validate(response))
                 .then(data => {
-                    console.log(`WindDirection => direction: ${JSON.stringify(data.data[data.data.length - 1],null,2)}`)
+                    //console.log(`WindDirection => direction: ${JSON.stringify(data.data[data.data.length - 1],null,2)}`)
                     setWind(data.data[data.data.length - 1].dr, data.data[data.data.length - 1].d, data.data[data.data.length - 1].s, data.data[data.data.length - 1].g)
                     setStatus(prevState => ({
                         ...prevState,
@@ -96,7 +96,7 @@ const WindDirection = ({columns, setWind}) => {
             clearInterval(timerID);
         }
         */
-       console.log(`getWindData`)
+       //console.log(`getWindData`)
 
     },[]);
 
