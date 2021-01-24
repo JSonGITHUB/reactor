@@ -4,7 +4,7 @@ import { withRouter } from "react-router-dom";
 const ScrollToTop = ({ loc }) => {
     useEffect(() => {
         if (window.location.pathname !== loc.location) {
-            console.log(`ScrollToTop =>\nlocation: ${loc.pathname}`);
+            //console.log(`ScrollToTop =>\nlocation: ${loc.pathname}`);
             window.scrollTo(0, 0);
         }    		
     },[loc.location, loc.pathname]);
