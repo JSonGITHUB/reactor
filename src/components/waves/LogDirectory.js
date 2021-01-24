@@ -53,7 +53,7 @@ const LogDirectory = ({ title, message }) => {
                         }
                     }}
                 >
-                    <div key={getKey("log")} className="flexContainer incompletedSelector myButton pt-10 pb-10 pr-20" onClick={() => sessionClick(item, spot)}>
+                    <div key={getKey("log")} className="flexContainer incompletedSelector myButton pt-10 pb-10 pr-20 mobileFull" onClick={() => sessionClick(item, spot)}>
                             <div className="flexOneFourthColumn p-10">
                                 {/*<img src={condition(item)} alt={item} className='shaka' />*/}
                                 <img src={condition} alt={conditionDescription} className='shaka' />
