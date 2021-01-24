@@ -24,7 +24,7 @@ const WaterTemp = ({isMotionOn}) => {
         const getEndTime = `${year}${month}${date}%20${hours}:${minutes}`;
         const getStartTime = `${year}${month}${date}%20${startHour}:00`;
         getCurrentTime = `${year}${month}${date}%20${hours}:${minutes}`;
-        console.log(`WaterTemp   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
+        //console.log(`WaterTemp   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
         const waterTempuri = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getStartTime}&end_date=${getEndTime}&station=9410230&product=water_temperature&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
         //`https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=20200520%2018:24&end_date=20200520%2018:24&station=9410230&product=water_temperature&datum=mllw&units=english&time_zone=gmt&application=web_services&format=json`
         const proxyurl = "https://cors-anywhere.herokuapp.com/";
@@ -56,12 +56,12 @@ const WaterTemp = ({isMotionOn}) => {
         const getEndTime = `${year}${month}${date}%20${hours}:${minutes}`;
         const getStartTime = `${year}${month}${date}%20${startHour}:00`;
         getCurrentTime = `${year}${month}${date}%20${hours}:${minutes}`;
-        console.log(`LocalWaterTemp   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
+        //console.log(`LocalWaterTemp   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
         const localWaterTempURI = `http://192.168.1.8:8080/`;
         fetch(localWaterTempURI)
             .then(response => validate(response))
             .then(data => {
-                console.log(`LocalWaterTemp: ${JSON.stringify(data, 2, null)}`)
+                //(`LocalWaterTemp: ${JSON.stringify(data, 2, null)}`)
                 setTemp(Number(data.data[data.data.length - 1].v).toFixed(0))
             })
             .catch(err => console.log(`Something went wrong!\nuri: ${localWaterTempURI} \npath: ${window.location.pathname}\n`, err));
@@ -69,7 +69,7 @@ const WaterTemp = ({isMotionOn}) => {
     
     useEffect(() => {   
         getWaterTempData();	
-        console.log(`getWaterTempData`)
+        //console.log(`getWaterTempData`)
     },[]);
     const getCurrentTemp = () => <div>
                             {temp}° 
