@@ -52,7 +52,7 @@ const WaveFinder = ({
     const getDefault = (item) => (getLocal(item) === null) ? getProps(item) : getLocal(item);
     const getSwell1Direction = () => localStorage.getItem("swell1Direction") ? localStorage.getItem("swell1Direction") : "SSW";
     const getSwell2Direction = () => localStorage.getItem("swell2Direction") ? localStorage.getItem("swell2Direction") : "SSW";
-    console.log(`isWind: ${getDefault("isWind")}`)
+    //console.log(`isWind: ${getDefault("isWind")}`)
     const getLocations = () => getLocalLocations() || defaultLocations();
     const getLocalLocations = () => (localStorage.getItem('locations')) ? JSON.parse(localStorage.getItem('locations')) : false;
     const defaultLocations = () => {
@@ -236,7 +236,7 @@ const WaveFinder = ({
 
     const handleSwell1Selection = (groupTitle, label, selected) => {
         const swell1Angle = directionObject[selected];
-        console.log(`handleSwell1Selection => \nselected: ${selected} \nswell1Angle: ${swell1Angle}\n directionObject: ${JSON.stringify(directionObject, null, 2)}`)
+        //console.log(`handleSwell1Selection => \nselected: ${selected} \nswell1Angle: ${swell1Angle}\n directionObject: ${JSON.stringify(directionObject, null, 2)}`)
         localStorage.setItem("swell1Angle", swell1Angle);
         localStorage.setItem("swell1Direction", selected);
         setStatus(prevState => ({
@@ -248,7 +248,7 @@ const WaveFinder = ({
     }
     const handleSwell2Selection = (groupTitle, label, selected) => {
         const swell2Angle = directionObject[selected];
-        console.log(`${selected} swell2Angle: ${swell2Angle}`)
+        //console.log(`${selected} swell2Angle: ${swell2Angle}`)
         localStorage.setItem("swell2Angle", swell2Angle);
         localStorage.setItem("swell2Direction", selected);
         setStatus(prevState => ({
@@ -331,14 +331,14 @@ const WaveFinder = ({
         }));
     }
     const pause = (event) => {
-        console.log("PAUSE");
+        //console.log("PAUSE");
         setStatus(prevState => ({
             ...prevState,
             pause: true
         }));
     }
     const unpause = () => {
-        console.log("UNPAUSE");
+        //console.log("UNPAUSE");
         setStatus(prevState => ({
             ...prevState,
             pause: false
@@ -644,11 +644,11 @@ const WaveFinder = ({
                             <div className="greet">{getState(matchKind)}{getStarDetails(matchKind)}</div>
                         </div>;
     const setTide = (tide) => {
-        console.log(`WaveFinder = > setTide(${tide})`)
+        //console.log(`WaveFinder = > setTide(${tide})`)
         let currentTide = (Number(tide)>2) ? "medium" : "low";
-        console.log(`WaveFinder = > ${tide} currentTide(${currentTide})`)
+        //console.log(`WaveFinder = > ${tide} currentTide(${currentTide})`)
         currentTide = (Number(tide)>4) ? "high" : currentTide;
-        console.log(`WaveFinder = > ${tide} currentTide(${currentTide})`)
+        //console.log(`WaveFinder = > ${tide} currentTide(${currentTide})`)
         if (status.pause === false) {
             setStatus(prevState => ({
                 ...prevState,
