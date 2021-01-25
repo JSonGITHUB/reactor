@@ -28,6 +28,7 @@ import WikiSearch from './components/WikiSearch.js';
 import Translator from './components/Translator.js';
 import Accordion from './components/Accordion.js';
 import Weather from './components/weather/Weather.js';
+import ScoreKeeper from './components/utils/ScoreKeeper.js';
 
 class App extends React.Component {
   constructor(props) {
@@ -153,6 +154,7 @@ class App extends React.Component {
                   <Route path="/Videos" render={(props) => <Videos />}/>
                   <Route path="/WikiSearch" render={(props) => <WikiSearch />}/>
                   <Route path="/Translator" render={(props) => <Translator />}/>
+                  <Route path="/ScoreKeeper" render={(props) => <ScoreKeeper />}/>
                   <Route path="/Accordion" render={(props) => <Accordion items={this.items}/>}/>
                   <Route path="/Todos" render={(props) => <Todos />}/>
                   <Route path="/Reducer" component={Reducer} />

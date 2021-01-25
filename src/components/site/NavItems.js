@@ -16,6 +16,7 @@ const NavItems = [
     //'PhotoSequence',
     //'Search'
     'WikiSearch',
-    'Translator'
+    'Translator',
+    'ScoreKeeper'
 ];
 export default NavItems
