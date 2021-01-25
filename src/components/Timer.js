@@ -39,16 +39,7 @@ const Timer = () => {
     const time = localDate.replace(" ","").toLocaleLowerCase();
     return (
         <div className="time p-20">
-            <div className='color-red'>
-                do you know what time it is?
-            </div>
-            <br/>
             <b>{time}</b>
-            <br/>
-            <br/>
-            <div className='color-green'>
-                <b>{ timeItIsNow }</b>
-            </div>
         </div>
     )
 }
