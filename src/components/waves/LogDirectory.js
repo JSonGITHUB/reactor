@@ -8,10 +8,12 @@ import {BrowserRouter as Link} from 'react-router-dom';
 
 const LogDirectory = ({ title, message }) => {
     
+   const getLog = () => window.location.pathname = "/reactor/SurfLog";
    const sessionClick = (item, spot) => {
         localStorage.setItem('spot', spot)
         localStorage.setItem('logId', item)
         console.log(`sessionClick \n${item} --> \nSpot: ${spot}`);
+        getLog();
     }
     
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"]
