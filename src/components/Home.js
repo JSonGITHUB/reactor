@@ -57,11 +57,11 @@ const Home = () => {
     const getTracker = () => {
         const tracker = (tracking === true) 
         ? <div>
-            <div className="color-neogreen p-20 bold bigFont100 bg-dkGreen r-5 m-20">{getDistance()}</div>
+            <div className="color-neogreen p-20 bold bigHeader bg-dkGreen r-5 m-20">{getDistance()}</div>
             <div className="button p-20 r-5 m-20 bg-red incompletedSelector color-yellow" onClick={stopTracking}>Stop Tracking</div>
         </div>
         : <div>
-            <div className="color-neogreen p-20 bold bigFont100 bg-dkGreen r-5 m-20">{distance}</div>
+            <div className="color-neogreen p-20 bold bigHeader bg-dkGreen r-5 m-20">{distance}</div>
             <div className="button p-20 r-5 m-20 bg-neogreen completedSelector color-black" onClick={startDistance}>Start Tracking</div>
         </div>
 
