@@ -22,7 +22,7 @@ const ScoreKeeper = () => {
         newPlayers.push(newPlayer)
         localStorage.setItem("players", JSON.stringify(newPlayers));
         setPlayers(newPlayers);
-        getScore();
+        //getScore();
     }
     const edit = (event) => {
         setEdit(!editStatus);
@@ -34,7 +34,7 @@ const ScoreKeeper = () => {
         newPlayers[index] = newPlayer;
         localStorage.setItem("players", JSON.stringify(newPlayers));
         setPlayers(newPlayers);
-        getScore();
+        //getScore();
     }
     const getScore = () => window.location.pathname = "/reactor/ScoreKeeper";
     const deletePlayer = (index) => {
@@ -44,7 +44,7 @@ const ScoreKeeper = () => {
         newPlayers.splice(index, 1);
         localStorage.setItem("players", JSON.stringify(newPlayers));
         setPlayers(newPlayers);
-        getScore();
+        //getScore();
     }
     const scorecards = () => {
         console.log(`build Scorecards`)
