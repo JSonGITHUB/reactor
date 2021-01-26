@@ -14,7 +14,7 @@ const ScoreCard = ({ player, index, editPlayer, deletePlayer }) => {
                     <div className='button bg-red p-10 m-10 r-10' onClick={() => subtractScore()}>-</div>
                     <div className='button bg-red p-10 m-10 r-10' onClick={() => deletePlayer(index)}>DELETE</div>
                 </div>
-                <input
+                <textarea cols='5'
                     className='flex3Column App bg-dark white'
                     type="text"
                     value={score}
