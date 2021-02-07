@@ -5,9 +5,10 @@ const Timer = () => {
     const timeItIs = ["shaka time!!!", "get a wave brah!", "keep froth alive..."];
     // eslint-disable-next-line
     const logos = [1,2,3];
+    // eslint-disable-next-line
     let x = 0;
     let interval = 0;
-    let timeItIsNow = timeItIs[x];
+    //let timeItIsNow = timeItIs[x];
     const stackIndex = 0;
     // eslint-disable-next-line
     const logoStacker = (value, index, array) => {
@@ -34,7 +35,7 @@ const Timer = () => {
     },[]);
     interval = (interval === 3) ? 0 : (interval+1);
     x = (x === (timeItIs.length-1) && (interval === 0)) ? 0 : ((interval === 0) ? (x+1) : x);
-    timeItIsNow = timeItIs[x];
+    //timeItIsNow = timeItIs[x];
     const localDate = date.toLocaleTimeString();
     const time = localDate.replace(" ","").toLocaleLowerCase();
     return (

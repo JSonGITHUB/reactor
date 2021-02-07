@@ -43,13 +43,14 @@ const WaveUtils = ({item, state, logLocation}) => {
         let waveLocations = JSON.parse(localStorage.getItem("locations"));
         //console.log(`Props: ${JSON.stringify(props, null, 2)}`)
         let index = 0;
-        let result = waveLocations.find(obj => {
+        /*
+        const result = waveLocations.find(obj => {
             index++
             return obj.name === props.name
         })
-        //console.log(`delete 1 => index: ${index-1} result: ${JSON.stringify(result, null, 2)}`)
-        //console.log(`delete 2 => locations: [${index-1}]: ${JSON.stringify(waveLocations[index-1], null, 2)}`)
-
+        console.log(`delete 1 => index: ${index-1} result: ${JSON.stringify(result, null, 2)}`)
+        console.log(`delete 2 => locations: [${index-1}]: ${JSON.stringify(waveLocations[index-1], null, 2)}`)
+        */
         ///////////////
         waveLocations.splice(index-1, 1);
         localStorage.setItem('locations', JSON.stringify(waveLocations))
@@ -106,7 +107,7 @@ const WaveUtils = ({item, state, logLocation}) => {
             //console.log(`edit a wave... ${JSON.stringify(item, null, 2)}`);
             //console.log(`Props: ${JSON.stringify(props, null, 2)}`)
             let index = 0;
-            let result = waveLocations.find(obj => {
+            const result = waveLocations.find(obj => {
                 index++
                 return obj.name === item.name
             })

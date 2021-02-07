@@ -17,6 +17,7 @@ const NavItems = [
     //'Search'
     'WikiSearch',
     'Translator',
-    'ScoreKeeper'
+    'ScoreKeeper',
+    'Shop'
 ];
 export default NavItems

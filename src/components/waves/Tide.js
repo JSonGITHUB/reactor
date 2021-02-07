@@ -41,6 +41,7 @@ const Tide = ({setTide, display, isMotionOn}) => {
         )
     }
     useEffect(() => { 
+        let ignore = false;
         const getTideData = () => {
             console.log(`getTideData ->`);
             let data;
@@ -96,8 +97,7 @@ const Tide = ({setTide, display, isMotionOn}) => {
                     }));
                 })
                 .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
-    
-        }
+            };
         const getDirection = () => {
             console.log(`getDirection ->`);
             let data;
@@ -162,7 +162,6 @@ const Tide = ({setTide, display, isMotionOn}) => {
             getTideData();
             getDirection();
         }  
-        getAllData();
         /*  		
         const timerID = setInterval(
             () => getAllData(),
@@ -172,7 +171,10 @@ const Tide = ({setTide, display, isMotionOn}) => {
             clearInterval(timerID);
         }
         */
-    },[]);
+
+       if (!ignore) getAllData();
+       return () => { ignore = true; }
+    },[setTide]);
     const previousTide = () => (localStorage.getItem("tide")) ? Number(localStorage.getItem("tide")) : 0;
     // eslint-disable-next-line
     const notEqual = () => (Number(previousTide()) !== Number(status.height)) ? true : false;

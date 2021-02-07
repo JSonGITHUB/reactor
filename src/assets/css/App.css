@@ -32,6 +32,13 @@
 .maxWidth400 {
   max-width: 400px;
 }
+.w-100 {
+  width: 100px;
+}
+.w-150 {
+  width: 150px;
+}
+
 .w-200 {
   width: 200px;
 }
@@ -221,6 +228,14 @@ select {
 .copyright {
   font-size: 9px;
 }
+.selectIcon {
+  right:30px;
+  position: absolute;
+}
+.cartIcon {
+  left:30px;
+  position: absolute;
+}
 .small {
   font-size: 11px;
 }
@@ -255,6 +270,10 @@ select {
   text-shadow:0px 3px 3px #333333;
   font-weight: bold;
   font-size: 30px;
+}
+.font50 {
+  font-weight: bold;
+  font-size: 50px;
 }
 .bigFont100 {
   font-weight: bold;
@@ -697,6 +716,10 @@ button:hover {
 }
 .button:hover {
   opacity: .9;
+  cursor: pointer;
+}
+.button {
+  
 }
 
 .button-green {
@@ -888,6 +911,31 @@ input.error {
 .time {
   color:yellow;
   font-size: 15px;
+}
+.regular-checkbox {
+	-webkit-appearance: none;
+	background-color: #222222;
+	border: 1px solid #999999;
+	padding: 10px;
+	border-radius: 3px;
+	display: inline-block;
+  position: relative;
+}
+.regular-checkbox:active, .regular-checkbox:checked:active {
+}
+
+.regular-checkbox:checked {
+	background-color: #222222;
+	border: 1px solid #999999;
+	color: #99a1a7;
+}
+.regular-checkbox:checked:after {
+	content: '\2714';
+	font-size: 14px;
+	position: absolute;
+	top: 0px;
+	left: 3px;
+	color: #99a1a7;
 }
 .mt-1 {
   margin-top: 1px;
