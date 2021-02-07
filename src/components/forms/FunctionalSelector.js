@@ -21,7 +21,7 @@ function FormSelector(props) {
     }
     return (
         <label>    
-            <select value={selected} onChange={handleChange}>
+            <select className='p-10 r-5 bg-dark white bold greet mt-5 button' value={selected} onChange={handleChange}>
                 {selectItems}
             </select>
         </label>

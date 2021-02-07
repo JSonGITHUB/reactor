@@ -53,7 +53,9 @@ const WaterTemp = ({isMotionOn}) => {
         const startHour = ((currentHour-1)<10) ? `0${(currentHour-1)}` : (currentHour-1);
         const currentMinutes = getCurrentTime.getMinutes();
         const minutes = (currentMinutes<10) ? `0${currentMinutes}` : currentMinutes;
+        // eslint-disable-next-line
         const getEndTime = `${year}${month}${date}%20${hours}:${minutes}`;
+        // eslint-disable-next-line
         const getStartTime = `${year}${month}${date}%20${startHour}:00`;
         getCurrentTime = `${year}${month}${date}%20${hours}:${minutes}`;
         //console.log(`LocalWaterTemp   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)

@@ -20,13 +20,13 @@ const Photos = () => {
             .then (response => {
                 const images = [];
                 //console.log(`response.data.results: ${response.data.results}`)
-                response.data.results.map(item => {
+                response.data.results.forEach(item => {
                     images.push({
                         'image': item.urls.thumb,
                         'description': item.alt_description,
                         'location': item.user.location
                     });
-                })
+                });
                 setPhotos(images);
                 return callback(images)
             });

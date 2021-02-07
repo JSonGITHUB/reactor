@@ -40,6 +40,7 @@ const WindDirection = ({columns, setWind}) => {
     */
 
     useEffect(() => {  
+        let ignore = false;
         async function getWindData () {
             console.log(`getWind ->`);
             let data;
@@ -86,7 +87,7 @@ const WindDirection = ({columns, setWind}) => {
                 .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
     
         } 
-        getWindData();  
+        if (!ignore) getWindData();  
         /*		
         const timerID = setInterval(
             () => getWindData(),
@@ -97,8 +98,8 @@ const WindDirection = ({columns, setWind}) => {
         }
         */
        //console.log(`getWindData`)
-
-    },[]);
+       return () => { ignore = true; }
+    },[setWind]);
 
     /*
     Water Level: 2.01 ft Above MLLW

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Timer from './Timer.js';
+import Timer from './utils/Timer.js';
 import Geolocator from './utils/Geolocator.js';
 
 const Home = () => {

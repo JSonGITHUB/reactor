@@ -129,7 +129,7 @@ const WaveFinder = ({
         return function cleanUp () {
             clearInterval(timerID);
         }
-    },[]);
+    });
     const currentPositionExists = () => (status.longitude) ? true : false;
     const updateCurrentLocation = (longitude, latitude) => {
 //      console.log(`UPDATING CURRENT POSITION ======> longitude: ${longitude} latitude: ${latitude}`)
