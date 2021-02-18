@@ -1,62 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import getKey from '../utils/KeyGenerator.js';
-import debounceType from '../utils/DebouncerType.js';
 import menu from '../../assets/images/menuYellow.png';
+import { BsFillGearFill } from "react-icons/bs";
 import Selected from '../../assets/images/cart.png';
 import Select from '../../assets/images/addToCart.png';
 import InCart from '../../assets/images/inCart.png';
 import PutInCart from '../../assets/images/putInCart.png';
 import Selector from '../forms/FunctionalSelector.js';
+import SettingsMenu from './SettingsMenu.js';
+import SearchBar from '../utils/SearchBar';
 import '../../assets/css/shop.css';
+import debounceType from '../utils/DebouncerType.js';
 
 const Shop = () => {
-    console.log(`Shop til you drop!!!`);
+    //console.log(`Shop til you drop!!!`);
+    const [ itemEntry, setItemEntry ] = useState('');
     const today = new Date();
     const initData = [
         {
-            "title": "Tent",
-            "aisle": "Baja",
-            "price": "60.00",
+            "title": "Sugar",
+            "aisle": "Baking",
+            "price": "8.00",
             "quantity": "1",
-            "tax": false,
-            "cart": false,
-            "select": false,
+            "tax": true,
+            "cart": true,
+            "select": true,
             "lastPurchase": "",
             "days": 0
         }
     ];
     const itemMenuDefault = ['', 'ADD INDEX', 'EDIT', 'PRICE', 'DELETE'];
     const quantities = [0,1,2,3,4,5,6,7,8,9,10];
-    const settings = [
-        'Sort by Name',
-        'Font Size',
-        'Tax',
-        'Save', 
-        'Restore',
-        'Export',
-        'Clear', 
-        'Undo'
-    ];
-    let newItem = {
-        title: '', 
-        aisle: '', 
-        price: '', 
-        quantity: 1, 
-        tax: false, 
-        cart: false, 
-        select: false, 
-        lastPurchase: '', 
-        days: 0
-    };
     const getTodos = () => {
         const newTodos = (localStorage.getItem('vueTodos')) ? JSON.parse(localStorage.getItem('vueTodos')) : initData;
+        
         return newTodos;
     }
-    const getLocalAisles = () => {
-        const aisles = localStorage.getItem('aisles').split(',');
-    }
     const aislesInit = ['Vons', 'Sprouts', 'Smart and Final'];
-    const getAisles = () => (localStorage.getItem('aisles') !== undefined) ? JSON.parse(localStorage.getItem('aisles')) : aislesInit;
+    const getAisles = () => (localStorage.getItem('aisles') !== null) ? JSON.parse(localStorage.getItem('aisles')) : aislesInit;
     const pad = (n, width, z) => {
         //pad(10, 4) => 0010
         z = z || '0';
@@ -66,14 +47,15 @@ const Shop = () => {
     const getColors = (aisles) => {
         const colors = [];
         let aisleColor = '';
-        aisles = (aisles !== undefined) ? aisles : aislesInit;
+        aisles = (aisles !== null) ? aisles : aislesInit;
+        //console.log(`getColors() => \naisles: ${aisles}`);
         aisles.forEach(aisle => {
             aisleColor = Math.floor(Math.random()*16777215).toString(16).toUpperCase();
             aisleColor = pad(aisleColor, 6);
-            console.log(`getColors => \naisleColor: ${aisleColor}\naisleColorLength: ${aisleColor.length}`)
+            //console.log(`getColors => \naisleColor: ${aisleColor}\naisleColorLength: ${aisleColor.length}`)
             colors.push(`#${aisleColor}`);
         });
-        console.log(`getColors => colors: ${colors}`)
+        //console.log(`getColors => colors: ${colors}`)
         return colors;
     }
     const [ status, setStatus ] = useState({
@@ -85,37 +67,40 @@ const Shop = () => {
         aisles: getAisles(),
         colors: getColors(getAisles()),
         retrievedData: getTodos(),
-        itemEntry: '',
         ogTitle: '',
         newTodoText: '',
         total: 0, 
         taxTotal: 0, 
         items: 0, 
-        totalItems: 0
+        totalItems: 0,
+        sortByIndex: true
     });
-    console.log(`todos: ${JSON.stringify(status.todos, null, 2)}`)
+    //console.log(`todos: ${JSON.stringify(status.todos, null, 2)}`)
     localStorage.setItem('vueTodosSaved', JSON.stringify(status.todos));
     localStorage.setItem('vueTodos', JSON.stringify(status.todos));
     //console.log(`vueTodosSaved(1): ${JSON.stringify(JSON.parse(localStorage.getItem('vueTodosSaved')),null,2)}`);
     const aisleIndex = (aisle) => (status.aisles === undefined) ? 0 : status.aisles.indexOf(aisle);
     const getColor = (aisle) => {
-        const index = aisleIndex(aisle);
-        console.log(`getColor => \nindex: ${index}\naisle: ${aisle}\ncolors: ${status.colors}\ncolor: ${status.colors[aisleIndex(aisle)]}`)
+        //const index = aisleIndex(aisle);
+        //console.log(`getColor => \nindex: ${index}\naisle: ${aisle}\ncolors: ${status.colors}\ncolor: ${status.colors[aisleIndex(aisle)]}`)
         return status.colors[aisleIndex(aisle)];
     }
     const daItem = (todo, index) => {
         //console.log(`daItem =>\ntodo: ${JSON.stringify(todo, null, 2)}\nindex: ${index}`);
         const getTaxCheckBox = () => {
            if (todo.tax) {
-            return <input className='regular-checkbox button' checked type='checkbox' id='tax' onChange={() => toggleTax(index)} />
+            return <input className='regular-checkbox button glassy' checked type='checkbox' id='tax' onChange={() => toggleTax(index)} />
            } else {
-            return <input className='regular-checkbox button' type='checkbox' id='tax' onChange={() => toggleTax(index)} />
+            return <input className='regular-checkbox button glassy' type='checkbox' id='tax' onChange={() => toggleTax(index)} />
            }
         }
+        const shopNavClasses = () => (todo.select) ? 'itemRemove glassyShopNav' : 'itemRemove';
+        const titleClasses = () => (todo.select) ? 'title white' : 'title';
         return (
-            <div>
-                <div className='itemRemove' onClick={() => toggleSelect(index)}>
-                    <span className='title'>{ status.todos[index].title }</span>
+            <div key={getKey(status.todos[index].title)}>
+                <div className='height1px' style={{backgroundColor: getColor(todo.aisle)}}></div>
+                <div className={shopNavClasses()} onClick={() => toggleSelect(index)}>
+                    <span className={titleClasses()}>{ status.todos[index].title }</span>
                     {getSelectIcon(index)}
                 </div>
                 {/*console.log(`color: ${getColor(todo.aisle)}`)*/}
@@ -125,15 +110,15 @@ const Shop = () => {
                             <div className='button'>
                                 {getInCartButton(index)}
                             </div>
-                            <div className='size25 m-10'> 
-                                { todo.price }
+                            <div className='size20 m-10'> 
+                                ${ todo.price }
                             </div>
                         </div>
                         <div>
                             <div>Days</div>
-                            <div className='lastPurchaseDays'>{todo.days}</div>
+                            <div className='lastPurchaseDays flexOneFifthColumn'>{todo.days}</div>
                         </div>
-                        <div className='mb-5'>
+                        <div>
                             <div className='mb-5'>Tax</div>
                             {getTaxCheckBox()}
                         </div>
@@ -146,16 +131,21 @@ const Shop = () => {
                                 label={index}
                                 items={quantities}
                                 onChange={updateQuantity}
+                                padding='5px'
+                                fontSize='15'
                             />
                         </div>
-                        <div id='aisle'>
-                        <div className='mb-5'>Aisle</div>
+                        <div id='aisle flexTwoFourthColumn' >
+                            <div className='mb-5'>Aisle</div>
                             <Selector
                                 groupTitle='Aisle'
                                 selected={todo.aisle} 
                                 label={index} 
                                 items={itemMenuDefault.concat(status.aisles) || itemMenuDefault.concat(aislesInit)}
                                 onChange={reIndex}
+                                padding='5px'
+                                fontSize='15' 
+                                maxWidth='115px'
                             />
                         </div>
                     </div>
@@ -194,11 +184,16 @@ const Shop = () => {
         getItems('effect');
         getTotal();
     },[status.todos]);
-
+    
+    useEffect(() => {
+        updateAisles();
+    },[]);
+    useEffect(() => {
+        getTotal();
+    },[status.tax]);
     const sortArray = (array) => {
         const alphabetic = [];
         const numeric = [];
-        let n=0;
         array.forEach(item => {
             if (Number(item.substring(0,1)) > 0) {
                 numeric.push(item);
@@ -251,25 +246,25 @@ const Shop = () => {
             //tax: newTax
         }));
     };
-    const updatePrice = () => {
-        const updatedTodos = status.todos;
-        updatedTodos.forEach(item => {
-            if (typeof item.price === 'undefined') {
-                item.price = Number(0).toFixed(2);
-            }
+    const sortName = () => {
+        let sortedTodos = status.todos;
+        sortedTodos.sort(function(a, b){
+            let x = a.title.toLowerCase();
+            let y = b.title.toLowerCase();
+            if (x < y) {return -1;}
+            if (x > y) {return 1;}
+            return 0;
         });
         setStatus(prevState => ({
             ...prevState,
-            todos: updatedTodos
+            todos: sortedTodos
         }));
-        getTotal();
     };
     const updateAisles = () => {
-        let aisleColor;
         let colors = [];
         let todoSort = [];
         let inactiveTodos = [];
-        let newAisles = status.aisles;
+        let newAisles = status.aisles || aislesInit;
         const updatedTodos = status.todos;
         updatedTodos.forEach(todo => {
             if (newAisles.indexOf(todo.aisle) < 0) {
@@ -288,38 +283,35 @@ const Shop = () => {
                 }
             });
         });
-        console.log(`updateAisles => !!!!!!!!!!\ntodoSort: ${todoSort}\ninactiveTodos: ${inactiveTodos}`)
+        //console.log(`updateAisles => !!!!!!!!!!\ntodoSort: ${JSON.stringify(todoSort, null,2)}\ninactiveTodos: ${inactiveTodos}`)
         inactiveTodos.forEach(todo => todoSort.push(todo));
         setStatus(prevState => ({
             ...prevState,
-            todos: (settings[0] === 'Sort by Name') ? todoSort : todoSort,
+            todos: todoSort,
             aisles: newAisles,
             colors: colors
         }));
     };
-    const setEntry = (e) => {
-        const entry = e.target.value
-        console.log(`setEntry ${entry}`);
-        setStatus(prevState => ({
-            ...prevState,
-            itemEntry: entry
-        }));
+    const setEntry = (value) => {
+        //console.log(`setEntry ${value}`);
+        debounceType(setItemEntry, value);
     }
-    const addTodo = (e) => {
-        e.preventDefault();
-        console.log(`addTodo ${status.itemEntry}`);
+    const addTodo = () => {
+        //e.preventDefault();
+        //console.log(`addTodo =>\nitemEntry: ${itemEntry}`);
         const updatedTodos = status.todos;
         let updatedRetrievedData = status.retrievedData;
-        const updatedAisles = status.aisles;
+        const updatedAisles = status.aisles || aislesInit;
         let newPriceUpdate = 0;
-        if (status.itemEntry) {
+        let newItem = {};
+        if (itemEntry) {
             const newAisle = prompt('Enter aisle number:', '');
             if (updatedAisles.indexOf(newAisle) < 0) {
                 updatedAisles.push(newAisle);
             }
             newPriceUpdate = prompt('Enter price:', '');
             newItem = {
-                title: status.itemEntry, 
+                title: itemEntry, 
                 aisle: newAisle, 
                 price: Number(newPriceUpdate).toFixed(2),
                 quantity: 1, 
@@ -334,18 +326,18 @@ const Shop = () => {
             localStorage.setItem('vueTodos', JSON.stringify(updatedRetrievedData));
             if (!localStorage.getItem('vueTodosSaved')) {
                 localStorage.setItem('vueTodosSaved', JSON.stringify(updatedTodos));
-                console.log(`vueTodosSaved(2): ${JSON.stringify(JSON.parse(localStorage.getItem('vueTodosSaved')),null,2)}`);                
+                //console.log(`vueTodosSaved(2): ${JSON.stringify(JSON.parse(localStorage.getItem('vueTodosSaved')),null,2)}`);                
             } else {
                 updatedRetrievedData = JSON.parse(localStorage.getItem('vueTodosSaved'));
                 updatedRetrievedData.push(newItem);
                 localStorage.setItem('vueTodosSaved', JSON.stringify(updatedRetrievedData));
-                console.log(`vueTodosSaved(3): ${JSON.stringify(JSON.parse(localStorage.getItem('vueTodosSaved')),null,2)}`);
+                //console.log(`vueTodosSaved(3): ${JSON.stringify(JSON.parse(localStorage.getItem('vueTodosSaved')),null,2)}`);
             }
             const newTodos = JSON.parse(localStorage.getItem('vueTodosSaved'));
             const newRetrievedData = (localStorage.getItem('vueTodosSaved')) ? JSON.parse(localStorage.getItem('vueTodosSaved')) : JSON.parse(localStorage.getItem('vueTodos'))
             setStatus(prevState => ({
                 ...prevState,
-                newTodoText: status.itemEntry,
+                newTodoText: itemEntry,
                 aisles: updatedAisles,
                 retrievedData: newRetrievedData,
                 todos: newTodos,
@@ -369,18 +361,12 @@ const Shop = () => {
         }));
         getTotal();
     };
-    const toggleSettings = () => {
-        console.log(`toggleSettings => displaySettings: ${status.displaySettings}`)
-        setStatus(prevState => ({
-            ...prevState,
-            displaySettings: !status.displaySettings
-        }));
-    };
+  
     const reIndex = (groupTitle, index, selectedAisle) => {
-        console.log(`REINDEX => \nselectedAisle: ${selectedAisle}\nindex: ${index}`);
+        //console.log(`REINDEX => \nselectedAisle: ${selectedAisle}\nindex: ${index}`);
         const updatedTodos = status.todos;
         const updatedRetrievedData = JSON.parse(localStorage.getItem('vueTodosSaved'));
-        let newAisles = status.aisles;   
+        let newAisles = status.aisles || aislesInit;   
         if (selectedAisle === 'DELETE') {
             updatedRetrievedData.forEach(item => {
                 if (item.title === status.todos[index].title) {
@@ -388,7 +374,7 @@ const Shop = () => {
                 }
             })
             localStorage.setItem('vueTodosSaved', JSON.stringify(updatedRetrievedData));
-            console.log(`vueTodosSaved(4): ${JSON.stringify(JSON.parse(localStorage.getItem('vueTodosSaved')),null,2)}`)
+            //console.log(`vueTodosSaved(4): ${JSON.stringify(JSON.parse(localStorage.getItem('vueTodosSaved')),null,2)}`)
             updatedTodos.splice(index, 1);
         } else if (selectedAisle === 'PRICE') {
             updatedTodos[index].price = Number(prompt('Enter price:', '')).toFixed(2);
@@ -399,7 +385,7 @@ const Shop = () => {
                 };
             });
             localStorage.setItem('vueTodosSaved', JSON.stringify(updatedRetrievedData));
-            console.log(`vueTodosSaved(5): ${JSON.stringify(JSON.parse(localStorage.getItem('vueTodosSaved')))}`);
+            //console.log(`vueTodosSaved(5): ${JSON.stringify(JSON.parse(localStorage.getItem('vueTodosSaved')))}`);
         } else if (selectedAisle === 'EDIT') {
             let updatedOgTitle = status.ogTitle;
             updatedOgTitle = updatedTodos[index].title;
@@ -413,9 +399,9 @@ const Shop = () => {
             updatedTodos[index].aisle = selectedAisle;
             //updateAisles();
             localStorage.setItem('vueTodosSaved', JSON.stringify(updatedRetrievedData));
-            console.log(`vueTodosSaved(6): ${JSON.stringify(JSON.parse(localStorage.getItem('vueTodosSaved')),null,2)}`)
+            //console.log(`vueTodosSaved(6): ${JSON.stringify(JSON.parse(localStorage.getItem('vueTodosSaved')),null,2)}`)
         } else {
-            newAisles = status.aisles;
+            newAisles = status.aisles || aislesInit;
             if (selectedAisle === 'ADD INDEX') {
                 selectedAisle = prompt('Enter aisle number:', '');
                 if(newAisles.indexOf(selectedAisle) < 0){
@@ -431,7 +417,7 @@ const Shop = () => {
             localStorage.setItem('aisles', JSON.stringify(newAisles));
             localStorage.setItem('vueTodosSaved', JSON.stringify(updatedRetrievedData));
             localStorage.setItem('vueTodos', JSON.stringify(updatedRetrievedData));
-            console.log(`vueTodosSaved(7): ${JSON.stringify(JSON.parse(localStorage.getItem('vueTodosSaved')),null,2)}`)
+            //console.log(`vueTodosSaved(7): ${JSON.stringify(JSON.parse(localStorage.getItem('vueTodosSaved')),null,2)}`)
             getTotal();
             updateAisles(); 
             //window.location.pathname = "/reactor/Shop";
@@ -447,68 +433,9 @@ const Shop = () => {
         }));
 
     };
-    const getSetting = (index) => {
-        if (settings[index] === 'Clear') {
-            clear();
-        } else if (settings[index] === 'Sort by Name') {
-            sortName();
-            settings.splice(0, 1, 'Sort by Index');
-        } else if (settings[index] === 'Sort by Index') {
-            settings.splice(0, 1, 'Sort by Name');
-            updateAisles();
-        } else if (settings[index] === 'Tax') {
-            let newTax = prompt('Enter sales tax', status.tax);
-            localStorage.setItem('tax', newTax);
-            setStatus(prevState => ({
-                ...prevState,
-                tax: localStorage.getItem('tax')
-            }));
-            getTotal();
-        } else if (settings[index] === 'Font Size') {
-            const newFontSize = prompt('Enter font size', status.fontSize);
-            localStorage.setItem('fontSize', newFontSize);
-        } else if (settings[index] === 'Undo') {
-            revert();
-        } else if (settings[index] === 'Save') {
-            save();
-        } else if (settings[index] === 'Restore') {
-            restore();
-        } else if (settings[index] === 'Export') {
-            console.log(JSON.stringify(status.todos));
-        }
-        toggleSettings();
-    };
-    const clear = () => {
-        localStorage.setItem('vueTodosRevert', JSON.stringify(status.todos));
-        localStorage.removeItem('aisles', '');
-        localStorage.removeItem('vueTodos', '');
-        setStatus(prevState => ({
-            ...prevState,
-            todos: [],
-            aisles: []
-        }));
-        
-        getTotal();
-    };
-    const sortName = () => {
-        let aisleColor;
-        let todoSort = [];
-        let inactiveTodos = [];
-        let sortedTodos = status.todos;
-        sortedTodos.sort(function(a, b){
-            let x = a.title.toLowerCase();
-            let y = b.title.toLowerCase();
-            if (x < y) {return -1;}
-            if (x > y) {return 1;}
-            return 0;
-        });
-        setStatus(prevState => ({
-            ...prevState,
-            todos: sortedTodos
-        }));
-    };
+    
     const updateQuantity = (groupTitle, id, selected) => {
-        console.log(`updateQuantity =>\ngroupTitle: ${groupTitle}\n, \nindex: ${id}, \nselected: ${selected}`);
+        //console.log(`updateQuantity =>\ngroupTitle: ${groupTitle}\n, \nindex: ${id}, \nselected: ${selected}`);
         const updatedTodos = status.todos;
         updatedTodos.forEach((item, index) => {
             if (id === index) {
@@ -521,53 +448,20 @@ const Shop = () => {
             ...prevState,
             todos: updatedTodos
         }));
-        window.location.pathname = "/reactor/Shop";
+        getTotal();
+        //window.location.pathname = "/reactor/Shop";
     
-    };
-    const updateSelect = () => {
-        const updatedTodos = status.todos;
-        updatedTodos.forEach(item => {
-            item.select = false;
-        });
-        setStatus(prevState => ({
-            ...prevState,
-            todos: updatedTodos
-        }));
-    };
-    const getDaysSincePurchase = (index) => {
-        let lastPurchase = new Date(status.todos[index].lastPurchase);
-        let todoPurchase = new Date(lastPurchase.getFullYear(), lastPurchase.getMonth(), lastPurchase.getDate()); 
-        let one_day=1000*60*60*24;    // Convert both dates to milliseconds
-        let date1_ms = todoPurchase.getTime();   
-        let date2_ms = today.getTime();    // Calculate the difference in milliseconds  
-        let difference_ms = date2_ms - date1_ms;        // Convert back to days and return   
-        return Math.round(difference_ms/one_day);
-    };
-    const updateLastPurchase = () => {
-        const updatedTodos = status.todos;
-        updatedTodos.forEach((item,index) => {
-            if (typeof item.lastPurchase === 'undefined') {
-                item.lastPurchase = today;
-                item.days = 0;
-            } else {
-                item.days = getDaysSincePurchase(index);
-            }
-        });
-        setStatus(prevState => ({
-            ...prevState,
-            todos: updatedTodos
-        }));
     };
     const toggleTax = (index) => {          
         const newTodos = status.todos;   
-        newTodos.map(item => {
+        newTodos.forEach(item => {
             if (item.title === status.todos[index].title) {
                 item.tax = !status.todos[index].tax;
             }
         });
         localStorage.setItem('vueTodos', JSON.stringify(newTodos));
         localStorage.setItem('vueTodosSaved', JSON.stringify(newTodos));
-        console.log(`vueTodosSaved(8): ${JSON.stringify(JSON.parse(localStorage.getItem('vueTodosSaved')),null,2)}`)
+        //console.log(`vueTodosSaved(8): ${JSON.stringify(JSON.parse(localStorage.getItem('vueTodosSaved')),null,2)}`)
         setStatus(prevState => ({
             ...prevState,
             todos: JSON.parse(localStorage.getItem('vueTodos')),
@@ -577,10 +471,11 @@ const Shop = () => {
     };
     const toggleSelect = (id) => { 
         const updatedTodos = status.todos; 
-        updatedTodos.map((item, index) => {
+        updatedTodos.forEach((item, index) => {
             if (item.title === updatedTodos[id].title) {
                 if (updatedTodos[id].select) {
                     updatedTodos[index].select = false;
+                    updatedTodos[index].cart = false;
                 } else {
                     updatedTodos[index].lastPurchase = today;
                     updatedTodos[index].days = 1;
@@ -596,33 +491,9 @@ const Shop = () => {
         getTotal();
         updateAisles();   
     };
-    const updateTax = () => {
-        const updatedTodos = status.todos;
-        updatedTodos.forEach(todo => {
-            if (typeof todo.tax === 'undefined') {
-                todo.tax = false;
-            }
-        });
-        setStatus(prevState => ({
-            ...prevState,
-            todos: updatedTodos
-        }));
-    };
-    const updateCart = () => {
-        const updatedTodos = status.todos;
-        updatedTodos.forEach(todo => {
-            if (typeof todo.cart === 'undefined') {
-                todo.cart = false;
-            }
-        });
-        setStatus(prevState => ({
-            ...prevState,
-            todos: updatedTodos
-        }));
-    };
     const revert = () => {
         const revertData = JSON.parse(localStorage.getItem('vueTodosRevert'));
-        console.log(`revertData: ${JSON.stringify(revertData, null, 2)}`)
+        //console.log(`revertData: ${JSON.stringify(revertData, null, 2)}`)
         localStorage.setItem('vueTodos', JSON.stringify(revertData));
         setStatus(prevState => ({
             ...prevState,
@@ -636,10 +507,10 @@ const Shop = () => {
     };
     const save = () => {
         localStorage.setItem('vueTodosSaved', JSON.stringify(status.todos));
-        console.log(`vueTodosSaved(9): ${JSON.stringify(JSON.parse(localStorage.getItem('vueTodosSaved')),null,2)}`)
+        //console.log(`vueTodosSaved(9): ${JSON.stringify(JSON.parse(localStorage.getItem('vueTodosSaved')),null,2)}`)
     };
     const restore = () => {
-        const newAisles = status.aisles;
+        const newAisles = status.aisles || aislesInit;
         itemMenuDefault.forEach(aisle => newAisles.push(aisle));
         updateAisles();
         localStorage.setItem('vueTodos', JSON.stringify(status.retrievedData));
@@ -661,51 +532,63 @@ const Shop = () => {
                                         className='cart' 
                                         alt='select' 
                                         src={(status.todos[index].select) ? Selected : Select}
-                                        />
-    const getSettingsMenu = () => {
-        const settingsMenu = <div id='settingsMenu' className='bg-dark'>
-                {
-                    settings.map((item, index) => {
-                        return (
-                            <div className='settingsButton' onClick={() => getSetting(index)}>
-                                { settings[index] }
-                            </div>  
-                        )
-                    })
-                }
-            </div>
-        
-        if (status.displaySettings) {
-            return settingsMenu
-        }
-        const index = 0;
-        return <div></div>
+                                    />
+    const setTax = () => {
+        setStatus(prevState => ({
+            ...prevState,
+            tax: localStorage.getItem('tax')
+        }));
     }
+    const toggleSettings = () => {
+        //console.log(`toggleSettings => displaySettings: ${status.displaySettings}`)
+        setStatus(prevState => ({
+            ...prevState,
+            displaySettings: !status.displaySettings
+        }));
+    };
+    const clear = () => {
+        localStorage.setItem('vueTodosRevert', JSON.stringify(status.todos));
+        localStorage.removeItem('aisles', '');
+        localStorage.removeItem('vueTodos', '');
+        setStatus(prevState => ({
+            ...prevState,
+            todos: [],
+            aisles: []
+        }));
+        getTotal();
+    };
+    const totals = <div className='total '>
+                        <div className='totalItems'>
+                            Items: { status.items }<br />
+                            total: { status.totalItems }
+                        </div>
+                        <div className='totalDollars'>
+                            Tax: $ { status.taxTotal }<br />
+                            Total: $ { status.total }
+                        </div>
+                    </div>
+    console.log(`Shop ==> REFRESH`);
     return (
-        <div>
+        <div className='mt--7'>
             <div className='input'>
-                <form onSubmit={addTodo}>
-                    <input type='text' id='itemEntry' className='inputItem' onChange={setEntry} placeholder='Add items'/>
-                    <img className='settings' src={menu} alt="open menu" onClick={() => toggleSettings()}/>
-                </form>
+                <SearchBar onSubmit={addTodo} onChange={setEntry} label='Add items' term=''/>
+                <img className='settings' src={menu} alt="open menu" onClick={() => toggleSettings()}/>
             </div>
-            <div className='mt-40 visible'>
-                {
-                    //status.list
-                    getItems('display')
-                }
+            <div className='mt-60 visible bottomPadding'>
+                {getItems('display')}
             </div>
-            <div className='total '>
-                <div className='totalItems'>
-                    Items: { status.items }<br />
-                    total: { status.totalItems }
-                </div>
-                <div className='totalDollars'>
-                    Tax: $ { status.taxTotal }<br />
-                    Total: $ { status.total }
-                </div>
-            </div>
-            {getSettingsMenu()}
+            {totals}
+            <SettingsMenu 
+                state={status} 
+                updateAisles={updateAisles} 
+                sortName={sortName} 
+                revert={revert} 
+                save={save} 
+                restore={restore} 
+                getTotal={getTotal} 
+                setTax={setTax} 
+                clear={clear}
+            />
         </div>
     )
 }

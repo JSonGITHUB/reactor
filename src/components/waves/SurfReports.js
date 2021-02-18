@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import getKey from '../utils/KeyGenerator.js';
 //import cheerio from 'cheerio';
 //import got from 'got';
 
@@ -51,14 +52,45 @@ const SurfReports = () => {
     }
         //this.getSwellData();
         //this.getRapidData();
-    return <div>
-            <iframe title="Oceanside Offshore" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224"></iframe><br/>
-            <iframe title="Torrey Pines Outer" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46225" ></iframe><br/>
-            <iframe title="Del Mar Nearshore" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46266"></iframe><br/>
-            <iframe title="SCRIPPS Nearshore" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46254"></iframe><br/>
-            <iframe title="La Jolla LJAC1" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=LJAC1"></iframe><br/>
-            <iframe title="La Jolla LJPC1" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=LJPC1"></iframe><br/>
-            <iframe title="Point Loma South" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46232"></iframe><br/>
+    
+    const bouys = [
+        {
+           title: 'Oceanside Offshore',
+           src: 'https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224'
+        },
+        {
+            title: 'Torrey Pines Outer',
+            src: 'https://www.ndbc.noaa.gov/widgets/station_page.php?station=46225'
+        },
+        {
+            title: 'Del Mar Nearshore',
+            src: 'https://www.ndbc.noaa.gov/widgets/station_page.php?station=46266'
+        },
+        {
+            title: 'SCRIPPS Nearshore',
+            src: 'https://www.ndbc.noaa.gov/widgets/station_page.php?station=46254'
+        },
+        {
+            title: 'La Jolla LJAC1',
+            src: 'https://www.ndbc.noaa.gov/widgets/station_page.php?station=LJAC1'
+        },
+        {
+            title: 'La Jolla LJPC1',
+            src: 'https://www.ndbc.noaa.gov/widgets/station_page.php?station=LJPC1'
+        },
+        {
+            title: 'Point Loma South',
+            src: 'https://www.ndbc.noaa.gov/widgets/station_page.php?station=46232'
+        }
+    ];
+    const menu = () => {
+        const classes = 'maxWidth400 m-10 r-5 glassy height500 horizontalItem';
+        const portraitButton = (item, index) => <iframe src={item.src} title={item.title} key={getKey(`index${index}`)} className={classes}></iframe>;
+        const menuItems = bouys.map((item) => portraitButton(item));
+        return menuItems;
+    }
+    return <div className='mt--30 width-100-percent h-scroll'>
+            {menu()}
         </div>
 }
 

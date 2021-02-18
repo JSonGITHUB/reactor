@@ -1,7 +1,7 @@
 const NavItems = [
     'Home',
     //'BowlBuilder',
-    'TempConverter',
+    'Converter',
     'Notes',
     //'Reservation',
     //'GuestList',

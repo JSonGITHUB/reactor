@@ -11,7 +11,7 @@ const WeatherCard = ({dt, temp_min, temp_max, main, icon}) => {
   return (
     <div key={getKey("loc")} /*onClick={() => this.props.editLocation()}*/>
         <div className="r-10 m-20 p-20 bg-dkGreen">
-                <div className="width100Percent flexContainer">
+                <div className="width-100-percent flexContainer">
                     <div className="flex3Column bg-lite mr-5 ml-5 p-10 r-10">
                         <img src={src} alt='weather' />
                     </div>

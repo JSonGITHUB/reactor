@@ -25,14 +25,13 @@ const SlideShow = () => {
             if (status.slideShow) {
                 const i = (status.index === 29) ? 1 : status.index+1;
                 //console.log(`getImage => imgArray[${i}].image: ${status.images[i].image}`)
-                setStatus({
-                    slideShow: status.slideShow,
+                setStatus(prevState => ({
+                    ...prevState,
                     index: i,
-                    images: status.images,
                     url1: status.images[i].image,
                     url2: status.images[i+30].image,
                     url3: status.images[i+60].image
-                })
+                }))
             }
         }   		
         const timerID = setInterval(
@@ -43,23 +42,38 @@ const SlideShow = () => {
             clearInterval(timerID);
         }
     },[status]);
-    const toggleSlideShow = () => {
-        setStatus({
-            slideShow: !status.slideShow,
-            index: status.index,
-            images: status.images,
-            url1: status.url1,
-            url2: status.url2,
-            url3: status.url3
-        })
+    const toggleSlideShow = (e) => {
+        e.persist();
+        const position = () => e.clientX;
+        const width = () => window.innerWidth;
+        const back = () => width()/3;
+        const halfway = () => width()/2;
+        const next = () => width() - back();
+        const getDirection = () => (position() > next()) ? 'next' : 'back';
+        const isNext = () => (position() > next()) ? true : false;
+        const isBack = () => (position() < back()) ? true : false;
+        const isCenter = () => ((position() > back()) && (position() < next())) ? true : false;
+        console.log(`$click\nwidth: ${width()}\nhalfway: ${halfway()}\nxpos: ${position()}\ndirection: ${getDirection()}\nback: ${back()}\nnext: ${next()}`)
+        const updateStatus = () => ((isNext() || isBack()) && !isCenter() ) ? false : !status.slideShow;
+        const getIndex = () => (isBack()) ? (status.index - 1) : (status.index + 1);
+        const i = (getIndex() === 30) ? 1 : (getIndex() === 0) ? 29 : getIndex();
+        //console.log(`getImage => imgArray[${i}].image: ${status.images[i].image}`)
+        setStatus(prevState => ({
+            ...prevState,
+            index: i,
+            slideShow: updateStatus(),
+            url1: status.images[i].image,
+            url2: status.images[i+30].image,
+            url3: status.images[i+60].image
+        }))
     }
     return (
-        <div>
-            <img id="slideshow1" className="width-100-percent" src={status.url1} onClick={() => toggleSlideShow()} alt="California Sur Swell" />
+        <div className='mt--30'>
+            <img id="slideshow1" className="width-100-percent" src={status.url1} onClick={(e) => toggleSlideShow(e)} alt="California Sur Swell" />
             <br/>
-            <img id="slideshow1" className="width-100-percent" src={status.url2} onClick={() => toggleSlideShow()} alt="Baja Norte Swell" />
+            <img id="slideshow1" className="width-100-percent" src={status.url2} onClick={(e) => toggleSlideShow(e)} alt="Baja Norte Swell" />
             <br/>
-            <img id="slideshow1" className="width-100-percent" src={status.url3} onClick={() => toggleSlideShow()} alt="Baja Sur Swell" />
+            <img id="slideshow1" className="width-100-percent" src={status.url3} onClick={(e) => toggleSlideShow(e)} alt="Baja Sur Swell" />
         </div>
     )
 }

@@ -5,6 +5,7 @@ import menu from '../../assets/images/menuYellow.png';
 import close from '../../assets/images/menuClose.png';
 import getKey from '../utils/KeyGenerator.js';
 import {BrowserRouter as Link} from 'react-router-dom';
+import navItems from './NavItems.js';
 
 class Header extends React.Component {
 
@@ -49,26 +50,6 @@ class Header extends React.Component {
     burgerButton = <button className="navButton menuPad" onClick={this.siteNavClick}><img src={menu} alt="open menu" /></button>;
     mobileLogo = <TextColorizer class='navBranding mt-7' text={this.props.company}/>;
     headerLogo = <TextColorizer class='navBranding mt-7' text={this.props.company}/>;
-    navItems = [
-        'Home',
-        //'BowlBuilder',
-        'TempConverter',
-        'Notes',
-        //'Reservation',
-        //'GuestList',
-        'LogDirectory',
-        'SurfLog',
-        'Swell',
-        'WaveFinder',
-        'SurfReports',
-        'Photos',
-        'Videos',
-        //'PhotoBlog',
-        //'PhotoSequence',
-        //'Search'
-        'WikiSearch',
-        'Translator'
-    ];
     wideNav = (item) => this.landscapeButton(item);
     portraitNav = (item) => <div key={getKey("nav")}>{this.portraitButton(item)}</div>;
 
@@ -106,7 +87,7 @@ class Header extends React.Component {
                                     <div className="flex3Column"></div>
                                     <div className="flex3ColumnRight">{getMenuButton}</div>
                                 </div>
-                                <div className="t-0 navigation height100Percent width-100-percent bg-dark">
+                                <div className="t-50 navigation height100Percent width-100-percent bg-dark">
                                     <div className="height50Percent scroll">
                                         {getMenuItems()}
                                     </div>

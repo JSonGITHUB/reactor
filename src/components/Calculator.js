@@ -1,41 +1,64 @@
 //stateful component
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import TemperatureInput from './TemperatureInput';
 import BoilingVerdict, {tryConvert, toCelsius, toFahrenheit} from './BoilingVerdict';
+import LiquidVerdict, {toGallons, toLiters} from './LiquidVerdict';
+
 // eslint-disable-next-line
 import templateData from './waves/TemplateData';
 
 const Calculator = () => {
 
-    const [temperature, setTemperature] = useState('');
-    const [scale, setScale] = useState('c');
+    const [value1, setValue1] = useState(0);
+    const [value2, setValue2] = useState(0);
+    const [unit1, setUnit1] = useState('Celsius');
+    const [unit2, setUnit2] = useState('Fahrenheit');
 
-    const handleCelsiusChange = (temperature) => {
-        setTemperature(temperature);
-        setScale('c');
+    const handleSetUnit1 = (value) => {
+        console.log(`handleSetUnit1 => unit1: ${unit1} value1: ${value}`)
+        setValue1(value);
     }
-    const handleFahrenheitChange = (temperature) => {
-        setTemperature(temperature);
-        setScale('f');
+
+    const handleSetUnit2 = (value) => {
+        console.log(`handleSetUnit2 => unit2: ${unit2} value2: ${value}`)
+        setValue2(value);
     }
-    const celsius = scale === 'f' ? tryConvert(temperature, toCelsius) : temperature;
-    const fahrenheit = scale === 'c' ? tryConvert(temperature, toFahrenheit) : temperature;
+    const handleUnit1Change = (unit) => {
+        console.log(`handleUnit1Change => unit1: ${unit}`)
+        setUnit1(unit);
+    }
+    const handleUnit2Change = (unit) => {
+        console.log(`handleUnit2Change => unit2: ${unit}`)
+        setUnit2(unit);
+    }
+    const celsius = () => (unit1 === 'Fahrenheit') ? tryConvert(value1, toCelsius) : value1;
+    const fahrenheit = () => (unit2 === 'Celsius') ? tryConvert(value2, toFahrenheit) : value2;
+    const gallons = () => (unit1 === 'Gallons') ? tryConvert(value1, toLiters) : value1;
+    const liters = () => (unit2 === 'Liters') ? tryConvert(value2, toGallons) : value2;
+    
+    useEffect(() => {
+        console.log(`unit1: ${unit1}\nunit2: ${unit2}\nvalue1: ${value1}\nvalue2: ${value2}\n`)
+      
+    },[value1, value2, unit1, unit2]);
     return (
-        <div className="p-20 App-content fadeIn">
-            <div className="p-20">
+        <div className="App-content fadeIn mt--14">
+            <div>
                 <TemperatureInput
-                    scale="c"
-                    temperature={celsius}
-                    onTemperatureChange={handleCelsiusChange} 
+                    scale={value1}
+                    value={celsius()}
+                    unit={unit1}
+                    onValueChange={handleSetUnit1} 
+                    onUnitChange={handleUnit1Change} 
                     id="celsius"
                 />
                 <TemperatureInput
-                    scale="f"
-                    temperature={fahrenheit}
-                    onTemperatureChange={handleFahrenheitChange}
+                    scale={unit2}
+                    value={fahrenheit()}
+                    onValueChange={handleSetUnit2}
+                    onUnitChange={handleUnit2Change} 
                     id="fahrenheit"
                 />
-                <BoilingVerdict celsius={parseFloat(celsius)} />
+                <BoilingVerdict celsius={parseFloat(celsius())} />
             </div>
         </div>
     );

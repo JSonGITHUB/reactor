@@ -62,7 +62,7 @@ const WaveFinder = ({
 
     const [status, setStatus] = useState({
         module: 'WaveFinder',
-        pause: false,
+        pause: true,
         date: new Date(),
         edit: false,
         tide: getDefault("tide"),
@@ -90,34 +90,16 @@ const WaveFinder = ({
         isSwell2: (getDefault("isSwell2") === "true") ? true : false,
         isTide: (getDefault("isTide") === "true") ? true : false,
         isWind: (getDefault("isWind") === "true") ? true : false,
-        locations: getLocations()
+        locations: getLocations(),
+        matches: []
     });
-    /*
-    componentDidMount() {
-        
-        let data;
-        const returnJSON = (response) => response.json();
-        const returnRejection = (response) => Promise.reject({status: response.status, data});
-        const validate = (response) => (response.ok) ? returnJSON(response) : returnRejection(response);
-        const uri = 'https://jsongithub.github.io/portfolio/assets/data/gpsData.json';
-        fetch(uri)
-            .then(response => validate(response))
-            .then(data => {
-                setStatus({
-                    isLoaded: true,
-                    locations: data
-                })
-            })
-            .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
-        
-    }
-    */
     const tick = () => {
         console.log(`pause: ${status.pause}`)
         if (status.pause === false) {
             setStatus(prevState => ({
                 ...prevState,
-                date: new Date()
+                date: new Date(),
+                pause: true
             }));
         }
     }
@@ -130,6 +112,9 @@ const WaveFinder = ({
             clearInterval(timerID);
         }
     });
+    const refresh = () => {
+        window.location.pathname = "/reactor/WaveFinder"
+    }
     const currentPositionExists = () => (status.longitude) ? true : false;
     const updateCurrentLocation = (longitude, latitude) => {
 //      console.log(`UPDATING CURRENT POSITION ======> longitude: ${longitude} latitude: ${latitude}`)
@@ -141,44 +126,6 @@ const WaveFinder = ({
             latitude
         }));
     }
-    /*
-    tideURL = ${`https://tidesandcurrents.noaa.gov/api/datagetter?
-        begin_date=20130101 10:00&
-        end_date=20130101 10:24&
-        station=9410230&
-        product=water_level&
-        datum=mllw&
-        units=metric&
-        time_zone=gmt&
-        application=web_services&
-        format=json`
-    }
-    data = () => {
-        const returnJSON = (response) => response.json();
-        const returnRejection = (response) => Promise.reject({status: response.status, data});
-        const validate = (response) => (response.ok) ? returnJSON(response) : returnRejection(response);
-        const uri = tideURL;
-        fetch(uri)
-            .then(response => validate(response))
-            .then(data => {
-                console.log(`data =-=-=-=-=-=-> ${JSON.stringify(data,null,2)}`)
-            })
-            .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
-    }
-   const data = () => {
-        let data;
-        const returnJSON = (response) => response.json();
-        const returnRejection = (response) => Promise.reject({status: response.status, data});
-        const validate = (response) => (response.ok) ? returnJSON(response) : returnRejection(response);
-        const uri = tideURL;
-        fetch("https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224")
-            .then(response => validate(response))
-            .then(data => {
-                console.log(`data =-=-=-=-=-=-> ${JSON.stringify(data,null,2)}`)
-            })
-            .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
-    }
-    */
     const getDefaultHeights = (tideSelected) => {
         if (tideSelected === "high") {
             return 5;
@@ -191,7 +138,7 @@ const WaveFinder = ({
         localStorage.setItem("tide", selected);
         setStatus(prevState => ({
             ...prevState,
-            pause: false,
+            pause: true,
             tide: selected,
             height: getDefaultHeights(selected)
         }));
@@ -201,7 +148,7 @@ const WaveFinder = ({
         localStorage.setItem("isWind", isWind);
         setStatus(prevState => ({
             ...prevState,
-            pause: false,
+            pause: true,
             isWind: isWind
         }));
     }
@@ -210,7 +157,7 @@ const WaveFinder = ({
         localStorage.setItem("isTide", isTide);
         setStatus(prevState => ({
             ...prevState,
-            pause: false,
+            pause: true,
             isTide: isTide
         }));
     }
@@ -219,7 +166,7 @@ const WaveFinder = ({
         localStorage.setItem("isSwell1", isSwell1);
         setStatus(prevState => ({
             ...prevState,
-            pause: false,
+            pause: true,
             isSwell1: isSwell1
         }));
     }
@@ -228,7 +175,7 @@ const WaveFinder = ({
         localStorage.setItem("isSwell2", isSwell2);
         setStatus(prevState => ({
             ...prevState,
-            pause: false,
+            pause: true,
             isSwell2: isSwell2
         }))
     }
@@ -241,7 +188,7 @@ const WaveFinder = ({
         localStorage.setItem("swell1Direction", selected);
         setStatus(prevState => ({
             ...prevState,
-            pause: false,
+            pause: true,
             swell1Direction: selected,
             swell1Angle: swell1Angle
         }));
@@ -253,7 +200,7 @@ const WaveFinder = ({
         localStorage.setItem("swell2Direction", selected);
         setStatus(prevState => ({
             ...prevState,
-            pause: false,
+            pause: true,
             swell2Direction: selected,
             swell2Angle: swell2Angle
         }));
@@ -262,7 +209,7 @@ const WaveFinder = ({
         localStorage.setItem("swell1Angle", selected);
         setStatus(prevState => ({
             ...prevState,
-            pause: false,
+            pause: true,
             swell1Angle: selected
         }));
     }
@@ -270,7 +217,7 @@ const WaveFinder = ({
         localStorage.setItem("swell2Angle", selected);
         setStatus(prevState => ({
             ...prevState,
-            pause: false,
+            pause: true,
             swell2Angle: selected
         }))
     }
@@ -278,7 +225,7 @@ const WaveFinder = ({
         localStorage.setItem("swell1Height", selected);
         setStatus(prevState => ({
             ...prevState,
-            pause: false,
+            pause: true,
             swell1Height: selected
         }));
     }
@@ -286,7 +233,7 @@ const WaveFinder = ({
         localStorage.setItem("swell2Height", selected);
         setStatus(prevState => ({
             ...prevState,
-            pause: false,
+            pause: true,
             swell2Height: selected
         }));
     }
@@ -294,7 +241,7 @@ const WaveFinder = ({
         localStorage.setItem("swell1Interval", selected);
         setStatus(prevState => ({
             ...prevState,
-            pause: false,
+            pause: true,
             swell1Interval: selected
         }));
     }
@@ -302,7 +249,7 @@ const WaveFinder = ({
         localStorage.setItem("swell2Interval", selected);
         setStatus(prevState => ({
             ...prevState,
-            pause: false,
+            pause: true,
             swell2Interval: selected
         }));
     }
@@ -310,7 +257,7 @@ const WaveFinder = ({
         localStorage.setItem("windDirection", selected);
         setStatus(prevState => ({
             ...prevState,
-            pause: false,
+            pause: true,
             windDirection: selected
         }));
     }
@@ -318,7 +265,7 @@ const WaveFinder = ({
         localStorage.setItem("stars", selected);
         setStatus(prevState => ({
             ...prevState,
-            pause: false,
+            pause: true,
             stars: selected
         }));
     }
@@ -341,7 +288,7 @@ const WaveFinder = ({
         //console.log("UNPAUSE");
         setStatus(prevState => ({
             ...prevState,
-            pause: false
+            pause: true
         }));
     }
     const isSwellSelected = (id) => ((id === 1 && status.isSwell1 === true) || (id === 2 && status.isSwell2===true)) ? 'bg-green' : 'bg-dkGreen';
@@ -358,6 +305,9 @@ const WaveFinder = ({
                 label="Direction" 
                 items={directionArray}
                 onChange={(id === 1) ? handleSwell1Selection : handleSwell2Selection}
+                fontSize='20'
+                padding='5px'
+                width='70%'
             />
             <br/>
             <span className="greet ml-5">angle</span><br/>
@@ -437,6 +387,9 @@ const WaveFinder = ({
                     "340"
                 ]}
                 onChange={(id === 1) ? handleSwell1Angle : handleSwell2Angle}
+                fontSize='20'
+                padding='5px'
+                width='70%'
             />
             <br/>
             <span className="greet ml-5">height</span><br/>
@@ -466,6 +419,9 @@ const WaveFinder = ({
                     "18ft"
                 ]}
                 onChange={(id === 1) ? handleSwell1Height : handleSwell2Height}
+                fontSize='20'
+                padding='5px'
+                width='70%'
             />
             <br/>
             <span className="greet ml-5">interval</span><br/>
@@ -496,6 +452,9 @@ const WaveFinder = ({
                     "23 seconds"
                 ]}
                 onChange={(id === 1) ? handleSwell1Interval : handleSwell2Interval}
+                fontSize='20'
+                padding='5px'
+                width='70%'
             />
         </div>
         
@@ -540,6 +499,9 @@ const WaveFinder = ({
                                     label="current" 
                                     items={["low", "medium", "high"]}
                                     onChange={handleTideSelection}
+                                    fontSize='20'
+                                    padding='5px'
+                                    width='93%'
                                 />
                                 <div className="button mt-15" onClick={handleTideCheck}>
                                     {(status.isTide === true) ? <img src={thumbsUp} alt='tide' className='p-10 r-20' /> : <img src={thumbsDown} alt='tide' className='p-10 r-20' /> }
@@ -550,13 +512,16 @@ const WaveFinder = ({
     const windSelector = (windDirection) => <div className={windClass()} onMouseDown={pause}>
     {/*console.log(`windSelector => windDirection: ${status.windDirection}`)*/}
                             Wind<br/>
-                            <div className="greet pt-10"><WindDirection columns="1" setWind={setWind}/></div>
+                            <div className="greet pt-10"><WindDirection columns="1" setWind={setWind} height='150px'/></div>
                             <Selector
                                 groupTitle="Wind" 
                                 selected={status.windDirection} 
                                 label="Direction"
                                 items={directionArray}
                                 onChange={handleWindSelection}
+                                fontSize='20'
+                                padding='5px'
+                                width='93%'
                             />
                             <div className="button mt-15" onClick={handleWindCheck}>
                                 {(status.isWind === true) ? <img src={thumbsUp} alt='wind' className='p-10 r-20' /> : <img src={thumbsDown} alt='wind' className='p-10 r-20' /> }
@@ -570,12 +535,15 @@ const WaveFinder = ({
                             label="Quality"
                             items={[0,1,2,3,4,5]}
                             onChange={handleStarSelection}
+                            fontSize='20'
+                            padding='5px'
+                            width='93%'
                         />
                     </div>
     const milesInput = (distance) => <div className="flex2Column bg-dkGreen r-10 m-5 p-10">
                                 <label>
                                     Miles<br/>
-                                    <input className="mt-10 p-5 r-10"
+                                    <input className="mt-10 p-10 r-10"
                                         name="distance"
                                         type="number"
                                         value={distance}
@@ -682,7 +650,7 @@ const WaveFinder = ({
             return <img src={swell2} className={`mb--5 ${getStarKind("tide")}`} alt="swell2" />;
         }
     }
-    const getReport = () => <iframe className="Percent95 mt-5 r-10" title="report" id="report" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224"></iframe>
+    const getReport = () => <iframe className="Percent95 mt-5 mb-5 r-10" title="report" id="report" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224"></iframe>
     
     console.log(`currentPositionExists: ${currentPositionExists()}`)
     const swell1Match = (item) => (item.swell.indexOf(status.swell1Direction)>-1) ? true : false;
@@ -751,7 +719,7 @@ const WaveFinder = ({
                         </div>
                         <div className="flexContainer">
                             <div className="flex2Column p-5 r-10 color-orange bg-dkGreen m-5">{/*getTideIcon*/} tide<br/><Tide setTide={setTide} display='wide'/></div>
-                            <div className="flex2Column p-5 r-10 color-yellow bg-dkGreen m-5"><span className="size25 bg-white p-3 m-10 r-20"></span>wind<WindDirection columns="2" setWind={setWind}/></div>
+                            <div className="flex2Column p-5 r-10 color-yellow bg-dkGreen m-5"><span className="size25 bg-white p-3 m-10 r-20"></span>wind<WindDirection columns="2" setWind={setWind} height='125px'/></div>
                         </div>
                     </div>
                     <div className="p-5 r-10 m-5">
@@ -768,7 +736,7 @@ const WaveFinder = ({
                             {milesInput(status.distance)}
                             {starSelector(status.stars)} 
                         </div>
-                        <div className="bg-neogreen r-10 m-5 p-15 color-black bold" onClick={unpause}>Use live data</div>
+                        <div className="bg-neogreen r-10 m-5 p-15 color-black bold" onClick={refresh}>Refresh</div>
                     </div>
                     <div className="mt-10 mb-20">
                         <span className="color-neogreen bold">{(count === 1) ? `1 wave` : `${count} waves`}</span> out of {status.locations.length}<br/>

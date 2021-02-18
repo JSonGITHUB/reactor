@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 
-const ScoreCard = ({ player, index, editPlayer, deletePlayer, game, updateTwoPlayerScores, winner }) => {
+const CricketScore = ({ player, index, editPlayer, deletePlayer, game, updateTwoPlayerScores, winner }) => {
 
     const cricketKey = `${player}Cricket${index}`;
-    const getScore = () => (localStorage.getItem(player) || 0);
+    const getScore = () => localStorage.getItem(cricketKey) || 0;
     const [ score, setScore ] = useState(getScore());
     const [ edit, setEdit ] = useState(false);
+    const dartsScores = ['-','/', 'X', 'O'];
+    const getDartScore = (score) => <div className='white'>{dartsScores[score]}</div>;
     const updateScore = (newScore) => {
         localStorage.setItem(player, newScore);
         setScore(Number(localStorage.getItem(player)));
@@ -17,11 +19,13 @@ const ScoreCard = ({ player, index, editPlayer, deletePlayer, game, updateTwoPla
     }
     const addScore = () => {
         let newScore = Number(score) + 1;
-        updateScore(newScore);       
+        newScore = (newScore > 3) ? 0 : newScore;
+        updateCricketScore(newScore);       
     }
     const subtractScore = () => {
         let newScore = Number(score)-1;
-        updateScore(newScore);
+        newScore = (newScore < 0) ? 3 : newScore;
+        updateCricketScore(newScore);
     }
     const editNav = () => {
         if (edit) {
@@ -35,36 +39,23 @@ const ScoreCard = ({ player, index, editPlayer, deletePlayer, game, updateTwoPla
                     </div>
         }
     }
-    const stockClasses = 'r-10 m-1 color-yellow bold ';
-    const gameClasses = {
-        'standard': 'bg-dkGreen', 
-        'ping pong': 'bg-dkGreen', 
-        'golf': 'bg-dkGreen', 
-        'cornhole': 'bg-dkYellow', 
-        'horse': 'bg-dkYellow',
-        'horseshoes': 'bg-dkRed', 
-        'bocci': 'bg-dkRed'
-    }
-    const buttonClass = 'bg-dark';
-    const getButtonClass = 'glassy button flex3Column p-10 r-10 m-1 ' + buttonClass;
+    const stockClasses = 'r-10 m-1 color-yellow bold bg-darker';
+    const buttonClass = 'bg-darker';
+    const getButtonClass = 'glassy button flex3Column p-10 r-10 ' + buttonClass;
     const dartClass = () => (score >= winner) ? 'color-neogreen shakingShaka' : 'white';
-    const scoreButtonClasses = 'glassy flex3Column button bg-green r-10 color-neogreen navBranding centeredContent';
+    const scoreButtonClasses = 'glassy flex3Column button bg-green m-10 r-10 color-neogreen navBranding centeredContent';
     return (
         <div>
-            <div className={stockClasses + gameClasses[game]}>
+            <div className={stockClasses}>
                 <div className='flexContainer'>
-                    <span className={scoreButtonClasses} onClick={() => subtractScore()}>-</span>
                     <span 
                         className={getButtonClass} 
-                        onClick={() => setEdit(!edit)}
+                        onClick={() => addScore()}
                     >
-                        <div></div>
-                            <div className={dartClass()}>{player}</div>
                         <div className='p-5 r-5 navBranding'>
-                            {score}
+                            {getDartScore(score)}
                         </div>
                     </span>
-                    <span className={scoreButtonClasses} onClick={() => addScore()}>+</span>
                 </div>
             </div>
             {editNav()}
@@ -73,4 +64,4 @@ const ScoreCard = ({ player, index, editPlayer, deletePlayer, game, updateTwoPla
 
 }
    
-export default ScoreCard;
+export default CricketScore;

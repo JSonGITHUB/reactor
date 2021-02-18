@@ -11,24 +11,26 @@ const GridImage = ({ item }) => {
     });
     const imageRef = React.createRef();
     
-    useEffect(() => {    
+    useEffect(() => {
         const setSpans = () => {
-            const height = imageRef.current.clientHeight;
-            const width = imageRef.current.clientWidth;
-            const spans = Math.ceil(height / 150 + 1);
-            setStatus({ 
-                imageWidth: width,
-                imageHeight: height,
-                spans,
-                location: item.location,
-                description: item.description,
-                image: item.image 
-            });
+            if ((imageRef.current !== null)) {
+                const height = imageRef.current.clientHeight;
+                const width = imageRef.current.clientWidth;
+                const spans = Math.ceil(height / 150 + 1);
+                setStatus({ 
+                    imageWidth: width,
+                    imageHeight: height,
+                    spans,
+                    location: item.location,
+                    description: item.description,
+                    image: item.image 
+                });
+            }
         } 		
         imageRef.current.addEventListener('load', setSpans);
     },[imageRef, item]);
     
-    return <div className="r-5 mb-5 bg-black w-200 mt-3 mb-1 ml-auto mr-auto">
+    return <div className="r-5 mb-5 bg-black mt-3 ml-auto mr-auto">
                 <div className="color-neogreen p-10 m-auto mb-5">{status.location}<br/><span className="bold copyright">{status.imageWidth} X {status.imageHeight}</span></div>
                 <img ref={imageRef} alt={status.description} src={status.image} className='r-5'/>
                 <div className="white m-auto p-15 mb-5 description">{status.description}</div>

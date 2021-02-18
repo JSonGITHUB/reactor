@@ -332,8 +332,8 @@ const SurfLocation = ({state, item, matches, regionMatch}) => {
     return (
         <div key={getKey("loc")} /*onClick={() => this.props.editLocation()}*/>
             <div className="r-10 m-10 p-20 bg-dkGreen">
-                    <div className="width100Percent flexContainer">{getStars(matches)}</div>
-                    <div className="mt-10 navBranding">{item.name}</div>
+                    <div className="width-100-percent flexContainer">{getStars(matches)}</div>
+                    <div className="mt-20 mb-20 navBranding">{item.name}</div>
                     <div className="greet color-yellow p-5 bg-dkGreen mt-15 mb-10 r-5">{`${regionMatch} miles`}</div>
                 <div className="flexContainer">
                     <div className="flexContainer m-auto">

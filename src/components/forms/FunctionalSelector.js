@@ -4,7 +4,7 @@ import getKey from '../utils/KeyGenerator.js';
 
 function FormSelector(props) {
     //let action = "";
-    let { items, label, groupTitle, selected } = props;
+    let { items, label, groupTitle, selected, padding, fontSize, maxWidth, width} = props;
     const select = selected;
     const setSelected = (item) => {
         selected = item;
@@ -19,9 +19,16 @@ function FormSelector(props) {
         //this.setState({value: e.target.value});
         props.onChange(groupTitle, label, selected);
     }
+    const getStyle = {
+        padding: padding || 0,
+        fontSize: Number(fontSize),
+        color: 'greenyellow',
+        maxWidth: maxWidth,
+        width: width
+    };
     return (
         <label>    
-            <select className='p-10 r-5 bg-dark white bold greet mt-5 button' value={selected} onChange={handleChange}>
+            <select className='pt-5 pb-5 r-10 bg-dark white mt-5 button' style={getStyle} value={selected} onChange={handleChange}>
                 {selectItems}
             </select>
         </label>

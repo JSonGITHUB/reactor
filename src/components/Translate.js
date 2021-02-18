@@ -19,7 +19,7 @@ const Translate = ({language, text}) => {
         const getTranslation = async () => {
             const proxyurl = "https://cors-anywhere.herokuapp.com/";
             const { data } = await axios.post(
-                (proxyurl + config.googleAPI_BASE_URL), 
+                (config.googleAPI_BASE_URL), 
                 {}, 
                 {
                     params: {
@@ -45,12 +45,13 @@ const Translate = ({language, text}) => {
                                 }
                 */
             );
-            setTranslated(data.data.translations[0].translatedText);
+            const translated = data.data.translations[0].translatedText;
+            setTranslated(translated);
         };
         getTranslation();
     }, [language, debouncedText]);
     return (
-        <div className='ui bg-dkGreen color-neogreen p-10 r-5 mt-5'>{translated}</div>
+        <div className='ui mt-20 p-20 r-5 white size25 glassy'>{translated}</div>
     )
 };
 

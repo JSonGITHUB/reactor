@@ -7,13 +7,15 @@ import config from './apis/config';
 
 const Videos = () => {
 
+  const [keyword, setTerm] = useState('');
   const KEY = config.youtubeAPI_KEY;
   const api = config.youtubeAPI_BASE_URL;
   const [videos, setVideos] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(null); 
-
+  
+  const onChange = (value) => setTerm(value)
   const onTermSubmit = async term => {
-    //console.log(`onTermSubmit =====> ${term}`);
+    console.log(`onTermSubmit =====> ${term}`);
     const response = await YouTube.get("/search", {
       params: {
         q: term,
@@ -25,6 +27,11 @@ const Videos = () => {
     });
     setVideos(response.data.items);
   };
+  const onFormSubmit = event =>  {
+    event.preventDefault();
+    console.log(`Search Term: ${keyword}`);
+    onTermSubmit(keyword);
+  }
   const onVideoSelect = (video) => {
     //console.log(`video: ${JSON.stringify(video, null, 2)}`)
     setSelectedVideo(video);
@@ -36,8 +43,10 @@ const Videos = () => {
   */
   return (
     <div>
-      <SearchBar onSubmit={onTermSubmit} KEY={KEY} api={api} term='Tidal Wave' />
-      <div>
+      <div className='input'>
+        <SearchBar onSubmit={onFormSubmit}  onChange={onChange} label='search for videos' KEY={KEY} api={api} term='' />
+      </div>
+      <div className='mt-88'>
         <div>
           <div>
             <VideoDetail video={selectedVideo} />
