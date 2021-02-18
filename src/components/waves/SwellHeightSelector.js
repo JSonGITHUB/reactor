@@ -32,5 +32,7 @@ export default function SwellHeightSelector(data) {
             ]}
             //onChange={(data.id === 1) ? handleSwell1Height : handleSwell2Height}
             onChange={() => setHeight(this.value)}
+            fontSize='25'
+            padding='20px'
         />
 }

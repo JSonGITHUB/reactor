@@ -7,8 +7,9 @@ import S from '../../assets/images/windS.png';
 import SW from '../../assets/images/windSW.png';
 import W from '../../assets/images/windW.png';
 import NW from '../../assets/images/windNW.png';
+import axios from 'axios';
 
-const WindDirection = ({columns, setWind}) => {
+const WindDirection = ({columns, setWind, height}) => {
     
     const [status, setStatus] = useState({
         columns: columns,
@@ -38,15 +39,15 @@ const WindDirection = ({columns, setWind}) => {
         ]
     }
     */
+   useEffect(() => {
 
-    useEffect(() => {  
         let ignore = false;
-        async function getWindData () {
-            console.log(`getWind ->`);
-            let data;
-            const returnJSON = (response) => response.json();
-            const returnRejection = (response) => Promise.reject({status: response.status, data});
-            const validate = (response) => (response.ok) ? returnJSON(response) : returnRejection(response);
+
+        const getWindData = async () => {
+
+            console.log(`getWindData =>`)
+            const proxyurl = "https://cors-anywhere.herokuapp.com/";
+            const uri = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=latest&station=9410230&product=wind&time_zone=lst&units=english&format=json';
             let getCurrentTime = new Date();
             const year = getCurrentTime.getFullYear();
             const currentMonth = getCurrentTime.getMonth()+1;
@@ -61,45 +62,33 @@ const WindDirection = ({columns, setWind}) => {
             const getEndTime = `${year}${month}${date}%20${hours}:${minutes}`;
             const getStartTime = `${year}${month}${date}%20${startHour}:00`;
             getCurrentTime = `${year}${month}${date}%20${hours}:${minutes}`;
-            //console.log(`Wind   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
-            // eslint-disable-next-line
-            const uriWind = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getStartTime}&end_date=${getEndTime}&station=9410230&product=wind&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
-            // eslint-disable-next-line
-            const uriWindTest = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=20200520%2020:00&end_date=20200520%2020:00&station=9410230&product=wind&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
-            const tri = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=latest&station=9410230&product=wind&time_zone=lst&units=english&format=json'
-            const uri = tri;
-            const proxyurl = "https://cors-anywhere.herokuapp.com/";
-            //const waterTempuri = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime}&end_date=${getCurrentTime}&station=9410230&product=water_temperature&datum=mllw&units=english&time_zone=gmt&application=web_services&format=json`;
-            fetch(proxyurl + uri)
-                .then(response => validate(response))
-                .then(data => {
-                    //console.log(`WindDirection => direction: ${JSON.stringify(data.data[data.data.length - 1],null,2)}`)
-                    setWind(data.data[data.data.length - 1].dr, data.data[data.data.length - 1].d, data.data[data.data.length - 1].s, data.data[data.data.length - 1].g)
-                    setStatus(prevState => ({
-                        ...prevState,
-                        station: data.metadata.name,
-                        speed: data.data[data.data.length - 1].s,
-                        angle: data.data[data.data.length - 1].d,
-                        direction: data.data[data.data.length - 1].dr,
-                        gusts: data.data[data.data.length - 1].g
-                    }))
-                })
-                .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
-    
-        } 
+            
+            const { data } = await axios.get(uri, {
+                params: {
+                    origin: '*',
+                    format: 'json',
+                    mode:'cors'
+                }
+            });
+            //console.log(`getWindData => data: ${JSON.stringify(data, null, 2)}`)
+            setWind(data.data[data.data.length - 1].dr, data.data[data.data.length - 1].d, data.data[data.data.length - 1].s, data.data[data.data.length - 1].g)
+            const station = data.metadata.name;
+            const speed = data.data[data.data.length - 1].s * 1.15078;
+            const angle = data.data[data.data.length - 1].d;
+            const direction = data.data[data.data.length - 1].dr;
+            const gusts = data.data[data.data.length - 1].g * 1.15078;
+            setStatus(prevState => ({
+                ...prevState,
+                station: station,
+                speed: speed,
+                angle: angle,
+                direction: direction,
+                gusts: gusts
+            }))
+        };
         if (!ignore) getWindData();  
-        /*		
-        const timerID = setInterval(
-            () => getWindData(),
-            300000
-        );
-        return function cleanUp () {
-            clearInterval(timerID);
-        }
-        */
-       //console.log(`getWindData`)
        return () => { ignore = true; }
-    },[setWind]);
+    },[]);
 
     /*
     Water Level: 2.01 ft Above MLLW
@@ -127,12 +116,15 @@ const WindDirection = ({columns, setWind}) => {
             return <img src={NW} className={classes} alt={windDirection} />;
         }
     }
+    const style = {
+        height: height
+    }
     const getCurrentWind = () => {
         return (
-            <div className="r-10 m-5 p-10 bg-lite white">
+            <div className='r-10 m-5 p-10 bg-lite white centeredContent' style={style}>
                 <div>{getWindIcon()}</div>
                 <div>{`${status.direction} ${Number(status.angle).toFixed(0)}°`}</div>
-                <div>{`${Number(status.speed).toFixed(0)}-${Number(status.gusts).toFixed(0)}`} <span className="greet">knots</span></div>
+                <div>{`${Number(status.speed).toFixed(0)}-${Number(status.gusts).toFixed(0)}`} <span className="greet">mph</span></div>
             </div>
         )
     }

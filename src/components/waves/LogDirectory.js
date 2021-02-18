@@ -55,16 +55,17 @@ const LogDirectory = ({ title, message }) => {
                         }
                     }}
                 >
-                    <div key={getKey("log")} className="flexContainer incompletedSelector myButton pt-10 pb-10 pr-20 mobileFull" onClick={() => sessionClick(item, spot)}>
-                            <div className="flexOneFourthColumn p-10">
+                    <div key={getKey("log")} className="flexContainer button glassy pt-10 pb-10 r-10 mb-1 mobileFull bg-vdkGreen" onClick={() => sessionClick(item, spot)}>
+                            <div className="flexOneFourthColumn p-10 bg-neogreen color-black m-10 r-5">
                                 {/*<img src={condition(item)} alt={item} className='shaka' />*/}
                                 <img src={condition} alt={conditionDescription} className='shaka' />
                                 <br/>{height}
                             </div>
                             <div className="flexThreeFourthColumnLeft pt-10 pb-10">
-                                {month + " " + day + suffix[Number(String(day).slice(-1))] + " " + year + ": "}
-                                <div className='size20 color-graphite pt-5'>{spot}</div>
-                                <div className='color-graphite'>
+                                <div className='copyright bold'>{year}</div>
+                                <div>{month + " " + day + suffix[Number(String(day).slice(-1))]}</div>
+                                <div className='size20 color-neogreen pt-5'>{spot}</div>
+                                <div className='color-neogreen description'>
                                     <span>{height}</span>
                                     <span className='ml-5'>{direction}</span>
                                     <span className='ml-5'>{angle}</span>
@@ -86,11 +87,11 @@ const LogDirectory = ({ title, message }) => {
     const logSession = () => window.location.pathname = "/reactor/SurfLog";
     //console.log(`postssssss=>${JSON.stringify(posts.getDirectory(),null,2)}`)
     return (
-        <div className="App-content fadeIn">
+        <div className="App-content fadeIn mt--14">
             <h1>Review Sessions</h1>
             <PostDirectory/>
             {sessions()}
-            <div className="button p-20 r-5 m-20 bg-neogreen incompletedSelector color-black" onClick={logSession}>Add Session</div>
+            <div className="button p-20 r-5 m-20 bg-green completedSelector color-black" onClick={logSession}>Add Session</div>
         </div>
     );
 }

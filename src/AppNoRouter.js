@@ -97,7 +97,7 @@ export default ({ props }) => {
                     <Route path='/Home'><Home /></Route>
                     <Route path='/Accordion'><Accordion items={items} /></Route>
                     <Route path='/BowlBuilder'><BowlBuilder /></Route>
-                    <Route path='/TempConverter'><Calculator /></Route>
+                    <Route path='/Converter'><Calculator /></Route>
                     <Route path='/Notes'><FormNotes /></Route>
                     <Route path='/Reservation'><Reservation /></Route>
                     <Route path='/GuestList'><SignUpDialog /></Route>

@@ -810,19 +810,7 @@ class Logger extends React.Component {
         //GOOD const uri = 'https://jsongithub.github.io/portfolio/assets/data/appData.json';
         const uri = 'https://jsongithub.github.io/portfolio/assets/data/appData.json';
         //const uri = 'localhost:8080/writeSurfLog.json';
-        /*
-        fetch(uri)
-            .then(response => validate(response))
-            .then(data => {
-                this.setState({
-                    isLoaded: true,
-                    items: data,
-                    //logId: this.props.logId
-                    logId: logId
-                })
-            })
-            .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
-        */
+        
         this.setState({
             isLoaded: true,
             items: data,

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import DropDown from './DropDown.js';
 import debounceType from './utils/DebouncerType.js';
+import SearchBar from './utils/SearchBar';
 
 const WikiSearch = () => {
     const options = [
@@ -88,29 +88,18 @@ const WikiSearch = () => {
             </div>
         )
     });
+    const submit = e =>  {
+        e.preventDefault();
+        //console.log(`submit =>\nterm: ${term}`)
+    }
     //console.log(`selected: ${selected.value}`)
     const selectedBackground = `bg-${selected.value}`;
     return (
         <div className="m-20">
-            <div className='directory sides-auto'>
-                <DropDown 
-                    label='Select a color:' 
-                    options={options} 
-                    selected={selected} 
-                    onSelectionChange={setSelected}
-                />
+            <div className='input'>
+                <SearchBar onSubmit={submit} onChange={setTerm} label='search wikipedia' term={term}/>
             </div>
-            <div className='ui form mt-20'>
-                <div className={`flexContainer ${selectedBackground} r-10 p-10`}>
-                    <label className='greet flex2Column10Percent p-10'><span>Search: </span></label>
-                    <input 
-                        value={term} 
-                        onChange={e => setTerm(e.target.value)}
-                        className='input flex2Column'
-                    />
-                </div>
-            </div>
-            <div className='ui celled list'>{renderedDivResults}</div>
+            <div className='mt-88'>{renderedDivResults}</div>
         </div>
     )
 };

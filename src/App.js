@@ -6,7 +6,6 @@ import debounce from './components/utils/Debouncer.js';
 import Footer from './components/site/Footer.js';
 import Header from './components/site/Header.js';
 import Home from './components/Home.js';
-import Calculator from './components/Calculator.js';
 //import BowlBuilder from './components/BowlBuilder.js';
 import LogDirectory from './components/waves/LogDirectory.js';
 import SurfLog from './components/waves/LoggerFunctional.js';
@@ -29,6 +28,7 @@ import Translator from './components/Translator.js';
 import Accordion from './components/Accordion.js';
 import Weather from './components/weather/Weather.js';
 import ScoreKeeper from './components/utils/ScoreKeeper.js';
+import Converter from './components/Converter.js';
 import Shop from './components/shop/Shop.js';
 
 
@@ -82,7 +82,7 @@ class App extends React.Component {
     //guestlist: <SignUpDialog title="Guest List" message="Sign up" />,
     //reservation: <Reservation />,
     notes: <FormNotes className='mt-40' />,
-    tempconverter: <Calculator />,
+    tempconverter: <Converter />,
     //bowlbuilder: <BowlBuilder />,
     home: <Home />
   };
@@ -137,7 +137,7 @@ class App extends React.Component {
                   <Route path="/Home" component={Home} />
                   {/*<Route path="/BowlBuilder" component={BowlBuilder} />*/}
                   {/*<Route path='/BowlBuilder' render={(props) => <BowlBuilder {...props} width={width} height={height} />}/>*/}
-                  <Route path="/TempConverter" component={Calculator} />
+                  <Route path="/Converter" component={Converter} />
                   <Route path="/Notes" component={FormNotes} />
                   {/*<Route path="/Reservation" component={Reservation} />*/}
                   {/*<Route path="/GuestList" component={SignUpDialog} />*/}

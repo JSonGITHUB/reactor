@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import ScoreCard from './ScoreCard.js';
+import CricketScore from './CricketScore.js';
 import Selector from '../forms/FunctionalSelector.js';
+import getKey from '../utils/KeyGenerator.js';
 
 const ScoreKeeper = () => {
     
@@ -110,6 +112,18 @@ const ScoreKeeper = () => {
     const scorecards = () => {
         //console.log(`build Scorecards`)
         const scorecard = (player, index) => {
+            if (darts) {
+                return <CricketScore 
+                        game={game} 
+                        player={player} 
+                        index={index} 
+                        editPlayer={editPlayer} 
+                        deletePlayer={deletePlayer}
+                        updateTwoPlayerScores={updateTwoPlayerScores}
+                        winner={winner}
+                        key={getKey(player)}
+                    />
+            }
             return <ScoreCard 
                         game={game} 
                         player={player} 
@@ -118,10 +132,11 @@ const ScoreKeeper = () => {
                         deletePlayer={deletePlayer}
                         updateTwoPlayerScores={updateTwoPlayerScores}
                         winner={winner}
+                        key={getKey(player)}
                     />
         }
         const renderedItems = players.map((player, index) => scorecard(player, index));
-        const dartScores = dartScoring.map((score, index) => <div className='flexContainer width-100-percent'>
+        const dartScores = dartScoring.map((score, index) => <div className='flexContainer width-100-percent' key={getKey(score)}>
                                                                 <div className='flex3Column p-5'>
                                                                     {scorecard(players[0], index)}
                                                                 </div>
@@ -147,7 +162,7 @@ const ScoreKeeper = () => {
         else return renderedItems;
     }
     return (
-        <div className="fadeIn m-5">
+        <div className="fadeIn mt--30">
             <div className="mb-20">
                 <Selector 
                     groupTitle="game"  
@@ -155,6 +170,9 @@ const ScoreKeeper = () => {
                     items={games}
                     selected={game}
                     onChange={selectGame}
+                    fontSize='25'
+                    padding='10px'
+                    width={(darts) ? '98%' : '67%'}
                 />
                 {
                     (darts) ? <div></div> : <Selector 
@@ -163,19 +181,22 @@ const ScoreKeeper = () => {
                                                 items={winners}
                                                 selected={winner}
                                                 onChange={selectWinner}
+                                                fontSize='25'
+                                                padding='10px'
+                                                width='32%'
                                             />
                 }
             </div>
             {scorecards()}
             <div className="flexContainer width-100-percent">
-                <div className="flex3Column p-5">
-                    <div value="Submit" className="button greet p-20 r-10 mt-20 width-100-percent bg-green brdr-green color-yellow" onClick={() => addPlayer()}>add player</div>  
+                <div className="flex3Column m-1">
+                    <div value="Submit" className="glassy button greet p-20 r-10 mt-20 width-100-percent bg-green brdr-green color-yellow" onClick={() => addPlayer()}>add player</div>  
                 </div>
-                <div className="flex3Column p-5">
-                    <div value="Submit" className="button greet p-20 r-10 mt-20 mb-20 width-100-percent bg-yellow brdr-yellow" onClick={() => reset()}>reset</div>
+                <div className="flex3Column m-1">
+                    <div value="Submit" className="glassy button greet p-20 r-10 mt-20 mb-20 width-100-percent bg-yellow brdr-yellow color-black" onClick={() => reset()}>reset</div>
                 </div>
-                <div className="flex3Column p-5">
-                    <div value="Submit" className="button greet p-20 r-10 mt-20 mb-20 width-100-percent bg-red brdr-red color-yellow" onClick={() => clear()}>clear</div>
+                <div className="flex3Column m-1">
+                    <div value="Submit" className="glassy button greet p-20 r-10 mt-20 mb-20 width-100-percent bg-red brdr-red color-yellow" onClick={() => clear()}>clear</div>
                 </div>
             </div>
         </div>

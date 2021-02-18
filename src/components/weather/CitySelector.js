@@ -103,7 +103,7 @@ const CitySelector = () => {
                             <div className='greet'>{matchKind}</div>
                         </div>;
             return (
-                <div className='width100Percant p-10 m-20 r-10 bg-dkGreen'>
+                <div className='width-100-percent p-10 m-20 r-10 bg-dkGreen'>
                     <div className='color-yellow p-10 navBranding'>{weekday(date)}</div>
                     <div className='greet color-neogreen'>{displayDate}</div>
                     <div className='greet color-neogreen mb-20'>{time} {timeOfDay}</div>
@@ -111,7 +111,7 @@ const CitySelector = () => {
                         <div className='color-yellow navBranding p-5'>{mainDescription}</div>
                         <div className='greet color-neogreen shadow p-5'>{description}</div>
                     </div>
-                    <div className='width100Percent flexContainer'>
+                    <div className='width-100-percent flexContainer'>
                         {cards.map((item) => card(item))}
                     </div>
                 </div>

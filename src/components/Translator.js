@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import DropDown from './DropDown.js';
 import Translate from './Translate.js';
+import SearchBar from './utils/SearchBar';
 const Translator = () => {
     //https://cloud.google.com/translate/docs/languages
     const options = [
@@ -19,25 +20,20 @@ const Translator = () => {
     const [term, setTerm] = useState('');
 
     //console.log(`language: ${language.value}`)
+    const submit = e =>  {
+        e.preventDefault();
+        //console.log(`submit =>\nterm: ${term}`)
+    }
     return (
-        <div className="m-20">
-            <div className='directory sides-auto'>
-                <div className='ui form bg-yellow r-5 p-10 mb-5'>
-                    <div className='field'>
-                        <label>Enter Text</label>
-                        <input value={term} onChange={(e) => setTerm(e.target.value)} />
-                    </div>
-                </div>
-                <DropDown 
-                    label='Select a language:' 
-                    options={options} 
-                    selected={language} 
-                    onSelectionChange={setLanguage}
-                />
-                <div className='white greet ui bg-lite p-10 r-5 mt-5'>Translation:
-                    <Translate text={term} language={language} />
-                </div>
-            </div>
+        <div className='mt--40'>
+            <SearchBar onSubmit={submit} onChange={setTerm} label='enter words here...' term={term}/>
+            <DropDown 
+                label='Select a language:' 
+                options={options} 
+                selected={language} 
+                onSelectionChange={setLanguage}
+            />
+            <Translate text={term} language={language} />
         </div>
     )
 };

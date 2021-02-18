@@ -22,7 +22,7 @@ const HamburgerNav = ({ navItems }) => {
                                 <div className="flex3Column"></div>
                                 <div className="flex3ColumnRight">{getMenuButton}</div>
                             </div>
-                            <div className="t-0 navigation height100Percent width-100-percent bg-dark">
+                            <div className="t-50 navigation height100Percent width-100-percent bg-dark">
                                 <div className="height50Percent scroll">
                                     {getMenuItems()}
                                 </div>

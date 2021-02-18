@@ -31,7 +31,7 @@ const selector = (item, groupTitle, spot, defaultSelection, handleSelection, sel
     }
     //console.log(`spot: ${spot} \n verifySpot(): ${verifySpot()} \nselected: ${defaultSelection(item,groupTitle)}`)
     
-    return <div className={selectorColor(item, groupTitle, selected) + " r-vw p-vw bg-green"}>
+    return <div className={selectorColor(item, groupTitle, selected) + " r-vw p-vw bg-green glassy"}>
         <div className="mb-5">{item.description}: </div>
         <div className="mb-5">
             <Selector 
@@ -40,6 +40,9 @@ const selector = (item, groupTitle, spot, defaultSelection, handleSelection, sel
                 items={verifySpot()}
                 selected={defaultSelection(item,groupTitle)}
                 onChange={handleSelection}
+                fontSize='25'
+                padding='20px'
+                width='90%'
             />
         </div>
     </div>;

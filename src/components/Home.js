@@ -57,12 +57,12 @@ const Home = () => {
     const getTracker = () => {
         const tracker = (tracking === true) 
         ? <div>
-            <div className="color-neogreen p-20 bold bigHeader bg-dkGreen r-5 m-20">{getDistance()}</div>
+            <div className="color-neogreen p-20 bold bigHeader bg-dkGreen r-5 m-20 glassy">{getDistance()}</div>
             <div className="button p-20 r-5 m-20 bg-red incompletedSelector color-yellow" onClick={stopTracking}>Stop Tracking</div>
         </div>
         : <div>
             <div className="color-neogreen p-20 bold bigHeader bg-dkGreen r-5 m-20">{distance}</div>
-            <div className="button p-20 r-5 m-20 bg-neogreen completedSelector color-black" onClick={startDistance}>Start Tracking</div>
+            <div className="glassy button p-20 r-5 m-20 bg-neogreen completedSelector color-black" onClick={startDistance}>Start Tracking</div>
         </div>
 
         return tracker;
@@ -71,7 +71,7 @@ const Home = () => {
     return (
         <div className="App fadeIn">
             <header className="App-content">
-                <a className="App-link bold greet p-20 r-10 w-200 bg-green brdr-green noUnderline"
+                <a className="glassy App-link bold greet p-20 r-10 w-200 bg-dkGreen brdr-green noUnderline"
                 href="https://jsongithub.github.io/portfolio/"
                 target="_self"
                 rel="noopener noreferrer"

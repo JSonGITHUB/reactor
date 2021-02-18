@@ -10,8 +10,8 @@ body {
     visibility: hidden; 
 }
 .settings {
-    right:5px;
-    padding-top:17px;
+    top: 27px;
+    right:23px;
     position: absolute;
 }
 .cart {
@@ -48,7 +48,7 @@ body {
 #settingsMenu {
     width: 100%;
     left:0px;
-    top:69px;
+    top:85px;
     position: fixed;
     height: auto;
 }
@@ -98,12 +98,12 @@ body {
 .itemSelectors {
     background-color:#111111;
     left:0px;
-    padding:10px;
+    padding-top:10px;
+    padding-bottom:10px;
     width: 100%;
-    border:1px solid #000000;
     position:relative;
     color: #BBBBBB;
-    font-size: 18px;
+    font-size: 12px;
     text-align: right;
     text-shadow: 1px 1px #000000;
 }
@@ -125,8 +125,8 @@ body {
 }
 .input {
     background-color: #333333;
+    top: 50px;
     left:0px;
-    top:60px;
     position: fixed;
     width:100%;
     z-index: 100;
@@ -139,6 +139,10 @@ body {
 }
 #quantitySelector {
     margin-left:3px;
+}
+.height1px {
+    margin-top: 1px;
+    height: 1px;
 }
 .menu {
     width: 100%;
@@ -154,14 +158,17 @@ body {
 }
 .inputItem {
     font-size: 20px;
-    width:calc(100% - 100px);
-    margin: 20px;
+    width:calc(100% - 30px);
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #222222;
 }
 .title {
     position: absolute;
-    font-size: 30px;
+    font-size: 25px;
     top: 20px;
-    left: 30px;
+    left: 15px;
 }
 .total {
     font-family: Arial, sans-serif;

@@ -116,23 +116,23 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, i
     
     const selectionInterface = (item, groupTitle) => (item.type === 'radio') ? radio(item, groupTitle) : selector(item, groupTitle, status.spot, defaultSelection, handleSelection, selected);
     const groups = () => getItems().map((item) => {
-        const headerClasses = 'subHeader color-yellow';
-        const selectorClasses = 'greet p-vw bg-vdkGreen flex3Column';
+        const headerClasses = 'subHeader color-yellow p-20';
+        const selectorClasses = 'greet p-vw flex3Column';
         const groupClasses = (window.innerWidth < 500) ? "r-vw" : "flexContainer width-100-percent r-vw";
         const description = item.description;
         //console.log(`description: ${JSON.stringify(item,null,2)}`)
        return <div key={getKey("groupConainer")}>
-                    <div key={getKey("groupHeader")} className={headerClasses}>
-                        {item.description}
-                    </div>
-                    <div className={groupClasses} key={getKey("groupSubConainer")}>
-                        {group(item).map((group) => 
-                            <div key={getKey("selectorContainer")} className={selectorClasses}>
-                                {selectionInterface(group, description)}
-                            </div>
-                        )}
-                    </div>
+                <div key={getKey("groupHeader")} className={headerClasses}>
+                    {item.description}
                 </div>
+                <div className={groupClasses} key={getKey("groupSubConainer")}>
+                    {group(item).map((group) => 
+                        <div key={getKey("selectorContainer")} className={selectorClasses}>
+                            {selectionInterface(group, description)}
+                        </div>
+                    )}
+                </div>
+            </div>
     });
     const categories = () => {
         status.selectorStatus = [];
@@ -145,7 +145,7 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, i
         const getDate = () => (logExists === true) ? new Date(stateLogDate()) : new Date(status.date);
         return <React.Fragment>
                     <div className='mb-5 subHeader color-yellow'>Date</div>
-                    <div className='flexContainer width-100-percent bg-vdkGreen'>
+                    <div className='flexContainer width-100-percent'>
                         <DatePicker
                             onChange={onDateChange}
                             value={getDate()} 

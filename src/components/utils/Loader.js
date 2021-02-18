@@ -16,8 +16,9 @@ const Loader = props => {
     logo2Class += logoClasses;
     let logo3Class = (isMotionOn) ? "z1 logo3" : "z1 logo3Stopped";
     logo3Class += logoClasses;
+    const waveFinder = () => window.location.pathname = "/reactor/WaveFinder";
     return (
-        <div>
+        <div onClick={() => waveFinder()}>
             <div className="ml--28">
                 <img id="shaka" src={shakaBlack} className={shakaClass} alt="js" />
             </div>

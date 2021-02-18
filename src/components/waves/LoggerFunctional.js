@@ -48,31 +48,6 @@ const Logger = ({logId, location}) => {
         const returnRejection = (response) => Promise.reject({status: response.status, data});
         // eslint-disable-next-line
         const validate = (response) => (response.ok) ? returnJSON(response) : returnRejection(response);
-        /*
-        const requestInit = {
-            method:'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            mode: 'cors',
-            cache: 'default'
-        };
-        */
-        //const uri = new Request('https://jsongithub.github.io/portfolio/assets/data/appData.json', requestInit);
-        //GOOD const uri = 'https://jsongithub.github.io/portfolio/assets/data/appData.json';
-        // eslint-disable-next-line
-        const uri = 'https://jsongithub.github.io/portfolio/assets/data/appData.json';
-        //const uri = 'localhost:8080/writeSurfLog.json';
-        /*
-        fetch(uri)
-            .then(response => validate(response))
-            .then(data => {
-                setIsLoaded(true);
-                setItems(data);
-                setLogID(logId);
-            })
-            .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
-        */
         setStatus({
             log: JSON.parse(localStorage.getItem(logId)),
             logID: logId,
