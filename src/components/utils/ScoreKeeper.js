@@ -172,7 +172,7 @@ const ScoreKeeper = () => {
                     onChange={selectGame}
                     fontSize='25'
                     padding='10px'
-                    width={(darts) ? '98%' : '67%'}
+                    width={(darts) ? '98%' : '65%'}
                 />
                 {
                     (darts) ? <div></div> : <Selector 
@@ -183,7 +183,7 @@ const ScoreKeeper = () => {
                                                 onChange={selectWinner}
                                                 fontSize='25'
                                                 padding='10px'
-                                                width='32%'
+                                                width='30%'
                                             />
                 }
             </div>

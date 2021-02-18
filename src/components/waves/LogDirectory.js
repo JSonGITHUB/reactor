@@ -56,16 +56,16 @@ const LogDirectory = ({ title, message }) => {
                     }}
                 >
                     <div key={getKey("log")} className="flexContainer button glassy pt-10 pb-10 r-10 mb-1 mobileFull bg-vdkGreen" onClick={() => sessionClick(item, spot)}>
-                            <div className="flexOneFourthColumn p-10 bg-neogreen color-black m-10 r-5">
+                            <div className="flexOneFourthColumn p-10 bg-green color-black m-10 r-5 size25 centeredContent">
                                 {/*<img src={condition(item)} alt={item} className='shaka' />*/}
-                                <img src={condition} alt={conditionDescription} className='shaka' />
-                                <br/>{height}
+                                <img src={condition} alt={conditionDescription} className='shaka m-5' />
+                                <span className='m-5'>{height}</span>
                             </div>
                             <div className="flexThreeFourthColumnLeft pt-10 pb-10">
                                 <div className='copyright bold'>{year}</div>
                                 <div>{month + " " + day + suffix[Number(String(day).slice(-1))]}</div>
-                                <div className='size20 color-neogreen pt-5'>{spot}</div>
-                                <div className='color-neogreen description'>
+                                <div className='size20 color-neogreen bold pt-5'>{spot}</div>
+                                <div className='color-yellow description'>
                                     <span>{height}</span>
                                     <span className='ml-5'>{direction}</span>
                                     <span className='ml-5'>{angle}</span>
