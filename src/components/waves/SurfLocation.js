@@ -112,8 +112,9 @@ const SurfLocation = ({state, item, matches, regionMatch}) => {
     const getStarDetails = (kind) => {
         let details = "";
         const {height, windSpeed, windGusts, swell1Height, swell1Angle,swell1Interval, swell2Height, swell2Angle, swell2Interval} = status;
+        const getWindSpeed = (((windSpeed * 1.15078)+(windGusts * 1.15078))/2).toFixed(0);
         details = (kind === "tide") ? <div className="bold color-neogreen">{height}'</div> : details;
-        details = (kind === "wind") ? <div className="bold color-neogreen">{windSpeed}-{windGusts}kts</div> : details;
+        details = (kind === "wind") ? <div className="bold color-neogreen">{getWindSpeed}mph</div> : details;
         details = (kind === "swell1") ? <div><div className="bold color-neogreen">{`${swell1Height}${(swell1Height.includes("ft")) ? "" : "'"}`}</div><div className="bold color-neogreen">{swell1Angle}°</div><div className="bold color-neogreen">{swell1Interval.replace(" seconds",secondsToSec())}</div></div> : details;
         details = (kind === "swell2") ? <div><div className="bold color-neogreen">{`${swell2Height}${(swell2Height.includes("ft")) ? "" : "'"}`}</div><div className="bold color-neogreen">{swell2Angle}°</div><div className="bold color-neogreen">{swell2Interval.replace(" seconds",secondsToSec())}</div></div> : details;
         return details

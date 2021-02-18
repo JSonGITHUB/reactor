@@ -603,7 +603,7 @@ const WaveFinder = ({
         let details = "";
         const { height, windSpeed, windGusts } = status;
         details = (kind === "tide") ? <div className="bold color-neogreen">{height}'</div> : details;
-        details = (kind === "wind") ? <div className="bold color-neogreen">{windSpeed}-{windGusts}kts</div> : details;
+        details = (kind === "wind") ? <div className="bold color-neogreen">{windSpeed * 1.15078}-{windGusts * 1.15078}mph</div> : details;
         return details
     }
     // eslint-disable-next-line
@@ -626,8 +626,7 @@ const WaveFinder = ({
         }
     }
     const setWind = (direction, angle, speed, gusts) => {
-        //console.log(`setWind => direction: ${direction}`)
-        if (!status.pause) {
+        console.log(`setWind =>\ndirection: ${direction}\nspeed: ${speed}`)
             setStatus(prevState => ({
                 ...prevState,
                 windDirection: direction,
@@ -635,7 +634,6 @@ const WaveFinder = ({
                 windSpeed: Number(speed).toFixed(0),
                 windGusts: Number(gusts).toFixed(0)
             }));
-        }
     }
     // eslint-disable-next-line
     const getTideIcon = <img src={status.tide} className={`mb--5 ${getStarKind("tide")}`} alt="tide" />;
@@ -665,7 +663,7 @@ const WaveFinder = ({
     //Math.abs(item.latitude - status.latitude)+Math.abs(item.longitude - status.longitude);
     //.01 - 1 mile
     const distanceRange = Number(status.distance);
-    const regionMatch = (item) => (getDistance(item)<distanceRange) ? getDistance(item) : false
+    const regionMatch = (item) => ((getDistance(item)<distanceRange) || (distanceRange > 999999999999)) ? getDistance(item) : false
     let count = 0;
     const match = (item) => {
         const matches = [];
@@ -694,6 +692,7 @@ const WaveFinder = ({
                 if (matches.length >= Number(status.stars)) {
                     //console.log(`STARS ==================> Matches: ${matches.length} state stars:${status.stars}`)
                     count = count + 1;
+                    console.log(`getMatchingLocation =>\nstatus.windSpeed: ${status.windSpeed}`)
                     return <SurfLocation key={getKey("link")} state={status} item={item} matches={matches} calculateDistance={calculateDistance} regionMatch={inRegion}></SurfLocation>
                 }
             }
@@ -706,7 +705,7 @@ const WaveFinder = ({
     
     const matches = matchingLocations();
     return ( 
-        <div className="App-content fadeIn">
+        <div className="App-content fadeIn mt--30">
             <Dialog title="Wave Finder" message=""> 
                 <div className="white pointer">   
                     <div>
