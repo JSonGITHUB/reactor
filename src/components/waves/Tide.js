@@ -51,7 +51,7 @@ const Tide = ({setTide, display, isMotionOn}) => {
 
         const tideData = async () => {
 
-            console.log(`tideData =>`)
+            console.log(`tideData => \ngetCurrentTime().startTime: ${getCurrentTime().startTime}\nendTime: ${getCurrentTime().endTime}`)
             const proxyurl = "https://cors-anywhere.herokuapp.com/";
             const uriMLLW = `https://api.tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime().startTime}&end_date=${getCurrentTime().endTime}&station=9410230&product=water_level&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`; 
 
@@ -130,11 +130,13 @@ const Tide = ({setTide, display, isMotionOn}) => {
                  
             }
             const closerTideIndex = (pastLastTide >= untilNextTide) ? nextTideIndex : (nextTideIndex-1);
-            const nextTide = tides[nextTideIndex];
+            const getNextIndex = () => nextTideIndex;
+            const nextTide = tides[getNextIndex()];
             const nextHeight = heights[nextTideIndex];
             const lastHeight = heights[nextTideIndex-1];
-            const nextHour = (Number(times[nextTideIndex].split(':')[0])>12) ? (Number(times[nextTideIndex].split(':')[0])-12) : Number(times[nextTideIndex].split(':')[0]);
-            const nextMinutes = (times[nextTideIndex].split(':')[1] < 10) ? `0${times[nextTideIndex].split(':')[1]}` : times[nextTideIndex].split(':')[1];
+            const getNextHour = Number(times[(nextTideIndex === -1) ? (times.length-1) : nextTideIndex].split(':')[0]);
+            const nextHour = (getNextHour>12) ? (getNextHour-12) : getNextHour;
+            const nextMinutes = (times[(nextTideIndex === -1) ? 1 : nextTideIndex].split(':')[1] < 10) ? `0${times[(nextTideIndex === -1) ? (times.length-1) : nextTideIndex].split(':')[1]}` : times[(nextTideIndex === -1) ? (times.length-1) : nextTideIndex].split(':')[1];
             const nextTime = `${nextHour}:${nextMinutes}`;
             // eslint-disable-next-line
             const lastTide = tides[nextTideIndex-1];
@@ -151,7 +153,8 @@ const Tide = ({setTide, display, isMotionOn}) => {
                 nextTide: nextHeight,
                 nextPhase: convertTide(nextTide),
                 nextTime: nextTime,
-                untilNextTide: untilTide()
+                untilNextTide: untilTide(),
+                nextTideIndex: nextTideIndex
             }))
         };
         getDirection();
@@ -178,13 +181,16 @@ const Tide = ({setTide, display, isMotionOn}) => {
 
     const getCurrentTide = () => <div className="r-10 m-5 p-10 bg-lite white">
                             <div>{getTideDirection()}</div>
-                            <div>{status.height} <span className="greet"> ft. </span></div>
-                            <div className='description pt-10'>
-                                from: <span className='greet bold'>{(status.previousTide) ? status.previousTide.toFixed(1) : ''}' </span>
-                                {(display === 'narrow') ? <br/> : ''}to: <span className='greet bold'>{(status.nextTide) ? status.nextTide.toFixed(1) : ''}'</span><br/>
-                                <span className='greet bold'>{status.nextPhase} in {status.untilNextTide} {(display === 'narrow') ? 'hr' : 'hour'}{status.untilNextTide === 1 ? '' : 's'} </span><br/>
-                                at: <span className='greet bold'>{status.nextTime}</span>
-                            </div>
+                            {(status.nextTideIndex === -1) 
+                                ? <div>{status.nextPhase} tide after midnight, tomorrows tide info will update in {24-getCurrentTime().hours} hrs</div> 
+                                : <div className='description pt-10'>
+                                        <div>{status.height} <span className="greet"> ft. </span></div>
+                                        from: <span className='greet bold'>{(status.previousTide) ? status.previousTide.toFixed(1) : ''}' </span>
+                                        {(display === 'narrow') ? <br/> : ''}to: <span className='greet bold'>{(status.nextTide) ? status.nextTide.toFixed(1) : ''}'</span><br/>
+                                        <span className='greet bold'>{status.nextPhase} in {status.untilNextTide} {(display === 'narrow') ? 'hr' : 'hour'}{status.untilNextTide === 1 ? '' : 's'} </span><br/>
+                                        at: <span className='greet bold'>{status.nextTime}</span>
+                                    </div>
+                            }  
                         </div>;
 
     const percent = 'twentyfivePercent mt--70 mb--70';

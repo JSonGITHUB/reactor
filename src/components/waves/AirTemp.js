@@ -30,7 +30,6 @@ const AirTemp = ({isMotionOn}) => {
             
             const airTempuri = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getStartTime}&end_date=${getEndTime}&station=9410230&product=air_temperature&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
             const airUrl = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${getStartTime}&end_date=${getEndTime}&station=9410230&product=air_temperature&units=english&time_zone=lst_ldt&application=ports_screen&format=json`;
-            console.log(`getAirTempData => ${airTempuri}`)
             const proxyurl = "https://cors-anywhere.herokuapp.com/";
             const uri = proxyurl + airTempuri;
 

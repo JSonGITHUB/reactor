@@ -103,7 +103,7 @@ const WaveFinder = ({
             }));
         }
     }
-    useEffect(() => {     		
+    useEffect(() => { 		
         const timerID = setInterval(
             () => tick(),
             3000000
@@ -112,6 +112,7 @@ const WaveFinder = ({
             clearInterval(timerID);
         }
     });
+
     const refresh = () => {
         window.location.pathname = "/reactor/WaveFinder"
     }
@@ -626,7 +627,7 @@ const WaveFinder = ({
         }
     }
     const setWind = (direction, angle, speed, gusts) => {
-        console.log(`setWind =>\ndirection: ${direction}\nspeed: ${speed}`)
+        //console.log(`setWind =>\ndirection: ${direction}\nspeed: ${speed}`)
             setStatus(prevState => ({
                 ...prevState,
                 windDirection: direction,
@@ -692,19 +693,42 @@ const WaveFinder = ({
                 if (matches.length >= Number(status.stars)) {
                     //console.log(`STARS ==================> Matches: ${matches.length} state stars:${status.stars}`)
                     count = count + 1;
-                    console.log(`getMatchingLocation =>\nstatus.windSpeed: ${status.windSpeed}`)
                     return <SurfLocation key={getKey("link")} state={status} item={item} matches={matches} calculateDistance={calculateDistance} regionMatch={inRegion}></SurfLocation>
                 }
             }
         }
     }
+    const sortedSpots = () => {
+        const latitude = (status.latitude !== undefined) ? status.latitude : 33.079940;
+        const north = [];
+        const south = [];
+        status.locations.forEach((item) => {
+            //console.log(`${item.name} current ${latitude} > item: ${item.latitude}`)
+            if (latitude > item.latitude) {
+                south.push(item);
+            } else {
+                north.push(item);
+            }
+        });
+        localStorage.setItem('scrollIndex', north.length)
+        setStatus(prevState => ({
+            ...prevState,
+            scrollIndex: localStorage.getItem('scrollIndex')
+        }));
+        const sorted = north.concat(south);
+        //console.log(`sortedSpots =>\nsortedNorth: ${JSON.stringify(north,null,2)}`)
+        //console.log(`sortedSpots =>\nsortedSouth: ${JSON.stringify(south,null,2)}`)
+        return sorted;
+    }
     const matchingLocations = () => status.locations.map((item) => getMatchingLocation(item));
     const date = status.date.toLocaleTimeString();
     const time = date.replace(" ","").toLowerCase();
     //localStorage.setItem('locations', JSON.stringify(status.locations))
-    
+    //console.log(`WaveFinder => \nstatus.locations: ${JSON.stringify(status.locations, null, 2)}`)
     const matches = matchingLocations();
-    return ( 
+    const scrollTo = {scrollTop: (status.scrollIndex*100)}
+    
+    return (
         <div className="App-content fadeIn mt--30">
             <Dialog title="Wave Finder" message=""> 
                 <div className="white pointer">   
