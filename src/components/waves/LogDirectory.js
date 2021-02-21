@@ -55,7 +55,7 @@ const LogDirectory = ({ title, message }) => {
                         }
                     }}
                 >
-                    <div key={getKey("log")} className="flexContainer button glassy pt-10 pb-10 r-10 mb-1 mobileFull bg-vdkGreen" onClick={() => sessionClick(item, spot)}>
+                    <div key={getKey("log")} className="flexContainer button glassy pt-10 pb-10 r-10 mb-1 mobileFull bg-black" onClick={() => sessionClick(item, spot)}>
                             <div className="flexOneFourthColumn p-10 bg-green color-black m-10 r-5 size25 centeredContent">
                                 {/*<img src={condition(item)} alt={item} className='shaka' />*/}
                                 <img src={condition} alt={conditionDescription} className='shaka m-5' />
