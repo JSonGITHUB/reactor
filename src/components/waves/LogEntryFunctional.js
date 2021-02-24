@@ -5,14 +5,13 @@ import DatePicker from 'react-date-picker';
 import getKey from '../utils/KeyGenerator.js';
 import PostDirectory from './PostDirectory.js';
 import {BrowserRouter as Link, Route} from 'react-router-dom';
-import selector from './Selector.js';
+import Selector from './Selector.js';
 import group from './Group.js';
 import templateData from './TemplateData.js';
 import generateNewLogId from './GenerateLogId.js';
 
 const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, items }) => {
 
-    console.log(`LogEntry => logId: ${logId}`)
     const posts = new PostDirectory();
     const logIdExists = () => (logId !== undefined && logId !== "" ) ? false : true;
     const localLastPostIdExists = () => (localStorage.getItem("lastPostId") === null) ? false : true;
@@ -20,7 +19,8 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, i
     const getLastPostId = () => (logIdExists()) ? logId : getLocalLastPostId();
     const localLogExists = () => (localStorage.getItem(logId) === null) ? false : true;
     const getLog = () => (localLogExists()) ? JSON.parse(localStorage.getItem(logId)) : templateData;
-
+    //console.log(`LogEntry => logId: ${logId}\nlog: ${JSON.stringify(getLog(), null, 2)}`)
+    
     const [status, setStatus] = useState({
         logId: logId,
         lastPostId: getLastPostId(),
@@ -95,8 +95,23 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, i
     }
     const getItems = () => items;
     const selected = (item, groupTitle) => ((item.selections.indexOf(status.log[groupTitle][item.description])) !== -1) ? true : false;
-    const defaultSelection = (item, groupTitle) => (selected(item, groupTitle)) ? (item.selections.indexOf(status.log[groupTitle][item.description])) : 0; 
-    
+    const getWaveHeight = (height) => {
+        const heights = ['knee high', 'waist high', 'chest high', 'shoulder high', 'head high', 'over head', 'foot over head', '2 feet over head' ,'double over head', 'triple over head']
+        const size = ['1ft', '2ft', '3ft', '4ft', '5ft', '6ft', '7ft', '8ft' ,'9ft', '10ft']
+        height = heights.indexOf(height);     
+        height = size[height];
+        return height;     
+    }
+    const defaultSelection = (item, groupTitle) => {
+        let selected = status.log[groupTitle][item.description];
+        //selected = getWaveSize(selected);
+        if (item.description === 'Height' && (groupTitle === 'Swell1' || groupTitle === 'Swell2')) {
+            selected = getWaveHeight(selected);
+        }
+        const selectedIndex = item.selections.indexOf(String(selected));
+        console.log(`defaultSelection => ${item.description}: ${groupTitle} - ${selected}\nselections:${item.selections[selectedIndex]}`);
+        return selectedIndex; 
+    }
     const radioItems = (item, groupTitle) => {
         return (
             <RadioSelector
@@ -114,16 +129,16 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, i
                 {radioItems(item, groupTitle)}
             </div>;
     
-    const selectionInterface = (item, groupTitle) => (item.type === 'radio') ? radio(item, groupTitle) : selector(item, groupTitle, status.spot, defaultSelection, handleSelection, selected);
+    const selectionInterface = (item, groupTitle) => (item.type === 'radio') ? radio(item, groupTitle) : Selector(item, groupTitle, status.spot, defaultSelection, handleSelection, selected);
     const groups = () => getItems().map((item) => {
         const headerClasses = 'subHeader color-yellow p-20';
         const selectorClasses = 'greet p-vw flex3Column';
         const groupClasses = (window.innerWidth < 500) ? "r-vw" : "flexContainer width-100-percent r-vw";
         const description = item.description;
-        //console.log(`description: ${JSON.stringify(item,null,2)}`)
+        //console.log(`description: ${description}`)
        return <div key={getKey("groupConainer")}>
                 <div key={getKey("groupHeader")} className={headerClasses}>
-                    {item.description}
+                    {description}
                 </div>
                 <div className={groupClasses} key={getKey("groupSubConainer")}>
                     {group(item).map((group) => 

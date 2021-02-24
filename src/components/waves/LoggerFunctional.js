@@ -6,7 +6,7 @@ import templateData from './LogTemplateData.js';
 import generateNewLogId from './GenerateLogId.js';
 
 const Logger = ({logId, location}) => { 
-    //console.log(`Logger => logId: ${logId}\nlocalStorage.getItem('logId'): ${localStorage.getItem('logId')}`); 
+    console.log(`Logger => logId: ${logId}\nlocalStorage.getItem('logId'): ${localStorage.getItem('logId')}`); 
     const logExists = () => (localStorage.getItem(logId) === null) ? false : true;
     // eslint-disable-next-line
     const initLogId = () => (logExists()) ? logId : generateNewLogId();
@@ -24,7 +24,7 @@ const Logger = ({logId, location}) => {
         // eslint-disable-next-line
         const { state } = location;
         const logId = localStorage.getItem('logId');
-        //console.log(`LoggerFunctional => componentDidMount -> SPOT: ${getSpot()}\ngetLogId: ${localStorage.getItem('logId')}\nlogId: ${logId}`); 
+        console.log(`LoggerFunctional => componentDidMount -> SPOT: ${getSpot()}\ngetLogId: ${localStorage.getItem('logId')}\nlogId: ${logId}`); 
         
         if (localStorage.getItem(logId) === null) {
             setStatus(prevState => ({
@@ -32,7 +32,7 @@ const Logger = ({logId, location}) => {
                 log: templateData,
                 logID:generateNewLogId()
             }));
-            //console.log(`LoggerFunctional => componentDidMount -> 1\nSPOT: ${getSpot()}\nlogID: ${logId}\nlog: ${JSON.stringify(status.log, null, 2)}`); 
+            console.log(`LoggerFunctional => componentDidMount -> 1\nSPOT: ${getSpot()}\nlogID: ${logId}\nlog: ${JSON.stringify(status.log, null, 2)}`); 
         
         } else {
             setStatus(prevState => ({

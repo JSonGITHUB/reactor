@@ -28,6 +28,9 @@ import thumbsDown from '../../assets/images/ThumbsDown.png';
 import SurfLocation from './SurfLocation.js';
 import locations from './Locations.js';
 import directionObject from './DirectionObject.js';
+import angles from './Angles.js';
+import directions from './Directions.js';
+import waveHeights from './WaveHeights.js';
 
 const WaveFinder = ({
         tide,
@@ -74,8 +77,8 @@ const WaveFinder = ({
         swell2Height: "2.0",
         swell2Interval: "9 seconds",
         swell2Direction: getSwell2Direction(),
-        swell1Angle: directionObject["SSW"],
-        swell2Angle: directionObject["SSW"],
+        swell1Angle: directionObject[getSwell1Direction()],
+        swell2Angle: directionObject[getSwell2Direction()],
         //swell1Direction: getDefault("swell1Direction"),
         //swell2Direction: getDefault("swell2Direction"),
         //swell1Angle: getDefault("swell1Angle"),
@@ -136,7 +139,9 @@ const WaveFinder = ({
         return 0;
     }
     const handleTideSelection = (groupTitle, label, selected) => {
+        console.log(`handleTideSelection =>\nselected: ${selected}`)
         localStorage.setItem("tide", selected);
+        setTide(selected);
         setStatus(prevState => ({
             ...prevState,
             pause: true,
@@ -180,8 +185,6 @@ const WaveFinder = ({
             isSwell2: isSwell2
         }))
     }
-    const directionArray = ["W", "WSW", "WNW", "E", "ESE", "ENE", "N", "NE", "NNE", "NW", "NNW", "S", "SE", "SSE", "SW", "SSW"];
-
     const handleSwell1Selection = (groupTitle, label, selected) => {
         const swell1Angle = directionObject[selected];
         //console.log(`handleSwell1Selection => \nselected: ${selected} \nswell1Angle: ${swell1Angle}\n directionObject: ${JSON.stringify(directionObject, null, 2)}`)
@@ -294,6 +297,7 @@ const WaveFinder = ({
     }
     const isSwellSelected = (id) => ((id === 1 && status.isSwell1 === true) || (id === 2 && status.isSwell2===true)) ? 'bg-green' : 'bg-dkGreen';
     const swellClass = (id) => `${isSwellSelected(id)} flex2Column r-10 m-5 p-15`;
+    const intervals = ['','5 seconds','6 seconds','7 seconds','8 seconds','9 seconds','10 seconds','11 seconds','12 seconds','13 seconds','14 seconds','15 seconds','16 seconds','17 seconds','18 seconds','19 seconds','20 seconds','21 seconds','22 seconds','23 seconds'];
     const swellSelector = (id, swellDirection) => <div className={swellClass(id)} onMouseDown={pause}>
         {getSwellIcon(id)}
         <span className="ml-5">Swell{id}</span><br/>
@@ -304,7 +308,7 @@ const WaveFinder = ({
                 selected={swellDirection} 
                 //getState(`swell1`)
                 label="Direction" 
-                items={directionArray}
+                items={directions}
                 onChange={(id === 1) ? handleSwell1Selection : handleSwell2Selection}
                 fontSize='20'
                 padding='5px'
@@ -316,77 +320,7 @@ const WaveFinder = ({
                 groupTitle={`SwellAngle${id}`}
                 selected={(id === 1) ? status.swell1Angle : status.swell2Angle} 
                 label="Angle" 
-                items={[
-                    "0",
-                    "5",
-                    "10",
-                    "15",
-                    "20",
-                    "25",
-                    "30",
-                    "35",
-                    "40",
-                    "45",
-                    "50",
-                    "55",
-                    "60",
-                    "65",
-                    "70",
-                    "75",
-                    "80",
-                    "85",
-                    "90",
-                    "95",
-                    "100",
-                    "105",
-                    "110",
-                    "115",
-                    "120",
-                    "125",
-                    "130",
-                    "135",
-                    "140",
-                    "145",
-                    "150",
-                    "155",
-                    "160",
-                    "165",
-                    "170",
-                    "175",
-                    "180",
-                    "185",
-                    "190",
-                    "195",
-                    "200",
-                    "205",
-                    "210",
-                    "215",
-                    "220",
-                    "225",
-                    "230",
-                    "235",
-                    "240",
-                    "245",
-                    "250",
-                    "255",
-                    "260",
-                    "265",
-                    "270",
-                    "275",
-                    "280",
-                    "285",
-                    "290",
-                    "295",
-                    "300",
-                    "305",
-                    "310",
-                    "315",
-                    "320",
-                    "325",
-                    "330",
-                    "335",
-                    "340"
-                ]}
+                items={angles}
                 onChange={(id === 1) ? handleSwell1Angle : handleSwell2Angle}
                 fontSize='20'
                 padding='5px'
@@ -398,27 +332,7 @@ const WaveFinder = ({
                 groupTitle={`SwellHeight${id}`}
                 selected={(id === 1) ? status.swell1Height : status.swell2Height} 
                 label="Height" 
-                items={[
-                    "",
-                    "1ft",
-                    "2ft",
-                    "3ft",
-                    "4ft",
-                    "5ft",
-                    "6ft",
-                    "7ft",
-                    "8ft",
-                    "9ft",
-                    "10ft",
-                    "11ft",
-                    "12ft",
-                    "13ft",
-                    "14ft",
-                    "15ft",
-                    "16ft",
-                    "17ft",
-                    "18ft"
-                ]}
+                items={waveHeights}
                 onChange={(id === 1) ? handleSwell1Height : handleSwell2Height}
                 fontSize='20'
                 padding='5px'
@@ -430,28 +344,7 @@ const WaveFinder = ({
                 groupTitle={`SwellInterval${id}`}
                 selected={(id === 1) ? status.swell1Interval : status.swell2Interval} 
                 label="interval" 
-                items={[
-                    "",
-                    "5 seconds",
-                    "6 seconds",
-                    "7 seconds",
-                    "8 seconds",
-                    "9 seconds",
-                    "10 seconds",
-                    "11 seconds",
-                    "12 seconds",
-                    "13 seconds",
-                    "14 seconds",
-                    "15 seconds",
-                    "16 seconds",
-                    "17 seconds",
-                    "18 seconds",
-                    "19 seconds",
-                    "20 seconds",
-                    "21 seconds",
-                    "22 seconds",
-                    "23 seconds"
-                ]}
+                items={intervals}
                 onChange={(id === 1) ? handleSwell1Interval : handleSwell2Interval}
                 fontSize='20'
                 padding='5px'
@@ -459,32 +352,11 @@ const WaveFinder = ({
             />
         </div>
         
-        {(id===1) ? 
-            /*
-            <div className="fl-left">
-                <input
-                    name="isSwell1"
-                    type="checkbox"
-                    checked={status.isSwell1}
-                    onChange={handleSwell1Check}
-                />
-            </div>
-            */
-            <div className="button mt-15" onClick={handleSwell1Check}>
+        {(id===1) 
+            ? <div className="button mt-15" onClick={handleSwell1Check}>
                 {(status.isSwell1 === true) ? <img src={thumbsUp} alt='swell1' className='p-10 r-20' /> : <img src={thumbsDown} alt='swell1' className='p-10 r-20' /> }
             </div>
-            :
-            /*
-            <div className="fl-left">
-                <input
-                    name="isSwell2"
-                    type="checkbox"
-                    checked={status.isSwell2}
-                    onChange={handleSwell2Check}
-                />
-            </div>
-            */
-            <div className="button mt-15" onClick={handleSwell2Check}>
+            : <div className="button mt-15" onClick={handleSwell2Check}>
                 {(status.isSwell2 === true) ? <img src={thumbsUp} alt='swell2' className='p-10 r-20' /> : <img src={thumbsDown} alt='swell2' className='p-10 r-20' /> }
             </div>
         }
@@ -518,7 +390,7 @@ const WaveFinder = ({
                                 groupTitle="Wind" 
                                 selected={status.windDirection} 
                                 label="Direction"
-                                items={directionArray}
+                                items={directions}
                                 onChange={handleWindSelection}
                                 fontSize='20'
                                 padding='5px'
@@ -548,7 +420,8 @@ const WaveFinder = ({
                                         name="distance"
                                         type="number"
                                         value={distance}
-                                        onChange={handleDistanceSelection}/>
+                                        onChange={handleDistanceSelection}
+                                    />
                                 </label>
                             </div>
     const getMatchIcon = (kind) => {
@@ -613,18 +486,17 @@ const WaveFinder = ({
                             <div className="greet">{getState(matchKind)}{getStarDetails(matchKind)}</div>
                         </div>;
     const setTide = (tide) => {
-        //console.log(`WaveFinder = > setTide(${tide})`)
-        let currentTide = (Number(tide)>2) ? "medium" : "low";
+        console.log(`WaveFinder = > setTide(${tide})`)
+        //let currentTide = (Number(tide)>2) ? "medium" : "low";
         //console.log(`WaveFinder = > ${tide} currentTide(${currentTide})`)
-        currentTide = (Number(tide)>4) ? "high" : currentTide;
+        //currentTide = (Number(tide)>4) ? "high" : currentTide;
         //console.log(`WaveFinder = > ${tide} currentTide(${currentTide})`)
-        if (status.pause === false) {
-            setStatus(prevState => ({
-                ...prevState,
-                tide: currentTide,
-                height: tide
-            }));
-        }
+        localStorage.setItem("tide", tide);
+        setStatus(prevState => ({
+            ...prevState,
+            tide: tide,
+            height: getDefaultHeights(tide)
+        }));
     }
     const setWind = (direction, angle, speed, gusts) => {
         //console.log(`setWind =>\ndirection: ${direction}\nspeed: ${speed}`)
@@ -729,7 +601,7 @@ const WaveFinder = ({
     const scrollTo = {scrollTop: (status.scrollIndex*100)}
     
     return (
-        <div className="App-content fadeIn mt--30">
+        <div className="App-content fadeIn">
             <Dialog title="Wave Finder" message=""> 
                 <div className="white pointer">   
                     <div>

@@ -12,10 +12,7 @@ const Photos = () => {
     const KEY = 'Client-ID '+config.unsplashAPI_KEY;
     const api = config.unsplashAPI_BASE_URL;
     //console.log(`KEY: ${KEY}\napi: ${api}`)
-    const updateArray = (array) => {
-        //console.log(`menuArray: ${JSON.stringify(array, null, 2)}`)
-        setMenuArray(array);
-    }
+    
     const onChange = (value) => setTerm(value);
     const getImageSize = (item) => {
         if (window.innerWidth >= 1080) {
@@ -47,6 +44,10 @@ const Photos = () => {
             });
     }
     const [menuArray, setMenuArray] = useState([]);
+    const updateArray = (array) => {
+        //console.log(`menuArray: ${JSON.stringify(array, null, 2)}`)
+        setMenuArray(array);
+    }
     const onFormSubmit = event =>  {
         event.preventDefault();
         console.log(`Search Term: ${keyword}`);

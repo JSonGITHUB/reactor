@@ -15,7 +15,6 @@ const LogDirectory = ({ title, message }) => {
         console.log(`sessionClick \n${item} --> \nSpot: ${spot}`);
         getLog();
     }
-    
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"]
     const suffix = ["th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th"];
     const icons = [shakaBlack, thumbsUp, thumbsDown];
