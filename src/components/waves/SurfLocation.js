@@ -144,7 +144,7 @@ const SurfLocation = ({state, item, matches, regionMatch}) => {
         console.log(`LogId: generateNewLogId => status.logId: ${newId}`);
         return newId;
     }
-    const goToLog = () => window.location.pathname = '/reactor/SurfLog'
+    const goToLog = () => window.location.pathname = `/reactor/SurfLog`;
     const createLog = (item) => {
         console.log(`SurfLocation => createLog`);
         localStorage.setItem('spot', item.name);
@@ -172,7 +172,12 @@ const SurfLocation = ({state, item, matches, regionMatch}) => {
             height = (height<0) ? heights[0] : heights[height];
             return height;     
         }
-        
+        const getWaveSize = (height) => {
+            height = height.split('.')[0];     
+            height = (height.includes("FT")) ? height.replace("FT","ft") : height;
+            height = (!height.includes("ft")) ? String(height+"ft") : height;
+            return height;     
+        }
         const getWindMPH = () => {
             let mph = Number(status.windGusts)+1;
             mph = mph + 'mph';
@@ -229,17 +234,17 @@ const SurfLocation = ({state, item, matches, regionMatch}) => {
             },
             Surf: {
                 Height: getWaveHeight(status.swell1Height),
-                Report: status.swell1Height,
-                Shape: 'close-outs'
+                Report: getWaveSize(status.swell1Height),
+                Shape: 'peaky'
             },
             Swell1: {
-                Height: status.swell1Height,
+                Height: getWaveHeight(status.swell1Height),
                 Direction: status.swell1Direction,
                 Angle: status.swell1Angle,
                 Interval: status.swell1Interval,
             },
             Swell2: {
-                Height: status.swell2Height,
+                Height: getWaveHeight(status.swell2Height),
                 Direction: status.swell2Direction,
                 Angle: status.swell2Angle,
                 Interval: status.swell2Interval,
@@ -276,10 +281,13 @@ const SurfLocation = ({state, item, matches, regionMatch}) => {
             console.log(`postDirectory: ${postDirectory}`)
             post = JSON.stringify(logObj, null, 2);
             console.log(`post: ${post}`)
+            localStorage.setItem('logId', recordId)
+            localStorage.setItem('spot', item.name)
             localStorage.setItem(recordId, post);
+
             //localStorage.setItem('postDirectory', postDirectory);
             posts.add(recordId);
-        }
+        }   
         logIt();
         goToLog();
         /*

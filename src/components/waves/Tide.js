@@ -29,7 +29,7 @@ const Tide = ({setTide, display, isMotionOn}) => {
         const startHour = ((currentHour-1)<10) ? `0${(currentHour-1)}` : (currentHour-1);
         const currentMinutes = currentTime.getMinutes();
         const minutes = (currentMinutes<10) ? `0${currentMinutes}` : currentMinutes;
-        const getEndTime = `${year}${month}${date}%20${hours}:${minutes}`;
+        const getEndTime = `${year}${month}${(date+1)}%20${hours}:${minutes}`;
         const getStartTime = `${year}${month}${date}%20${startHour}:00`;
         currentTime = `${year}${month}${date}%20${hours}:${minutes}`;
         return (
@@ -62,7 +62,7 @@ const Tide = ({setTide, display, isMotionOn}) => {
             const uriMSL = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime().currentTime}&end_date=${getCurrentTime().currentTime}&station=9410230&product=water_level&datum=MSL&units=english&time_zone=lst_ldt&application=web_services&format=json`;
             const uriNAVD = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime().currentTime}&end_date=${getCurrentTime().currentTime}&station=9410230&product=water_level&datum=NAVD&units=english&time_zone=lst_ldt&application=web_services&format=json`;
             const uriSTND = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime().currentTime}&end_date=${getCurrentTime().currentTime}&station=9410230&product=water_level&datum=STND&units=english&time_zone=lst_ldt&application=web_services&format=json`;
-            const uriLaJolla = `https://tidesandcurrents.noaa.gov/api/datagetter?product=predictions&amp;application=NOS.COOPS.TAC.WL&amp;begin_date=20201020&amp;end_date=20201021&amp;datum=MLLW&amp;station=9410230&amp;time_zone=lst_ldt&amp;units=english&amp;interval=hilo&amp;format=json`;
+            const uriLaJolla = `https://tidesandcurrents.noaa.gov/api/datagetter?product=predictions&amp;application=NOS.COOPS.TAC.WL&amp;begin_date=20201020&amp;end_date=${getCurrentTime().endTime}&amp;datum=MLLW&amp;station=9410230&amp;time_zone=lst_ldt&amp;units=english&amp;interval=hilo&amp;format=json`;
             const uri = proxyurl + uriMLLW;
             const { data } = await axios.get(uriMLL, {
                 params: {
@@ -74,12 +74,14 @@ const Tide = ({setTide, display, isMotionOn}) => {
             //console.log(`tideData => data: ${JSON.stringify(data, null, 2)}`)
             
             const waterLevel = Number(data.data[data.data.length - 1].v).toFixed(1);
+            const tide = (waterLevel > 3) ? "high" : (waterLevel < 2) ? "low" : "medium";
             //console.log(`TIDE => waterLevel: ${waterLevel}`)
-            setTide(waterLevel);
+            
+            setTide(tide);
             setStatus(prevState => ({
                 ...prevState,
                 station: data.metadata.name,
-                tide:(waterLevel > 3) ? "high" : (waterLevel < 2) ? "low" : "medium",
+                tide: tide,
                 height: waterLevel
             }));
         };
@@ -89,7 +91,7 @@ const Tide = ({setTide, display, isMotionOn}) => {
     useEffect(() => {
         let ignore = false;
         
-        const tideDaily = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&amp;application=NOS.COOPS.TAC.WL&amp;begin_date=${getCurrentTime().year}${getCurrentTime().month}${getCurrentTime().date}&amp;end_date=${getCurrentTime().year}${getCurrentTime().month}${getCurrentTime().date}&amp;datum=MLLW&amp;station=9410230&amp;time_zone=lst_ldt&amp;units=english&amp;interval=hilo&amp;format=json`;
+        const tideDaily = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&amp;application=NOS.COOPS.TAC.WL&amp;begin_date=${getCurrentTime().year}${getCurrentTime().month}${getCurrentTime().date}&amp;end_date=${getCurrentTime().year}${getCurrentTime().month}${getCurrentTime().date+1}&amp;datum=MLLW&amp;station=9410230&amp;time_zone=lst_ldt&amp;units=english&amp;interval=hilo&amp;format=json`;
         const uri = tideDaily;
         //console.log(`Tide   - getStartTime: ${getCurrentTime().startTime} => getEndTime: ${getCurrentTime().endTime}`)
         
@@ -174,7 +176,7 @@ const Tide = ({setTide, display, isMotionOn}) => {
     }
     const getTideDirection = () => (status.tideDirection === "DOWN") ? getDownArrow() : getUpArrow();
     //getTideDirection = () => (notEqual() && greaterThan()) ? "DOWN" : status.tideDirection;
-    const setLocalTide = () => localStorage.setItem("tide", Number(status.height));
+    const setLocalTide = () => localStorage.setItem("tide", status.tide);
     const setLocalTideDirection = () => localStorage.setItem("tideDirection", status.tideDirection);
     // eslint-disable-next-line
     const fixHours = () => (getCurrentTime().hours>12) ? Number(getCurrentTime().hours - 12) : getCurrentTime().hours;
@@ -183,12 +185,12 @@ const Tide = ({setTide, display, isMotionOn}) => {
                             <div>{getTideDirection()}</div>
                             {(status.nextTideIndex === -1) 
                                 ? <div>{status.nextPhase} tide after midnight, tomorrows tide info will update in {24-getCurrentTime().hours} hrs</div> 
-                                : <div className='description pt-10'>
-                                        <div>{status.height} <span className="greet"> ft. </span></div>
-                                        from: <span className='greet bold'>{(status.previousTide) ? status.previousTide.toFixed(1) : ''}' </span>
-                                        {(display === 'narrow') ? <br/> : ''}to: <span className='greet bold'>{(status.nextTide) ? status.nextTide.toFixed(1) : ''}'</span><br/>
-                                        <span className='greet bold'>{status.nextPhase} in {status.untilNextTide} {(display === 'narrow') ? 'hr' : 'hour'}{status.untilNextTide === 1 ? '' : 's'} </span><br/>
-                                        at: <span className='greet bold'>{status.nextTime}</span>
+                                : <div className='greet pt-10'>
+                                        <div><span className='bold'>{status.height}</span> ft.</div>
+                                        from: <span className='bold'>{(status.previousTide) ? status.previousTide.toFixed(1) : ''}' </span>
+                                        {(display === 'narrow') ? <br/> : ''}to: <span className='bold'>{(status.nextTide) ? status.nextTide.toFixed(1) : ''}'</span><br/>
+                                        <span className='bold'>{status.nextPhase} in {status.untilNextTide} {(display === 'narrow') ? 'hr' : 'hour'}{status.untilNextTide === 1 ? '' : 's'} </span><br/>
+                                        at: <span className='bold'>{status.nextTime}</span>
                                     </div>
                             }  
                         </div>;
@@ -200,8 +202,8 @@ const Tide = ({setTide, display, isMotionOn}) => {
                     </div>;
 
     
-    //console.log(`tide direction: ${status.tideDirection} previous height: ${previousTide()} height: ${status.height} == ${previousTide() === Number(status.height)}`)
-    setLocalTide();
+    //console.log(`tide direction: ${status.tideDirection} previous height: ${previousTide()} height: ${status.height} == ${previousTide() === Number(status.height)} \ntide: ${localStorage.getItem('tide')}`)
+    //setLocalTide();
     setLocalTideDirection();
     return <div>{getCurrentTide()}</div>
 }
