@@ -127,8 +127,14 @@ const Tide = ({setTide, display, isMotionOn}) => {
             const untilTide = () => {
                 const pastTime = (untilNextTideMinutes < 0) ? (-1*untilNextTideMinutes) : untilNextTideMinutes;
                 console.log(`untilTide => \nuntilNextTideMinutes: ${untilNextTideMinutes}\nuntilNextTide: ${untilNextTide}`)
-                const time = (lessThanHour) ? pastTime : untilNextTide
-                return time;
+                const time = (lessThanHour) ? pastTime : String(untilNextTide) + 'hr ' + String(untilNextTideMinutes) + 'min';
+                const hourDisplay = (display === 'narrow')  ? 'hr' : 'hour';
+                const minuteDisplay = (display === 'narrow')  ? 'min' : 'minutes';
+                const getUnits = () => (lessThanHour) ? minuteDisplay : hourDisplay;
+                const multipleDisplay = (status.untilNextTide === 1) ? '' : 's';
+                //const timeDisplay = time + getUnits() + multipleDisplay;
+                const timeDisplay = time;
+                return timeDisplay;
                  
             }
             const closerTideIndex = (pastLastTide >= untilNextTide) ? nextTideIndex : (nextTideIndex-1);
@@ -189,7 +195,7 @@ const Tide = ({setTide, display, isMotionOn}) => {
                                         <div><span className='bold'>{status.height}</span> ft.</div>
                                         from: <span className='bold'>{(status.previousTide) ? status.previousTide.toFixed(1) : ''}' </span>
                                         {(display === 'narrow') ? <br/> : ''}to: <span className='bold'>{(status.nextTide) ? status.nextTide.toFixed(1) : ''}'</span><br/>
-                                        <span className='bold'>{status.nextPhase} in {status.untilNextTide} {(display === 'narrow') ? 'hr' : 'hour'}{status.untilNextTide === 1 ? '' : 's'} </span><br/>
+                                        <span className='bold'>{status.nextPhase} in {status.untilNextTide}</span><br/>
                                         at: <span className='bold'>{status.nextTime}</span>
                                     </div>
                             }  

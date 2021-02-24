@@ -5,7 +5,7 @@ import getKey from '../utils/KeyGenerator.js';
 function FunctionalSelector(props) {
     //let action = "";
     let { items, label, groupTitle, selected, padding, fontSize, maxWidth, width} = props;
-    console.log(`FunctionalSelector => \n${groupTitle}\nlabel: ${label}\nselected: ${selected}`)
+    //console.log(`FunctionalSelector => \n${groupTitle}\nlabel: ${label}\nselected: ${selected}`)
     const setSelected = (item) => {
         selected = item;
         return tag(item)
