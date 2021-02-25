@@ -28,9 +28,8 @@ import thumbsDown from '../../assets/images/ThumbsDown.png';
 import SurfLocation from './SurfLocation.js';
 import locations from './Locations.js';
 import directionObject from './DirectionObject.js';
-import angles from './Angles.js';
 import directions from './Directions.js';
-import waveHeights from './WaveHeights.js';
+import SwellSelector from './SwellSelector.js';
 
 const WaveFinder = ({
         tide,
@@ -294,73 +293,7 @@ const WaveFinder = ({
             ...prevState,
             pause: true
         }));
-    }
-    const isSwellSelected = (id) => ((id === 1 && status.isSwell1 === true) || (id === 2 && status.isSwell2===true)) ? 'bg-green' : 'bg-dkGreen';
-    const swellClass = (id) => `${isSwellSelected(id)} flex2Column r-10 m-5 p-15`;
-    const intervals = ['','5 seconds','6 seconds','7 seconds','8 seconds','9 seconds','10 seconds','11 seconds','12 seconds','13 seconds','14 seconds','15 seconds','16 seconds','17 seconds','18 seconds','19 seconds','20 seconds','21 seconds','22 seconds','23 seconds'];
-    const swellSelector = (id, swellDirection) => <div className={swellClass(id)} onMouseDown={pause}>
-        {getSwellIcon(id)}
-        <span className="ml-5">Swell{id}</span><br/>
-        <div className='bg-lite r-10 mt-20 pb-15'>
-            <span className="greet ml-5">direction</span><br/>
-            <Selector
-                groupTitle={`Swell${id}`}
-                selected={swellDirection} 
-                //getState(`swell1`)
-                label="Direction" 
-                items={directions}
-                onChange={(id === 1) ? handleSwell1Selection : handleSwell2Selection}
-                fontSize='20'
-                padding='5px'
-                width='70%'
-            />
-            <br/>
-            <span className="greet ml-5">angle</span><br/>
-            <Selector
-                groupTitle={`SwellAngle${id}`}
-                selected={(id === 1) ? status.swell1Angle : status.swell2Angle} 
-                label="Angle" 
-                items={angles}
-                onChange={(id === 1) ? handleSwell1Angle : handleSwell2Angle}
-                fontSize='20'
-                padding='5px'
-                width='70%'
-            />
-            <br/>
-            <span className="greet ml-5">height</span><br/>
-            <Selector
-                groupTitle={`SwellHeight${id}`}
-                selected={(id === 1) ? status.swell1Height : status.swell2Height} 
-                label="Height" 
-                items={waveHeights}
-                onChange={(id === 1) ? handleSwell1Height : handleSwell2Height}
-                fontSize='20'
-                padding='5px'
-                width='70%'
-            />
-            <br/>
-            <span className="greet ml-5">interval</span><br/>
-            <Selector
-                groupTitle={`SwellInterval${id}`}
-                selected={(id === 1) ? status.swell1Interval : status.swell2Interval} 
-                label="interval" 
-                items={intervals}
-                onChange={(id === 1) ? handleSwell1Interval : handleSwell2Interval}
-                fontSize='20'
-                padding='5px'
-                width='70%'
-            />
-        </div>
-        
-        {(id===1) 
-            ? <div className="button mt-15" onClick={handleSwell1Check}>
-                {(status.isSwell1 === true) ? <img src={thumbsUp} alt='swell1' className='p-10 r-20' /> : <img src={thumbsDown} alt='swell1' className='p-10 r-20' /> }
-            </div>
-            : <div className="button mt-15" onClick={handleSwell2Check}>
-                {(status.isSwell2 === true) ? <img src={thumbsUp} alt='swell2' className='p-10 r-20' /> : <img src={thumbsDown} alt='swell2' className='p-10 r-20' /> }
-            </div>
-        }
-    </div>
+    };
     const isTideSelected = () => (status.isTide === true) ? 'bg-green' : 'bg-dkGreen';
     const tideClass = () => `${isTideSelected()} flex2Column r-10 m-5 p-15`;
     const tideSelector = (tide) => <div className={tideClass()} onMouseDown={pause}>
@@ -424,6 +357,11 @@ const WaveFinder = ({
                                     />
                                 </label>
                             </div>
+    const getStarKind = (kind) => {
+        let classes = "shaka r-20 p-2";
+        classes = (kind === "wind") ? (classes + " bg-white") : classes; 
+        return classes;
+    }
     const getMatchIcon = (kind) => {
         // eslint-disable-next-line
         let icon = (kind === "swell1") ? "swell1" : "swell2";
@@ -455,12 +393,7 @@ const WaveFinder = ({
                 return <img src={NW} className={getStarKind(kind)} alt={kind} />;
             }
         }
-    }
-    const getStarKind = (kind) => {
-        let classes = "shaka r-20 p-2";
-        classes = (kind === "wind") ? (classes + " bg-white") : classes; 
-        return classes;
-    }
+    };
     const getState = (kind) => {
         const { swell1Direction, swell2Direction, tide, windDirection } = status;
         if (kind === "swell1") {
@@ -514,13 +447,7 @@ const WaveFinder = ({
     const getWaterTempIcon = <img src={waterTemp} className={`mb--7 ${getStarKind("tide")}`} alt="water temp" />;
     // eslint-disable-next-line
     const getAirTempIcon = <img src={airTemp} className={`mb--7 ${getStarKind("tide")}`} alt="air temp" />;
-    const getSwellIcon = (id) => {
-        if (id === 1) {
-            return <img src={swell1} className={`mb--5 ${getStarKind("tide")}`} alt="swell1" />
-        } else {
-            return <img src={swell2} className={`mb--5 ${getStarKind("tide")}`} alt="swell2" />;
-        }
-    }
+    
     const getReport = () => <iframe className="Percent95 mt-5 mb-5 r-10" title="report" id="report" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224"></iframe>
     
     console.log(`currentPositionExists: ${currentPositionExists()}`)
@@ -620,8 +547,40 @@ const WaveFinder = ({
                     <div className="p-5 r-10 m-5">
                         <div className='p-10 color-yellow'>select current conditions:</div>
                         <div className="flexContainer">
-                            {swellSelector(1,status.swell1Direction)}
-                            {swellSelector(2,status.swell2Direction)}
+                            {/*swellSelector(1,status.swell1Direction, status, handleSwell1Selection, handleSwell2Selection, handleSwell1Angle, handleSwell2Angle, handleSwell1Height, handleSwell2Height, handleSwell1Interval, handleSwell2Interval, handleSwell1Check, handleSwell2Check, pause)*/}
+                            {/*swellSelector(2,status.swell2Direction, status, handleSwell1Selection, handleSwell2Selection, handleSwell1Angle, handleSwell2Angle, handleSwell1Height, handleSwell2Height, handleSwell1Interval, handleSwell2Interval, handleSwell1Check, handleSwell2Check, pause)*/}
+                            <SwellSelector 
+                                id='1' 
+                                swellDirection={status.swell1Direction} 
+                                status={status} 
+                                handleSwell1Selection={handleSwell1Selection} 
+                                handleSwell2Selection={handleSwell2Selection} 
+                                handleSwell1Angle={handleSwell1Angle} 
+                                handleSwell2Angle={handleSwell2Angle} 
+                                handleSwell1Height={handleSwell1Height} 
+                                handleSwell2Height={handleSwell2Height} 
+                                handleSwell1Interval={handleSwell1Interval} 
+                                handleSwell2Interval={handleSwell2Interval} 
+                                handleSwell1Check={handleSwell1Check} 
+                                handleSwell2Check={handleSwell2Check} 
+                                pause={pause}>
+                            </SwellSelector>
+                            <SwellSelector 
+                                id='2' 
+                                swellDirection={status.swell2Direction} 
+                                status={status} 
+                                handleSwell1Selection={handleSwell1Selection} 
+                                handleSwell2Selection={handleSwell2Selection} 
+                                handleSwell1Angle={handleSwell1Angle} 
+                                handleSwell2Angle={handleSwell2Angle} 
+                                handleSwell1Height={handleSwell1Height} 
+                                handleSwell2Height={handleSwell2Height} 
+                                handleSwell1Interval={handleSwell1Interval} 
+                                handleSwell2Interval={handleSwell2Interval} 
+                                handleSwell1Check={handleSwell1Check} 
+                                handleSwell2Check={handleSwell2Check} 
+                                pause={pause}>
+                            </SwellSelector>
                         </div>
                         <div className="flexContainer">
                             {tideSelector(status.tide)}
