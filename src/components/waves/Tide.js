@@ -125,9 +125,9 @@ const Tide = ({setTide, display, isMotionOn}) => {
             const untilNextTideMinutes = Number(minutes[nextTideIndex]-getCurrentTime().minutes);
             const lessThanHour = (untilNextTide === 0) ? true : false;
             const untilTide = () => {
-                const pastTime = (untilNextTideMinutes < 0) ? (-1*untilNextTideMinutes) : untilNextTideMinutes;
-                console.log(`untilTide => \nuntilNextTideMinutes: ${untilNextTideMinutes}\nuntilNextTide: ${untilNextTide}`)
-                const time = (lessThanHour) ? pastTime : String(untilNextTide) + 'hr ' + String(untilNextTideMinutes) + 'min';
+                const pastTime = (untilNextTideMinutes < 0) ? (untilNextTideMinutes+60) : untilNextTideMinutes;
+                console.log(`untilTide => \npastTime: ${pastTime}\nuntilNextTideMinutes: ${untilNextTideMinutes}\nuntilNextTide: ${untilNextTide}`)
+                const time = (lessThanHour) ? pastTime : ((untilNextTideMinutes < 0) ? (untilNextTide-1) : untilNextTide) + 'hr ' + String(pastTime) + 'min';
                 const hourDisplay = (display === 'narrow')  ? 'hr' : 'hour';
                 const minuteDisplay = (display === 'narrow')  ? 'min' : 'minutes';
                 const getUnits = () => (lessThanHour) ? minuteDisplay : hourDisplay;
@@ -135,7 +135,6 @@ const Tide = ({setTide, display, isMotionOn}) => {
                 //const timeDisplay = time + getUnits() + multipleDisplay;
                 const timeDisplay = time;
                 return timeDisplay;
-                 
             }
             const closerTideIndex = (pastLastTide >= untilNextTide) ? nextTideIndex : (nextTideIndex-1);
             const getNextIndex = () => nextTideIndex;
