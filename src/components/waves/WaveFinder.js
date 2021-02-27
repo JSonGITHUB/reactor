@@ -138,7 +138,7 @@ const WaveFinder = ({
         return 0;
     }
     const handleTideSelection = (groupTitle, label, selected) => {
-        console.log(`handleTideSelection =>\nselected: ${selected}`)
+        //console.log(`handleTideSelection =>\nselected: ${selected}`)
         localStorage.setItem("tide", selected);
         setTide(selected);
         setStatus(prevState => ({
@@ -166,23 +166,51 @@ const WaveFinder = ({
             isTide: isTide
         }));
     }
-    const handleSwell1Check = (event) => {
-        const isSwell1 = (!!status.isSwell1 === true) ? false : true;
-        localStorage.setItem("isSwell1", isSwell1);
-        setStatus(prevState => ({
-            ...prevState,
-            pause: true,
-            isSwell1: isSwell1
-        }));
+    const handleSwellCheck = (id) => {
+        if (id === '1') {
+            const isSwell1 = (!!status.isSwell1 === true) ? false : true;
+            localStorage.setItem("isSwell1", isSwell1);
+            console.log(`handleSwellCheck => \nid: ${id}\nisSwell1: ${isSwell1}`);
+            setStatus(prevState => ({
+                ...prevState,
+                pause: true,
+                isSwell1: isSwell1
+            }));
+        } else {
+            const isSwell2 = (!!status.isSwell2 === true) ? false : true;
+            localStorage.setItem("isSwell2", isSwell2);
+            console.log(`handleSwellCheck => \nid: ${id}\nisSwell2: ${isSwell2}`);
+            setStatus(prevState => ({
+                ...prevState,
+                pause: true,
+                isSwell2: isSwell2
+            }));
+        }
     }
-    const handleSwell2Check = (event) => {
-        const isSwell2 = (!!status.isSwell2 === true) ? false : true;
-        localStorage.setItem("isSwell2", isSwell2);
-        setStatus(prevState => ({
-            ...prevState,
-            pause: true,
-            isSwell2: isSwell2
-        }))
+    const handleSwellSelection = (id, groupTitle, label, selected) => {
+        const swellAngle = directionObject[selected];
+        //console.log(`handleSwellSelection => \nselected: ${selected} \nswellAngle: ${swellAngle}\n directionObject: ${JSON.stringify(directionObject, null, 2)}`)
+        if(id === '1') {
+            localStorage.setItem("swell1Angle", swell1Angle);
+            localStorage.setItem("swell1Direction", selected);
+            setStatus(prevState => ({
+                ...prevState,
+                pause: true,
+                swell1Direction: selected,
+                swell1Angle: swell1Angle
+            }));
+        } else {
+            const swell2Angle = directionObject[selected];
+            //console.log(`${selected} swell2Angle: ${swell2Angle}`)
+            localStorage.setItem("swell2Angle", swell2Angle);
+            localStorage.setItem("swell2Direction", selected);
+            setStatus(prevState => ({
+                ...prevState,
+                pause: true,
+                swell2Direction: selected,
+                swell2Angle: swell2Angle
+            }));
+        }
     }
     const handleSwell1Selection = (groupTitle, label, selected) => {
         const swell1Angle = directionObject[selected];
@@ -547,8 +575,6 @@ const WaveFinder = ({
                     <div className="p-5 r-10 m-5">
                         <div className='p-10 color-yellow'>select current conditions:</div>
                         <div className="flexContainer">
-                            {/*swellSelector(1,status.swell1Direction, status, handleSwell1Selection, handleSwell2Selection, handleSwell1Angle, handleSwell2Angle, handleSwell1Height, handleSwell2Height, handleSwell1Interval, handleSwell2Interval, handleSwell1Check, handleSwell2Check, pause)*/}
-                            {/*swellSelector(2,status.swell2Direction, status, handleSwell1Selection, handleSwell2Selection, handleSwell1Angle, handleSwell2Angle, handleSwell1Height, handleSwell2Height, handleSwell1Interval, handleSwell2Interval, handleSwell1Check, handleSwell2Check, pause)*/}
                             <SwellSelector 
                                 id='1' 
                                 swellDirection={status.swell1Direction} 
@@ -561,8 +587,7 @@ const WaveFinder = ({
                                 handleSwell2Height={handleSwell2Height} 
                                 handleSwell1Interval={handleSwell1Interval} 
                                 handleSwell2Interval={handleSwell2Interval} 
-                                handleSwell1Check={handleSwell1Check} 
-                                handleSwell2Check={handleSwell2Check} 
+                                handleSwellCheck={handleSwellCheck}  
                                 pause={pause}>
                             </SwellSelector>
                             <SwellSelector 
@@ -577,8 +602,7 @@ const WaveFinder = ({
                                 handleSwell2Height={handleSwell2Height} 
                                 handleSwell1Interval={handleSwell1Interval} 
                                 handleSwell2Interval={handleSwell2Interval} 
-                                handleSwell1Check={handleSwell1Check} 
-                                handleSwell2Check={handleSwell2Check} 
+                                handleSwellCheck={handleSwellCheck} 
                                 pause={pause}>
                             </SwellSelector>
                         </div>
