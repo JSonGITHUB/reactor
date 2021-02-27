@@ -117,17 +117,25 @@ const Tide = ({setTide, display, isMotionOn}) => {
             const times = data.predictions.map((tide) => getTideTime(tide));
             const heights = data.predictions.map((tide) => getTideHeight(tide));
             const tides = data.predictions.map((tide) => getTide(tide));
-            const checkTide = (hour) => hour >= getCurrentTime().hours;
+            const checkTide = (hour) => {
+                console.log(`checkTide =>\nhour: ${hour}\ncurrent hour: ${getCurrentTime().hours}`)
+                if (hour >= getCurrentTime().hours) {
+                    return true;
+                };
+            }
+            //const nextTideIndex = hours.findIndex(checkTide);
             const nextTideIndex = hours.findIndex(checkTide);
-            const pastLastTide = Number(getCurrentTime().hours-hours[nextTideIndex-1]);
-            const untilNextTide = Number(hours[nextTideIndex]-getCurrentTime().hours);
+            const nextIndexExtra = () => ((hours[nextTideIndex] === getCurrentTime().hours) && (minutes[nextTideIndex] > getCurrentTime().minutes)) ? 1 : 0;
+            const getNextIndex = () => nextTideIndex + nextIndexExtra();
+            const pastLastTide = Number(getCurrentTime().hours-hours[getNextIndex()-1]);
+            const untilNextTide = Number(hours[getNextIndex()]-getCurrentTime().hours);
             // eslint-disable-next-line
-            const untilNextTideMinutes = Number(minutes[nextTideIndex]-getCurrentTime().minutes);
+            const untilNextTideMinutes = Number(minutes[getNextIndex()]-getCurrentTime().minutes);
             const lessThanHour = (untilNextTide === 0) ? true : false;
             const untilTide = () => {
                 const pastTime = (untilNextTideMinutes < 0) ? (untilNextTideMinutes+60) : untilNextTideMinutes;
                 console.log(`untilTide => \npastTime: ${pastTime}\nuntilNextTideMinutes: ${untilNextTideMinutes}\nuntilNextTide: ${untilNextTide}`)
-                const time = (lessThanHour) ? pastTime : ((untilNextTideMinutes < 0) ? (untilNextTide-1) : untilNextTide) + 'hr ' + String(pastTime) + 'min';
+                const time = (lessThanHour) ? (String(pastTime) + 'min') : ((untilNextTideMinutes < 0) ? (untilNextTide-1) : untilNextTide) + 'hr ' + String(pastTime) + 'min';
                 const hourDisplay = (display === 'narrow')  ? 'hr' : 'hour';
                 const minuteDisplay = (display === 'narrow')  ? 'min' : 'minutes';
                 const getUnits = () => (lessThanHour) ? minuteDisplay : hourDisplay;
@@ -136,17 +144,17 @@ const Tide = ({setTide, display, isMotionOn}) => {
                 const timeDisplay = time;
                 return timeDisplay;
             }
-            const closerTideIndex = (pastLastTide >= untilNextTide) ? nextTideIndex : (nextTideIndex-1);
-            const getNextIndex = () => nextTideIndex;
+            const closerTideIndex = (pastLastTide >= untilNextTide) ? getNextIndex() : (getNextIndex()-1);
+            
             const nextTide = tides[getNextIndex()];
-            const nextHeight = heights[nextTideIndex];
-            const lastHeight = heights[nextTideIndex-1];
-            const getNextHour = Number(times[(nextTideIndex === -1) ? (times.length-1) : nextTideIndex].split(':')[0]);
+            const nextHeight = heights[getNextIndex()];
+            const lastHeight = heights[getNextIndex()-1];
+            const getNextHour = Number(times[(getNextIndex() === -1) ? (times.length-1) : getNextIndex()].split(':')[0]);
             const nextHour = (getNextHour>12) ? (getNextHour-12) : getNextHour;
-            const nextMinutes = (times[(nextTideIndex === -1) ? 1 : nextTideIndex].split(':')[1] < 10) ? `0${times[(nextTideIndex === -1) ? (times.length-1) : nextTideIndex].split(':')[1]}` : times[(nextTideIndex === -1) ? (times.length-1) : nextTideIndex].split(':')[1];
+            const nextMinutes = (times[(getNextIndex() === -1) ? 1 : getNextIndex()].split(':')[1] < 10) ? `0${times[(getNextIndex() === -1) ? (times.length-1) : getNextIndex()].split(':')[1]}` : times[(getNextIndex() === -1) ? (times.length-1) : getNextIndex()].split(':')[1];
             const nextTime = `${nextHour}:${nextMinutes}`;
             // eslint-disable-next-line
-            const lastTide = tides[nextTideIndex-1];
+            const lastTide = tides[getNextIndex()-1];
             const convertTide = (tide) => (tide === 'L') ? 'low' : 'high';
             const getCurrentTide = convertTide(tides[closerTideIndex]);
             const currentTide = ((pastLastTide !== untilNextTide)) ? getCurrentTide : 'medium';
@@ -161,7 +169,7 @@ const Tide = ({setTide, display, isMotionOn}) => {
                 nextPhase: convertTide(nextTide),
                 nextTime: nextTime,
                 untilNextTide: untilTide(),
-                nextTideIndex: nextTideIndex
+                nextTideIndex: getNextIndex()
             }))
         };
         getDirection();

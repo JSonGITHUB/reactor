@@ -16,9 +16,9 @@ import SW from '../../assets/images/windSW.png';
 import W from '../../assets/images/windW.png';
 import NW from '../../assets/images/windNW.png';
 
-const SwellSelector = ({id, swellDirection, status, handleSwell1Selection, handleSwell2Selection, handleSwell1Angle, handleSwell2Angle, handleSwell1Height, handleSwell2Height, handleSwell1Interval, handleSwell2Interval, handleSwell1Check, handleSwell2Check, pause}) => {
+const SwellSelector = ({id, swellDirection, status, handleSwell1Selection, handleSwell2Selection, handleSwell1Angle, handleSwell2Angle, handleSwell1Height, handleSwell2Height, handleSwell1Interval, handleSwell2Interval, handleSwellCheck, pause}) => {
     const swellClass = (id) => `${isSwellSelected(id)} flex2Column r-10 m-5 p-15`;
-    const isSwellSelected = (id) => ((id === '1' && status.isSwell1 === true) || (id === 2 && status.isSwell2===true)) ? 'bg-green' : 'bg-dkGreen';
+    const isSwellSelected = (id) => ((id === '1' && status.isSwell1) || (id === '2' && status.isSwell2)) ? 'bg-green' : 'bg-dkGreen';
     const intervals = ['','5 seconds','6 seconds','7 seconds','8 seconds','9 seconds','10 seconds','11 seconds','12 seconds','13 seconds','14 seconds','15 seconds','16 seconds','17 seconds','18 seconds','19 seconds','20 seconds','21 seconds','22 seconds','23 seconds'];
 
     const getSwellIcon = (id) => {
@@ -48,18 +48,19 @@ const SwellSelector = ({id, swellDirection, status, handleSwell1Selection, handl
         }
     }
     const getSwellIndicator = () => {
-        console.log(`getSwellIndicator => swellDirection: ${swellDirection}`)
+        //console.log(`getSwellIndicator => swellDirection: ${swellDirection}`)
         return (
             getDirectionIcon()
         )
     }
+    const isSelected = () => ((id === '1' && status.isSwell1) || (id === '2' && status.isSwell2)) ? true : false;
     return (
             <div className={swellClass(id)} onMouseDown={pause}>
             {getSwellIcon(id)}
             <div className="ml-5">Swell{id}</div>
             <div className='p-10'>{getSwellIndicator()}</div>
             <div className='bg-lite r-10 mt-20 pb-15'>
-                <span className="greet ml-5">direction</span><br/>
+                <span className="greet ml-5 color-yellow">direction</span><br/>
                 <Selector
                     groupTitle={`Swell${id}`}
                     selected={swellDirection} 
@@ -72,7 +73,7 @@ const SwellSelector = ({id, swellDirection, status, handleSwell1Selection, handl
                     width='70%'
                 />
                 <br/>
-                <span className="greet ml-5">angle</span><br/>
+                <span className="greet ml-5 color-yellow">angle</span><br/>
                 <Selector
                     groupTitle={`SwellAngle${id}`}
                     selected={(id === '1') ? status.swell1Angle : status.swell2Angle} 
@@ -84,7 +85,7 @@ const SwellSelector = ({id, swellDirection, status, handleSwell1Selection, handl
                     width='70%'
                 />
                 <br/>
-                <span className="greet ml-5">height</span><br/>
+                <span className="greet ml-5 color-yellow">height</span><br/>
                 <Selector
                     groupTitle={`SwellHeight${id}`}
                     selected={(id === '1') ? status.swell1Height : status.swell2Height} 
@@ -96,7 +97,7 @@ const SwellSelector = ({id, swellDirection, status, handleSwell1Selection, handl
                     width='70%'
                 />
                 <br/>
-                <span className="greet ml-5">interval</span><br/>
+                <span className="greet ml-5 color-yellow">interval</span><br/>
                 <Selector
                     groupTitle={`SwellInterval${id}`}
                     selected={(id === '1') ? status.swell1Interval : status.swell2Interval} 
@@ -109,14 +110,9 @@ const SwellSelector = ({id, swellDirection, status, handleSwell1Selection, handl
                 />
             </div>
             
-            {(id===1) 
-                ? <div className="button mt-15" onClick={handleSwell1Check}>
-                    {(status.isSwell1 === true) ? <img src={thumbsUp} alt='swell1' className='p-10 r-20' /> : <img src={thumbsDown} alt='swell1' className='p-10 r-20' /> }
-                </div>
-                : <div className="button mt-15" onClick={handleSwell2Check}>
-                    {(status.isSwell2 === true) ? <img src={thumbsUp} alt='swell2' className='p-10 r-20' /> : <img src={thumbsDown} alt='swell2' className='p-10 r-20' /> }
-                </div>
-            }
+            <div className="button mt-15" onClick={() => handleSwellCheck(id)}>
+                <img src={(isSelected()) ? thumbsUp : thumbsDown} alt={`swell${id}`} className='p-10 r-20' />
+            </div>
         </div>
     )
 }
