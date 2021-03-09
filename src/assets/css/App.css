@@ -100,6 +100,9 @@
 .mb-30 {
   margin-bottom: 30px;
 }
+.mb-55 {
+  margin-bottom: 55px;
+}
 .mb--70 {
   margin-bottom: -70px;
 }
@@ -704,14 +707,14 @@ body {
 .r-vw {
   border-radius: 2vw;
 }
-.r-20 {
-  border-radius: 20px;
-}
 .r-10 {
   border-radius: 10px;
 }
 .r-20 {
   border-radius: 20px;
+}
+.r-25 {
+  border-radius: 25px;
 }
 .r-30 {
   border-radius: 30px;
@@ -889,6 +892,9 @@ input.error {
 .pb-25 {
   padding-bottom: 25px;
 }
+.pb-30 {
+  padding-bottom: 30px;
+}
 .pt-5 {
   padding-top: 5px;
 }
@@ -897,6 +903,18 @@ input.error {
 }
 .pt-12 {
   padding-top: 12px;
+}
+.pt-15 {
+  padding-top: 15px;
+}
+.pt-20 {
+  padding-top: 20px;
+}
+.pt-25 {
+  padding-top: 25px;
+}
+.pt-30 {
+  padding-top: 30px;
 }
 .pt-40 {
   padding-top: 40px;
@@ -1115,6 +1133,10 @@ input.error {
   height: 50px;
   width: 50px;
   background-color: #0e0e0e;
+}
+.h50w50 { 
+  height: 50px;
+  width: 50px;
 }
 .App-link {
   color: #00FF00;

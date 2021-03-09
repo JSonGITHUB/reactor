@@ -127,7 +127,7 @@ body {
     background-color: #333333;
     top: 50px;
     left:0px;
-    position: fixed;
+    position: absolute;
     width:100%;
     z-index: 100;
 }

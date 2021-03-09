@@ -11,29 +11,16 @@ import SettingsMenu from './SettingsMenu.js';
 import SearchBar from '../utils/SearchBar';
 import '../../assets/css/shop.css';
 import debounceType from '../utils/DebouncerType.js';
-
+import initData from './initData.js'
 const Shop = () => {
     //console.log(`Shop til you drop!!!`);
+
     const [ itemEntry, setItemEntry ] = useState('');
     const today = new Date();
-    const initData = [
-        {
-            "title": "Sugar",
-            "aisle": "Baking",
-            "price": "8.00",
-            "quantity": "1",
-            "tax": true,
-            "cart": true,
-            "select": true,
-            "lastPurchase": "",
-            "days": 0
-        }
-    ];
     const itemMenuDefault = ['', 'ADD INDEX', 'EDIT', 'PRICE', 'DELETE'];
     const quantities = [0,1,2,3,4,5,6,7,8,9,10];
     const getTodos = () => {
         const newTodos = (localStorage.getItem('vueTodos')) ? JSON.parse(localStorage.getItem('vueTodos')) : initData;
-        
         return newTodos;
     }
     const aislesInit = ['Vons', 'Sprouts', 'Smart and Final'];
@@ -103,7 +90,6 @@ const Shop = () => {
                     <span className={titleClasses()}>{ status.todos[index].title }</span>
                     {getSelectIcon(index)}
                 </div>
-                {/*console.log(`color: ${getColor(todo.aisle)}`)*/}
                 <div className='itemSelectors' style={{backgroundColor: getColor(todo.aisle)}}>
                     <div className='flex-container'>
                         <div>
@@ -192,9 +178,14 @@ const Shop = () => {
         getTotal();
     },[status.tax]);
     const sortArray = (array) => {
+        const filtered = array.filter(function (el) {
+            return el != null;
+        });
+        console.log(`sortArray => filtered: ${filtered}`)
+
         const alphabetic = [];
         const numeric = [];
-        array.forEach(item => {
+        filtered.forEach(item => {
             if (Number(item.substring(0,1)) > 0) {
                 numeric.push(item);
             } else {
