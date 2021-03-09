@@ -10,8 +10,6 @@ const Geolocate = ({ isMotionOn, returnCurrentPosition, currentPositionExists })
             returnCurrentPosition: returnCurrentPosition,
             currentPositionExists: currentPositionExists
         })
-
-    
     
     useEffect(() => {  
         const getCurrentPosition = () => {

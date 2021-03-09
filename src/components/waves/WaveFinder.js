@@ -1,28 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import getKey from '../utils/KeyGenerator.js';
-import Geolocator from '../utils/Geolocator.js';
 import WaveUtils from '../utils/WaveUtils.js';
 import calculateDistance from '../utils/CalculateDistance.js';
 import Tide from './Tide.js';
 import WaterTemp from './WaterTemp.js';
 import AirTemp from './AirTemp.js';
 import WindDirection from './WindDirection.js';
+import Sunset from './Sunset.js';
 import Selector from '../forms/FunctionalSelector.js';
-import Dialog from '../functional/Dialog.js';
-import swell1 from '../../assets/images/wavePrimary.png';
-import swell2 from '../../assets/images/waveSecondaryB.png';
-import N from '../../assets/images/windN.png';
-import NE from '../../assets/images/windNE.png';
-import E from '../../assets/images/windE.png';
-import SE from '../../assets/images/windSE.png';
-import S from '../../assets/images/windS.png';
-import SW from '../../assets/images/windSW.png';
-import W from '../../assets/images/windW.png';
-import NW from '../../assets/images/windNW.png';
+
 // eslint-disable-next-line
 import tide from '../../assets/images/tide.png';
-import waterTemp from '../../assets/images/waterTemp.png';
-import airTemp from '../../assets/images/airTemp.png';
 import thumbsUp from '../../assets/images/ThumbsUp.png';
 import thumbsDown from '../../assets/images/ThumbsDown.png';
 import SurfLocation from './SurfLocation.js';
@@ -30,6 +18,8 @@ import locations from './Locations.js';
 import directionObject from './DirectionObject.js';
 import directions from './Directions.js';
 import SwellSelector from './SwellSelector.js';
+//import GetMatchIcon from './GetMatchIcon.js';
+import Geolocator from '../utils/Geolocator.js';
 
 const WaveFinder = ({
         tide,
@@ -324,9 +314,10 @@ const WaveFinder = ({
     };
     const isTideSelected = () => (status.isTide === true) ? 'bg-green' : 'bg-dkGreen';
     const tideClass = () => `${isTideSelected()} flex2Column r-10 m-5 p-15`;
+    const tideDisplay = (display) => <Tide setTide={setTide} display={`${display}`}/>
     const tideSelector = (tide) => <div className={tideClass()} onMouseDown={pause}>
                                 Tide
-                                <div className="greet pt-10"><Tide setTide={setTide} display='narrow'/></div>
+                                <div className="greet pt-10">{tideDisplay('narrow')}</div>
                                 <Selector 
                                     groupTitle="Tide"
                                     selected={status.tide} 
@@ -344,9 +335,11 @@ const WaveFinder = ({
     const isWindSelected = () => (status.isWind === true) ? 'bg-green' : 'bg-dkGreen';
     const windClass = () => `${isWindSelected()} flex2Column r-10 m-5 p-15`;
     const windSelector = (windDirection) => <div className={windClass()} onMouseDown={pause}>
-    {/*console.log(`windSelector => windDirection: ${status.windDirection}`)*/}
+                            {/*console.log(`windSelector => windDirection: ${status.windDirection}`)*/}
                             Wind<br/>
-                            <div className="greet pt-10"><WindDirection columns="1" setWind={setWind} height='150px'/></div>
+                            <div className="pt-10">
+                                <WindDirection columns="1" setWind={setWind} height='150px'/>
+                            </div>
                             <Selector
                                 groupTitle="Wind" 
                                 selected={status.windDirection} 
@@ -385,43 +378,6 @@ const WaveFinder = ({
                                     />
                                 </label>
                             </div>
-    const getStarKind = (kind) => {
-        let classes = "shaka r-20 p-2";
-        classes = (kind === "wind") ? (classes + " bg-white") : classes; 
-        return classes;
-    }
-    const getMatchIcon = (kind) => {
-        // eslint-disable-next-line
-        let icon = (kind === "swell1") ? "swell1" : "swell2";
-        icon = (kind === "wind") ? "wind" : icon;
-        icon = (kind === "tide") ? "tide" : icon;
-        if (kind === "swell1") {
-            return <img src={swell1} className={getStarKind(kind)} alt={kind} />
-        } else if (kind === "swell2") {
-            return <img src={swell2} className={getStarKind(kind)} alt={kind} />;
-        } else if (kind === "tide") {
-            return <img src={status.tide} className={getStarKind(kind)} alt={kind} />;
-        } else if (kind === "wind") {
-            const windDirection = status.windDirection;
-            if (windDirection === "N") {
-                return <img src={N} className={getStarKind(kind)} alt={kind} />;
-            } else if ((windDirection === "NE") || (windDirection === "NNE") || (windDirection === "ENE")) {
-                return <img src={NE} className={getStarKind(kind)} alt={kind} />;
-            } else if (windDirection === "E") {
-                return <img src={E} className={getStarKind(kind)} alt={kind} />;
-            } else if ((windDirection === "SE") || (windDirection === "SSE") || (windDirection === "ESE")) {
-                return <img src={SE} className={getStarKind(kind)} alt={kind} />;
-            } else if (windDirection === "S") {
-                return <img src={S} className={getStarKind(kind)} alt={kind} />;
-            } else if ((windDirection === "SW") || (windDirection === "SSW") || (windDirection === "WSW")) {
-                return <img src={SW} className={getStarKind(kind)} alt={kind} />;
-            } else if (windDirection === "W") {
-                return <img src={W} className={getStarKind(kind)} alt={kind} />;
-            } else if ((windDirection === "NW") || (windDirection === "NNW") || (windDirection === "WNW")) {
-                return <img src={NW} className={getStarKind(kind)} alt={kind} />;
-            }
-        }
-    };
     const getState = (kind) => {
         const { swell1Direction, swell2Direction, tide, windDirection } = status;
         if (kind === "swell1") {
@@ -442,12 +398,14 @@ const WaveFinder = ({
         return details
     }
     // eslint-disable-next-line
+    /*
     const star = (matchKind) => <div className="flex3Column bg-lite mr-5 ml-5 p-10 r-10">
-                            {getMatchIcon(matchKind)}
+                            <GetMatchIcon kind={matchKind} status={status}/>
                             <div className="greet">{getState(matchKind)}{getStarDetails(matchKind)}</div>
                         </div>;
+    */
     const setTide = (tide) => {
-        console.log(`WaveFinder = > setTide(${tide})`)
+        //console.log(`WaveFinder = > setTide(${tide})`)
         //let currentTide = (Number(tide)>2) ? "medium" : "low";
         //console.log(`WaveFinder = > ${tide} currentTide(${currentTide})`)
         //currentTide = (Number(tide)>4) ? "high" : currentTide;
@@ -469,13 +427,6 @@ const WaveFinder = ({
                 windGusts: Number(gusts).toFixed(0)
             }));
     }
-    // eslint-disable-next-line
-    const getTideIcon = <img src={status.tide} className={`mb--5 ${getStarKind("tide")}`} alt="tide" />;
-    // eslint-disable-next-line
-    const getWaterTempIcon = <img src={waterTemp} className={`mb--7 ${getStarKind("tide")}`} alt="water temp" />;
-    // eslint-disable-next-line
-    const getAirTempIcon = <img src={airTemp} className={`mb--7 ${getStarKind("tide")}`} alt="air temp" />;
-    
     const getReport = () => <iframe className="Percent95 mt-5 mb-5 r-10" title="report" id="report" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224"></iframe>
     
     console.log(`currentPositionExists: ${currentPositionExists()}`)
@@ -520,7 +471,7 @@ const WaveFinder = ({
                 if (matches.length >= Number(status.stars)) {
                     //console.log(`STARS ==================> Matches: ${matches.length} state stars:${status.stars}`)
                     count = count + 1;
-                    return <SurfLocation key={getKey("link")} state={status} item={item} matches={matches} calculateDistance={calculateDistance} regionMatch={inRegion}></SurfLocation>
+                    return <SurfLocation key={getKey("link")} state={status} item={item} matches={matches} calculateDistance={calculateDistance} regionMatch={inRegion} tideDisplay={tideDisplay}></SurfLocation>
                 }
             }
         }
@@ -556,76 +507,88 @@ const WaveFinder = ({
     const scrollTo = {scrollTop: (status.scrollIndex*100)}
     
     return (
-        <div className="App-content fadeIn">
-            <Dialog title="Wave Finder" message=""> 
-                <div className="white pointer">   
-                    <div>
-                        <span className="bold color-neogreen">{time}</span>
-                        <Geolocator currentPositionExists={currentPositionExists} returnCurrentPosition={updateCurrentLocation}/>
-                        {getReport()}
-                        <div className="flexContainer">
-                            <span className="flex2Column p-5 r-10 color-blue bg-dkGreen m-5">{/*getWaterTempIcon*/}<span className="ml-2">water</span><br/><WaterTemp/></span>
-                            <span className="flex2Column p-5 r-10 color-white bg-dkGreen m-5">{/*getAirTempIcon*/}<span className="ml-2">air</span><br/><AirTemp/></span>
+        <div className="App-content fadeIn mt--30">
+            <Geolocator currentPositionExists={currentPositionExists} returnCurrentPosition={updateCurrentLocation}/>
+            <div className="white pointer">   
+                <div>
+                    <div className="flexContainer">
+                        <div className="flex2Column p-5 r-10 color-orange bg-green m-5">
+                            tide<br/>
+                            <Tide setTide={setTide} display='wide'/>
                         </div>
-                        <div className="flexContainer">
-                            <div className="flex2Column p-5 r-10 color-orange bg-dkGreen m-5">{/*getTideIcon*/} tide<br/><Tide setTide={setTide} display='wide'/></div>
-                            <div className="flex2Column p-5 r-10 color-yellow bg-dkGreen m-5"><span className="size25 bg-white p-3 m-10 r-20"></span>wind<WindDirection columns="2" setWind={setWind} height='125px'/></div>
+                        <div className="flex2Column p-5 r-10 color-yellow bg-green m-5">
+                            wind
+                            <WindDirection columns="2" setWind={setWind} height='157px'/>
                         </div>
                     </div>
-                    <div className="p-5 r-10 m-5">
-                        <div className='p-10 color-yellow'>select current conditions:</div>
-                        <div className="flexContainer">
-                            <SwellSelector 
-                                id='1' 
-                                swellDirection={status.swell1Direction} 
-                                status={status} 
-                                handleSwell1Selection={handleSwell1Selection} 
-                                handleSwell2Selection={handleSwell2Selection} 
-                                handleSwell1Angle={handleSwell1Angle} 
-                                handleSwell2Angle={handleSwell2Angle} 
-                                handleSwell1Height={handleSwell1Height} 
-                                handleSwell2Height={handleSwell2Height} 
-                                handleSwell1Interval={handleSwell1Interval} 
-                                handleSwell2Interval={handleSwell2Interval} 
-                                handleSwellCheck={handleSwellCheck}  
-                                pause={pause}>
-                            </SwellSelector>
-                            <SwellSelector 
-                                id='2' 
-                                swellDirection={status.swell2Direction} 
-                                status={status} 
-                                handleSwell1Selection={handleSwell1Selection} 
-                                handleSwell2Selection={handleSwell2Selection} 
-                                handleSwell1Angle={handleSwell1Angle} 
-                                handleSwell2Angle={handleSwell2Angle} 
-                                handleSwell1Height={handleSwell1Height} 
-                                handleSwell2Height={handleSwell2Height} 
-                                handleSwell1Interval={handleSwell1Interval} 
-                                handleSwell2Interval={handleSwell2Interval} 
-                                handleSwellCheck={handleSwellCheck} 
-                                pause={pause}>
-                            </SwellSelector>
-                        </div>
-                        <div className="flexContainer">
-                            {tideSelector(status.tide)}
-                            {windSelector(status.windDirection)}
-                        </div>
-                        <div className="flexContainer">
-                            {milesInput(status.distance)}
-                            {starSelector(status.stars)} 
-                        </div>
-                        <div className="bg-neogreen r-10 m-5 p-15 color-black bold" onClick={refresh}>Refresh</div>
+                    <div className="flexContainer">
+                        <span className="flex2Column p-5 r-10 color-blue bg-green m-5">
+                            {/*getWaterTempIcon*/}
+                            <span className="ml-2">water</span><br/>
+                            <WaterTemp/>
+                        </span>
+                        <span className="flex2Column p-5 r-10 color-white bg-green m-5">
+                            {/*getAirTempIcon*/}
+                            <span className="ml-2">air</span><br/>
+                            <AirTemp/>
+                        </span>
                     </div>
-                    <div className="mt-10 mb-20">
-                        <span className="color-neogreen bold">{(count === 1) ? `1 wave` : `${count} waves`}</span> out of {status.locations.length}<br/>
-                        are in a <span className="color-neogreen bold">{status.distance}</span> mile radius<br/>
-                        and prefer <span className="color-neogreen bold">{status.swell1Direction} </span>and <span className="color-orange bold ">{status.swell2Direction} </span>swell <br/>
-                        with a <span className="color-neogreen bold">{status.height}' {status.tide} </span>tide:
+                    <Sunset />
+                </div>
+                {getReport()}
+                <div className="p-5 r-10 m-5">
+                    <div className='p-10 color-yellow'>select current conditions:</div>
+                    <div className="flexContainer">
+                        <SwellSelector 
+                            id='1' 
+                            swellDirection={status.swell1Direction} 
+                            status={status} 
+                            handleSwell1Selection={handleSwell1Selection} 
+                            handleSwell2Selection={handleSwell2Selection} 
+                            handleSwell1Angle={handleSwell1Angle} 
+                            handleSwell2Angle={handleSwell2Angle} 
+                            handleSwell1Height={handleSwell1Height} 
+                            handleSwell2Height={handleSwell2Height} 
+                            handleSwell1Interval={handleSwell1Interval} 
+                            handleSwell2Interval={handleSwell2Interval} 
+                            handleSwellCheck={handleSwellCheck}  
+                            pause={pause}>
+                        </SwellSelector>
+                        <SwellSelector 
+                            id='2' 
+                            swellDirection={status.swell2Direction} 
+                            status={status} 
+                            handleSwell1Selection={handleSwell1Selection} 
+                            handleSwell2Selection={handleSwell2Selection} 
+                            handleSwell1Angle={handleSwell1Angle} 
+                            handleSwell2Angle={handleSwell2Angle} 
+                            handleSwell1Height={handleSwell1Height} 
+                            handleSwell2Height={handleSwell2Height} 
+                            handleSwell1Interval={handleSwell1Interval} 
+                            handleSwell2Interval={handleSwell2Interval} 
+                            handleSwellCheck={handleSwellCheck} 
+                            pause={pause}>
+                        </SwellSelector>
                     </div>
-                    {matches}
-                    <WaveUtils state={status} item={status}></WaveUtils>
-                </div> 
-            </Dialog>
+                    <div className="flexContainer">
+                        {tideSelector(status.tide)}
+                        {windSelector(status.windDirection)}
+                    </div>
+                    <div className="flexContainer">
+                        {milesInput(status.distance)}
+                        {starSelector(status.stars)} 
+                    </div>
+                    <div className="bg-neogreen r-10 m-5 p-15 color-black bold" onClick={refresh}>Refresh</div>
+                </div>
+                <div className="mt-10 mb-20">
+                    <span className="color-neogreen bold">{(count === 1) ? `1 wave` : `${count} waves`}</span> out of {status.locations.length}<br/>
+                    are in a <span className="color-neogreen bold">{status.distance}</span> mile radius<br/>
+                    and prefer <span className="color-neogreen bold">{status.swell1Direction} </span>and <span className="color-orange bold ">{status.swell2Direction} </span>swell <br/>
+                    with a <span className="color-neogreen bold">{status.height}' {status.tide} </span>tide:
+                </div>
+                {matches}
+                <WaveUtils state={status} item={status}></WaveUtils>
+            </div> 
         </div>  
     )
 }

@@ -28,23 +28,24 @@ const SwellSelector = ({id, swellDirection, status, handleSwell1Selection, handl
             return <img src={swell2} className='shaka r-20 p-2' alt="swell2" />;
         }
     }
+    const classes = 'h50w50 r-10 p-5 bg-white';
     const getDirectionIcon = () => {
         if (swellDirection === "N") {
-            return <img src={N} className='shaka r-20 p-2 bg-white' alt={swellDirection} />;
+            return <img src={N} className={classes} alt={swellDirection} />;
         } else if ((swellDirection === "NE") || (swellDirection === "NNE") || (swellDirection === "ENE")) {
-            return <img src={NE} className='shaka r-20 p-2 bg-white' alt={swellDirection} />;
+            return <img src={NE} className={classes} alt={swellDirection} />;
         } else if (swellDirection === "E") {
-            return <img src={E} className='shaka r-20 p-2 bg-white' alt={swellDirection} />;
+            return <img src={E} className={classes} alt={swellDirection} />;
         } else if ((swellDirection === "SE") || (swellDirection === "SSE") || (swellDirection === "ESE")) {
-            return <img src={SE} className='shaka r-20 p-2 bg-white' alt={swellDirection} />;
+            return <img src={SE} className={classes} alt={swellDirection} />;
         } else if (swellDirection === "S") {
-            return <img src={S} className='shaka r-20 p-2 bg-white' alt={swellDirection} />;
+            return <img src={S} className={classes} alt={swellDirection} />;
         } else if ((swellDirection === "SW") || (swellDirection === "SSW") || (swellDirection === "WSW")) {
-            return <img src={SW} className='shaka r-20 p-2 bg-white' alt={swellDirection} />;
+            return <img src={SW} className={classes} alt={swellDirection} />;
         } else if (swellDirection === "W") {
-            return <img src={W} className='shaka r-20 p-2 bg-white' alt={swellDirection} />;
+            return <img src={W} className={classes} alt={swellDirection} />;
         } else if ((swellDirection === "NW") || (swellDirection === "NNW") || (swellDirection === "WNW")) {
-            return <img src={NW} className='shaka r-20 p-2 bg-white' alt={swellDirection} />;
+            return <img src={NW} className={classes} alt={swellDirection} />;
         }
     }
     const getSwellIndicator = () => {

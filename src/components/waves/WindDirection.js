@@ -7,10 +7,13 @@ import S from '../../assets/images/windS.png';
 import SW from '../../assets/images/windSW.png';
 import W from '../../assets/images/windW.png';
 import NW from '../../assets/images/windNW.png';
-import axios from 'axios';
+import useOceanData from './useOceanData.js';
 
 const WindDirection = ({columns, setWind, height}) => {
     
+    const uri = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=latest&station=9410230&product=wind&time_zone=lst&units=english&format=json';
+    const [data, getData] = useOceanData('wind', uri);
+
     const [status, setStatus] = useState({
         columns: columns,
         station: null,
@@ -40,38 +43,8 @@ const WindDirection = ({columns, setWind, height}) => {
     }
     */
    useEffect(() => {
-
-        let ignore = false;
-
-        const getWindData = async () => {
-
-            console.log(`getWindData =>`)
-            const proxyurl = "https://cors-anywhere.herokuapp.com/";
-            const uri = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=latest&station=9410230&product=wind&time_zone=lst&units=english&format=json';
-            let getCurrentTime = new Date();
-            const year = getCurrentTime.getFullYear();
-            const currentMonth = getCurrentTime.getMonth()+1;
-            const month = ((currentMonth)<10) ? `0${(currentMonth)}` : currentMonth;
-            const currentDate = getCurrentTime.getDate();
-            const date = (currentDate<10) ? `0${currentDate}` : currentDate;
-            const currentHour = getCurrentTime.getHours();
-            const hours = (currentHour<10) ? `0${currentHour}` : currentHour;
-            const startHour = ((currentHour-1)<10) ? `0${(currentHour-1)}` : (currentHour-1);
-            const currentMinutes = getCurrentTime.getMinutes();
-            const minutes = (currentMinutes<10) ? `0${currentMinutes}` : currentMinutes;
-            const getEndTime = `${year}${month}${date}%20${hours}:${minutes}`;
-            const getStartTime = `${year}${month}${date}%20${startHour}:00`;
-            getCurrentTime = `${year}${month}${date}%20${hours}:${minutes}`;
-            
-            const { data } = await axios.get(uri, {
-                params: {
-                    origin: '*',
-                    format: 'json',
-                    mode:'cors'
-                }
-            });
-            //console.log(`getWindData => data: ${JSON.stringify(data, null, 2)}`)
-            setWind(data.data[data.data.length - 1].dr, data.data[data.data.length - 1].d, data.data[data.data.length - 1].s, data.data[data.data.length - 1].g)
+        console.log(`getWindData =>`)
+        if (data.data !== undefined) {
             const station = data.metadata.name;
             const speed = data.data[data.data.length - 1].s * 1.15078;
             const angle = data.data[data.data.length - 1].d;
@@ -85,10 +58,9 @@ const WindDirection = ({columns, setWind, height}) => {
                 direction: direction,
                 gusts: gusts
             }))
-        };
-        if (!ignore) getWindData();  
-       return () => { ignore = true; }
-    },[]);
+            setWind(data.data[data.data.length - 1].dr, data.data[data.data.length - 1].d, data.data[data.data.length - 1].s, data.data[data.data.length - 1].g);
+        }
+    },[data]);
 
     /*
     Water Level: 2.01 ft Above MLLW
@@ -97,7 +69,7 @@ const WindDirection = ({columns, setWind, height}) => {
     */
     const getWindIcon = () => {
         const windDirection = status.direction;
-        const classes = "shaka r-20 p-2 bg-white";
+        const classes = "h50w50 r-25 p-5 mt-5 mb-5 bg-white";
         if (windDirection === "N") {
             return <img src={N} className={classes} alt={windDirection} />;
         } else if ((windDirection === "NE") || (windDirection === "NNE") || (windDirection === "ENE")) {
@@ -119,12 +91,15 @@ const WindDirection = ({columns, setWind, height}) => {
     const style = {
         height: height
     }
+    const getSpeed = () => `${Number(status.speed).toFixed(0)}-${Number(status.gusts).toFixed(0)}`;
+    const getStrength = () => (Number(status.speed)<2) ? 'light' : (Number(status.speed)>8) ? 'strong' : 'moderate';
     const getCurrentWind = () => {
         return (
             <div className='r-10 m-5 p-10 bg-lite white centeredContent' style={style}>
                 <div>{getWindIcon()}</div>
-                <div>{`${status.direction} ${Number(status.angle).toFixed(0)}°`}</div>
-                <div>{`${Number(status.speed).toFixed(0)}-${Number(status.gusts).toFixed(0)}`} <span className="greet">mph</span></div>
+                <div className='m-2'>{`${getStrength()}`}</div>
+                <div className='m-2'>{`${status.direction} ${Number(status.angle).toFixed(0)}°`}</div>
+                <div className='m-2'>{getSpeed()} <span className="greet">mph</span></div>
             </div>
         )
     }
