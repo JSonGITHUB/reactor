@@ -1,5 +1,6 @@
 import React from 'react';
 import navItems from './NavItems.js';
+// eslint-disable-next-line
 import {BrowserRouter as Router, Switch, Link, Route} from 'react-router-dom';
 import getKey from '../utils/KeyGenerator.js';
 

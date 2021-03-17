@@ -43,12 +43,15 @@ const SurfLocation = ({state, item, matches, regionMatch, tideDisplay}) => {
             </div>
         )
     }
+    // eslint-disable-next-line
     const setTide = (tide) => {
         localStorage.setItem("tide", tide);
     }
     const getStarDetails = (kind) => {
         let details = '';
+        // eslint-disable-next-line
         const {height, windSpeed, windGusts, swell1Height, swell1Angle,swell1Interval, swell2Height, swell2Angle, swell2Interval} = status;
+        // eslint-disable-next-line
         const getWindSpeed = (((windSpeed * 1.15078)+(windGusts * 1.15078))/2).toFixed(0);
         details = (kind === 'tide') ? tideDisplay('star') : details;
         details = (kind === 'wind') ? getCurrentWind() : details;
@@ -124,7 +127,9 @@ const SurfLocation = ({state, item, matches, regionMatch, tideDisplay}) => {
     const swell1Match = (item) => (item.swell.indexOf(swell1Direction)>-1) ? true : false;
     // eslint-disable-next-line
     const swell2Match = (item) => (item.swell.indexOf(swell2Direction)>-1) ? true : false;
+    // eslint-disable-next-line
     const windMatch = (item) => (item.wind.indexOf(windDirection)>-1) ? true : false;
+    // eslint-disable-next-line
     const tideMatch = (item) => (item.tide.indexOf(tide)>-1) ? true : false;
     const swell2DirectionMatch = (direction) => (direction===swell2Direction) ? true : false;
     const windDirectionMatch = (direction) => (direction.wind === windDirection) ? true : false;

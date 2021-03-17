@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import getKey from '../utils/KeyGenerator.js';
 import menu from '../../assets/images/menuYellow.png';
+// eslint-disable-next-line
 import { BsFillGearFill } from "react-icons/bs";
 import Selected from '../../assets/images/cart.png';
 import Select from '../../assets/images/addToCart.png';
@@ -181,7 +182,7 @@ const Shop = () => {
         const filtered = array.filter(function (el) {
             return el != null;
         });
-        console.log(`sortArray => filtered: ${filtered}`)
+        //console.log(`sortArray => filtered: ${filtered}`)
 
         const alphabetic = [];
         const numeric = [];

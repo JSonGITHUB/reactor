@@ -5,9 +5,11 @@ const CricketScore = ({ player, index, editPlayer, deletePlayer, game, updateTwo
     const cricketKey = `${player}Cricket${index}`;
     const getScore = () => localStorage.getItem(cricketKey) || 0;
     const [ score, setScore ] = useState(getScore());
+    // eslint-disable-next-line
     const [ edit, setEdit ] = useState(false);
     const dartsScores = ['-','/', 'X', 'O'];
     const getDartScore = (score) => <div className='white'>{dartsScores[score]}</div>;
+    // eslint-disable-next-line
     const updateScore = (newScore) => {
         localStorage.setItem(player, newScore);
         setScore(Number(localStorage.getItem(player)));
@@ -22,6 +24,7 @@ const CricketScore = ({ player, index, editPlayer, deletePlayer, game, updateTwo
         newScore = (newScore > 3) ? 0 : newScore;
         updateCricketScore(newScore);       
     }
+    // eslint-disable-next-line
     const subtractScore = () => {
         let newScore = Number(score)-1;
         newScore = (newScore < 0) ? 3 : newScore;
@@ -42,7 +45,9 @@ const CricketScore = ({ player, index, editPlayer, deletePlayer, game, updateTwo
     const stockClasses = 'r-10 m-1 color-yellow bold bg-darker';
     const buttonClass = 'bg-darker';
     const getButtonClass = 'glassy button flex3Column p-10 r-10 ' + buttonClass;
+    // eslint-disable-next-line
     const dartClass = () => (score >= winner) ? 'color-neogreen shakingShaka' : 'white';
+    // eslint-disable-next-line
     const scoreButtonClasses = 'glassy flex3Column button bg-green m-10 r-10 color-neogreen navBranding centeredContent';
     return (
         <div>

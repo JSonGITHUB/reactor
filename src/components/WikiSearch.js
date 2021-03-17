@@ -9,6 +9,7 @@ const WikiSearch = () => {
         { label: 'Red', value: 'red' },
         { label: 'Yellow', value: 'yellow' }
     ]
+    // eslint-disable-next-line
     const [selected, setSelected] = useState(options[0]);
     const [term, setTerm] = useState('');
     const [debouncedTerm, setDebouncedTerm] = useState(term);
@@ -93,6 +94,7 @@ const WikiSearch = () => {
         //console.log(`submit =>\nterm: ${term}`)
     }
     //console.log(`selected: ${selected.value}`)
+    // eslint-disable-next-line
     const selectedBackground = `bg-${selected.value}`;
     return (
         <div className="m-20">

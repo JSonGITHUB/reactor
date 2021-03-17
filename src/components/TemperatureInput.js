@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import Selector from './forms/FunctionalSelector.js';
 
 const TemperatureInput = ({ scale, value, onValueChange, onUnitChange }) => {
-
+    
+    // eslint-disable-next-line
     const scaleNames = {
         c: 'Celsius',
         f: 'Fahrenheit',
@@ -24,7 +25,8 @@ const TemperatureInput = ({ scale, value, onValueChange, onUnitChange }) => {
         'Klometers'
     ];
 
-    const [ unit, setUnit ] = useState(scale); 
+    const [ unit, setUnit ] = useState(scale);
+    // eslint-disable-next-line
     const [ unitValue, setUnitValue ] = useState(value);
 
     const handleChange = (e) => {

@@ -17,6 +17,7 @@ const getNextDay = (currentDate) => {
     //((currentTime.getMonth()+1 === 2) &&)
 }
 const getNextMonth = (currentMonth) => {
+    // eslint-disable-next-line
     let endOfMonth = false;
     if (currentTime.getDate() === getDaysInMonth()) {
         currentMonth = currentMonth + 1;
@@ -45,8 +46,9 @@ const useCurrentTime = () => {
     const getStartTime = `${year}${month}${date}%20${startHour}:00`;
     getCurrentTime = `${year}${month}${date}%20${hours}:${minutes}`;
     //console.log(`Air   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
-
+    // eslint-disable-next-line
     const [startTime, setStartTime] = useState(getStartTime);
+    // eslint-disable-next-line
     const [endTime, setEndTime] = useState(getEndTime);
     const currentTime = new Date();
     const time = {   

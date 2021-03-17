@@ -1,5 +1,3 @@
-import React from 'react';
-
 const toGallons = (liter) => (liter * .264172);
 const tryConvert = (volume, convert) => {
     const input = parseFloat(volume);

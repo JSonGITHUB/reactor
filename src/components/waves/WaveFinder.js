@@ -8,6 +8,7 @@ import AirTemp from './AirTemp.js';
 import WindDirection from './WindDirection.js';
 import Sunset from './Sunset.js';
 import Selector from '../forms/FunctionalSelector.js';
+import WindSelector from './wind/WindSelector.js';
 
 // eslint-disable-next-line
 import tide from '../../assets/images/tide.png';
@@ -16,7 +17,6 @@ import thumbsDown from '../../assets/images/ThumbsDown.png';
 import SurfLocation from './SurfLocation.js';
 import locations from './Locations.js';
 import directionObject from './DirectionObject.js';
-import directions from './Directions.js';
 import SwellSelector from './SwellSelector.js';
 //import GetMatchIcon from './GetMatchIcon.js';
 import Geolocator from '../utils/Geolocator.js';
@@ -104,7 +104,6 @@ const WaveFinder = ({
             clearInterval(timerID);
         }
     });
-
     const refresh = () => {
         window.location.pathname = "/reactor/WaveFinder"
     }
@@ -139,8 +138,10 @@ const WaveFinder = ({
         }));
     }
     const handleWindCheck = (event) => {
+        console.log(`handleWindCheck =>`);
         const isWind = (!!status.isWind === true) ? false : true;
-        localStorage.setItem("isWind", isWind);
+        localStorage.setItem('isWind', isWind);
+        console.log(`handleWindCheck =>\nisWind: ${isWind}`)
         setStatus(prevState => ({
             ...prevState,
             pause: true,
@@ -177,7 +178,9 @@ const WaveFinder = ({
             }));
         }
     }
+    // eslint-disable-next-line
     const handleSwellSelection = (id, groupTitle, label, selected) => {
+        // eslint-disable-next-line
         const swellAngle = directionObject[selected];
         //console.log(`handleSwellSelection => \nselected: ${selected} \nswellAngle: ${swellAngle}\n directionObject: ${JSON.stringify(directionObject, null, 2)}`)
         if(id === '1') {
@@ -274,14 +277,6 @@ const WaveFinder = ({
             swell2Interval: selected
         }));
     }
-    const handleWindSelection = (groupTitle, label, selected) => {
-        localStorage.setItem("windDirection", selected);
-        setStatus(prevState => ({
-            ...prevState,
-            pause: true,
-            windDirection: selected
-        }));
-    }
     const handleStarSelection = (groupTitle, label, selected) => {
         localStorage.setItem("stars", selected);
         setStatus(prevState => ({
@@ -305,6 +300,7 @@ const WaveFinder = ({
             pause: true
         }));
     }
+    // eslint-disable-next-line
     const unpause = () => {
         //console.log("UNPAUSE");
         setStatus(prevState => ({
@@ -332,28 +328,6 @@ const WaveFinder = ({
                                     {(status.isTide === true) ? <img src={thumbsUp} alt='tide' className='p-10 r-20' /> : <img src={thumbsDown} alt='tide' className='p-10 r-20' /> }
                                 </div>
                             </div>
-    const isWindSelected = () => (status.isWind === true) ? 'bg-green' : 'bg-dkGreen';
-    const windClass = () => `${isWindSelected()} flex2Column r-10 m-5 p-15`;
-    const windSelector = (windDirection) => <div className={windClass()} onMouseDown={pause}>
-                            {/*console.log(`windSelector => windDirection: ${status.windDirection}`)*/}
-                            Wind<br/>
-                            <div className="pt-10">
-                                <WindDirection columns="1" setWind={setWind} height='150px'/>
-                            </div>
-                            <Selector
-                                groupTitle="Wind" 
-                                selected={status.windDirection} 
-                                label="Direction"
-                                items={directions}
-                                onChange={handleWindSelection}
-                                fontSize='20'
-                                padding='5px'
-                                width='93%'
-                            />
-                            <div className="button mt-15" onClick={handleWindCheck}>
-                                {(status.isWind === true) ? <img src={thumbsUp} alt='wind' className='p-10 r-20' /> : <img src={thumbsDown} alt='wind' className='p-10 r-20' /> }
-                            </div>
-                        </div>
     const starSelector = (stars) => <div className="flex2Column bg-dkGreen r-10 m-5 p-15" onMouseDown={pause}>
                         Match<br/>
                         <Selector
@@ -378,6 +352,7 @@ const WaveFinder = ({
                                     />
                                 </label>
                             </div>
+    // eslint-disable-next-line
     const getState = (kind) => {
         const { swell1Direction, swell2Direction, tide, windDirection } = status;
         if (kind === "swell1") {
@@ -390,6 +365,7 @@ const WaveFinder = ({
             return windDirection;
         }
     }
+    // eslint-disable-next-line
     const getStarDetails = (kind) => {
         let details = "";
         const { height, windSpeed, windGusts } = status;
@@ -450,6 +426,7 @@ const WaveFinder = ({
         let matchesCount = (swell1Match(item)) ? matches.push("swell1") : matches;
         matchesCount = (swell2Match(item)) ? matches.push("swell2") : matches;
         matchesCount = (windMatch(item)) ? matches.push("wind") : matches;
+        // eslint-disable-next-line
         matchesCount = (tideMatch(item)) ? matches.push("tide") : matches;
         //console.log(`matches => ${item.name} - ${matches}`)
         return matches;
@@ -476,6 +453,7 @@ const WaveFinder = ({
             }
         }
     }
+    // eslint-disable-next-line
     const sortedSpots = () => {
         const latitude = (status.latitude !== undefined) ? status.latitude : 33.079940;
         const north = [];
@@ -500,12 +478,22 @@ const WaveFinder = ({
     }
     const matchingLocations = () => status.locations.map((item) => getMatchingLocation(item));
     const date = status.date.toLocaleTimeString();
+    // eslint-disable-next-line
     const time = date.replace(" ","").toLowerCase();
     //localStorage.setItem('locations', JSON.stringify(status.locations))
     //console.log(`WaveFinder => \nstatus.locations: ${JSON.stringify(status.locations, null, 2)}`)
     const matches = matchingLocations();
+    // eslint-disable-next-line
     const scrollTo = {scrollTop: (status.scrollIndex*100)}
-    
+    console.log(`WaveFinder =>`)
+    const setWindStatus = (selected) => {
+        localStorage.setItem("windDirection", selected);
+        setStatus(prevState => ({
+            ...prevState,
+            pause: true,
+            windDirection: selected
+        }));
+    }
     return (
         <div className="App-content fadeIn mt--30">
             <Geolocator currentPositionExists={currentPositionExists} returnCurrentPosition={updateCurrentLocation}/>
@@ -572,7 +560,14 @@ const WaveFinder = ({
                     </div>
                     <div className="flexContainer">
                         {tideSelector(status.tide)}
-                        {windSelector(status.windDirection)}
+                        <WindSelector 
+                            windDirection={status.windDirection} 
+                            pause={pause} 
+                            setWind={setWind} 
+                            isWind={isWind} 
+                            setStatus={setWindStatus} 
+                            handleWindCheck={handleWindCheck}
+                        />
                     </div>
                     <div className="flexContainer">
                         {milesInput(status.distance)}

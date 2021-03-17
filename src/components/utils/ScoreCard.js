@@ -10,6 +10,7 @@ const ScoreCard = ({ player, index, editPlayer, deletePlayer, game, updateTwoPla
         localStorage.setItem(player, newScore);
         setScore(Number(localStorage.getItem(player)));
     }
+    // eslint-disable-next-line
     const updateCricketScore = (newScore) => {
         localStorage.setItem(cricketKey, newScore);
         setScore(localStorage.getItem(cricketKey));

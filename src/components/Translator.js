@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import DropDown from './DropDown.js';
 import Translate from './Translate.js';
 import SearchBar from './utils/SearchBar';
+
 const Translator = () => {
     //https://cloud.google.com/translate/docs/languages
     const options = [

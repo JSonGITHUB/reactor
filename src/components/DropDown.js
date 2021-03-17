@@ -17,7 +17,6 @@ const DropDown = ({ label, options, selected, onSelectionChange}) => {
         }
 
     }, []);
-    
     const list = options.map((option) => {
         if (option.value === selected.value) {
             return null;

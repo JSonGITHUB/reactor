@@ -34,6 +34,7 @@ const Timer = () => {
         }
     },[]);
     interval = (interval === 3) ? 0 : (interval+1);
+    // eslint-disable-next-line
     x = (x === (timeItIs.length-1) && (interval === 0)) ? 0 : ((interval === 0) ? (x+1) : x);
     //timeItIsNow = timeItIs[x];
     const localDate = date.toLocaleTimeString();

@@ -13,6 +13,7 @@ import WaveFinder from './components/waves/WaveFinder.js';
 import SurfReports from './components/waves/SurfReports.js';                            
 import SlideShow from './components/SlideShow.js';
 import PhotoBlog from './components/PhotoBlog.js';
+import Blog from './components/blog/Blog.js';
 import PhotoSequence from './components/PhotoSequence.js';
 import Reducer from './components/Reducer.js';
 import Adder from './components/hooks/Adder.js';
@@ -30,6 +31,7 @@ import Weather from './components/weather/Weather.js';
 import ScoreKeeper from './components/utils/ScoreKeeper.js';
 import Converter from './components/Converter.js';
 import Shop from './components/shop/Shop.js';
+import MusicPlayer from './components/music/Player.js';
 
 
 class App extends React.Component {
@@ -149,6 +151,7 @@ class App extends React.Component {
                   <Route path="/LogDirectory" component={LogDirectory} />
                   <Route path="/Swell" component={SlideShow} />
                   <Route path="/PhotoBlog" component={PhotoBlog} />
+                  <Route path="/Blog" component={Blog} />
                   <Route path="/PhotoSequence" component={PhotoSequence} />
                   <Route path="/Adder" render={(props) => <Adder {...props} label="How big was it?" unit="ft" count="10" />}/>
                   <Route path="/Counter" render={(props) => <Counter />}/>
@@ -158,6 +161,7 @@ class App extends React.Component {
                   <Route path="/Translator" render={(props) => <Translator />}/>
                   <Route path="/ScoreKeeper" render={(props) => <ScoreKeeper />}/>
                   <Route path="/Shop" render={(props) => <Shop />}/>
+                  <Route path="/Music" render={(props) => <MusicPlayer />}/>
                   <Route path="/Accordion" render={(props) => <Accordion items={this.items}/>}/>
                   <Route path="/Todos" render={(props) => <Todos />}/>
                   <Route path="/Reducer" component={Reducer} />
