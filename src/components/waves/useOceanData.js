@@ -11,15 +11,17 @@ const useOceanData = (component, uri) => {
                 mode:'cors'
             }
         });
-        //console.log(`getOceanData => ${component}: \nuri: ${uri}\noceanData: ${JSON.stringify(data, null, 2)}`)
+        console.log(`getOceanData => ${component}: \nuri: ${uri}\noceanData: ${JSON.stringify(data, null, 2)}`)
         setOceanData(data)
     };
-
     useEffect(() => {
+        console.log(`OceanData =>`)
         let ignore = false;
-        if (!ignore) getOceanData();
+        if (!ignore) {
+            getOceanData();
+        }
         return () => { ignore = true; }
-    },[]);
+    }, [uri]);
         
     return [ oceanData, getOceanData ];    
 }

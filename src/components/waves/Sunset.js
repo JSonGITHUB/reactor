@@ -13,6 +13,7 @@ const Sunset = ({isMotionOn}) => {
     const [sunrise, setSunrise] = useState(null);
     const [sunset, setSunset] = useState(null);
     const [untilDark, setUntilDark] = useState(null);
+    // eslint-disable-next-line
     const [data, getData] = useOceanData('sunset', sunset1uri);
     const [ time ] = useCurrentTime(null);
     
@@ -21,19 +22,19 @@ const Sunset = ({isMotionOn}) => {
             //console.log(`sunset => ${JSON.stringify(data,null,2)}`)
             const sunsetTime = data.results.sunset;
             const sunsetTimeArray = sunsetTime.split(':');
-            const sunsetHours = Number(sunsetTimeArray[0])+4;
+            const sunsetHours = Number(sunsetTimeArray[0])+5;
             const sunsetMinutes = sunsetTimeArray[1];
             const sunsetDisplayTime = `${sunsetHours}:${sunsetMinutes}`
             setSunset(sunsetDisplayTime);
             const sunriseTime = data.results.sunrise;
             const sunriseTimeArray = sunriseTime.split(':');
-            const sunriseHours = Number(sunriseTimeArray[0])+4;
+            const sunriseHours = Number(sunriseTimeArray[0])+5;
             const sunriseMinutes = sunriseTimeArray[1];
             const sunriseDisplayTime = `${sunriseHours}:${sunriseMinutes}`
             setSunrise(sunriseDisplayTime);
             const untilDark = data.results.civil_twilight_end;
             const untilDarkTimeArray = untilDark.split(':');
-            const untilDarkHours = Number(untilDarkTimeArray[0])+4;
+            const untilDarkHours = Number(untilDarkTimeArray[0])+5;
             const untilDarkMinutes = untilDarkTimeArray[1];
             const untilDarkDisplayTime = `${untilDarkHours}:${untilDarkMinutes}`
             setUntilDark(untilDarkDisplayTime);
@@ -49,6 +50,7 @@ const Sunset = ({isMotionOn}) => {
     const displaySurfHours = () => (hoursUntilDark()>0) ? `${hoursUntilDark()} hours` : '';
     const displaySurfMinutes = () => (minutesUntilDark()>0)? `${minutesUntilDark()} minutes` : '';
     const surfTime = () => `${displaySurfHours()} ${displaySurfMinutes()}`;
+    // eslint-disable-next-line
     const darkClass = (hoursUntilDark()<2) ? 'color-red m-5' : 'color-neogreen m-5';
     const getCurrentSunset = () => <div>
         <div className="p-5 r-10 color-yellow bg-green m-5">

@@ -8,10 +8,14 @@ import S from '../../assets/images/windS.png';
 import SW from '../../assets/images/windSW.png';
 import W from '../../assets/images/windW.png';
 import NW from '../../assets/images/windNW.png';
+// eslint-disable-next-line
 import tideIcon from '../../assets/images/tide.png';
 import tide from '../../assets/images/tide.png';
+// eslint-disable-next-line
 import high from '../../assets/images/tide.png';
+// eslint-disable-next-line
 import medium from '../../assets/images/tide.png';
+// eslint-disable-next-line
 import low from '../../assets/images/tide.png';
 import waterTemp from '../../assets/images/waterTemp.png';
 import airTemp from '../../assets/images/airTemp.png';
@@ -33,6 +37,7 @@ const getMatchIcon = ({kind, status}) => {
     // eslint-disable-next-line
     let icon = (kind === "swell1") ? "swell1" : "swell2";
     icon = (kind === "wind") ? "wind" : icon;
+    // eslint-disable-next-line
     icon = (kind === "tide") ? "tide" : icon;
     const getDirectionIcon = (direction) => {
         if (direction === "N") {

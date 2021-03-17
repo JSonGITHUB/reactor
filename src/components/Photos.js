@@ -53,6 +53,7 @@ const Photos = () => {
         console.log(`Search Term: ${keyword}`);
         onSubmit(keyword, updateArray);
     }
+    // eslint-disable-next-line
     const clearMenu = () => (menuArray.length>0) ? setMenuArray([]) : null;
     
     const getImage = (item) => <GridImage key={getKey("thumb")} item={item}></GridImage>

@@ -20,7 +20,9 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, i
     const localLogExists = () => (localStorage.getItem(logId) === null) ? false : true;
     const getLog = () => (localLogExists()) ? JSON.parse(localStorage.getItem(logId)) : templateData;
     //console.log(`LogEntry => logId: ${logId}\nlog: ${JSON.stringify(getLog(), null, 2)}`)
-    
+    const classes = 'stripe p-10 color-black m-10 r-10 bg-soft';
+    const buttonClasses = 'button p-10 r-10 m-1 width-100-percent';
+
     const [status, setStatus] = useState({
         logId: logId,
         lastPostId: getLastPostId(),
@@ -125,9 +127,15 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, i
         )
     };
 
-    const radio = (item, groupTitle) => <div className="r-vw bg-green">
+                            
+    const radio = (item, groupTitle) => {
+        console.log('RADIO button')
+        return (
+            <div className="r-vw bg-green">
                 {radioItems(item, groupTitle)}
-            </div>;
+            </div>
+        )
+    };
     
     const selectionInterface = (item, groupTitle) => (item.type === 'radio') ? radio(item, groupTitle) : Selector(item, groupTitle, status.spot, defaultSelection, handleSelection, selected);
     const groups = () => getItems().map((item) => {

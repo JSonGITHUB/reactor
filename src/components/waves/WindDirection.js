@@ -12,6 +12,7 @@ import useOceanData from './useOceanData.js';
 const WindDirection = ({columns, setWind, height}) => {
     
     const uri = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=latest&station=9410230&product=wind&time_zone=lst&units=english&format=json';
+    // eslint-disable-next-line
     const [data, getData] = useOceanData('wind', uri);
 
     const [status, setStatus] = useState({

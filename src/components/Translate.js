@@ -17,6 +17,7 @@ const Translate = ({language, text}) => {
     
     useEffect(() => {
         const getTranslation = async () => {
+            // eslint-disable-next-line
             const proxyurl = "https://cors-anywhere.herokuapp.com/";
             const { data } = await axios.post(
                 (config.googleAPI_BASE_URL), 

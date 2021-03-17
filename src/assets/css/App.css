@@ -100,6 +100,9 @@
 .mb-30 {
   margin-bottom: 30px;
 }
+.mb-40 {
+  margin-bottom: 40px;
+}
 .mb-55 {
   margin-bottom: 55px;
 }
@@ -250,6 +253,9 @@ select {
 }
 .copyright {
   font-size: 9px;
+}
+.i {
+  font-style: italic;
 }
 .selectIcon {
   right:30px;
@@ -530,6 +536,9 @@ body {
 .ml--25 {
   margin-left: -25px;
 }
+.bg-soft {
+  background-color: #999999;
+}
 .bg-white {
   background-color: #FFFFFF;
 }
@@ -599,6 +608,12 @@ body {
 .color-graphite {
   color: #666666;
 }
+.color-soft {
+  color: #999999;
+}
+.color-lite {
+  color: #dddddd;
+}
 .name {
   z-index:3;
 }
@@ -629,6 +644,11 @@ body {
 }
 .fadeOutFaded {
 	animation: fadeOutFaded .5s ease;
+}
+.horizontalStripe {
+	width: 100%;
+  background-color: #999999;
+  height: 1px;
 }
 .stripe {
 	width: 100%;

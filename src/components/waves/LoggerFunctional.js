@@ -54,7 +54,7 @@ const Logger = ({logId, location}) => {
             items: data,
             isLoaded: true
         });
-    }, [location])
+    }, [location, status.log])
 
     const updateLog = (groupTitle, label, selected, set) => {
         const log = (status.log !== null) ? status.log : templateData;

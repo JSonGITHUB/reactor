@@ -41,6 +41,8 @@ const LogDirectory = ({ title, message }) => {
             const angle = Swell1.Angle;
             const interval = Swell1.Interval.replace('seconds', 'sec');
             const condition = icons[conditionsIndex];
+            const classes = 'stripe p-10 color-black m-10 r-10 bg-soft';
+            const buttonClasses = 'button p-10 r-10 m-1 width-100-percent';
 
             return (
                 <Link 
@@ -54,30 +56,25 @@ const LogDirectory = ({ title, message }) => {
                         }
                     }}
                 >
-                    <div key={getKey("log")} className="flexContainer button glassy pt-10 pb-10 r-10 mb-1 mobileFull bg-black" onClick={() => sessionClick(item, spot)}>
-                            <div className="flexOneFourthColumn p-10 bg-green color-black m-10 r-5 size25 centeredContent">
-                                {/*<img src={condition(item)} alt={item} className='shaka' />*/}
+                    <div className={buttonClasses} onClick={() => sessionClick(item, spot)}>
+                        <div className='flexContainer'>
+                            <div className={classes}>
                                 <img src={condition} alt={conditionDescription} className='shaka m-5' />
-                                <span className='m-5'>{height}</span>
-                            </div>
-                            <div className="flexThreeFourthColumnLeft pt-10 pb-10">
-                                <div className='copyright bold'>{year}</div>
-                                <div>{month + " " + day + suffix[Number(String(day).slice(-1))]}</div>
-                                <div className='size20 color-neogreen bold pt-5'>{spot}</div>
-                                <div className='color-yellow description'>
+                                <div className='size20'>{spot}</div>
+                                <div className='description'>
                                     <span>{height}</span>
                                     <span className='ml-5'>{direction}</span>
                                     <span className='ml-5'>{angle}</span>
                                     <span className='ml-5'>{interval}</span>
                                 </div>
                             </div>
-                                {
-                                    //item.substring(3, 6) + ", " + 
-                                    //item.substring(6, item.indexOf("20")) + " " + 
-                                    //item.substring(item.indexOf("20"), item.indexOf("20")+4) + " " + 
-                                    //item.substring(item.length-2, item.length) + 
-                                }
-                    </div>
+                        </div>
+                        <div className="pt-10 pb-10 color-light">
+                            <div className='size25 pb-5 color-soft'>{year}</div>
+                            <div>{month + " " + day + suffix[Number(String(day).slice(-1))]}</div>
+                        </div>
+                        <div className='horizontalStripe mt-10'></div>
+                    </div>                    
                 </Link>
             )
         }
@@ -87,9 +84,8 @@ const LogDirectory = ({ title, message }) => {
     //console.log(`postssssss=>${JSON.stringify(posts.getDirectory(),null,2)}`)
     return (
         <div className="App-content fadeIn mt--14">
-            <h1>Review Sessions</h1>
-            <PostDirectory/>
             {sessions()}
+            <PostDirectory/>
             <div className="button p-20 r-5 m-20 bg-green completedSelector color-black" onClick={logSession}>Add Session</div>
         </div>
     );
