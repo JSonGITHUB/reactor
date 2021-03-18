@@ -579,15 +579,15 @@ const Tide = ({setTide, display, isMotionOn}) => {
     const getCurrentWaterLevel = () => {
         if (tideNow.data !== undefined) { 
             const waterLevel = Number(tideNow.data[tideNow.data.length - 1].v).toFixed(1);
-            console.log(`getCurrentWaterLevel => waterLevel: ${waterLevel}`)
+            //console.log(`Tide => getCurrentWaterLevel => waterLevel: ${waterLevel}`)
             return waterLevel;
         }
     }
     const getCurrentTide = () => {
         const waterLevel = getCurrentWaterLevel();
-        console.log(`getCurrentTide => waterLevel: ${waterLevel}`)
+        //console.log(`getCurrentTide => waterLevel: ${waterLevel}`)
         const tide = (waterLevel > 3) ? "high" : (waterLevel < 2) ? "low" : "medium";
-        console.log(`getCurrentTide =>\ntide: ${tide}\nwaterLevel: ${waterLevel}`)
+        //console.log(`getCurrentTide =>\ntide: ${tide}\nwaterLevel: ${waterLevel}`)
         return tide;
     }
     useEffect(() => {
@@ -656,7 +656,7 @@ const Tide = ({setTide, display, isMotionOn}) => {
             const lastTide = tides[getNextIndex()-1];
             const convertTide = (tide) => (tide === 'L' || 'low') ? 'low' : 'high';
             const currentTide = getCurrentTide();
-            //console.log(`CURRENT ${currentTide} \nheights: ${heights}\nlastHeight: ${lastHeight}\nnextHeight: ${nextHeight}\nHOUR: ${time.hours} \nTIMES: ${hours}\n next ${nextTide} \ntide in ${untilNextTide} hours\n previous ${lastTide} tide was ${pastLastTide} hours ago tideMinutes: ${time.minutes}`);
+            console.log(`CURRENT: ${currentTide} \nheights: ${heights}\nlastHeight: ${lastHeight}\nnextHeight: ${nextHeight}\nHOUR: ${time.hours} \nTIMES: ${hours}\n next ${nextTide} \ntide in ${untilNextTide} hours\n previous ${lastTide} tide was ${pastLastTide} hours ago tideMinutes: ${time.minutes}`);
             setStatus(prevState => ({
                 ...prevState,
                 tide: currentTide,

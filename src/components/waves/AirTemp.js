@@ -4,23 +4,22 @@ import useOceanData from './useOceanData.js';
 import useCurrentTime from './useCurrentTime.js';
 
 const AirTemp = ({isMotionOn}) => {
+    
     const [ time ] = useCurrentTime(null);
-    console.log(`AirTemp => \nstartTime: ${time.startTime} \nendTime: ${time.endTime}`)
-    const airTempuri = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${time.startTime}&end_date=${time.endTime}&station=9410230&product=air_temperature&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
     const airUrl = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${time.startTime}&end_date=${time.endTime}&station=9410230&product=air_temperature&units=english&time_zone=lst_ldt&application=ports_screen&format=json`;
-    const proxyurl = "https://cors-anywhere.herokuapp.com/";
-    // eslint-disable-next-line
-    const uri = proxyurl + airTempuri;
-
     const [temp, setTemp] = useState(null);
+    const [updated, setUpdated] = useState(false);
     // eslint-disable-next-line
     const [data, getData] = useOceanData('air', airUrl);
-    console.log()
     
+    
+            
     useEffect(() => {
-        if (data.data !== undefined) {
+        if (data.data !== undefined && updated !== true) {
+            console.log(`AirTemp => \nstartTime: ${time.startTime} \nendTime: ${time.endTime}`)
             const temp = Number(data.data[data.data.length - 1].v).toFixed(0);
             setTemp(temp);
+            setUpdated(true);
         }
     },[data]);
 

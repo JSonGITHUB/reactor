@@ -9,11 +9,9 @@ import WindDirection from './WindDirection.js';
 import Sunset from './Sunset.js';
 import Selector from '../forms/FunctionalSelector.js';
 import WindSelector from './wind/WindSelector.js';
-
+import TideSelector from './tide/TideSelector.js';
 // eslint-disable-next-line
 import tide from '../../assets/images/tide.png';
-import thumbsUp from '../../assets/images/ThumbsUp.png';
-import thumbsDown from '../../assets/images/ThumbsDown.png';
 import SurfLocation from './SurfLocation.js';
 import locations from './Locations.js';
 import directionObject from './DirectionObject.js';
@@ -137,11 +135,9 @@ const WaveFinder = ({
             height: getDefaultHeights(selected)
         }));
     }
-    const handleWindCheck = (event) => {
-        console.log(`handleWindCheck =>`);
+    const handleWindCheck = () => {
         const isWind = (!!status.isWind === true) ? false : true;
         localStorage.setItem('isWind', isWind);
-        console.log(`handleWindCheck =>\nisWind: ${isWind}`)
         setStatus(prevState => ({
             ...prevState,
             pause: true,
@@ -308,26 +304,7 @@ const WaveFinder = ({
             pause: true
         }));
     };
-    const isTideSelected = () => (status.isTide === true) ? 'bg-green' : 'bg-dkGreen';
-    const tideClass = () => `${isTideSelected()} flex2Column r-10 m-5 p-15`;
     const tideDisplay = (display) => <Tide setTide={setTide} display={`${display}`}/>
-    const tideSelector = (tide) => <div className={tideClass()} onMouseDown={pause}>
-                                Tide
-                                <div className="greet pt-10">{tideDisplay('narrow')}</div>
-                                <Selector 
-                                    groupTitle="Tide"
-                                    selected={status.tide} 
-                                    label="current" 
-                                    items={["low", "medium", "high"]}
-                                    onChange={handleTideSelection}
-                                    fontSize='20'
-                                    padding='5px'
-                                    width='93%'
-                                />
-                                <div className="button mt-15" onClick={handleTideCheck}>
-                                    {(status.isTide === true) ? <img src={thumbsUp} alt='tide' className='p-10 r-20' /> : <img src={thumbsDown} alt='tide' className='p-10 r-20' /> }
-                                </div>
-                            </div>
     const starSelector = (stars) => <div className="flex2Column bg-dkGreen r-10 m-5 p-15" onMouseDown={pause}>
                         Match<br/>
                         <Selector
@@ -485,7 +462,6 @@ const WaveFinder = ({
     const matches = matchingLocations();
     // eslint-disable-next-line
     const scrollTo = {scrollTop: (status.scrollIndex*100)}
-    console.log(`WaveFinder =>`)
     const setWindStatus = (selected) => {
         localStorage.setItem("windDirection", selected);
         setStatus(prevState => ({
@@ -502,7 +478,7 @@ const WaveFinder = ({
                     <div className="flexContainer">
                         <div className="flex2Column p-5 r-10 color-orange bg-green m-5">
                             tide<br/>
-                            <Tide setTide={setTide} display='wide'/>
+                            {tideDisplay('wide')}
                         </div>
                         <div className="flex2Column p-5 r-10 color-yellow bg-green m-5">
                             wind
@@ -559,12 +535,18 @@ const WaveFinder = ({
                         </SwellSelector>
                     </div>
                     <div className="flexContainer">
-                        {tideSelector(status.tide)}
+                        <TideSelector 
+                            status={status} 
+                            pause={pause} 
+                            tideDisplay={tideDisplay} 
+                            handleTideCheck={handleTideCheck} 
+                            handleTideSelection={handleTideSelection}
+                        />
                         <WindSelector 
                             windDirection={status.windDirection} 
                             pause={pause} 
                             setWind={setWind} 
-                            isWind={isWind} 
+                            isWind={status.isWind} 
                             setStatus={setWindStatus} 
                             handleWindCheck={handleWindCheck}
                         />

@@ -11,7 +11,7 @@ const CurrentTide = ({setTide}) => {
     const getCurrentWaterLevel = () => {
         if (tideNow.data !== undefined) { 
             const waterLevel = Number(tideNow.data[tideNow.data.length - 1].v).toFixed(1);
-            console.log(`getCurrentWaterLevel => waterLevel: ${waterLevel}`)
+            console.log(`CurrentTide => getCurrentWaterLevel => waterLevel: ${waterLevel}`)
             return waterLevel;
         }
     }
