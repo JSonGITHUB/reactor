@@ -6,9 +6,9 @@ import thumbsUp from '../../../assets/images/ThumbsUp.png';
 import thumbsDown from '../../../assets/images/ThumbsDown.png';
 
 const WindSelector = ({windDirection, pause, setWind, isWind, setStatus, handleWindCheck}) => {
-
+    //console.log(`WindSelector => isWind: ${isWind}`);
     const [filterByWind, setFilterByWind] = useState(isWind);
-    const backgroundColorClass = (filterByWind === true) ? 'bg-green' : 'bg-dkGreen';
+    const backgroundColorClass = (isWind === true) ? 'bg-green' : 'bg-dkGreen';
     const windClass = () => `${backgroundColorClass} flex2Column r-10 m-5 p-15`;
     const handleWindSelection = (groupTitle, label, selected) => {
         setStatus(selected)

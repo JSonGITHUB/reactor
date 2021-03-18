@@ -11,7 +11,7 @@ const useOceanData = (component, uri) => {
                 mode:'cors'
             }
         });
-        console.log(`getOceanData => ${component}: \nuri: ${uri}\noceanData: ${JSON.stringify(data, null, 2)}`)
+        //console.log(`getOceanData => ${component}: \nuri: ${uri}\noceanData: ${JSON.stringify(data, null, 2)}`)
         setOceanData(data)
     };
     useEffect(() => {

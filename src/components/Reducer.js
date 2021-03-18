@@ -1,4 +1,5 @@
 import React from "react";
+import { ADD_TODO, COMPLETE_TODO, INCOMPLETE_TODO } from '../actions/types.js';
 
 const initialTodos = [
   {
@@ -15,13 +16,13 @@ const initialTodos = [
 const todoReducer = (state, action) => {
     console.log(`todoReducer => `)
   switch (action.type) {
-    case "ADD_TODO":
+    case ADD_TODO:
         console.log(`ADD_TODO:${JSON.stringify(state,2, null)}`);
       return initialTodos.map(todo => {
             console.log(`1b\ntodo: ${JSON.stringify(todo, 2, null)}`)
             return todo;
       });
-    case "COMPLETE_TODO":
+    case COMPLETE_TODO:
         console.log(`COMPLETE_TODO:`)
       return initialTodos.map(todo => {
         if (todo.id === action.id) {
@@ -32,7 +33,7 @@ const todoReducer = (state, action) => {
           return todo;
         }
       });
-    case "INCOMPLETE_TODO":
+    case INCOMPLETE_TODO:
         console.log(`INCOMPLETE_TODO:`)
       return initialTodos.map(todo => {
         if (todo.id === action.id) {
