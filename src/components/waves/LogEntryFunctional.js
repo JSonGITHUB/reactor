@@ -20,7 +20,9 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, i
     const localLogExists = () => (localStorage.getItem(logId) === null) ? false : true;
     const getLog = () => (localLogExists()) ? JSON.parse(localStorage.getItem(logId)) : templateData;
     //console.log(`LogEntry => logId: ${logId}\nlog: ${JSON.stringify(getLog(), null, 2)}`)
+    // eslint-disable-next-line
     const classes = 'stripe p-10 color-black m-10 r-10 bg-soft';
+    // eslint-disable-next-line
     const buttonClasses = 'button p-10 r-10 m-1 width-100-percent';
 
     const [status, setStatus] = useState({

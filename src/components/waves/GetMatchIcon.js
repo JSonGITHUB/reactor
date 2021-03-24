@@ -24,8 +24,8 @@ const getMatchIcon = ({kind, status}) => {
     //console.log(`getMatchIcon => kind: ${kind}\nstatus:${JSON.stringify(status,null,2)}`)
     const getStarMatchKind = (kind) => {
         //let classes = "shaka r-20 p-2";
-        let classes = 'h50w50 r-10 p-5';
-        classes = (kind === "wind") ? (classes + " bg-white mb-55") : classes; 
+        let classes = 'h50w50 p-5';
+        classes = (kind === "wind") ? (classes + " r-10 bg-white mb-55") : classes; 
         return classes;
     }
     // eslint-disable-next-line

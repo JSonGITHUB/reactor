@@ -21,7 +21,7 @@ const Sunrise = ({isMotionOn}) => {
             const displayTime = `${timeArray[0]}:${timeArray[1]}`
             setSunrise(displayTime);
         }
-    },[data]);
+    },[data.results.sunrise]);
 
     const getCurrentSunrise = () => <div className="r-10 m-5 p-10 bg-lite white">
                                 {sunrise}<span className='copyright bold'>PM</span>

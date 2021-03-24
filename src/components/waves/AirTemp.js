@@ -5,7 +5,7 @@ import useCurrentTime from './useCurrentTime.js';
 
 const AirTemp = ({isMotionOn}) => {
     
-    const [ time ] = useCurrentTime(null);
+    const [ time ] = useCurrentTime();
     const airUrl = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${time.startTime}&end_date=${time.endTime}&station=9410230&product=air_temperature&units=english&time_zone=lst_ldt&application=ports_screen&format=json`;
     const [temp, setTemp] = useState(null);
     const [updated, setUpdated] = useState(false);
@@ -16,12 +16,12 @@ const AirTemp = ({isMotionOn}) => {
             
     useEffect(() => {
         if (data.data !== undefined && updated !== true) {
-            console.log(`AirTemp => \nstartTime: ${time.startTime} \nendTime: ${time.endTime}`)
+            console.log(`AirTemp =>`)
             const temp = Number(data.data[data.data.length - 1].v).toFixed(0);
             setTemp(temp);
             setUpdated(true);
         }
-    },[data]);
+    },[data.data, time.startTime, time.endTime, updated]);
 
     const getCurrentTemp = () => <div className="r-10 m-5 p-10 bg-lite white">
                                 {temp}° 

@@ -18,6 +18,9 @@ import directionObject from './DirectionObject.js';
 import SwellSelector from './SwellSelector.js';
 //import GetMatchIcon from './GetMatchIcon.js';
 import Geolocator from '../utils/Geolocator.js';
+// eslint-disable-next-line
+import useOceanData from './useOceanData.js';
+import useCurrentTime from './useCurrentTime.js';
 
 const WaveFinder = ({
         tide,
@@ -37,6 +40,16 @@ const WaveFinder = ({
         distance
     }) => {
     
+    const time = useCurrentTime();
+    const startTime = time[0].startTime;
+    const endTime = time[0].endTime;
+    //console.log(`WaveFinder => time: ${JSON.stringify(time, null, 2)}\nstartTime: ${startTime} \nendTime: ${endTime}`);
+    const tideNowLink = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${startTime}&end_date=${endTime}&station=9410660&product=water_level&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
+    const uriMLL = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=NOS.COOPS.TAC.WL&begin_date=${startTime}&end_date=${endTime}&datum=MLLW&station=9410230&time_zone=lst_ldt&units=english&interval=hilo&format=json`;
+     // eslint-disable-next-line
+    const [data, getData] = useOceanData('tides', uriMLL);
+     // eslint-disable-next-line
+    const [tideNow, getTideNow] = useOceanData('tide', tideNowLink);
     const getLocal = (item) => localStorage.getItem(item);
     const getProps = (item) => item;
     const getDefault = (item) => (getLocal(item) === null) ? getProps(item) : getLocal(item);
@@ -49,7 +62,6 @@ const WaveFinder = ({
         localStorage.setItem('locations', JSON.stringify(locations));
         return locations;
     }
-
     const [status, setStatus] = useState({
         module: 'WaveFinder',
         pause: true,
@@ -84,7 +96,7 @@ const WaveFinder = ({
         matches: []
     });
     const tick = () => {
-        console.log(`pause: ${status.pause}`)
+        console.log(`tick => pause: ${status.pause}`)
         if (status.pause === false) {
             setStatus(prevState => ({
                 ...prevState,
@@ -93,6 +105,7 @@ const WaveFinder = ({
             }));
         }
     }
+    
     useEffect(() => { 		
         const timerID = setInterval(
             () => tick(),
@@ -304,7 +317,7 @@ const WaveFinder = ({
             pause: true
         }));
     };
-    const tideDisplay = (display) => <Tide setTide={setTide} display={`${display}`}/>
+    const tideDisplay = (display) => <Tide tideNow={tideNow} data={data} time={time} setTide={setTide} display={`${display}`}/>
     const starSelector = (stars) => <div className="flex2Column bg-dkGreen r-10 m-5 p-15" onMouseDown={pause}>
                         Match<br/>
                         <Selector
@@ -363,22 +376,24 @@ const WaveFinder = ({
         //console.log(`WaveFinder = > ${tide} currentTide(${currentTide})`)
         //currentTide = (Number(tide)>4) ? "high" : currentTide;
         //console.log(`WaveFinder = > ${tide} currentTide(${currentTide})`)
-        localStorage.setItem("tide", tide);
-        setStatus(prevState => ({
-            ...prevState,
-            tide: tide,
-            height: getDefaultHeights(tide)
-        }));
+        if (localStorage.getItem("tide") !== tide) {
+            localStorage.setItem("tide", tide);
+            setStatus(prevState => ({
+                ...prevState,
+                tide: tide,
+                height: getDefaultHeights(tide)
+            }));
+        }
     }
     const setWind = (direction, angle, speed, gusts) => {
         //console.log(`setWind =>\ndirection: ${direction}\nspeed: ${speed}`)
-            setStatus(prevState => ({
-                ...prevState,
-                windDirection: direction,
-                windAngle: Number(angle).toFixed(0),
-                windSpeed: Number(speed).toFixed(0),
-                windGusts: Number(gusts).toFixed(0)
-            }));
+        setStatus(prevState => ({
+            ...prevState,
+            windDirection: direction,
+            windAngle: Number(angle).toFixed(0),
+            windSpeed: Number(speed).toFixed(0),
+            windGusts: Number(gusts).toFixed(0)
+        }));
     }
     const getReport = () => <iframe className="Percent95 mt-5 mb-5 r-10" title="report" id="report" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224"></iframe>
     
@@ -454,9 +469,6 @@ const WaveFinder = ({
         return sorted;
     }
     const matchingLocations = () => status.locations.map((item) => getMatchingLocation(item));
-    const date = status.date.toLocaleTimeString();
-    // eslint-disable-next-line
-    const time = date.replace(" ","").toLowerCase();
     //localStorage.setItem('locations', JSON.stringify(status.locations))
     //console.log(`WaveFinder => \nstatus.locations: ${JSON.stringify(status.locations, null, 2)}`)
     const matches = matchingLocations();
@@ -536,6 +548,8 @@ const WaveFinder = ({
                     </div>
                     <div className="flexContainer">
                         <TideSelector 
+                            tideNow={tideNow} 
+                            data={data} 
                             status={status} 
                             pause={pause} 
                             tideDisplay={tideDisplay} 
