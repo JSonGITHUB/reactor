@@ -15,7 +15,7 @@ const Sunset = ({isMotionOn}) => {
     const [untilDark, setUntilDark] = useState(null);
     // eslint-disable-next-line
     const [data, getData] = useOceanData('sunset', sunset1uri);
-    const [ time ] = useCurrentTime(null);
+    const [ time ] = useCurrentTime();
     
     useEffect(() => {
         if (data.results !== undefined) {
@@ -39,7 +39,7 @@ const Sunset = ({isMotionOn}) => {
             const untilDarkDisplayTime = `${untilDarkHours}:${untilDarkMinutes}`
             setUntilDark(untilDarkDisplayTime);
         }
-    },[data]);
+    },[data.results]);
     const getUntilDarkMinutes = () => Number(String(untilDark).split(':')[1]);
     const areDarkMinutesLess = () => (getUntilDarkMinutes() < time.minutes) ? true : false;
     const darkHours = () => Number(String(untilDark).split(':')[0]);

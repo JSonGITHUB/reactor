@@ -5,7 +5,7 @@ import useCurrentTime from './useCurrentTime.js';
 
 const WaterTemp = ({isMotionOn}) => {
 
-    const [ time ] = useCurrentTime(null);
+    const [ time ] = useCurrentTime();
     const waterUrl = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${time.startTime}&end_date=${time.endTime}&station=9410230&product=water_temperature&units=english&time_zone=lst_ldt&application=ports_screen&format=json`;
         
     const [temp, setTemp] = useState(null);

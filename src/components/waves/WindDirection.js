@@ -46,22 +46,26 @@ const WindDirection = ({columns, setWind, height}) => {
    useEffect(() => {
         console.log(`getWindData =>`)
         if (data.data !== undefined) {
+            
             const station = data.metadata.name;
             const speed = data.data[data.data.length - 1].s * 1.15078;
             const angle = data.data[data.data.length - 1].d;
             const direction = data.data[data.data.length - 1].dr;
             const gusts = data.data[data.data.length - 1].g * 1.15078;
-            setStatus(prevState => ({
-                ...prevState,
-                station: station,
-                speed: speed,
-                angle: angle,
-                direction: direction,
-                gusts: gusts
-            }))
-            setWind(data.data[data.data.length - 1].dr, data.data[data.data.length - 1].d, data.data[data.data.length - 1].s, data.data[data.data.length - 1].g);
+
+            if (status.station !== station) {
+                setStatus(prevState => ({
+                    ...prevState,
+                    station: station,
+                    speed: speed,
+                    angle: angle,
+                    direction: direction,
+                    gusts: gusts
+                }))
+                setWind(data.data[data.data.length - 1].dr, data.data[data.data.length - 1].d, data.data[data.data.length - 1].s, data.data[data.data.length - 1].g);
+            }
         }
-    },[data]);
+    },[data, setWind, status.station]);
 
     /*
     Water Level: 2.01 ft Above MLLW

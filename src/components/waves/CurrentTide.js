@@ -4,7 +4,7 @@ import useCurrentTime from './useCurrentTime.js';
 
 const CurrentTide = ({setTide}) => {
     
-    const [ time ] = useCurrentTime(null);
+    const [ time ] = useCurrentTime();
     const tideNowLink = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${time.startTime}&end_date=${time.endTime}&station=9410660&product=water_level&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
     const [tideNow, getTideNow] = useOceanData('tide', tideNowLink);
     
