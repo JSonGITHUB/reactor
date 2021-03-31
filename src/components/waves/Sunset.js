@@ -53,26 +53,26 @@ const Sunset = ({isMotionOn}) => {
     // eslint-disable-next-line
     const darkClass = (hoursUntilDark()<2) ? 'color-red m-5' : 'color-neogreen m-5';
     const getCurrentSunset = () => <div>
-        <div className="p-5 r-10 color-yellow bg-green m-5">
+        <div className="p-5 r-10 color-yellow glassy m-5">
             <span className="ml-2">surf time remaining:</span><br/>
             <div className="r-10 m-5 p-10 bg-lite white">
                 {surfTime()}
             </div>
         </div>
         <div className="flexContainer">
-            <span className="flex3Column p-5 r-10 color-yellow bg-dkGreen m-5">
+            <span className="flex3Column p-5 r-10 color-yellow glassy m-5">
                 <span className="ml-2">sunrise</span><br/>
                 <div className="r-10 m-5 p-10 bg-lite white">
                     {sunrise}<span className='copyright bold'>AM</span>
                 </div>
             </span>
-            <span className="flex3Column p-5 r-10 color-orange bg-dkGreen m-5">
+            <span className="flex3Column p-5 r-10 color-orange glassy m-5">
                 <span className="ml-2">sunset</span><br/>
                 <div className="r-10 m-5 p-10 bg-lite white">
                     {sunset}<span className='copyright bold'>PM</span>
                 </div>
             </span>
-            <span className="flex3Column p-5 r-10 color-black bg-dkGreen m-5">
+            <span className="flex3Column p-5 r-10 color-graphite glassy m-5">
                 <div className="ml-2">dark</div>
                 {/*<div className="copyright bold">in {darkCount()}</div>*/}
                 <div className="r-10 m-5 p-10 bg-lite white">

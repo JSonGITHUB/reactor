@@ -5,7 +5,7 @@ import thumbsDown from '../../../assets/images/ThumbsDown.png';
 const TideSelector = ({status, pause, tideDisplay,  handleTideCheck, handleTideSelection}) => {
 
     const tideClass = () => `${isTideSelected()} flex2Column r-10 m-5 p-15`;
-    const isTideSelected = () => (status.isTide === true) ? 'bg-green' : 'bg-dkGreen';
+    const isTideSelected = () => (status.isTide === true) ? 'bg-lite glassy' : 'glassy';
 
     return (
         <div className={tideClass()} onMouseDown={pause}>

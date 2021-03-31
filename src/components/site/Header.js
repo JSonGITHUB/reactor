@@ -8,10 +8,11 @@ import {BrowserRouter as Router, Switch, Link, Route} from 'react-router-dom';
 import { navClassesClosed, navClassesOpen, navClassesClose } from './NavClasses.js';
 import { CgMenuGridO } from "react-icons/cg";
 import Menu from './Menu.js';
+import GoogleAuth from './GoogleAuth.js';
 
-const Header = ({company, width, isMotionOn}) => {
+const Header = ({company, width, isMotionOn, isSignedIn, setSignIn}) => {
     console.log(`Header => width: ${width}`)
-
+    console.log(`Header => isSignedIn: ${isSignedIn}`)
     const [menuOpen, setMenuOpen] = useState(false);
     const [initialized, setInitialized] = useState(false);
     const initialize = () => setInitialized(true);
@@ -57,7 +58,7 @@ const Header = ({company, width, isMotionOn}) => {
     const hamburgerClosed = <div>
                                 <div className="flexContainer width-100-percent">
                                     <div className="flex3ColumnLeft">{logoButton(mobileLogo)}</div>
-                                    <div className="flex3Column"></div>
+                                    <div className="flex3Column centeredContent pb-3"></div>
                                     <div className="flex3ColumnRight">{burgerButton}</div>
                                 </div>
                                 <div className="t-collapse lowerBorder bg-dark width-100-percent h-scroll p-20">
@@ -75,7 +76,7 @@ const Header = ({company, width, isMotionOn}) => {
             <Background />
             <div className="flexContainer header width-100-percent">
                 <div className="flex3Column bg-green" />
-                <div className="flex3Column bg-yellow" />
+                <div className="flex3Column bg-yellow"></div>
                 <div className="flex3Column bg-red" />
             </div>
             <Branding />

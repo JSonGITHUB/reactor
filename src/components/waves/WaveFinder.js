@@ -318,7 +318,7 @@ const WaveFinder = ({
         }));
     };
     const tideDisplay = (display) => <Tide tideNow={tideNow} data={data} time={time} setTide={setTide} display={`${display}`}/>
-    const starSelector = (stars) => <div className="flex2Column bg-dkGreen r-10 m-5 p-15" onMouseDown={pause}>
+    const starSelector = (stars) => <div className="flex2Column glassy r-10 m-5 p-15" onMouseDown={pause}>
                         Match<br/>
                         <Selector
                             groupTitle="Matches" 
@@ -331,7 +331,7 @@ const WaveFinder = ({
                             width='93%'
                         />
                     </div>
-    const milesInput = (distance) => <div className="flex2Column bg-dkGreen r-10 m-5 p-10">
+    const milesInput = (distance) => <div className="flex2Column glassy r-10 m-5 p-10">
                                 <label>
                                     Miles<br/>
                                     <input className="mt-10 p-10 r-10"
@@ -488,22 +488,22 @@ const WaveFinder = ({
             <div className="white pointer">   
                 <div>
                     <div className="flexContainer">
-                        <div className="flex2Column p-5 r-10 color-orange bg-green m-5">
+                        <div className="flex2Column p-5 r-10 color-orange glassy m-5">
                             tide<br/>
                             {tideDisplay('wide')}
                         </div>
-                        <div className="flex2Column p-5 r-10 color-yellow bg-green m-5">
+                        <div className="flex2Column p-5 r-10 color-yellow glassy m-5">
                             wind
                             <WindDirection columns="2" setWind={setWind} height='157px'/>
                         </div>
                     </div>
                     <div className="flexContainer">
-                        <span className="flex2Column p-5 r-10 color-blue bg-green m-5">
+                        <span className="flex2Column p-5 r-10 color-blue glassy m-5">
                             {/*getWaterTempIcon*/}
                             <span className="ml-2">water</span><br/>
                             <WaterTemp/>
                         </span>
-                        <span className="flex2Column p-5 r-10 color-white bg-green m-5">
+                        <span className="flex2Column p-5 r-10 color-white glassy m-5">
                             {/*getAirTempIcon*/}
                             <span className="ml-2">air</span><br/>
                             <AirTemp/>

@@ -31,7 +31,7 @@ const Selector = (item, groupTitle, spot, defaultSelection, handleSelection, sel
     }
     //console.log(`spot: ${spot} \n verifySpot(): ${verifySpot()} \nselected: ${defaultSelection(item,groupTitle)}`)
     
-    return <div className={selectorColor(item, groupTitle, selected) + " r-vw p-vw bg-green glassy"}>
+    return <div className={"r-vw p-vw"}>
         <div className="mb-5">{item.description}: </div>
         <div className="mb-5">
             <FunctionalSelector 

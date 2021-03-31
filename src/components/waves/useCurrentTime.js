@@ -4,15 +4,18 @@ const currentTime = new Date();
 const getDaysInMonth = () => {
     const month = currentTime.getMonth()+1;
     const year = currentTime.getYear();
-    return new Date(year, month, 0).getDate();
+    const daysInMonth = new Date(year, month, 0).getDate();
+    return daysInMonth;
 }
 const getNextDay = (currentDate) => {
-    currentDate = currentDate + 1;
+    currentDate = currentDate;
     currentDate = (currentDate<10) ? `0${currentDate}` : currentDate;
+
     if (currentDate === getDaysInMonth()) {
+        //console.log(`getNextDay =>\nnextDay: 01\nDaysInMont: ${getDaysInMonth()}`);
         return '01'
     }
-    //console.log(`getNextDay => ${currentDate}`);
+    //console.log(`getNextDay =>\nnextDay: ${currentDate}\nDaysInMont: ${getDaysInMonth()}`);
     return currentDate;
     //((currentTime.getMonth()+1 === 2) &&)
 }
@@ -45,12 +48,25 @@ const useCurrentTime = () => {
     const getEndTime = `${year}${getNextMonth(currentMonth)}${getNextDay(currentDate)}%20${hours}:${minutes}`;
     const getStartTime = `${year}${month}${date}%20${startHour}:00`;
     getCurrentTime = `${year}${month}${date}%20${hours}:${minutes}`;
-    //console.log(`Air   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
+    //console.log(`useCurrentTime - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
     // eslint-disable-next-line
     const [startTime, setStartTime] = useState(getStartTime);
     // eslint-disable-next-line
     const [endTime, setEndTime] = useState(getEndTime);
     const currentTime = new Date();
+/*
+    https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?
+    product=predictions&
+    application=NOS.COOPS.TAC.WL&
+    begin_date=20210330%2003:00&
+      end_date=20210330%2010:33&
+    datum=MLLW&
+    station=9410230&
+    time_zone=lst_ldt&
+    units=english&
+    interval=hilo&
+    format=json
+*/   
     const time = {   
         hours,
         minutes,

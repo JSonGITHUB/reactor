@@ -22,13 +22,13 @@ function FunctionalSelector(props) {
     const getStyle = {
         padding: padding || 0,
         fontSize: Number(fontSize),
-        color: 'greenyellow',
+        color: 'yellow',
         maxWidth: maxWidth,
         width: width
     };
     return (
         <label>    
-            <select className='pt-5 pb-5 r-10 bg-dark white mt-5 button' style={getStyle} value={selected} onChange={handleChange}>
+            <select className='glassy pt-5 pb-5 r-10 bg-dark white mt-5 button' style={getStyle} value={selected} onChange={handleChange}>
                 {selectItems}
             </select>
         </label>

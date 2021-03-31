@@ -4,11 +4,13 @@ import usersReducer from './usersReducer.js';
 import songReducer from './songReducer.js';
 import selectedSongReducer from './selectedSongReducer.js';
 import streamReducer from './streamReducer.js';
+import authReducer from './authReducer';
 
 export default combineReducers({
     posts: postsReducer,
     users: usersReducer,
     songs: songReducer,
     selectedSong: selectedSongReducer,
-    streamLoggedIn: streamReducer
+    streamLoggedIn: streamReducer,
+    auth: authReducer
 });
