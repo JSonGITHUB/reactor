@@ -133,7 +133,7 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, i
     const radio = (item, groupTitle) => {
         console.log('RADIO button')
         return (
-            <div className="r-vw bg-green">
+            <div className="r-vw">
                 {radioItems(item, groupTitle)}
             </div>
         )
@@ -174,7 +174,7 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, i
                         <DatePicker
                             onChange={onDateChange}
                             value={getDate()} 
-                            className='p-vw bg-green flex3Column r-vw m-vw'
+                            className='glassy p-vw bg-lite flex3Column r-vw m-vw p-20'
                         /><br/>
                     </div>
                 </React.Fragment>
@@ -182,43 +182,41 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, i
     
     return (
         <Route>
-            <Dialog title={title} message={message}>
-                <form onSubmit={handleSubmit}>
-                    {dateEntry()}
-                    {categories()}
-                    <br/>
-                    <div className="mb-5">Additional Comments: </div>
-                    <textarea 
-                        rows="10" 
-                        cols={window.innerWidth/15} 
-                        value={status.log.Comments.notes} 
-                        onChange={updateNotes} 
-                        className="mt-10 greet p-10 r-10 brdr-green"
-                    /><br/><br/>
-                    <Link className="noUnderline color-black"
-                        to="/LogDirectory"
-                        onClick={() => handleSubmit()}>
-                        <div onClick={handleSubmit} className="button m-1 greet p-20 r-10 bg-green brdr-green">
-                            {buttonLabel}
-                        </div>
-                    </Link> 
-                    <Link className="noUnderline color-black"
-                        to="/LogDirectory"
-                        onClick={() => handleSave()}>
-                        <div onClick={handleSave} className="myButton m-1 greet p-20 r-10 bg-yellow brdr-yellow">
-                            save
-                        </div>
-                    </Link>
-                    <Link className="noUnderline"
-                        to="/LogDirectory"
-                        onClick={() => handleDelete()}>
-                        <div onClick={handleDelete} className="button m-1 greet p-20 r-10 bg-red brdr-red">
-                            delete
-                        </div>
-                    </Link>
-                    <PostDirectory />
-                </form>
-            </Dialog>
+            <form onSubmit={handleSubmit}>
+                {dateEntry()}
+                {categories()}
+                <br/>
+                <div className="mb-5">Additional Comments: </div>
+                <textarea 
+                    rows="10" 
+                    cols={window.innerWidth/15} 
+                    value={status.log.Comments.notes} 
+                    onChange={updateNotes} 
+                    className="mt-10 greet p-10 r-10 brdr-green"
+                /><br/><br/>
+                <Link className="noUnderline color-black"
+                    to="/LogDirectory"
+                    onClick={() => handleSubmit()}>
+                    <div onClick={handleSubmit} className="button m-1 greet p-20 r-10 bg-green brdr-green">
+                        {buttonLabel}
+                    </div>
+                </Link> 
+                <Link className="noUnderline color-black"
+                    to="/LogDirectory"
+                    onClick={() => handleSave()}>
+                    <div onClick={handleSave} className="myButton m-1 greet p-20 r-10 bg-yellow brdr-yellow">
+                        save
+                    </div>
+                </Link>
+                <Link className="noUnderline"
+                    to="/LogDirectory"
+                    onClick={() => handleDelete()}>
+                    <div onClick={handleDelete} className="button m-1 greet p-20 r-10 bg-red brdr-red">
+                        delete
+                    </div>
+                </Link>
+                <PostDirectory />
+            </form>
         </Route>
     );
 }

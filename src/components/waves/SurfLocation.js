@@ -137,10 +137,10 @@ const SurfLocation = ({state, item, matches, regionMatch, tideDisplay}) => {
     const preferredClasses = 'white bold mt-5';
     return (
         <div key={getKey('loc')} /*onClick={() => this.props.editLocation()}*/>
-            <div className='r-10 m-10 p-20 bg-dkGreen'>
+            <div className='r-10 m-10 p-20 glassy'>
                     <div className='width-100-percent flexContainer'>{getStars(matches)}</div>
                     <div className='mt-20 mb-20 navBranding color-yellow'>{item.name}</div>
-                    <div className='greet color-yellow p-5 bg-dkGreen mt-15 mb-10 r-5'>{`${regionMatch} miles`}</div>
+                    <div className='greet color-yellow p-5 bg-lite mt-15 mb-10 r-5'>{`${regionMatch} miles`}</div>
                 <div className='flexContainer'>
                     <div className='flexContainer m-auto'>
                         <div className='columnRight pr-10'>
