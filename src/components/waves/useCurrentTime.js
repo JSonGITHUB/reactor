@@ -8,7 +8,7 @@ const getDaysInMonth = () => {
     return daysInMonth;
 }
 const getNextDay = (currentDate) => {
-    currentDate = currentDate;
+    currentDate = Number(currentDate)+1;
     currentDate = (currentDate<10) ? `0${currentDate}` : currentDate;
 
     if (currentDate === getDaysInMonth()) {
@@ -48,7 +48,7 @@ const useCurrentTime = () => {
     const getEndTime = `${year}${getNextMonth(currentMonth)}${getNextDay(currentDate)}%20${hours}:${minutes}`;
     const getStartTime = `${year}${month}${date}%20${startHour}:00`;
     getCurrentTime = `${year}${month}${date}%20${hours}:${minutes}`;
-    //console.log(`useCurrentTime - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
+    console.log(`useCurrentTime - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
     // eslint-disable-next-line
     const [startTime, setStartTime] = useState(getStartTime);
     // eslint-disable-next-line

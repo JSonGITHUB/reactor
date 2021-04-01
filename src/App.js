@@ -10,7 +10,7 @@ import Home from "./components/Home.js";
 import LogDirectory from "./components/waves/LogDirectory.js";
 import SurfLog from "./components/waves/LoggerFunctional.js";
 import WaveFinder from "./components/waves/WaveFinder.js";
-import SurfReports from "./components/waves/SurfReports.js";
+import Buoys from "./components/waves/SurfReports.js";
 import SlideShow from "./components/SlideShow.js";
 import PhotoBlog from "./components/PhotoBlog.js";
 import Blog from "./components/blog/Blog.js";
@@ -193,7 +193,7 @@ class App extends React.Component {
                 )}
               />
               <Route path="/Weather" render={(props) => <Weather />} />
-              <Route path="/SurfReports" component={SurfReports} />
+              <Route path="/Buoys" component={Buoys} />
               <Route path="/LogDirectory" component={LogDirectory} />
               <Route path="/Swell" component={SlideShow} />
               <Route path="/PhotoBlog" component={PhotoBlog} />

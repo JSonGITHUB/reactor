@@ -11,7 +11,7 @@ import BowlBuilder from './components/BowlBuilder.js';
 import LogDirectory from './components/waves/LogDirectoryNoRouter.js';
 import SurfLog from './components/waves/LoggerFunctional.js';
 import WaveFinder from './components/waves/WaveFinder.js';
-import SurfReports from './components/waves/SurfReports.js';                            
+import Buoys from './components/waves/SurfReports.js';                            
 import SlideShow from './components/SlideShow.js';
 import PhotoBlog from './components/PhotoBlog.js';
 import PhotoSequence from './components/PhotoSequence.js';
@@ -122,7 +122,7 @@ export default ({ props }) => {
                             distance='10'
                         />
                     </Route>
-                    <Route path='/SurfReports'><SurfReports /></Route>
+                    <Route path='/Buoys'><Buoys /></Route>
                     <Route path='/LogDirectory'><LogDirectory /></Route>
                     <Route path='/Swell'><SlideShow /></Route>
                     <Route path='/PhotoBlog'><PhotoBlog/></Route>
