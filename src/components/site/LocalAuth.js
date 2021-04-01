@@ -26,14 +26,14 @@ class LocalAuth extends React.Component {
             return (
                 <button onClick={this.onSignOutClick} className="ui google button">
                 <i className="larger middle aligned icon user" />
-                Sign Out
+                Local Sign Out
                 </button>
             );
         } else {
             return (
                 <button onClick={this.onSignInClick} className="ui google button">
                 <i className="larger middle aligned icon user" />
-                Sign In
+                Local Sign In
                 </button>
             );
         }

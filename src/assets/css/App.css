@@ -639,8 +639,11 @@ body {
 .o-0 {
   opacity: 0;
 }
+.fadeOut {
+	animation: fadeOut 1s ease;
+}
 .fadeIn {
-	animation: fadeIn .5s ease;
+	animation: fadeIn 1s ease;
 }
 .fadeInFaded {
 	animation: fadeInFaded .5s ease;
@@ -784,7 +787,7 @@ body {
 }
 .glassy {
   border: 1px solid;
-  border-color: #FFFFFF;
+  border-color: #111111;
   background-image: linear-gradient(#FFFFFF30, #00000000, #00000000, #00000000, #00000000, #00000000,#00000000, #00000000, #00000000, #00000000, #00000000, #FFFFFF30);
 }
 .glassyShopNav {
@@ -1218,9 +1221,17 @@ input.error {
   from { bottom: 0px }
   to { bottom: -250px }
 }
-@keyframes fadeIn {
+@keyframes glassy {
   from { opacity: 0 }
   to { opacity: 1 }
+}
+@keyframes fadeOut {
+    from { opacity: 1 }
+    to { opacity: .75 }
+}
+@keyframes fadeIn {
+    from { opacity: .75 }
+    to { opacity: 1 }
 }
 @keyframes fadeInFaded {
   from { opacity: .8 }

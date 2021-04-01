@@ -9,7 +9,7 @@ const NavItems = [
     'SurfLog',
     'Swell',
     'WaveFinder',
-    'SurfReports',
+    'Buoys',
     'Photos',
     'Videos',
     //'PhotoBlog',

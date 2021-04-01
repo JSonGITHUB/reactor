@@ -8,7 +8,7 @@ import thumbsDown from '../../../assets/images/ThumbsDown.png';
 const WindSelector = ({windDirection, pause, setWind, isWind, setStatus, handleWindCheck}) => {
     //console.log(`WindSelector => isWind: ${isWind}`);
     const [filterByWind, setFilterByWind] = useState(isWind);
-    const backgroundColorClass = (isWind === true) ? 'bg-lite glassy' : 'glassy';
+    const backgroundColorClass = (isWind === true) ? 'bg-lite glassy fadeInFaded' : 'bg-lite glassy fadeOutFaded';
     const windClass = () => `${backgroundColorClass} flex2Column r-10 m-5 p-15`;
     const handleWindSelection = (groupTitle, label, selected) => {
         setStatus(selected)
