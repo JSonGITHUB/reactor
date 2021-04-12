@@ -1,3 +1,4 @@
+import React from 'react';
 import swell1 from '../../assets/images/wavePrimary.png';
 import swell2 from '../../assets/images/waveSecondaryB.png';
 import N from '../../assets/images/windN.png';
@@ -60,16 +61,16 @@ const getMatchIcon = ({kind, status}) => {
     }
     if (kind === "swell1") {
         const swellDirection = status.swell1Direction;
-        return <div>
+        return <React.Fragment>
                 <img src={swell1} className={getStarMatchKind(kind)} alt={kind} /><br/>
                 {getDirectionIcon(swellDirection)}
-            </div>;
+            </React.Fragment>;
     } else if (kind === "swell2") {
         const swellDirection = status.swell2Direction;
-        return <div>
+        return <React.Fragment>
                 <img src={swell2} className={getStarMatchKind(kind)} alt={kind} /><br/>
                 {getDirectionIcon(swellDirection)}
-            </div>;
+            </React.Fragment>;
     } else if (kind === "tide") {
         return <img src={tide} className={getStarMatchKind(kind)} alt={kind} />;
     } else if (kind === "wind") {

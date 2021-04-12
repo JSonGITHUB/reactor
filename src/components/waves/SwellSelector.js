@@ -60,8 +60,8 @@ const SwellSelector = ({id, swellDirection, status, handleSwell1Selection, handl
             {getSwellIcon(id)}
             <div className="ml-5">Swell{id}</div>
             <div className='p-10'>{getSwellIndicator()}</div>
-            <div className='bg-lite r-10 mt-20 pb-15'>
-                <span className="greet ml-5 color-yellow">direction</span><br/>
+            <div className='bg-lite r-10 mt-20 pt-10 pb-15'>
+                <div className="ml-5 color-yellow pt-10">direction</div>
                 <Selector
                     groupTitle={`Swell${id}`}
                     selected={swellDirection} 
@@ -70,11 +70,11 @@ const SwellSelector = ({id, swellDirection, status, handleSwell1Selection, handl
                     items={directions}
                     onChange={(id === '1') ? handleSwell1Selection : handleSwell2Selection}
                     fontSize='20'
-                    padding='5px'
+                    padding='10px'
                     width='70%'
                 />
                 <br/>
-                <span className="greet ml-5 color-yellow">angle</span><br/>
+                <div className="ml-5 color-yellow pt-10">angle</div>
                 <Selector
                     groupTitle={`SwellAngle${id}`}
                     selected={(id === '1') ? status.swell1Angle : status.swell2Angle} 
@@ -86,7 +86,7 @@ const SwellSelector = ({id, swellDirection, status, handleSwell1Selection, handl
                     width='70%'
                 />
                 <br/>
-                <span className="greet ml-5 color-yellow">height</span><br/>
+                <div className="ml-5 color-yellow pt-10">height</div>
                 <Selector
                     groupTitle={`SwellHeight${id}`}
                     selected={(id === '1') ? status.swell1Height : status.swell2Height} 
@@ -98,7 +98,7 @@ const SwellSelector = ({id, swellDirection, status, handleSwell1Selection, handl
                     width='70%'
                 />
                 <br/>
-                <span className="greet ml-5 color-yellow">interval</span><br/>
+                <div className="ml-5 color-yellow pt-10">interval</div>
                 <Selector
                     groupTitle={`SwellInterval${id}`}
                     selected={(id === '1') ? status.swell1Interval : status.swell2Interval} 

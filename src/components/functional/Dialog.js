@@ -11,6 +11,6 @@ const Dialog = props => {
 }
 const FancyBorder = props => {
     const { children } = props;
-    return <div>{children}</div>
+    return <React.Fragment>{children}</React.Fragment>
 }
 export default Dialog;

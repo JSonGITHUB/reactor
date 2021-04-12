@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { signIn, signOut } from '../../actions/index.js';
+import { signIn, signOut } from '../../actions';
 import LocalAuth from './LocalAuth.js';
 
 class GoogleAuth extends React.Component {
@@ -77,7 +77,7 @@ class GoogleAuth extends React.Component {
   }
 
   render() {
-    return <div>{this.renderAuthButton()}</div>;
+    return <React.Fragment>{this.renderAuthButton()}</React.Fragment>;
   }
 }
 

@@ -149,14 +149,14 @@ const ScoreKeeper = () => {
                                                             </div>);
         const getWinner = (playerIndex) => (getDartTotal(players[playerIndex]) >= winner) ? ' color-neogreen shakingShaka mt-20' : '';
         const dartClass = (playerIndex) => 'flex3Column p-20 size25 bold' + getWinner(playerIndex);
-        const dartScoreboard = <div>
-                        <div className='flexContainer width-100-percent mb-20 bg-green r-10'>
+        const dartScoreboard = <React.Fragment>
+                        <div className='flexContainer glassy width-100-percent mb-20 bg-green r-10'>
                             <div className={dartClass(0)}>{players[0]}:<div className="color-yellow mt-10">{getDartTotal(players[0])}</div></div>
                             <div className='p-20 bg-yellow navBranding w-200'>vs</div>
                             <div className={dartClass(1)}>{players[1]}:<div className="color-yellow mt-10">{getDartTotal(players[1])}</div></div>
                         </div>
                         {dartScores}
-                    </div>
+                    </React.Fragment>
                     
         if (darts) return dartScoreboard
         else return renderedItems;
@@ -175,16 +175,18 @@ const ScoreKeeper = () => {
                     width={(darts) ? '98%' : '65%'}
                 />
                 {
-                    (darts) ? <div></div> : <Selector 
-                                                groupTitle="winner"  
-                                                label="i.description" 
-                                                items={winners}
-                                                selected={winner}
-                                                onChange={selectWinner}
-                                                fontSize='25'
-                                                padding='10px'
-                                                width='30%'
-                                            />
+                    (darts) 
+                    ? <React.Fragment></React.Fragment> 
+                    : <Selector 
+                        groupTitle="winner"  
+                        label="i.description" 
+                        items={winners}
+                        selected={winner}
+                        onChange={selectWinner}
+                        fontSize='25'
+                        padding='10px'
+                        width='30%'
+                    />
                 }
             </div>
             {scorecards()}

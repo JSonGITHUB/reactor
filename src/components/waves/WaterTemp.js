@@ -19,10 +19,10 @@ const WaterTemp = ({isMotionOn}) => {
         }
     },[data]);
 
-    const getCurrentTemp = () => <div>
-                            {temp}° 
-                            <span className="greet">F</span>
-                        </div>;
+    const getCurrentTemp = () => <React.Fragment>
+                                    {temp}° 
+                                    <span className="greet">F</span>
+                                </React.Fragment>;
     const percent = 'twentyfivePercent mt--70 mb--70';
     // eslint-disable-next-line
     const loading = () => <div className={percent}>
@@ -30,7 +30,7 @@ const WaterTemp = ({isMotionOn}) => {
             </div>;
 
     return <div className="r-10 m-5 p-10 bg-lite white">
-            <div>{getCurrentTemp()}</div>
+            {getCurrentTemp()}
         </div>
 }
 

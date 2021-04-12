@@ -84,7 +84,7 @@ const SurfReports = () => {
         }
     ];
     const menu = () => {
-        const classes = 'maxWidth400 m-10 r-5 glassy height500 horizontalItem';
+        const classes = 'maxWidth400 m-10 r-5 glassy height400 horizontalItem';
         const portraitButton = (item, index) => <iframe src={item.src} title={item.title} key={getKey(`index${index}`)} className={classes}></iframe>;
         const menuItems = bouys.map((item) => portraitButton(item));
         return menuItems;

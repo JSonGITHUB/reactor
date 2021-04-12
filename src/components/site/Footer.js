@@ -37,31 +37,31 @@ const Footer = ({ isSignedIn, isMotionOn, setMotion, setSignIn }) => {
         path.includes("home") || path === "/reactor" || path === "/reactor/"
         ? true
         : console.log(`path: ${path}`);
-    const bottom = isPageSurfLog || !isPageHome ? "b-collapse" : "b-0";
+    const bottom = isPageSurfLog || !isPageHome ? "b-collapse" : "bt-0";
     const footerClasses =
         bottom +
         " fixed subfooter flexContainer width-100-percent responsive height200";
     console.log(`Footer 2 =>\nisSignedIn: ${isSignedIn}\nsignedIn: ${signedIn}`);
     return (
         <div>
-        <div id="footer" className={footerClasses}>
-            <div className="flex3Column responsive bg-dkGreen m-1 color-neogreen centeredContent">
-            <GoogleAuth isSignedIn={signedIn} setSignIn={setSignIn} />
+            <div id="footer" className={footerClasses}>
+                <div className="flex3Column responsive bg-dkGreen m-1 color-neogreen centeredContent">
+                <GoogleAuth isSignedIn={signedIn} setSignIn={setSignIn} />
+                </div>
+                <div className="flex3Column responsive bg-dkYellow m-1 color-yellow">
+                {loaderTag}
+                <img className="mb-1" src={js} alt="js" />
+                <CopyrightText />
+                </div>
+                <div className="flex3Column responsive bg-dkRed m-1 color-red centeredContent">
+                <Toggle isMotionOn={isMotionOn} setMotion={setMotion} id="toggle" />
+                </div>
             </div>
-            <div className="flex3Column responsive bg-dkYellow m-1 color-yellow">
-            {loaderTag}
-            <img className="mb-1" src={js} alt="js" />
-            <CopyrightText />
+            <div className="flexContainer width-100-percent footer fixed">
+                <div className="flex3Column bg-green" />
+                <div className="flex3Column bg-yellow" />
+                <div className="flex3Column bg-red" />
             </div>
-            <div className="flex3Column responsive bg-dkRed m-1 color-red centeredContent">
-            <Toggle isMotionOn={isMotionOn} setMotion={setMotion} id="toggle" />
-            </div>
-        </div>
-        <div className="flexContainer width-100-percent footer fixed">
-            <div className="flex3Column bg-green" />
-            <div className="flex3Column bg-yellow" />
-            <div className="flex3Column bg-red" />
-        </div>
         </div>
     );
 };

@@ -4,15 +4,10 @@ import SongDetail from './SongDetail.js';
 
 const Player = () => {
     return (
-        <div>
-            <div>
-                <SongDetail />
-            </div>
-            <div>
-                <SongList />
-            </div>
-            
-        </div>
+        <React.Fragment>
+            <SongDetail />
+            <SongList />
+        </React.Fragment>
     )
 }
 

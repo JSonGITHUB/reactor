@@ -29,33 +29,33 @@ const CitySelector = () => {
             const temp_max = fahrenheit(main.temp_max).toFixed(1);
             // eslint-disable-next-line
             const feels_like = `feels like: ${fahrenheit(main.feels_like).toFixed(1)}°`;
-            const temperature = <div>
+            const temperature = <React.Fragment>
                             <div className='color-yellow bold mb-10'>temperature: </div>
                             <div className='r-5 p-10 bg-dkGreen'>
                                 {temp}°<br/>
                                 <span className='copyright'>{temp_min}°</span>
                             </div>
-                        </div>;
+                        </React.Fragment>;
             
-            const humidity = <div>
+            const humidity = <React.Fragment>
                                 <div className='color-yellow bold mb-10'>humidity: </div>
                                 <div className='r-5 p-10 bg-dkGreen'>
                                     {main.humidity}%
                                 </div>
-                            </div>
+                            </React.Fragment>
             const weather = item.weather[0];
             const mainDescription = weather.main;
             const description = weather.description;
             // eslint-disable-next-line
             const icon = weather.icon;
             const wind = item.wind;
-            const windSpeed = () => <div>
+            const windSpeed = () => <React.Fragment>
                                         {wind.speed.toFixed(0)}
                                         <span className='copyright'> mph</span>
-                                    </div>;
+                                    </React.Fragment>;
             
-            const windDirection = () => <div>{wind.deg}°</div>;
-            const windDisplay = () => <div>
+            const windDirection = () => <React.Fragment>{wind.deg}°</React.Fragment>;
+            const windDisplay = () => <React.Fragment>
                                             <div className='color-yellow bold mb-10'>wind: </div>
                                             <div className='r-5 p-10 bg-dkGreen'>
                                                 <div className="r-5 m-5 pt-5 pb-5 bg-white">
@@ -65,14 +65,14 @@ const CitySelector = () => {
                                                 {windDirection()}
                                                 {windSpeed()}
                                             </div>
-                                        </div>
-            const visibility = <div>
+                                        </React.Fragment>
+            const visibility = <React.Fragment>
                                     <div className='color-yellow bold mb-10'>visibility: </div>
                                     <div className='r-5 p-10 bg-dkGreen'>
                                         {item.visibility}
                                         <span className='copyright'> ft</span>
                                     </div>
-                            </div>;
+                            </React.Fragment>;
             const period = () => item.dt_txt;
             console.log(`period: ${period()}`)
             const momentArray = () => period().split(' ');
@@ -133,7 +133,7 @@ const CitySelector = () => {
         }
     };
     return (
-        <div>
+        <React.Fragment>
             <h1 className='navBranding color-yellow'>Search your city</h1>
             <input onKeyDown={onKeyDown} value={city} placeholder='Enter city'
                     onChange={(event) => setCity(event.target.value)} className='greet p-20 r-10 w-200 brdr-green'/>
@@ -141,7 +141,7 @@ const CitySelector = () => {
                 Check Weather
             </button>
             <div className='white shadow'>{results}</div>
-        </div>
+        </React.Fragment>
     );
 };
 

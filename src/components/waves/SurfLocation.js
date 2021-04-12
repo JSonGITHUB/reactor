@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import getKey from '../utils/KeyGenerator.js';
 import WaveUtils from '../utils/WaveUtils.js';
-import {BrowserRouter as Link} from 'react-router-dom';
+import { BrowserRouter as Router, Link} from 'react-router-dom';
 import GetMatchIcon from './GetMatchIcon.js';
 import getAngle from './GetAngle.js';
 import createLog from './CreateLog.js';
@@ -56,18 +56,18 @@ const SurfLocation = ({state, item, matches, regionMatch, tideDisplay}) => {
         details = (kind === 'tide') ? tideDisplay('star') : details;
         details = (kind === 'wind') ? getCurrentWind() : details;
         details = (kind === 'swell1') 
-            ? (<div>
+            ? (<React.Fragment>
                     <div className='bold white'>{`${swell1Height}${(swell1Height.includes('ft')) ? '' : "'"}`}</div>
                     <div className='bold white'>{swell1Angle}°</div>
                     <div className='bold white'>{swell1Interval.replace(' seconds',secondsToSec())}</div>
-                </div>) 
+                </React.Fragment>) 
             : details;
         details = (kind === 'swell2') 
-            ? (<div>
+            ? (<React.Fragment>
                     <div className='bold white'>{`${swell2Height}${(swell2Height.includes('ft')) ? '' : "'"}`}</div>
                     <div className='bold white'>{swell2Angle}°</div>
                     <div className='bold white'>{swell2Interval.replace(' seconds',secondsToSec())}</div>
-                </div>)
+                </React.Fragment>)
             : details;
         return details
     }
@@ -84,7 +84,7 @@ const SurfLocation = ({state, item, matches, regionMatch, tideDisplay}) => {
         }
     }
     const star = (matchKind) => {
-        return (<div key={getKey('star')} className='flex3Column bg-lite mr-5 ml-5 p-10 r-10'>
+        return (<div key={getKey('star')} className='flex3Column bg-lite glassy mr-5 ml-5 p-10 r-10'>
             <GetMatchIcon kind={matchKind} status={status}/>
             <div className='greet color-yellow bold'>
                 {(matchKind === 'tide') ? '' : getState(matchKind)}{getStarDetails(matchKind)}
@@ -94,17 +94,15 @@ const SurfLocation = ({state, item, matches, regionMatch, tideDisplay}) => {
     const getStars = (stars) => stars.map((currentStar) => star(currentStar));
     const logLocation = (item) => (status.logged === true) ? alert('log already exists') : createLog(item, status);
     const logLocationButton = (item) => {
-        return <div>
+        return <React.Fragment>
                     {
-                        (localStorage.getItem('edit') === 'true') ? <div>
-                                <WaveUtils state={status} item={item} logLocation={() => logLocation(item)}></WaveUtils>
-                            </div>
-                        :
-                        <div className='App button bg-yellow color-black p-10 r-10 mt-20' onClick={() => logLocation(item)}>
+                        (localStorage.getItem('edit') === 'true') 
+                        ? <WaveUtils state={status} item={item} logLocation={() => logLocation(item)}></WaveUtils>
+                        : <div className='App button bg-dkYellow color-black glassy p-10 r-10 mt-20' onClick={() => logLocation(item)}>
                             Log Session
                         </div>
                     }
-                </div>
+                </React.Fragment>
     }
     // eslint-disable-next-line
     const editLogButton = () => {
@@ -140,7 +138,7 @@ const SurfLocation = ({state, item, matches, regionMatch, tideDisplay}) => {
             <div className='r-10 m-10 p-20 glassy'>
                     <div className='width-100-percent flexContainer'>{getStars(matches)}</div>
                     <div className='mt-20 mb-20 navBranding color-yellow'>{item.name}</div>
-                    <div className='greet color-yellow p-5 bg-lite mt-15 mb-10 r-5'>{`${regionMatch} miles`}</div>
+                    <div className='greet glassy color-yellow p-5 bg-lite mt-15 mb-10 r-5'>{`${regionMatch} miles`}</div>
                 <div className='flexContainer'>
                     <div className='flexContainer m-auto'>
                         <div className='columnRight pr-10'>

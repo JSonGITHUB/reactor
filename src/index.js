@@ -14,7 +14,7 @@ import reducers from './reducers/SitewideReducers.js';
 
 
 import * as serviceWorker from './serviceWorker';
-const composeEnhancers = window._REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const store = createStore(
     reducers, 
     composeEnhancers(applyMiddleware(thunk)

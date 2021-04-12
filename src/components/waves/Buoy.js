@@ -78,9 +78,9 @@ const Buoy = ({isMotionOn}) => {
     const loading = () => <div className={percent}>
                 <Loader isMotionOn={isMotionOn}/>
             </div>;
-    return <div>
-                <div>{getCurrentBuoy()}</div>
-            </div>
+    return <React.Fragment>
+            {getCurrentBuoy()}
+        </React.Fragment>
 }
 
 export default Buoy;

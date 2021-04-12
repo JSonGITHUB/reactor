@@ -10,7 +10,7 @@ const VideoList = ({ videos, onVideoSelect }) => {
                     videoObj={video}
                 />;
     });
-    return <div>{renderedList}</div>
+    return renderedList
 };
 
 export default VideoList;

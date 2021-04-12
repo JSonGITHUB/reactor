@@ -131,19 +131,18 @@ const Tide = ({tideNow, data, time, setTide, display, isMotionOn}) => {
     const setLocalTideDirection = () => localStorage.setItem('tideDirection', status.tideDirection);
     // eslint-disable-next-line
     const fixHours = () => (time[0].hours>12) ? Number(time[0].hours - 12) : time[0].hours;
-    const narrowDisplay = <div></div>;
-    const wideDisplay = <div>from: <span className='bold'>{(status.previousTide) ? status.previousTide.toFixed(1) : ''}' </span>
+    const narrowDisplay = <React.Fragment></React.Fragment>;
+    const wideDisplay = <div>
+                            from: <span className='bold'>{(status.previousTide) ? status.previousTide.toFixed(1) : ''}' </span>
                             to: <span className='bold'>{(status.nextTide) ? status.nextTide.toFixed(1) : ''}'</span><br/>
                             <span className='bold'>{status.nextPhase} in {status.untilNextTide}</span><br/>
                             at: <span className='bold'>{status.nextTime}</span>
                         </div>
-    const starDisplay = <div></div>
+    const starDisplay = <React.Fragment></React.Fragment>
     const getTideDetails = () => {
         return <div className='greet pt-10'>
                     <div className='bold'>{String(status.tide).toUpperCase()} tide</div>
-                    <div>
-                        <span className='bold'>{getCurrentWaterLevel()}</span> ft.
-                    </div>
+                    <span className='bold'>{getCurrentWaterLevel()}</span> ft.
                     {(display === 'narrow') 
                         ? narrowDisplay 
                         : (display === 'star') 
@@ -155,15 +154,13 @@ const Tide = ({tideNow, data, time, setTide, display, isMotionOn}) => {
     const getHeight = () => {
         return <div className='greet pt-10'>
                     <div className='bold'>{String(status.tide).toUpperCase()} tide</div>
-                    <div>
-                        <span className='bold'>{getCurrentWaterLevel()}</span> ft.
-                    </div>
+                    <div className='bold'>{getCurrentWaterLevel()} ft.</div>
                 </div>
     }
     // eslint-disable-next-line
-    const tideError = () => <div>
+    const tideError = () => <React.Fragment>
             {status.nextPhase} tide after midnight, tomorrows tide info will update in {24-time[0].hours} hrs
-        </div> 
+        </React.Fragment>
     const tideClasses = () => {
         if (display === 'star') {
             return ''
@@ -187,7 +184,7 @@ const Tide = ({tideNow, data, time, setTide, display, isMotionOn}) => {
     //console.log(`tide direction: ${status.tideDirection} previous height: ${previousTide()} height: ${status.height} == ${previousTide() === Number(status.height)} \ntide: ${localStorage.getItem('tide')}`)
     //setLocalTide();
     setLocalTideDirection();
-    return <div>{getTideDisplay()}</div>
+    return getTideDisplay()
 }
 
 export default Tide;

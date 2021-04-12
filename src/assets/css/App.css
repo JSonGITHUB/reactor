@@ -7,6 +7,9 @@
 .rt-0 {
   right: 0px;
 }
+.rt-10 {
+    right: 10px;
+  }
 .lowerBorder {
   border-bottom: 1px solid #444444;
 }
@@ -154,6 +157,9 @@
 .mt--30 {
   margin-top: -30px;
 }
+.mt--20 {
+    margin-top: -20px;
+  }
 .mt--14 {
   margin-top: -14px;
 }
@@ -239,11 +245,17 @@ select {
 .mr-5 {
   margin-right: 5px;
 }
+.mr-10 {
+    margin-right: 10px;
+}
 .mr-20 {
   margin-right: 20px;
 }
 .ml-5 {
   margin-left: 5px;
+}
+.ml-10 {
+    margin-left: 10px;
 }
 .ml-15 {
   margin-left: 15px;
@@ -333,7 +345,7 @@ select {
 .height125 {
   height: 125px;
 }
-.height500 {
+.height400 {
   height: 400px;
 }
 .flexContainer {
@@ -786,8 +798,9 @@ body {
   cursor: pointer;
 }
 .glassy {
+  opacity: .95;
   border: 1px solid;
-  border-color: #111111;
+  border-color: #333333;
   background-image: linear-gradient(#FFFFFF30, #00000000, #00000000, #00000000, #00000000, #00000000,#00000000, #00000000, #00000000, #00000000, #00000000, #FFFFFF30);
 }
 .glassyShopNav {
@@ -884,9 +897,17 @@ input.error {
   border-color: red;
 }
 */
-.b-0 {
+.bt-0 {
   bottom: 0px;
   position: fixed;
+}
+.bt-10 {
+    bottom: 10px;
+    position: fixed;
+}
+.bt-20 {
+    bottom: 20px;
+    position: fixed;
 }
 .b-collapse {
   bottom: -250px;

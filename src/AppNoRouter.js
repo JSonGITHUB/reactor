@@ -13,19 +13,19 @@ import SurfLog from './components/waves/LoggerFunctional.js';
 import WaveFinder from './components/waves/WaveFinder.js';
 import Buoys from './components/waves/SurfReports.js';                            
 import SlideShow from './components/SlideShow.js';
-import PhotoBlog from './components/PhotoBlog.js';
-import PhotoSequence from './components/PhotoSequence.js';
+import PhotoBlog from './components/blog/PhotoBlog.js';
+import PhotoSequence from './components/utils/PhotoSequence.js';
 import Reducer from './components/Reducer.js';
 import Adder from './components/hooks/Adder.js';
 import Counter from './components/hooks/Counter.js';
 import Todos from './components/hooks/Todos.js';   
 import './assets/css/App.css';
-import Photos from './components/Photos.js';
-import Videos from './components/Videos.js';
-import WikiSearch from './components/WikiSearch.js';
-import Translator from './components/Translator.js';
-import Accordion from './components/Accordion.js';
-import Route from './components/Route.js';
+import Photos from './components/utils/Photos.js';
+import Videos from './components/utils/Videos.js';
+import WikiSearch from './components/utils/WikiSearch.js';
+import Translator from './components/utils/Translator.js';
+import Accordion from './components/utils/Accordion.js';
+import Route from './components/utils/Route.js';
 
 export default ({ props }) => {
 

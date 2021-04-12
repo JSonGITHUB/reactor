@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import getKey from '../utils/KeyGenerator.js';
-import { selectSong } from '../../actions/MusicActions.js';
+import { selectSong } from './MusicActions.js';
 
 const SongList = (props) => {
     console.log(`SongList => props: ${JSON.stringify(props,null,2)}`);
@@ -20,11 +20,7 @@ const SongList = (props) => {
             )
         })
     }
-    return (
-        <div>
-            {renderList()}
-        </div>
-    )
+    return renderList();
 }
 
 //const getReduxState

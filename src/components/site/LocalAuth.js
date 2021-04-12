@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { signIn, signOut } from "../../actions/index.js";
+import { signIn, signOut } from '../../actions';
 
 class LocalAuth extends React.Component {
     constructor(props) {
@@ -40,7 +40,7 @@ class LocalAuth extends React.Component {
     }
 
     render() {
-        return <div>{this.renderAuthButton()}</div>;
+        return <React.Fragment>{this.renderAuthButton()}</React.Fragment>;
     }
 }
 

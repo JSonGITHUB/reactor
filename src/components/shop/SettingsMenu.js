@@ -72,7 +72,7 @@ const SettingsMenu = ({ state, updateAisles, sortName, revert, save, restore, ge
     if (state.displaySettings) {
         return settingsMenu
     }
-    return <div></div>
+    return <React.Fragment></React.Fragment>
 }
 
 export default SettingsMenu

@@ -15,14 +15,14 @@ function FormSelector(props) {
         //select = event.target.value;
         //this.setState({select: event.target.value});
     }
-    const tagSelected = (item) => <div>
+    const tagSelected = (item) => <React.Fragment>
             <input key={item.toString().toLowerCase()} type="radio" value={item.toString()} onChange={handleChange} checked={true}/>
             <span className="description">{item.toString()}</span>
-        </div>
-    const tag = (item) => <div>
+        </React.Fragment>
+    const tag = (item) => <React.Fragment>
             <input key={item.toString().toLowerCase()} type="radio" value={item.toString()} onChange={handleChange} checked={false}/>
             <span className="description">{item.toString()}</span>
-        </div>;
+        </React.Fragment>;
     const getTag = (item, index) => (Number(index) === Number(selected)) ? tagSelected(item) : tag(item);
     const selectItems = items.map((item, index) =>
         getTag(item,index)

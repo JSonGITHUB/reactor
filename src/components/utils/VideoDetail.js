@@ -3,7 +3,7 @@ import React from 'react'
 const VideoDetail = ({ video }) => {
 
     if (!video) {
-        return <div></div>
+        return <React.Fragment></React.Fragment>
     }
 
     const videoSource = `https://www.youtube.com/embed/${video.id.videoId}`
