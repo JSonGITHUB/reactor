@@ -1,0 +1,185 @@
+{
+  "streams": [
+    {
+      "title": "Number 2s",
+      "description": "Second Time",
+      "id": 2
+    },
+    {
+      "title": "3",
+      "description": "no. 3",
+      "id": 3
+    },
+    {
+      "title": "Numero uno",
+      "description": "1st",
+      "id": 4
+    },
+    {
+      "title": "poop",
+      "description": "kaka",
+      "id": 5
+    },
+    {
+      "title": "poop",
+      "description": "poopy",
+      "id": 6
+    },
+    {
+      "title": "Ninja",
+      "description": "Cali",
+      "id": 7
+    },
+    {
+      "title": "Cali",
+      "description": "Ninja",
+      "id": 8
+    },
+    {
+      "title": "Cali",
+      "description": "A cat",
+      "id": 9
+    },
+    {
+      "title": "Ninja",
+      "description": "Big Cat",
+      "id": 10
+    },
+    {
+      "title": "Cali",
+      "description": "Little cat",
+      "id": 11
+    },
+    {
+      "title": "I created this stream",
+      "description": "made by me",
+      "userId": "107509299236388595543",
+      "id": 12
+    },
+    {
+      "title": "This Evening",
+      "description": "4:16 pm",
+      "userId": "107509299236388595543",
+      "id": 19
+    },
+    {
+      "title": "J",
+      "description": "S",
+      "userId": "107509299236388595543",
+      "id": 21
+    },
+    {
+      "title": "Evening 2",
+      "description": "5:10pm",
+      "userId": "107509299236388595543",
+      "id": 23
+    },
+    {
+      "title": "Evening 4",
+      "description": "5:13 pm",
+      "userId": "107509299236388595543",
+      "id": 25
+    },
+    {
+      "title": "Eve 3...",
+      "description": "Threee",
+      "id": 28
+    },
+    {
+      "title": "registrar",
+      "description": "Webber",
+      "userId": "107509299236388595543",
+      "id": 29
+    },
+    {
+      "title": "t",
+      "description": "2",
+      "userId": "107509299236388595543",
+      "id": 30
+    },
+    {
+      "title": "3",
+      "description": "4",
+      "userId": "107509299236388595543",
+      "id": 31
+    },
+    {
+      "title": "3",
+      "description": "4",
+      "userId": "107509299236388595543",
+      "id": 32
+    },
+    {
+      "title": "17",
+      "description": "magical",
+      "userId": "107509299236388595543",
+      "id": 33
+    },
+    {
+      "title": "4",
+      "description": "6",
+      "userId": "107509299236388595543",
+      "id": 35
+    },
+    {
+      "title": "t",
+      "description": "d",
+      "userId": "107509299236388595543",
+      "id": 36
+    },
+    {
+      "title": "title",
+      "description": "desc",
+      "userId": "107509299236388595543",
+      "id": 37
+    },
+    {
+      "title": "New Day",
+      "description": "April 9th",
+      "userId": "107509299236388595543",
+      "id": 38
+    },
+    {
+      "title": "NEWie",
+      "description": "DAYie",
+      "userId": "107509299236388595543",
+      "id": 40
+    },
+    {
+      "title": "BrowserRouter",
+      "description": "attempt 1",
+      "userId": "107509299236388595543",
+      "id": 41
+    },
+    {
+      "title": "BrowserRouter",
+      "description": "Attempt2",
+      "userId": "107509299236388595543",
+      "id": 42
+    },
+    {
+      "title": "BrowserRouter",
+      "description": "Attempt 4",
+      "userId": "107509299236388595543",
+      "id": 44
+    },
+    {
+      "title": "BrowserRouter",
+      "description": "changed go Router",
+      "userId": "107509299236388595543",
+      "id": 45
+    },
+    {
+      "title": "Router",
+      "description": "attempt 1",
+      "userId": "107509299236388595543",
+      "id": 46
+    },
+    {
+      "title": "Not fixed yet",
+      "description": "history not updating on CREATE_STREAM submit",
+      "userId": "107509299236388595543",
+      "id": 47
+    }
+  ]
+}

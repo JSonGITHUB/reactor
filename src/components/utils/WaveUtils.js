@@ -127,10 +127,10 @@ const WaveUtils = ({item, state, logLocation}) => {
         */
     }
     const menu = <div>
-                    <div className="button m-5 r-10 p-10 bg-green" onClick={() => addWave()}>
+                    <div className="glassy button m-5 r-10 p-10 bg-green " onClick={() => addWave()}>
                         Add wave
                     </div>
-                    <div className="button m-5 r-10 p-10 bg-green" onClick={() => editWave({"name":"button"})}>
+                    <div className="glassy button m-5 r-10 p-10 bg-green" onClick={() => editWave({"name":"button"})}>
                         {(localStorage.getItem("edit") === "true") ? "Save" : "Edit wave"}
                     </div>
                 </div>;

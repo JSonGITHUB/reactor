@@ -4,7 +4,7 @@ import PostDirectory from './PostDirectory.js';
 import shakaBlack from '../../assets/images/shakaBlack.png';
 import thumbsUp from '../../assets/images/ThumbsUp.png';
 import thumbsDown from '../../assets/images/ThumbsDown.png';
-import {BrowserRouter as Link} from 'react-router-dom';
+import { BrowserRouter as Router, Link} from 'react-router-dom';
 
 const LogDirectory = ({ title, message }) => {
     
@@ -42,7 +42,7 @@ const LogDirectory = ({ title, message }) => {
             const interval = Swell1.Interval.replace('seconds', 'sec');
             const condition = icons[conditionsIndex];
             const classes = 'stripe p-10 color-black m-10 r-10 bg-soft';
-            const buttonClasses = 'button p-10 r-10 m-1 width-100-percent';
+            const buttonClasses = 'button p-10 r-10 m-1 width-100-percent glassy';
 
             return (
                 <Link 
@@ -71,9 +71,8 @@ const LogDirectory = ({ title, message }) => {
                         </div>
                         <div className="pt-10 pb-10 color-light">
                             <div className='size25 pb-5 color-soft'>{year}</div>
-                            <div>{month + " " + day + suffix[Number(String(day).slice(-1))]}</div>
+                            <div className='color-soft'>{month + " " + day + suffix[Number(String(day).slice(-1))]}</div>
                         </div>
-                        <div className='horizontalStripe mt-10'></div>
                     </div>                    
                 </Link>
             )
@@ -86,7 +85,7 @@ const LogDirectory = ({ title, message }) => {
         <div className="App-content fadeIn mt--14">
             {sessions()}
             <PostDirectory/>
-            <div className="button p-20 r-5 m-20 bg-green completedSelector color-black" onClick={logSession}>Add Session</div>
+            <div className="button p-20 r-5 m-20 bg-green completedSelector color-black glassy" onClick={logSession}>Add Session</div>
         </div>
     );
 }

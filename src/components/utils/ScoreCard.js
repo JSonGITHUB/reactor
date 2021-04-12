@@ -60,7 +60,7 @@ const ScoreCard = ({ player, index, editPlayer, deletePlayer, game, updateTwoPla
                         onClick={() => setEdit(!edit)}
                     >
                         <div></div>
-                            <div className={dartClass()}>{player}</div>
+                        <div className={dartClass()}>{player}</div>
                         <div className='p-5 r-5 navBranding'>
                             {score}
                         </div>

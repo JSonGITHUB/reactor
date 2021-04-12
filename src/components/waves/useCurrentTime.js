@@ -9,12 +9,11 @@ const getDaysInMonth = () => {
 }
 const getNextDay = (currentDate) => {
     currentDate = Number(currentDate)+1;
-    currentDate = (currentDate<10) ? `0${currentDate}` : currentDate;
-
-    if (currentDate === getDaysInMonth()) {
+    if (currentDate >= getDaysInMonth()) {
         //console.log(`getNextDay =>\nnextDay: 01\nDaysInMont: ${getDaysInMonth()}`);
         return '01'
     }
+    currentDate = (currentDate<10) ? `0${currentDate}` : currentDate;
     //console.log(`getNextDay =>\nnextDay: ${currentDate}\nDaysInMont: ${getDaysInMonth()}`);
     return currentDate;
     //((currentTime.getMonth()+1 === 2) &&)

@@ -87,7 +87,7 @@ const App = () => {
   }
   
   return (
-    <div>
+    <React.Fragment>
         <ul>
         {initialTodos.map(todo => (
             <li key={todo.id} >
@@ -106,7 +106,7 @@ const App = () => {
         </ul>
         <div className="button bg-dkGreen r-5 color-neogreen b p-10 m-10" 
         onClick={() => addTask()}>Add</div>
-    </div>
+    </React.Fragment>
   );
 };
 

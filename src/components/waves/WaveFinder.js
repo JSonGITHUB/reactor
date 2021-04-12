@@ -395,7 +395,7 @@ const WaveFinder = ({
             windGusts: Number(gusts).toFixed(0)
         }));
     }
-    const getReport = () => <iframe className="Percent95 mt-5 mb-5 r-10" title="report" id="report" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224"></iframe>
+    const getReport = () => <iframe className="glassy Percent95 mt-5 mb-5 r-10" title="report" id="report" src="https://www.ndbc.noaa.gov/widgets/station_page.php?station=46224"></iframe>
     
     console.log(`currentPositionExists: ${currentPositionExists()}`)
     const swell1Match = (item) => (item.swell.indexOf(status.swell1Direction)>-1) ? true : false;
@@ -485,32 +485,30 @@ const WaveFinder = ({
     return (
         <div className="App-content fadeIn mt--30">
             <Geolocator currentPositionExists={currentPositionExists} returnCurrentPosition={updateCurrentLocation}/>
-            <div className="white pointer">   
-                <div>
-                    <div className="flexContainer">
-                        <div className="flex2Column p-5 r-10 color-orange glassy m-5">
-                            tide<br/>
-                            {tideDisplay('wide')}
-                        </div>
-                        <div className="flex2Column p-5 r-10 color-yellow glassy m-5">
-                            wind
-                            <WindDirection columns="2" setWind={setWind} height='157px'/>
-                        </div>
+            <div className="white">
+                <div className="flexContainer">
+                    <div className="flex2Column p-5 r-10 color-orange glassy m-5">
+                        tide<br/>
+                        {tideDisplay('wide')}
                     </div>
-                    <div className="flexContainer">
-                        <span className="flex2Column p-5 r-10 color-blue glassy m-5">
-                            {/*getWaterTempIcon*/}
-                            <span className="ml-2">water</span><br/>
-                            <WaterTemp/>
-                        </span>
-                        <span className="flex2Column p-5 r-10 color-white glassy m-5">
-                            {/*getAirTempIcon*/}
-                            <span className="ml-2">air</span><br/>
-                            <AirTemp/>
-                        </span>
+                    <div className="flex2Column p-5 r-10 color-yellow glassy m-5">
+                        wind
+                        <WindDirection columns="2" setWind={setWind} height='157px'/>
                     </div>
-                    <Sunset />
                 </div>
+                <div className="flexContainer">
+                    <span className="flex2Column p-5 r-10 color-blue glassy m-5">
+                        {/*getWaterTempIcon*/}
+                        <span className="ml-2">water</span><br/>
+                        <WaterTemp/>
+                    </span>
+                    <span className="flex2Column p-5 r-10 color-white glassy m-5">
+                        {/*getAirTempIcon*/}
+                        <span className="ml-2">air</span><br/>
+                        <AirTemp/>
+                    </span>
+                </div>
+                <Sunset />
                 {getReport()}
                 <div className="p-5 r-10 m-5">
                     <div className='p-10 color-yellow'>select current conditions:</div>
@@ -569,7 +567,7 @@ const WaveFinder = ({
                         {milesInput(status.distance)}
                         {starSelector(status.stars)} 
                     </div>
-                    <div className="bg-neogreen r-10 m-5 p-15 color-black bold" onClick={refresh}>Refresh</div>
+                    <div className="button bg-neogreen r-10 m-5 p-15 color-black bold glassy" onClick={refresh}>Refresh</div>
                 </div>
                 <div className="mt-10 mb-20">
                     <span className="color-neogreen bold">{(count === 1) ? `1 wave` : `${count} waves`}</span> out of {status.locations.length}<br/>

@@ -11,7 +11,7 @@ export default function Adder(props) {
     const getNextUnit = () => ((getUnitId()+1)<units.length) ? getUnitId()+1 : 0;
     
     return (
-        <div>
+        <React.Fragment>
             <div className="color-yellow p-5 r-10 flexContainer">
                 <div className="flex3Column"></div>
                 <div className="p-5 r-10 flex3Column bg-darker">
@@ -31,6 +31,6 @@ export default function Adder(props) {
                     </div>
                     <div className="flex3Column"></div>
             </div>
-        </div>
+        </React.Fragment>
     );
 }

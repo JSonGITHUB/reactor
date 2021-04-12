@@ -25,7 +25,7 @@ export default function Todos(props) {
         const makeMenu = (menu) => menu.map(item => <div className="button bg-green r-5 m-5 p-5">{item}</div>);
         const menuData = ["one","two","thee"];
         return (
-            <div>{makeMenu(menuData)}</div>
+            <React.Fragment>{makeMenu(menuData)}</React.Fragment>
         )
     }
     return (

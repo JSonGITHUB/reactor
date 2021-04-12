@@ -52,7 +52,7 @@ const Sunset = ({isMotionOn}) => {
     const surfTime = () => `${displaySurfHours()} ${displaySurfMinutes()}`;
     // eslint-disable-next-line
     const darkClass = (hoursUntilDark()<2) ? 'color-red m-5' : 'color-neogreen m-5';
-    const getCurrentSunset = () => <div>
+    const getCurrentSunset = () => <React.Fragment>
         <div className="p-5 r-10 color-yellow glassy m-5">
             <span className="ml-2">surf time remaining:</span><br/>
             <div className="r-10 m-5 p-10 bg-lite white">
@@ -80,7 +80,7 @@ const Sunset = ({isMotionOn}) => {
                 </div>
             </span>
         </div>
-    </div>;
+    </React.Fragment>;
 
     return getCurrentSunset();
 }

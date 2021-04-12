@@ -142,7 +142,7 @@ const Shop = () => {
     }
     const getItems = (context) => {
         const newAisles = (status.aisles !== undefined) ? status.aisles : aislesInit;
-        let newList = <div></div>;
+        let newList = <React.Fragment></React.Fragment>;
         //console.log(`daList => todos: ${JSON.stringify(status.todos, null,2)}`);
         const pushNewAisle = (aisle) => (newAisles.indexOf(aisle) > -1) ? '' : newAisles.push(aisle);
         status.todos.forEach((todo,index) => {

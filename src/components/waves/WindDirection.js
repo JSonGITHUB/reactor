@@ -101,14 +101,14 @@ const WindDirection = ({columns, setWind, height}) => {
     const getCurrentWind = () => {
         return (
             <div className='r-10 m-5 p-10 bg-lite white centeredContent' style={style}>
-                <div>{getWindIcon()}</div>
+                {getWindIcon()}
                 <div className='m-2'>{`${getStrength()}`}</div>
                 <div className='m-2'>{`${status.direction} ${Number(status.angle).toFixed(0)}°`}</div>
                 <div className='m-2'>{getSpeed()} <span className="greet">mph</span></div>
             </div>
         )
     }
-    return <div>{getCurrentWind()}</div>
+    return <React.Fragment>{getCurrentWind()}</React.Fragment>
 }
 
 export default WindDirection;

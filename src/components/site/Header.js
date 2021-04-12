@@ -4,7 +4,7 @@ import TextColorizer from '../utils/TextColorizer.js';
 import close from '../../assets/images/menuClose.png';
 import getKey from '../utils/KeyGenerator.js';
 // eslint-disable-next-line
-import {BrowserRouter as Router, Switch, Link, Route} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { navClassesClosed, navClassesOpen, navClassesClose } from './NavClasses.js';
 import { CgMenuGridO } from "react-icons/cg";
 import Menu from './Menu.js';
@@ -51,7 +51,7 @@ const Header = ({company, width, isMotionOn, isSignedIn, setSignIn}) => {
                                 <div className="flex3Column"></div>
                                 <div className="flex3ColumnRight">{getMenuButton}</div>
                             </div>
-                            <div className="t-50 lowerBorder bg-dark width-100-percent h-scroll p-20">
+                            <div className="t-50 lowerBorder bg-dark width-100-percent h-scroll">
                                 <Menu closeMenu={closeMenu} />
                             </div>
                         </div>
@@ -61,7 +61,7 @@ const Header = ({company, width, isMotionOn, isSignedIn, setSignIn}) => {
                                     <div className="flex3Column centeredContent pb-3"></div>
                                     <div className="flex3ColumnRight">{burgerButton}</div>
                                 </div>
-                                <div className="t-collapse lowerBorder bg-dark width-100-percent h-scroll p-20">
+                                <div className="t-collapse t-50 lowerBorder bg-dark width-100-percent h-scroll">
                                     <Menu closeMenu={closeMenu}/>
                                 </div>
                         </div>

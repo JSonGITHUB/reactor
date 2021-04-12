@@ -4,7 +4,7 @@ import RadioSelector from '../forms/FormRadio.js';
 import DatePicker from 'react-date-picker';
 import getKey from '../utils/KeyGenerator.js';
 import PostDirectory from './PostDirectory.js';
-import {BrowserRouter as Link, Route} from 'react-router-dom';
+import { BrowserRouter as Router, Link, Route} from 'react-router-dom';
 import Selector from './Selector.js';
 import group from './Group.js';
 import templateData from './TemplateData.js';
@@ -197,21 +197,21 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, i
                 <Link className="noUnderline color-black"
                     to="/LogDirectory"
                     onClick={() => handleSubmit()}>
-                    <div onClick={handleSubmit} className="button m-1 greet p-20 r-10 bg-green brdr-green">
+                    <div onClick={handleSubmit} className="button m-1 greet p-20 r-10 bg-green brdr-green glassy">
                         {buttonLabel}
                     </div>
                 </Link> 
                 <Link className="noUnderline color-black"
                     to="/LogDirectory"
                     onClick={() => handleSave()}>
-                    <div onClick={handleSave} className="myButton m-1 greet p-20 r-10 bg-yellow brdr-yellow">
+                    <div onClick={handleSave} className="myButton m-1 greet p-20 r-10 bg-yellow brdr-yellow glassy">
                         save
                     </div>
                 </Link>
                 <Link className="noUnderline"
                     to="/LogDirectory"
                     onClick={() => handleDelete()}>
-                    <div onClick={handleDelete} className="button m-1 greet p-20 r-10 bg-red brdr-red">
+                    <div onClick={handleDelete} className="button m-1 greet p-20 r-10 bg-red brdr-red glassy">
                         delete
                     </div>
                 </Link>

@@ -4,7 +4,7 @@ import TextColorizer from '../utils/TextColorizer.js';
 import menu from '../../assets/images/menuYellow.png';
 import close from '../../assets/images/menuClose.png';
 import getKey from '../utils/KeyGenerator.js';
-import {BrowserRouter as Link} from 'react-router-dom';
+import { BrowserRouter as Router, Link} from 'react-router-dom';
 import navItems from './NavItems.js';
 
 class Header extends React.Component {

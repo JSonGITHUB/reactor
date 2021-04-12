@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { fetchPostsAndUsers } from '../../actions/BlogActions.js';
+import { fetchPostsAndUsers } from './BlogActions.js';
 import UserHeader from './UserHeader.js';
 class PostList extends React.Component {
     componentDidMount() {
@@ -33,7 +33,7 @@ class PostList extends React.Component {
     }
     render() {
         //console.log(`PostList => posts: ${JSON.stringify(this.props.posts,null,2)}`)
-        return <div>{this.list()}</div>;
+        return this.list();
     }
 }
 

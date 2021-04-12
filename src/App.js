@@ -11,10 +11,10 @@ import LogDirectory from "./components/waves/LogDirectory.js";
 import SurfLog from "./components/waves/LoggerFunctional.js";
 import WaveFinder from "./components/waves/WaveFinder.js";
 import Buoys from "./components/waves/SurfReports.js";
-import SlideShow from "./components/SlideShow.js";
-import PhotoBlog from "./components/PhotoBlog.js";
+import SlideShow from "./components/utils/SlideShow.js";
+import PhotoBlog from "./components/blog/PhotoBlog.js";
 import Blog from "./components/blog/Blog.js";
-import PhotoSequence from "./components/PhotoSequence.js";
+import PhotoSequence from "./components/utils/PhotoSequence.js";
 import Reducer from "./components/Reducer.js";
 import Adder from "./components/hooks/Adder.js";
 import Counter from "./components/hooks/Counter.js";
@@ -22,17 +22,22 @@ import Todos from "./components/hooks/Todos.js";
 import "./assets/css/App.css";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import ScrollToTop from "./components/utils/ScrollToTop.js";
-import Photos from "./components/Photos.js";
-import Videos from "./components/Videos.js";
-import WikiSearch from "./components/WikiSearch.js";
-import Translator from "./components/Translator.js";
-import Accordion from "./components/Accordion.js";
+import Photos from "./components/utils/Photos.js";
+import Videos from "./components/utils/Videos.js";
+import WikiSearch from "./components/utils/WikiSearch.js";
+import Translator from "./components/translator/Translator.js";
+import Accordion from "./components/utils/Accordion.js";
 import Weather from "./components/weather/Weather.js";
 import ScoreKeeper from "./components/utils/ScoreKeeper.js";
-import Converter from "./components/Converter.js";
+import Calculator from './components/converter/Calculator.js';
 import Shop from "./components/shop/Shop.js";
 import MusicPlayer from "./components/music/Player.js";
-
+import StreamCreate from './components/streams/StreamCreate';
+import StreamEdit from './components/streams/StreamEdit';
+import StreamDelete from './components/streams/StreamDelete';
+import StreamList from './components/streams/StreamList';
+import StreamShow from './components/streams/StreamShow';
+import history from './components/utils/history.js';
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -91,7 +96,7 @@ class App extends React.Component {
     //guestlist: <SignUpDialog title="Guest List" message="Sign up" />,
     //reservation: <Reservation />,
     notes: <FormNotes className="mt-40" />,
-    tempconverter: <Converter />,
+    tempconverter: <Calculator />,
     //bowlbuilder: <BowlBuilder />,
     home: <Home />,
   };
@@ -119,7 +124,7 @@ class App extends React.Component {
     console.log(`App => this.state.isSignedIn: ${this.state.isSignedIn}`);
     return (
       //AppComponent();
-      <Router basename={this.base}>
+      <Router basename={this.base} history={history}>
         <ScrollToTop loc={window.location} />
         <div className="App">
           <Switch>
@@ -160,7 +165,7 @@ class App extends React.Component {
               <Route path="/Home" component={Home} />
               {/*<Route path="/BowlBuilder" component={BowlBuilder} />*/}
               {/*<Route path='/BowlBuilder' render={(props) => <BowlBuilder {...props} width={width} height={height} />}/>*/}
-              <Route path="/Converter" component={Converter} />
+              <Route path="/Converter" component={Calculator} />
               <Route path="/Notes" component={FormNotes} />
               {/*<Route path="/Reservation" component={Reservation} />*/}
               {/*<Route path="/GuestList" component={SignUpDialog} />*/}
@@ -224,6 +229,13 @@ class App extends React.Component {
               />
               <Route path="/Todos" render={(props) => <Todos />} />
               <Route path="/Reducer" component={Reducer} />
+              <Route path="/streams" exact component={StreamList} />
+              <Route path="/streams/" exact component={StreamList} />
+              <Route path="/streams/list" exact component={StreamList} />
+              <Route path="/streams/new" exact component={StreamCreate} />
+              <Route path="/streams/edit/:id" exact component={StreamEdit} />
+              <Route path="/streams/delete/:id" exact component={StreamDelete} />
+              <Route path="/streams/:id" exact component={StreamShow} />
             </Switch>
           </div>
           <Switch>
