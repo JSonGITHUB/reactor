@@ -5,7 +5,7 @@ import thumbsDown from '../../../assets/images/ThumbsDown.png';
 const TideSelector = ({status, pause, tideDisplay, handleTideCheck, handleTideSelection}) => {
 
     const tideClass = () => `${isTideSelected()} flex2Column r-10 m-5 p-15`;
-    const isTideSelected = () => (localStorage.getItem('isTide') === 'true') ? 'bg-lite glassy fadeInFaded' : 'bg-dark glassy fadeOutFaded';
+    const isTideSelected = () => (localStorage.getItem('isTide') === 'true') ? 'bg-lite glassy fadeInFaded' : 'glassy fadeOutFaded';
 
     return (
         <div className={tideClass()} onMouseDown={pause}>
