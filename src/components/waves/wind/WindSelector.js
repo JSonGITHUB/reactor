@@ -8,7 +8,7 @@ import thumbsDown from '../../../assets/images/ThumbsDown.png';
 const WindSelector = ({windDirection, pause, setWind, isWind, setStatus, handleWindCheck}) => {
     //console.log(`WindSelector => isWind: ${isWind}`);
     const [filterByWind, setFilterByWind] = useState(isWind);
-    const backgroundColorClass = (isWind === true) ? 'bg-lite glassy fadeInFaded' : 'bg-lite glassy fadeOutFaded';
+    const backgroundColorClass = (localStorage.getItem('isWind') === 'true') ? 'bg-lite glassy fadeInFaded' : 'bg-dark glassy fadeOutFaded';
     const windClass = () => `${backgroundColorClass} flex2Column r-10 m-5 p-15`;
     const handleWindSelection = (groupTitle, label, selected) => {
         setStatus(selected)
@@ -32,7 +32,7 @@ const WindSelector = ({windDirection, pause, setWind, isWind, setStatus, handleW
                 width='93%'
             />
             <div className="button mt-15" onClick={handleWindCheck}>
-                {(isWind === true) ? <img src={thumbsUp} alt='wind' className='p-10 r-20' /> : <img src={thumbsDown} alt='wind' className='p-10 r-20' /> }
+                {(localStorage.getItem('isWind') === 'true') ? <img src={thumbsUp} alt='wind' className='p-10 r-20' /> : <img src={thumbsDown} alt='wind' className='p-10 r-20' /> }
             </div>
         </div>
     );

@@ -54,7 +54,7 @@ const SwellSelector = ({id, swellDirection, status, handleSwell1Selection, handl
             getDirectionIcon()
         )
     }
-    const isSelected = () => ((id === '1' && status.isSwell1) || (id === '2' && status.isSwell2)) ? true : false;
+    const isSelected = () => ((id === '1' && (localStorage.getItem('isSwell1') === 'true')) || (id === '2' && (localStorage.getItem('isSwell2') === 'true'))) ? true : false;
     return (
             <div className={swellClass(id)} onMouseDown={pause}>
             {getSwellIcon(id)}

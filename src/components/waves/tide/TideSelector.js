@@ -2,10 +2,10 @@ import Selector from '../../forms/FunctionalSelector.js';
 import thumbsUp from '../../../assets/images/ThumbsUp.png';
 import thumbsDown from '../../../assets/images/ThumbsDown.png';
 
-const TideSelector = ({status, pause, tideDisplay,  handleTideCheck, handleTideSelection}) => {
+const TideSelector = ({status, pause, tideDisplay, handleTideCheck, handleTideSelection}) => {
 
     const tideClass = () => `${isTideSelected()} flex2Column r-10 m-5 p-15`;
-    const isTideSelected = () => (status.isTide === true) ? 'bg-lite glassy fadeInFaded' : 'bg-lite glassy fadeOutFaded';
+    const isTideSelected = () => (localStorage.getItem('isTide') === 'true') ? 'bg-lite glassy fadeInFaded' : 'bg-dark glassy fadeOutFaded';
 
     return (
         <div className={tideClass()} onMouseDown={pause}>
@@ -22,7 +22,7 @@ const TideSelector = ({status, pause, tideDisplay,  handleTideCheck, handleTideS
                 width='93%'
             />
             <div className="button mt-15" onClick={handleTideCheck}>
-                {(status.isTide === true) ? <img src={thumbsUp} alt='tide' className='p-10 r-20' /> : <img src={thumbsDown} alt='tide' className='p-10 r-20' /> }
+                {(localStorage.getItem('isTide') === 'true') ? <img src={thumbsUp} alt='tide' className='p-10 r-20' /> : <img src={thumbsDown} alt='tide' className='p-10 r-20' /> }
             </div>
         </div>
     );
