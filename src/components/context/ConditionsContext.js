@@ -1,14 +1,30 @@
-export default function getLocations() {
-    return [
-        {
-            "name": "C St.",
-            "latitude": 34.273282,
-            "longitude": -119.304653,
-            "swell": ["S", "SW", "W", "NW"],
-            "wind": ["E"],
-            "tide": ["low", "medium"]
-        },
-        {
+import React from 'react';
+
+export default React.createContext({
+    module: 'WaveFinder',
+    pause: true,
+    date: new Date(),
+    edit: false,
+    tide: 'low',
+    stars: 0,
+    waterTemp: '66.2',
+    swell1Height: '2.0',
+    swell1Interval: '17 seconds',
+    swell1Direction: 'SSW',
+    swell2Height: '2.0',
+    swell2Interval: '9 seconds',
+    swell2Direction: 'SSW',
+    swell1Angle: 205,
+    swell2Angle: 205,
+    windDirection: 'E',
+    distance: 20,
+    isSwell1: true,
+    isSwell2: false,
+    isTide: true,
+    isWind: false,
+    locations: [],
+    /*
+    locations: JSON.stringify([{
             "name": "HB: 17th St.",
             "latitude": 33.663781,
             "longitude": -118.013605,
@@ -383,6 +399,7 @@ export default function getLocations() {
             "swell": ["S","SW", "W"],
             "wind": ["SE"],
             "tide": ["low", "medium"]
-        }
-    ]
-}
+        }]),
+    */
+    matches: []
+});

@@ -10,20 +10,27 @@ class StreamList extends React.Component {
         this.props.fetchStreams();
     }
     streamList = () => this.props.streams.map((stream) => {
-        return (
-            <div 
-                className='item glassy r-5 p-10 flexContainer' 
-                key={stream.id}
-                onClick={() => console.log(stream.title)}
-            >
-                <i className='large middle pr-5 aligned icon camera width50px'/>
-                <div className='pl-10 flex2Column'>
-                    <Link to={`/streams/${stream.id}`} className='size25 color-lite'>{stream.title}</Link>
-                    <div className='description color-soft bold'>{stream.description}</div>
+        let match = false;
+        if (stream.userId === this.props.currentUserId) {
+            //console.log(`Stream => \n${stream.userId}\n${this.props.currentUserId}`)
+            match = true;
+        }
+        if (match) {
+            return (
+                <div 
+                    className='item glassy r-5 p-10 flexContainer' 
+                    key={stream.id}
+                    onClick={() => console.log(stream.title)}
+                >
+                    <i className='large middle pr-5 aligned icon camera width50px'/>
+                    <div className='pl-10 flex2Column'>
+                        <Link to={`/streams/${stream.id}`} className='size25 color-lite'>{stream.title}</Link>
+                        <div className='description color-soft bold'>{stream.description}</div>
+                    </div>
+                    <ButtonAdmin stream={stream} currentUserId={this.props.currentUserId}/>
                 </div>
-                <ButtonAdmin stream={stream} currentUserId={this.props.currentUserId}/>
-            </div>
-        )
+            )
+        }
     });
     renderCreate() {
         if (this.props.isSignedIn) {
