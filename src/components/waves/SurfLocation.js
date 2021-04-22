@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Link} from 'react-router-dom';
 import GetMatchIcon from './GetMatchIcon.js';
 import getAngle from './GetAngle.js';
 import createLog from './CreateLog.js';
-const SurfLocation = ({state, item, matches, regionMatch, tideDisplay}) => {
+const SurfLocation = ({state, item, matches, regionMatch, tideDisplay, updateLocations}) => {
     
     const { edit, windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, swell1Interval, swell2Interval, tide, height, stars } = state;
     // eslint-disable-next-line
@@ -97,7 +97,7 @@ const SurfLocation = ({state, item, matches, regionMatch, tideDisplay}) => {
         return <React.Fragment>
                     {
                         (localStorage.getItem('edit') === 'true') 
-                        ? <WaveUtils state={status} item={item} logLocation={() => logLocation(item)}></WaveUtils>
+                        ? <WaveUtils state={status} item={item} logLocation={() => logLocation(item)} updateLocations={updateLocations}></WaveUtils>
                         : <div className='App button bg-dkYellow color-black glassy p-10 r-10 mt-20' onClick={() => logLocation(item)}>
                             Log Session
                         </div>

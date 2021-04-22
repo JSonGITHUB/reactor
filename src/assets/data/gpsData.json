@@ -1,4 +1,13 @@
-[{
+[
+{
+    "name": "C St.",
+    "latitude": 34.273282,
+    "longitude": -119.304653,
+    "swell": ["S", "SW", "W", "NW"],
+    "wind": ["E"],
+    "tide": ["low", "medium"]
+},
+{
     "name": "HB: 17th St.",
     "latitude": 33.663781,
     "longitude": -118.013605,

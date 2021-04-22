@@ -38,6 +38,8 @@ import StreamDelete from './components/streams/StreamDelete';
 import StreamList from './components/streams/StreamList';
 import StreamShow from './components/streams/StreamShow';
 import history from './components/utils/history.js';
+import CountryContext from './components/context/CountryContext.js';
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -46,6 +48,7 @@ class App extends React.Component {
       width: window.innerWidth,
       height: window.innerHeight,
       isSignedIn: null,
+      country: 'us'
     };
     this.setIt = this.setIt.bind(this);
   }
@@ -59,6 +62,12 @@ class App extends React.Component {
     console.log(`sssetSignIn ======> ${!this.state.isSignedIn}`);
     this.setState({
       isSignedIn: !this.state.isSignedIn,
+    });
+  };
+  setCountry = (countryInitials) => {
+    console.log(`setCountry => ${countryInitials}`);
+    this.setState({
+      country: countryInitials
     });
   };
   widthChanged = () => (window.innerWidth !== this.state.width ? true : false);
@@ -239,12 +248,15 @@ class App extends React.Component {
             </Switch>
           </div>
           <Switch>
-            <Footer
-              isMotionOn={isMotionOn}
-              isSignedIn={this.state.isSignedIn}
-              setMotion={this.setMotion}
-              setSignIn={this.setSignIn}
-            />
+            <CountryContext.Provider value={this.state.country}>
+                <Footer
+                    isMotionOn={isMotionOn}
+                    isSignedIn={this.state.isSignedIn}
+                    setMotion={this.setMotion}
+                    setSignIn={this.setSignIn}
+                    setCountry={this.setCountry}
+                />
+            </CountryContext.Provider>
           </Switch>
         </div>
       </Router>

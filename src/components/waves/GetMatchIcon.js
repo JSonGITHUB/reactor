@@ -42,21 +42,21 @@ const getMatchIcon = ({kind, status}) => {
     icon = (kind === "tide") ? "tide" : icon;
     const getDirectionIcon = (direction) => {
         if (direction === "N") {
-            return <img src={N} className={getStarMatchKind(kind)} alt={kind} />;
+            return <img className='width50px' src={N} className={getStarMatchKind(kind)} alt={kind} />;
         } else if ((direction === "NE") || (direction === "NNE") || (direction === "ENE")) {
-            return <img src={NE} className={getStarMatchKind(kind)} alt={kind} />;
+            return <img className='width50px' src={NE} className={getStarMatchKind(kind)} alt={kind} />;
         } else if (direction === "E") {
-            return <img src={E} className={getStarMatchKind(kind)} alt={kind} />;
+            return <img className='width50px' src={E} className={getStarMatchKind(kind)} alt={kind} />;
         } else if ((direction === "SE") || (direction === "SSE") || (direction === "ESE")) {
-            return <img src={SE} className={getStarMatchKind(kind)} alt={kind} />;
+            return <img className='width50px' src={SE} className={getStarMatchKind(kind)} alt={kind} />;
         } else if (direction === "S") {
-            return <img src={S} className={getStarMatchKind(kind)} alt={kind} />;
+            return <img className='width50px' src={S} className={getStarMatchKind(kind)} alt={kind} />;
         } else if ((direction === "SW") || (direction === "SSW") || (direction === "WSW")) {
-            return <img src={SW} className={getStarMatchKind(kind)} alt={kind} />;
+            return <img className='width50px' src={SW} className={getStarMatchKind(kind)} alt={kind} />;
         } else if (direction === "W") {
-            return <img src={W} className={getStarMatchKind(kind)} alt={kind} />;
+            return <img className='width50px' src={W} className={getStarMatchKind(kind)} alt={kind} />;
         } else if ((direction === "NW") || (direction === "NNW") || (direction === "WNW")) {
-            return <img src={NW}  alt={kind} />;
+            return <img className='width50px' src={NW}  alt={kind} />;
         }
     }
     if (kind === "swell1") {
