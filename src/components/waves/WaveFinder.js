@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import getKey from '../utils/KeyGenerator.js';
 import WaveUtils from '../utils/WaveUtils.js';
 import calculateDistance from '../utils/CalculateDistance.js';
@@ -57,12 +57,19 @@ const WaveFinder = ({
         localStorage.setItem('locations', JSON.stringify(locations));
         return locations;
     }
+    const selectionsRef = useRef({
+        isSwell1: false,
+        isSwell2: false,
+        isTide: false,
+        isWind: false,
+        tide: getDefault('tide'),
+    });
     const [status, setStatus] = useState({
         module: 'WaveFinder',
         pause: true,
         date: new Date(),
         edit: false,
-        tide: getDefault('tide'),
+        tide: selectionsRef.current.tide,
         stars: getDefault('stars'),
         waterTemp: '66.2',
         swell1Height: '2.0',
@@ -83,10 +90,10 @@ const WaveFinder = ({
         //swell2Interval: getDefault('swell2Interval'),
         windDirection: getDefault('windDirection'),
         distance: getDefault('distance'),
-        isSwell1: false,
-        isSwell2: false,
-        isTide: (getDefault('isTide') === 'true') ? true : false,
-        isWind: (getDefault('isWind') === 'true') ? true : false,
+        isSwell1: selectionsRef.current.isSwell1,
+        isSwell2: selectionsRef.current.isSwell2,
+        isTide: selectionsRef.current.isTide,
+        isWind: selectionsRef.current.isWind,
         locations: getLocations(),
         matches: []
     });
@@ -138,31 +145,39 @@ const WaveFinder = ({
         return 0;
     }
     const handleWindCheck = () => {
-        const isWind = (!!status.isWind === true) ? false : true;
-        localStorage.setItem('isWind', isWind);
+        selectionsRef.current.isWind = !selectionsRef.current.isWind;
+        localStorage.setItem('isWind', selectionsRef.current.isWind);
         setStatus(prevState => ({
             ...prevState,
             pause: true,
-            isWind: isWind
+            isWind: selectionsRef.current.isWind
+        }));
+    }
+    const handleTideCheck = () => {
+        selectionsRef.current.isTide = !selectionsRef.current.isTide;
+        localStorage.setItem('isTide', selectionsRef.current.isTide);
+        setStatus(prevState => ({
+            ...prevState,
+            pause: true,
+            isTide: selectionsRef.current.isTide
         }));
     }
     const handleSwellCheck = (id) => {
         if (id === '1') {
-            console.log(`handleSwellCheck => swell1a: ${status.isSwell1}`);
-            localStorage.setItem('isSwell1', !status.isSwell1);
-            console.log(`handleSwellCheck => swell1b: ${!status.isSwell1}`);
+            selectionsRef.current.isSwell1 = !selectionsRef.current.isSwell1;
+            localStorage.setItem('isSwell1', selectionsRef.current.isSwell1);
             setStatus(prevState => ({
                 ...prevState,
                 pause: true,
-                isSwell1: (localStorage.getItem('isSwell1')==='true') ? true : false
+                isSwell1: selectionsRef.current.isSwell1
             }));
         } else {
-            localStorage.setItem('isSwell2', !status.isSwell2);
-            console.log(`handleSwellCheck => swell2: ${localStorage.getItem('isSwell2')}`);
+            selectionsRef.current.isSwell2 = !selectionsRef.current.isSwell2;
+            localStorage.setItem('isSwell2', selectionsRef.current.isSwell2);
             setStatus(prevState => ({
                 ...prevState,
                 pause: true,
-                isSwell2: (localStorage.getItem('isSwell2')==='true') ? true : false
+                isSwell2: selectionsRef.current.isSwell2
             }));
         }
     }
@@ -297,7 +312,7 @@ const WaveFinder = ({
         }));
     };
     const setTide = (tide) => {
-        //console.log(`WaveFinder = > setTide(${tide})`)
+        console.log(`WaveFinder = > setTide(${tide})`)
         //let currentTide = (Number(tide)>2) ? 'medium' : 'low';
         //console.log(`WaveFinder = > ${tide} currentTide(${currentTide})`)
         //currentTide = (Number(tide)>4) ? 'high' : currentTide;
@@ -349,14 +364,16 @@ const WaveFinder = ({
     */
     
     const handleTideSelection = (groupTitle, label, selected) => {
-        //console.log(`handleTideSelection =>\nselected: ${selected}`)
-        localStorage.setItem('tide', selected);
-        setTide(selected);
+        console.log(`handleTideSelection =>\nselected: ${selected}`)
+        selectionsRef.current.tide = selected;
+        console.log(`handleTideSelection =>\nselectionsRef.current.tide: ${selectionsRef.current.tide}`)
+        localStorage.setItem('tide', selectionsRef.current.tide);
+        setTide(selectionsRef.current.tide);
         setStatus(prevState => ({
             ...prevState,
             pause: true,
-            tide: selected,
-            height: getDefaultHeights(selected)
+            tide: selectionsRef.current.tide,
+            height: getDefaultHeights(selectionsRef.current.tide)
         }));
     }
     const setWind = (direction, angle, speed, gusts) => {
@@ -474,6 +491,7 @@ const WaveFinder = ({
                         setTide={setTide}
                         setWind={setWind}
                         setWindStatus={setWindStatus}
+                        handleTideCheck={handleTideCheck}
                         handleTideSelection={handleTideSelection}
                         handleWindCheck={handleWindCheck} 
                         handleSwellCheck={handleSwellCheck}

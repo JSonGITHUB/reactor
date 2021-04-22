@@ -13,6 +13,8 @@ class ConditionsSelectors extends React.Component {
         this.setWind = props.setWind;
         this.setWindStatus = props.setWindStatus;
         this.handleWindCheck = props.handleWindCheck;
+        this.handleTideCheck = props.handleTideCheck;
+        this.handleTideSelection = props.handleTideSelection;
         this.handleSwellCheck = props.handleSwellCheck;
         this.handleSwell1Selection = props.handleSwell1Selection;
         this.handleSwell2Selection = props.handleSwell2Selection;

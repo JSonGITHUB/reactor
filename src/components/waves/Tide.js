@@ -31,7 +31,7 @@ const Tide = ({tideNow, data, time, setTide, display, isMotionOn}) => {
             const tide = getCurrentTide;
             //console.log(`tideNowData => \nurl: ${tideNowLink}\nstartTime: ${startTime}\nendTime: ${endTime}`)
             //console.log(`tideData => data: ${JSON.stringify(data, null, 2)}`)
-            setTide(tide);
+            //setTide(tide);
         }
         return () => mounted = false;
     },[tideNow.data, getCurrentTide, setTide]);
