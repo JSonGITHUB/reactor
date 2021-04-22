@@ -58,10 +58,10 @@ const WaveFinder = ({
         return locations;
     }
     const selectionsRef = useRef({
-        isSwell1: localStorage.getItem('isSwell1') || false,
-        isSwell2: localStorage.getItem('isSwell2') || false,
-        isTide: localStorage.getItem('isTide') || false,
-        isWind: localStorage.getItem('isWind') || false,
+        isSwell1: (localStorage.getItem('isSwell1') === 'true') ? true : false,
+        isSwell2: (localStorage.getItem('isSwell2') === 'true') ? true : false,
+        isTide: (localStorage.getItem('isTide') === 'true') ? true : false,
+        isWind: (localStorage.getItem('isWind') === 'true') ? true : false,
         tide: getDefault('tide'),
     });
     const [status, setStatus] = useState({
