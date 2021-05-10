@@ -614,6 +614,9 @@ body {
 .color-black {
   color:#000000;
 }
+.color-dark {
+    color:#333333;
+  }
 .color-blue {
   color:#00ffee;
 }
@@ -664,9 +667,9 @@ body {
 	animation: fadeOutFaded .5s ease;
 }
 .horizontalStripe {
-	width: 100%;
-  background-color: #999999;
-  height: 1px;
+    width: 100%;
+    background-color: #999999;
+    height: 1px;
 }
 .stripe {
 	width: 100%;
@@ -909,8 +912,12 @@ input.error {
     bottom: 20px;
     position: fixed;
 }
+.bt-50 {
+    bottom: 50px;
+    position: fixed;
+}
 .b-collapse {
-  bottom: -250px;
+  bottom: -500px;
   position: fixed;
   animation: bottomCollapse 1s ease;
 }
@@ -1240,7 +1247,7 @@ input.error {
 }
 @keyframes bottomCollapse {
   from { bottom: 0px }
-  to { bottom: -250px }
+  to { bottom: -500px }
 }
 @keyframes glassy {
   from { opacity: 0 }

@@ -5,8 +5,9 @@ import { BrowserRouter as Router, Link} from 'react-router-dom';
 import GetMatchIcon from './GetMatchIcon.js';
 import getAngle from './GetAngle.js';
 import createLog from './CreateLog.js';
+
 const SurfLocation = ({state, item, matches, regionMatch, tideDisplay, updateLocations}) => {
-    
+    console.log(`SurfLocation: state: ${JSON.stringify(state, null, 2)}`)
     const { edit, windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, swell1Interval, swell2Interval, tide, height, stars } = state;
     // eslint-disable-next-line
     const [status, setStatus] = useState({
@@ -57,15 +58,15 @@ const SurfLocation = ({state, item, matches, regionMatch, tideDisplay, updateLoc
         details = (kind === 'wind') ? getCurrentWind() : details;
         details = (kind === 'swell1') 
             ? (<React.Fragment>
-                    <div className='bold white'>{`${swell1Height}${(swell1Height.includes('ft')) ? '' : "'"}`}</div>
                     <div className='bold white'>{swell1Angle}°</div>
+                    <div className='bold white'>{`${swell1Height}${(swell1Height.includes('ft')) ? '' : "'"}`}</div>
                     <div className='bold white'>{swell1Interval.replace(' seconds',secondsToSec())}</div>
                 </React.Fragment>) 
             : details;
         details = (kind === 'swell2') 
             ? (<React.Fragment>
-                    <div className='bold white'>{`${swell2Height}${(swell2Height.includes('ft')) ? '' : "'"}`}</div>
                     <div className='bold white'>{swell2Angle}°</div>
+                    <div className='bold white'>{`${swell2Height}${(swell2Height.includes('ft')) ? '' : "'"}`}</div>
                     <div className='bold white'>{swell2Interval.replace(' seconds',secondsToSec())}</div>
                 </React.Fragment>)
             : details;
@@ -97,7 +98,7 @@ const SurfLocation = ({state, item, matches, regionMatch, tideDisplay, updateLoc
         return <React.Fragment>
                     {
                         (localStorage.getItem('edit') === 'true') 
-                        ? <WaveUtils state={status} item={item} logLocation={() => logLocation(item)} updateLocations={updateLocations}></WaveUtils>
+                        ? <WaveUtils item={item} state={status} logLocation={() => logLocation(item)} updateLocations={updateLocations}></WaveUtils>
                         : <div className='App button bg-dkYellow color-black glassy p-10 r-10 mt-20' onClick={() => logLocation(item)}>
                             Log Session
                         </div>

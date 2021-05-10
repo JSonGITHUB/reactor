@@ -22,8 +22,8 @@ class StreamList extends React.Component {
                     key={stream.id}
                     onClick={() => console.log(stream.title)}
                 >
-                    <i className='large middle pr-5 aligned icon camera width50px'/>
-                    <div className='pl-10 flex2Column'>
+                    {/*<i className='large middle pr-5 aligned icon camera width50px'/>*/}
+                    <div className='pt-5 flex2Column'>
                         <Link to={`/streams/${stream.id}`} className='size25 color-lite'>{stream.title}</Link>
                         <div className='description color-soft bold'>{stream.description}</div>
                     </div>
