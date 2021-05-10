@@ -1,10 +1,19 @@
 import React, {useState} from 'react';
 
 const WaveUtils = ({item, state, logLocation, updateLocations}) => {
-    console.log(`WaveUtils => \nstate: \n${JSON.stringify(state,null,2)}\nlogLocation: \n${JSON.stringify(logLocation,null,2)}`)
+   //console.log(`WaveUtils => \nstate: \n${JSON.stringify(state,null,2)}\nlogLocation: \n${JSON.stringify(logLocation,null,2)}`)
     // eslint-disable-next-line
+    //console.log(`WaveUtils => state: ${state}`);
+    const locationsInit = [{
+        "name": "Seaside Reef",
+        "latitude": 33.001613,
+        "longitude": -117.278393,
+        "swell": ["NW","W"],
+        "wind": ["E"],
+        "tide": ["low", "medium"]
+    }];
     const [status, setStatus] = useState(state);
-    const [locations, setLocations] = useState(state.locations)
+    const [locations, setLocations] = useState((status !== undefined) ? status.locations : locationsInit)
     const addWave = () => {
         const swells = [];
         const winds = [];
@@ -158,6 +167,6 @@ const WaveUtils = ({item, state, logLocation, updateLocations}) => {
                     </div>
                 </div>
     //console.log(`status.module: ${status.module}`)
-    return (status.module === 'WaveFinder') ? menu : itemContainer;
+    return ((status !== undefined && status.module) === 'WaveFinder') ? menu : itemContainer;
 }
 export default WaveUtils
