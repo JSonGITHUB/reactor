@@ -6,7 +6,7 @@ import getWindMPH from './GetWindMPH.js';
 import getSurface from './GetSurface.js';
 const createLog = (item, status) => {
     const posts = new PostDirectory();
-    console.log(`SurfLocation => createLog`);
+    console.log(`createLog =>\nstatus: ${JSON.stringify(status, null, 2)}`);
     localStorage.setItem('spot', item.name);
     const goToLog = () => window.location.pathname = `/reactor/SurfLog`;
     const generateNewLogId = () => {
@@ -88,7 +88,7 @@ const createLog = (item, status) => {
             Conditions: 'Good'
         },
         Comments: {
-            'notes': getNotes()
+            'notes': getNotes(status)
         }
     }
     //return logObj;

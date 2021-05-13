@@ -2,7 +2,8 @@ import getWaveHeight from './GetWaveHeight.js';
 import getWindOrientation from './GetWindOrientation.js';
 import getWindMPH from './GetWindMPH.js';
 import getSurface from './GetSurface.js';
-const getNotes = ({status}) => {
+const getNotes = (status) => {
+    console.log(`getNotes => status: ${JSON.stringify(status, null, 2)}`)
     const { height, tide, windDirection, windGusts, swell1Height, swell1Angle, swell1Direction, swell1Interval } = status;
     let notes = `${swell1Height}(${getWaveHeight(swell1Height)})`;
     notes = `${notes} out of the ${swell1Direction}`;

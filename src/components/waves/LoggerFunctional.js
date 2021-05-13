@@ -77,6 +77,7 @@ const Logger = ({logId, location}) => {
                             </div>
                             <div className="flex3Column"></div>
                         </div>;
+                        
     if (status.isLoaded) {
         appInterface = <div className="App-content fadeIn">
             <div className="flex3Column"></div>

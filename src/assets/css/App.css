@@ -9,7 +9,13 @@
 }
 .rt-10 {
     right: 10px;
-  }
+}
+.rt-100 {
+    right: 100px;
+}
+.rt-150 {
+    right: 150px;
+}
 .lowerBorder {
   border-bottom: 1px solid #444444;
 }
@@ -223,6 +229,18 @@ select {
 .width-auto {
   width: auto;
 }
+.m-10Percent {
+    margin-left: 10%;
+    margin-right: 10%;
+}
+.m-25Percent {
+    margin-left: 25%;
+    margin-right: 25%;
+}
+.m-50Percent {
+    margin-left: 50%;
+    margin-right: 50%;
+}
 .ml-auto {
   margin-left: auto;
 }
@@ -268,6 +286,9 @@ select {
 }
 .copyright {
   font-size: 9px;
+}
+.icon {
+    height: 25px;
 }
 .i {
   font-style: italic;
@@ -332,6 +353,9 @@ select {
   font-weight: bold;
   font-size: 30px;
 }
+.leftJustify {
+    justify-content: left;
+}
 .subHeader {
   margin-top:5px;
   margin-bottom:5px;
@@ -366,6 +390,13 @@ select {
   min-height: 2px;
   flex: 3;
 }
+.flexOneFourthColumnRight {
+    justify-content:right;
+    height: auto;
+    margin:auto;
+    min-height: 2px;
+    flex: 3;
+  }
 .flexTwoFourthColumn {
   height: auto;
   margin:auto;
@@ -379,6 +410,13 @@ select {
   min-height: 2px;
   flex: 9;
 }
+.flexThreeFourthColumnLeft {
+    justify-content: left;
+    height: auto;
+    margin:auto;
+    min-height: 2px;
+    flex: 9;
+  }
 .flexThreeFourthColumnLeft {
   justify-content: left;
   align-items: left;
@@ -431,6 +469,30 @@ select {
 }
 .m-auto {
   margin:auto;
+}
+.margin0Auto {
+    margin: 0 auto;
+}
+.grid {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    grid-template-rows: auto 1fr;
+  }
+.article {
+    display: grid;
+    grid-template-columns:
+        minmax(2rem, 1fr)
+        minmax(auto, 65ch)
+        minmax(2rem, 1fr);
+}
+/* sets all children in the middle of the screen */
+.article > * {
+    grid-column: 2;
+}
+/* overrides the above for images to be wider, but centered */
+.article > img {
+    grid-column: 1 / 4;
 }
 .flex3ColumnLeft {
   justify-content: left;
@@ -908,6 +970,10 @@ input.error {
     bottom: 10px;
     position: fixed;
 }
+.bt-15 {
+    bottom: 15px;
+    position: fixed;
+}
 .bt-20 {
     bottom: 20px;
     position: fixed;
@@ -1152,6 +1218,7 @@ input.error {
 .z3 {
   z-index:8995;
 }
+
 .shaka {
   cursor: pointer;
   margin-left: 1px;

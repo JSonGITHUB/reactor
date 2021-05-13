@@ -11,7 +11,7 @@ import templateData from './TemplateData.js';
 import generateNewLogId from './GenerateLogId.js';
 
 const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, items }) => {
-
+    console.log(`LogEntry => logId: ${logId}`)
     const posts = new PostDirectory();
     const logIdExists = () => (logId !== undefined && logId !== "" ) ? false : true;
     const localLastPostIdExists = () => (localStorage.getItem("lastPostId") === null) ? false : true;
@@ -100,20 +100,59 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, i
     const getItems = () => items;
     const selected = (item, groupTitle) => ((item.selections.indexOf(status.log[groupTitle][item.description])) !== -1) ? true : false;
     const getWaveHeight = (height) => {
+        console.log(`getWaveHeight(1) => height: ${height}`)
+        let newHeight = height;
         const heights = ['knee high', 'waist high', 'chest high', 'shoulder high', 'head high', 'over head', 'foot over head', '2 feet over head' ,'double over head', 'triple over head']
-        const size = ['1ft', '2ft', '3ft', '4ft', '5ft', '6ft', '7ft', '8ft' ,'9ft', '10ft']
-        height = heights.indexOf(height);     
-        height = size[height];
-        return height;     
+        const size = ['1ft', '2ft', '3ft', '4ft', '5ft', '6ft', '7ft', '8ft' ,'9ft', '10ft'];
+        const decimal = ['1.0', '2.0', '3.0', '4.0', '5.0', '6.0', '7.0', '8.0' ,'9.0', '10.0']
+        newHeight = (size.indexOf(height)<0) ? height : size[heights.indexOf(height)];
+        console.log(`getWaveHeight(2) => height: ${height}`);
+        newHeight = (decimal.indexOf(height)<0) ? height : size[decimal.indexOf(height)];
+        console.log(`getWaveHeight(3) => height: ${newHeight}`)
+        return newHeight;     
+    }
+    const getTide = (height) => {
+        const tide = Number(height.replace('ft','')).toFixed(0) + 'ft';
+        console.log(`getTide => height: ${tide}`);
+        return tide;
     }
     const defaultSelection = (item, groupTitle) => {
+        console.log(`defaultSelection => status.log: ${JSON.stringify(status.log,null,2)}`);
         let selected = status.log[groupTitle][item.description];
+        console.log(`defaultSelection => \nselected: ${selected}\ngroupTitle: ${groupTitle}\nitem.description: ${item.description}`);
+        
         //selected = getWaveSize(selected);
-        if (item.description === 'Height' && (groupTitle === 'Swell1' || groupTitle === 'Swell2')) {
+        if ((item.description === 'Height' && (groupTitle === 'Swell1' || groupTitle === 'Swell2')) || (item.description === 'Report' && groupTitle === 'Surf')) {
             selected = getWaveHeight(selected);
         }
-        const selectedIndex = item.selections.indexOf(String(selected));
-        console.log(`defaultSelection => ${item.description}: ${groupTitle} - ${selected}\nselections:${item.selections[selectedIndex]}`);
+        if (item.description === 'Phase' && groupTitle === 'Tide') {
+            console.log(`defaultSelection => Tide(1) => Phase: ${selected}`)
+            if (selected === 'high' || selected === 'medium' || selected === 'low') {
+            } else if (selected > 3) {
+                selected = 'high';
+            } else if (selected > 2) {
+                selected = 'medium';
+            } else {
+                selected = 'low';
+            }
+            //selected = getTide(selected);
+            console.log(`defaultSelection => Tide(2) => Phase: ${selected}`)
+        }
+        if (item.description === 'Height' && groupTitle === 'Tide') {
+            if (selected === 'NaNft') {
+                selected = status.log[groupTitle]['Phase'];
+            }
+            console.log(`defaultSelection => Tide => Height: ${selected}`)
+            selected = getTide(selected);
+        }
+        if (selected === ('High => Low' || 'Low => High')) {
+            selected = 'medium';
+        }
+        let selectedIndex = item.selections.indexOf(String(selected).toLocaleLowerCase());
+        if (item.selections[selectedIndex] === undefined) {
+            selectedIndex = item.selections.indexOf(String(selected));
+        }
+        console.log(`defaultSelection => ${item.description}: ${groupTitle} - ${selected}\nselections:${item.selections[selectedIndex]}\nitem: ${JSON.stringify(item, null, 2)}`);
         return selectedIndex; 
     }
     const radioItems = (item, groupTitle) => {
@@ -143,7 +182,9 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, i
     const groups = () => getItems().map((item) => {
         const headerClasses = 'subHeader color-yellow p-20';
         const selectorClasses = 'greet p-vw flex3Column';
-        const groupClasses = (window.innerWidth < 500) ? "r-vw" : "flexContainer width-100-percent r-vw";
+        const groupClasses = (window.innerWidth < 500) 
+            ? "r-vw bg-dark r-10" 
+            : "flexContainer width-100-percent r-vw bg-dark r-10";
         const description = item.description;
         //console.log(`description: ${description}`)
        return <div key={getKey("groupConainer")}>
@@ -182,7 +223,7 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, i
     
     return (
         <Route>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className='bg-lite p-20 m-5 r-10'>
                 {dateEntry()}
                 {categories()}
                 <br/>
@@ -193,7 +234,8 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, i
                     value={status.log.Comments.notes} 
                     onChange={updateNotes} 
                     className="mt-10 greet p-10 r-10 brdr-green"
-                /><br/><br/>
+                />
+                <PostDirectory />
                 <Link className="noUnderline color-black"
                     to="/LogDirectory"
                     onClick={() => handleSubmit()}>
@@ -211,11 +253,10 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, i
                 <Link className="noUnderline"
                     to="/LogDirectory"
                     onClick={() => handleDelete()}>
-                    <div onClick={handleDelete} className="button m-1 greet p-20 r-10 bg-red brdr-red glassy">
+                    <div onClick={handleDelete} className="button m-1 color-black greet p-20 r-10 bg-red brdr-red glassy">
                         delete
                     </div>
                 </Link>
-                <PostDirectory />
             </form>
         </Route>
     );
