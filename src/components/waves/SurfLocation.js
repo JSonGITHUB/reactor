@@ -7,7 +7,7 @@ import getAngle from './GetAngle.js';
 import createLog from './CreateLog.js';
 
 const SurfLocation = ({state, item, matches, regionMatch, tideDisplay, updateLocations}) => {
-    console.log(`SurfLocation: state: ${JSON.stringify(state, null, 2)}`)
+    //console.log(`SurfLocation: state: ${JSON.stringify(state, null, 2)}`)
     const { edit, windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, swell1Interval, swell2Interval, tide, height, stars } = state;
     // eslint-disable-next-line
     const [status, setStatus] = useState({
@@ -26,7 +26,7 @@ const SurfLocation = ({state, item, matches, regionMatch, tideDisplay, updateLoc
         swell1Interval: swell1Interval,
         swell2Interval: swell2Interval,
         tide: tide, 
-        height: height,
+        height: swell1Height,
         stars: stars
     });
     const secondsToSec = () => 'sec';

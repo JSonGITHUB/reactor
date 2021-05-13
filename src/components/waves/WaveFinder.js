@@ -8,6 +8,7 @@ import Tide from './Tide.js';
 import ConditionsDashboard from './ConditionsDashboard.js';
 // eslint-disable-next-line
 import tide from '../../assets/images/tide.png';
+import GetMatchIcon from './GetMatchIcon.js';
 import SurfLocation from './SurfLocation.js';
 import locations from './Locations.js';
 import directionObject from './DirectionObject.js';
@@ -100,9 +101,9 @@ const WaveFinder = () => {
         }
     },[]);
     
-    useEffect(() => {		
+    useEffect(() => {
         setScroll();
-    },[status.longitude]);
+    },[]);
 
     const currentPositionExists = () => (status.longitude) ? true : false;
     const updateCurrentLocation = (longitude, latitude) => {
@@ -428,10 +429,27 @@ const WaveFinder = () => {
     const setScroll = () => {
         const body = document.body; // For Safari
         const html = document.documentElement; // Chrome, Firefox, IE and Opera places the overflow at the html level, unless else is specified. Therefore, we use the documentElement property for these browsers
+        const height = document.getElementById('north').clientHeight;
         body.scrollLeft = 0;
-        body.scrollTop = localStorage.getItem('scrollIndex')*446;
+        body.scrollTop = height+1700;
         html.scrollLeft = 0;
-        html.scrollTop = localStorage.getItem('scrollIndex')*446;
+        html.scrollTop = height+1700;
+    }
+    const currentConditions = () => {
+        const body = document.body; // For Safari
+        const html = document.documentElement; // Chrome, Firefox, IE and Opera places the overflow at the html level, unless else is specified. Therefore, we use the documentElement property for these browsers
+        body.scrollLeft = 0;
+        body.scrollTop = 25;
+        html.scrollLeft = 0;
+        html.scrollTop = 25;
+    }
+    const conditionsEntry = () => {
+        const body = document.body; // For Safari
+        const html = document.documentElement; // Chrome, Firefox, IE and Opera places the overflow at the html level, unless else is specified. Therefore, we use the documentElement property for these browsers
+        body.scrollLeft = 0;
+        body.scrollTop = 740;
+        html.scrollLeft = 0;
+        html.scrollTop = 740;
     }
     const sortedNorthSpots = () => {
         const latitude = (status.latitude !== undefined) ? status.latitude : 33.079940;
@@ -483,7 +501,7 @@ const WaveFinder = () => {
         //console.log(`sortedSpots =>\nsortedSouth: ${JSON.stringify(south,null,2)}`)
         const sortedLocations = sorted.map((item) => getMatchingLocation(item));
         return <div>
-                <div className='p-10 r-10 glassy mb-1'>
+                <div id='north' className='p-10 r-10 glassy mb-1'>
                     {northLocations}<br/>north
                 </div>
                 <div className='p-10 r-10 glassy'>
@@ -503,6 +521,59 @@ const WaveFinder = () => {
             pause: true,
             windDirection: selected
         }));
+    }
+    const tideButton = () => {
+        return (
+            <div className='p-10 button r-5 color-lite bold bg-green glassy m-1'>
+                <GetMatchIcon kind='tide' status={status}/>
+                Tide
+            </div>
+        )
+    }
+    const windButton = () => {
+        return (
+            <div className='p-10 button r-5 color-lite bold bg-green glassy m-1'>
+                <GetMatchIcon kind='wind' status={status}/>
+                Wind
+            </div>
+        )
+    }
+    const swell1Button = () => {
+        return (
+            <div className='p-10 button r-5 color-lite bold bg-green glassy m-1'>
+                <GetMatchIcon kind='swell1' status={status}/>
+                Swell1
+            </div>
+        )
+    }
+    const swell2Button = () => {
+        return (
+            <div className='p-10 button r-5 color-lite bold bg-green glassy m-1'>
+                <GetMatchIcon kind='swell2' status={status}/>
+                Swell2
+            </div>
+        )
+    }
+    const repositionButton = () => {
+        return (
+            <div onClick={() => setScroll()} className='p-10 button r-5 color-lite bold bg-green glassy m-1'>
+                Reposition
+            </div>
+        )
+    }
+    const conditionsButton = () => {
+        return (
+            <div onClick={() => conditionsEntry()} className='p-10 button r-5 color-lite bold bg-green glassy m-1'>
+                Conditions
+            </div>
+        )
+    }
+    const currentButton = () => {
+        return (
+            <div onClick={() => currentConditions()} className='p-10 button r-5 color-lite bold bg-green glassy m-1'>
+                Current
+            </div>
+        )
     }
     return (
         <div className='App-content fadeIn mt--30'>
@@ -536,13 +607,26 @@ const WaveFinder = () => {
                     />
                 </ConditionsContext.Provider>
                 <div className='mt-10 mb-20'>
-                    <div className='p-5'><span className='color-neogreen bold'>{(getCount() === 1) ? `1 wave` : `${count} waves`}</span> out of {locations().length}</div>
-                    <div className='p-5'>are in a <span className='color-neogreen bold'>{status.distance}</span> mile radius</div>
-                    <div className='p-5'>and prefer <span className='color-neogreen bold'>{status.swell1Direction} </span>and <span className='color-orange bold '>{status.swell2Direction} </span>swell </div>
-                    <div className='p-5'>with a <span className='color-neogreen bold'>{status.height}' {status.tide} </span>tide:</div>
+                    <div className='m-5'><span className='color-neogreen bold'>{(getCount() === 1) ? `1 wave` : `${count} waves`}</span> out of {locations().length}</div>
+                    <div className='m-5'>are in a <span className='color-neogreen bold'>{status.distance}</span> mile radius</div>
+                    <div className='m-5'>and prefer <span className='color-neogreen bold'>{status.swell1Direction} </span>and <span className='color-orange bold '>{status.swell2Direction} </span>swell </div>
+                    <div className='m-5'>with a <span className='color-neogreen bold'>{status.height}' {status.tide} </span>tide:</div>
                 </div>
                 {sortedSpots()}
                 <WaveUtils status={status} item={status} updateLocations={updateLocations}></WaveUtils>
+                <div className='flexContainer bt-15'>
+                    <div className='flex3Column'>{currentButton()}</div>
+                    <div className='flex3Column'>{conditionsButton()}</div>
+                    <div className='flex3Column'>{repositionButton()}</div>
+                </div>
+                {/*
+                    <div className='flexContainer t-50 mt-10'>
+                        <div className='flex4Column'>{swell1Button()}</div>
+                        <div className='flex4Column'>{swell2Button()}</div>
+                        <div className='flex4Column'>{tideButton()}</div>
+                        <div className='flex4Column'>{windButton()}</div>
+                    </div>
+                */}
             </div> 
         </div>  
     )

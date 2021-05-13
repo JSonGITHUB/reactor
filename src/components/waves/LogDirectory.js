@@ -41,12 +41,13 @@ const LogDirectory = ({ title, message }) => {
             const angle = Swell1.Angle;
             const interval = Swell1.Interval.replace('seconds', 'sec');
             const condition = icons[conditionsIndex];
-            const classes = 'stripe p-10 color-black m-10 r-10 bg-soft';
+            const classes = 'stripe color-black m-1 r-10 flexContainer m-10Percent';
             const buttonClasses = 'button p-10 r-10 m-1 width-100-percent glassy';
 
             return (
                 <Link 
-                    className="noUnderline mobileFull m-1" 
+                    onClick={() => sessionClick(item, spot)}
+                    className="noUnderline mobileFull m-1 stripe color-black m-1 r-10" 
                     key={getKey("link")} 
                     to={{
                         pathname: '/SurfLog', 
@@ -56,24 +57,23 @@ const LogDirectory = ({ title, message }) => {
                         }
                     }}
                 >
-                    <div className={buttonClasses} onClick={() => sessionClick(item, spot)}>
-                        <div className='flexContainer'>
-                            <div className={classes}>
-                                <img src={condition} alt={conditionDescription} className='shaka m-5' />
-                                <div className='size20'>{spot}</div>
-                                <div className='description'>
-                                    <span>{height}</span>
-                                    <span className='ml-5'>{direction}</span>
-                                    <span className='ml-5'>{angle}</span>
-                                    <span className='ml-5'>{interval}</span>
-                                </div>
+                    <div className='flexContainer m-25Percent'>
+                        <div className='flexOneFourthColumnRight p-10'>
+                            <img src={condition} alt={conditionDescription} className='icon r-5' />
+                        </div>
+                        <div className='flexThreeFourthColumnLeft m-10'>
+                            <div className='description'>
+                                {month + " " + day + suffix[Number(String(day).slice(-1))]} {year}
+                            </div>
+                            <div className='size20'>{spot}</div>
+                            <div className='description'>
+                                <span>{height}</span>
+                                <span className='ml-5'>{direction}</span>
+                                <span className='ml-5'>{angle}</span>
+                                <span className='ml-5'>{interval}</span>
                             </div>
                         </div>
-                        <div className="pt-10 pb-10 color-light">
-                            <div className='size25 pb-5 color-soft'>{year}</div>
-                            <div className='color-soft'>{month + " " + day + suffix[Number(String(day).slice(-1))]}</div>
-                        </div>
-                    </div>                    
+                    </div>
                 </Link>
             )
         }

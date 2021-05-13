@@ -93,7 +93,7 @@ class PostDirectory extends React.Component {
      getStorageItem = (id) => localStorage.getItem(id)
      getLastItem = () => (localStorage.getItem(this.getLastId()) === null) ? JSON.parse(this.getStorageItem(this.get2ndToLastId())) : JSON.parse(this.getStorageItem(this.getLastId()));
      render() {      
-             return <p>Count: {this.state.postDirectory.length}</p> 
+             return <div className='p-20'>Count: {this.state.postDirectory.length}</div> 
      }
      
  }
