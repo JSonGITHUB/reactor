@@ -11,7 +11,7 @@
     "cheerio": "^1.0.0-rc.3",
     "formik": "^2.1.5",
     "gh-pages": "^2.2.0",
-    "got": "^10.4.0",
+    "got": "^11.8.5",
     "mobx": "^5.15.6",
     "mobx-react": "^6.2.5",
     "querystring": "^0.2.0",
