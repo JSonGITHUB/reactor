@@ -9,13 +9,13 @@ const NavItems = [
     'SurfLog',
     'Swell',
     'WaveFinder',
-    'SurfReports',
-    'Photos',
-    'Videos',
+    //'SurfReports',
+    //'Photos',
+    //'Videos',
     //'PhotoBlog',
     //'PhotoSequence',
     //'Search'
     'WikiSearch',
-    'Translator'
+    //'Translator'
 ];
 export default NavItems
