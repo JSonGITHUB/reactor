@@ -53,12 +53,14 @@ const WaveFinder = ({
     const getSwell2Direction = () => localStorage.getItem("swell2Direction") ? localStorage.getItem("swell2Direction") : "SSW";
     console.log(`isWind: ${getDefault("isWind")}`)
     const getLocations = () => getLocalLocations() || defaultLocations();
+    console.log(`1~~~~~~~~~~~~~~~~`)
     const getLocalLocations = () => (localStorage.getItem('locations')) ? JSON.parse(localStorage.getItem('locations')) : false;
+    console.log(`2~~~~~~~~~~~~~~~~`)
     const defaultLocations = () => {
         localStorage.setItem('locations', JSON.stringify(locations));
         return locations;
     }
-
+    console.log(`3~~~~~~~~~~~~~~~~`)
     const [status, setStatus] = useState({
         module: 'WaveFinder',
         pause: false,
@@ -91,6 +93,7 @@ const WaveFinder = ({
         isWind: (getDefault("isWind") === "true") ? true : false,
         locations: getLocations()
     });
+    console.log(`4~~~~~~~~~~~~~~~~`)
     /*
     componentDidMount() {
         
