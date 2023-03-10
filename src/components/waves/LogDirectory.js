@@ -19,7 +19,67 @@ const LogDirectory = ({ title, message }) => {
     const suffix = ["th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th"];
     const icons = [shakaBlack, thumbsUp, thumbsDown];
     const conditions = ["Firing", "Good", "Bad"];
-    const items = () => JSON.parse(localStorage.getItem("postDirectory"));
+    const getPostDirectory = () => {
+        const report = {  
+            "Day": {
+                "Date": "2020-01-17T08:00:00.000Z",
+                "Day": 17,
+                "Month": 1,
+                "Year": 2023
+            },
+            "Location": {
+                "Break": "Secret Spot"
+            },
+            "Surf": {
+                "Height": "couple of feet over head",
+                "Report": "8ft",
+                "Shape": "speedy runners"
+            },
+            "Swell1": {
+                "Height": "8ft",
+                "Direction": "NW",
+                "Angle": "290",
+                "Interval": "17 seconds"
+            },
+            "Swell2": {
+                "Height": "1ft",
+                "Direction": "NW",
+                "Angle": "270",
+                "Interval": "8 seconds"
+            },
+            "Swell3": {
+                "Height": "1ft",
+                "Direction": "NW",
+                "Angle": "180",
+                "Interval": "6 seconds"
+            },
+            "Tide": {
+                "Phase": "High => Low",
+                "Height": "1ft"
+            },
+            "Wind": {
+                "Direction": "NW",
+                "Orientation": "sideshore => lefts",
+                "MPH": "8mph",
+                "Surface": "textured"
+            },
+            "Conditions": {
+                "Conditions": "Firing"
+            },
+            "Comments": {
+                "notes": "Only 4 other guys out, uncrowded perfection!"
+            }
+        };
+                            
+        const isSavedPostDirectory = (localStorage.getItem("postDirectory")) ? true : false;
+                            
+        const postDirectory = (isSavedPostDirectory) ? localStorage.getItem("postDirectory") : '["ThuMar0920234:42:07PM"]';
+        localStorage.setItem("ThuMar0920234:42:07PM", JSON.stringify(report))                 
+        localStorage.setItem("postDirectory", postDirectory)
+        
+        return postDirectory
+    }
+    const items = () => JSON.parse(getPostDirectory());
     
     const sessions = () => items().map((item) => {
         const itemObj = JSON.parse(localStorage.getItem(item));
