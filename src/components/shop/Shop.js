@@ -6,6 +6,7 @@ import { BsFillGearFill } from "react-icons/bs";
 import Selected from '../../assets/images/cart.png';
 import Select from '../../assets/images/addToCart.png';
 import SettingsMenu from './SettingsMenu.js';
+import ProductEntry from './ProductEntry.js';
 import SearchBar from '../utils/SearchBar';
 import '../../assets/css/shop.css';
 import debounceType from '../utils/DebouncerType.js';
@@ -47,6 +48,8 @@ const Shop = () => {
     }
     const [ status, setStatus ] = useState({
         displaySettings: false,
+        displayProductEntry: false,
+        search: '',
         list: <div></div>,
         fontSize: 25,
         tax: 8.75,
@@ -60,7 +63,8 @@ const Shop = () => {
         taxTotal: 0, 
         items: 0, 
         totalItems: 0,
-        sortByIndex: true
+        sortByIndex: true,
+        item: ''
     });
     //console.log(`todos: ${JSON.stringify(status.todos, null, 2)}`)
     localStorage.setItem('vueTodosSaved', JSON.stringify(status.todos));
@@ -154,7 +158,8 @@ const Shop = () => {
             //console.log(`vueTodosSaved(4): ${JSON.stringify(JSON.parse(localStorage.getItem('vueTodosSaved')),null,2)}`)
             updatedTodos.splice(index, 1);
         } else if (selectedAisle === 'PRICE') {
-            updatedTodos[index].price = Number(prompt('Enter price:', '')).toFixed(2);
+            const newPrice = prompt('Enter price:', updatedTodos[index].price);
+            updatedTodos[index].price = (newPrice !== null) ? Number(newPrice).toFixed(2) : updatedTodos[index].price;
             updatedRetrievedData.forEach(item => {
                 if (item.title === updatedTodos[index].title) {
                     item.price = updatedTodos[index].price;
@@ -166,7 +171,9 @@ const Shop = () => {
         } else if (selectedAisle === 'EDIT') {
             let updatedOgTitle = status.ogTitle;
             updatedOgTitle = updatedTodos[index].title;
-            updatedTodos[index].title = prompt('Enter new label:', updatedTodos[index].title);
+            
+            const newLabel = prompt('Enter new label:', updatedTodos[index].title);
+            updatedTodos[index].title = (newLabel !== null) ? newLabel : updatedTodos[index].title;
             updatedRetrievedData.forEach(item => {
                 if (item.title === updatedOgTitle) {
                     item.title = updatedTodos[index].title;
@@ -180,7 +187,10 @@ const Shop = () => {
         } else {
             newAisles = status.aisles || aislesInit;
             if (selectedAisle === 'ADD INDEX') {
-                selectedAisle = prompt('Enter aisle number:', '');
+
+                const newAisle = prompt('Enter aisle number:', '');
+                selectedAisle = (newAisle !== null) ? newAisle : 'New';
+
                 if(newAisles.indexOf(selectedAisle) < 0){
                     newAisles.push(selectedAisle);
                 }
@@ -295,6 +305,7 @@ const Shop = () => {
         let newList = <React.Fragment></React.Fragment>;
         //console.log(`daList => todos: ${JSON.stringify(status.todos, null,2)}`);
         const pushNewAisle = (aisle) => (newAisles.indexOf(aisle) > -1) ? '' : newAisles.push(aisle);
+        /*
         status.todos.forEach((todo,index) => {
             pushNewAisle(todo.aisle);
             //console.log(`daList =>\nnewAisles: ${newAisles}\nquantities: ${todo.quantity}\ntitle: ${todo.title}\ndays: ${todo.days}\nprice: ${todo.price}\ntax: ${todo.tax}\nquantity: ${todo.quantity}`)
@@ -303,6 +314,19 @@ const Shop = () => {
                     {daItem(todo, index)}
                 </div>;
         })
+        */
+        const filteredTodos = status.todos.filter(todo => {
+            return todo.title.toLowerCase().includes(status.search.toLowerCase());
+        });
+
+        filteredTodos.forEach((todo, index) => {
+            pushNewAisle(todo.aisle);
+            newList = <div>
+                {newList}
+                {daItem(todo, index)}
+            </div>;
+        });
+
         //console.log(`daList => newList: ${JSON.stringify(newList,null,2)}`)
         localStorage.setItem('aisles', JSON.stringify(newAisles));
         if (context === 'display') {
@@ -402,6 +426,12 @@ const Shop = () => {
             todos: sortedTodos
         }));
     };
+    const updateItem = (item) => {
+        setStatus(prevState => ({
+            ...prevState,
+            item: item
+        }));
+    }
     const updateAisles = () => {
         let colors = [];
         let todoSort = [];
@@ -435,23 +465,33 @@ const Shop = () => {
         }));
     };
     const setEntry = (value) => {
-        //console.log(`setEntry ${value}`);
+        console.log(`setEntry ${value}`);
         debounceType(setItemEntry, value);
+        setStatus(prevState => ({
+            ...prevState,
+            displayProductEntry: false,
+            displaySettings: false,
+            search: value,
+            item: value
+        }));
     }
     const addTodo = () => {
         //e.preventDefault();
-        //console.log(`addTodo =>\nitemEntry: ${itemEntry}`);
+        console.log(`addTodo =>\nitemEntry: ${itemEntry}`);
         const updatedTodos = status.todos;
         let updatedRetrievedData = status.retrievedData;
         const updatedAisles = status.aisles || aislesInit;
         let newPriceUpdate = 0;
         let newItem = {};
         if (itemEntry) {
-            const newAisle = prompt('Enter aisle number:', '');
+            //onClick={() => toggleProductEntry()}
+            //const newAisle = prompt('Enter aisle number:', '');
+            const newAisle = 'Walmart';
             if (updatedAisles.indexOf(newAisle) < 0) {
                 updatedAisles.push(newAisle);
             }
-            newPriceUpdate = prompt('Enter price:', '');
+            //newPriceUpdate = prompt('Enter price:', '');
+            
             newItem = {
                 title: itemEntry, 
                 aisle: newAisle, 
@@ -514,12 +554,16 @@ const Shop = () => {
     };
     const revert = () => {
         const revertData = JSON.parse(localStorage.getItem('vueTodosRevert'));
+        
         //console.log(`revertData: ${JSON.stringify(revertData, null, 2)}`)
         localStorage.setItem('vueTodos', JSON.stringify(revertData));
         setStatus(prevState => ({
             ...prevState,
             todos: revertData,
-            retrievedData: revertData
+            retrievedData: revertData,
+            displaySettings: false,
+            displayProductEntry: false
+
         }));
         //itemMenuDefault.forEach(aisle => newAisles.push(aisle));
         //setAisles(newAisles);
@@ -529,6 +573,11 @@ const Shop = () => {
     const save = () => {
         localStorage.setItem('vueTodosSaved', JSON.stringify(status.todos));
         //console.log(`vueTodosSaved(9): ${JSON.stringify(JSON.parse(localStorage.getItem('vueTodosSaved')),null,2)}`)
+        setStatus(prevState => ({
+            ...prevState,
+            displaySettings: false,
+            displayProductEntry: false
+        }));
     };
     const restore = () => {
         const newAisles = status.aisles || aislesInit;
@@ -540,6 +589,8 @@ const Shop = () => {
             todos: status.retrievedData,
             aisles: newAisles,
             retrievedData: JSON.parse(localStorage.getItem('vueTodosSaved')),
+            displaySettings: false,
+            displayProductEntry: false
         }));        
     };    
     const getSelectIcon = (index) => <img 
@@ -558,6 +609,13 @@ const Shop = () => {
         setStatus(prevState => ({
             ...prevState,
             displaySettings: !status.displaySettings
+        }));
+    };
+    const toggleProductEntry = () => {
+        //console.log(`toggleProductEntry => displayProductEntry: ${status.displayProductEntry}`)
+        setStatus(prevState => ({
+            ...prevState,
+            displayProductEntry: !status.displayProductEntry
         }));
     };
     const clear = () => {
@@ -581,17 +639,31 @@ const Shop = () => {
                             Total: $ { status.total }
                         </div>
                     </div>
-    console.log(`Shop ==> REFRESH`);
+    const getMenuHeight = (status.displaySettings) ? 'mt-180 visible bottomPadding' : 'mt-850 visible bottomPadding';
+    const menuClasses = (!status.displaySettings && !status.displayProductEntry) ? 'mt-60 visible bottomPadding' : getMenuHeight;
+    console.log(`Shop ==> REFRESH
+                    displaySettings: ${status.displaySettings}
+                    displayProductEntry: ${status.displayProductEntry}
+                `);
+    
     return (
         <div className='mt--7'>
             <div className='input'>
                 <SearchBar onSubmit={addTodo} onChange={setEntry} label='Add items' term=''/>
                 <img className='settings' src={menu} alt="open menu" onClick={() => toggleSettings()}/>
             </div>
-            <div className='mt-60 visible bottomPadding'>
+            <div className={menuClasses}>
                 {getItems('display')}
             </div>
             {totals}
+            <ProductEntry
+                state={status} 
+                updateAisles={updateAisles} 
+                save={save} 
+                displayProductEntry={status.displayProductEntry}
+                Item={status.search}
+                updateItem={updateItem} 
+            />
             <SettingsMenu 
                 state={status} 
                 updateAisles={updateAisles} 

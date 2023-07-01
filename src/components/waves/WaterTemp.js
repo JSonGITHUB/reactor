@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Loader from '../utils/Loader.js';
 import useOceanData from './useOceanData.js';
-import useCurrentTime from './useCurrentTime.js';
+import useCurrentTime from '../utils/useCurrentTime.js';
 
 const WaterTemp = ({isMotionOn}) => {
 
@@ -18,11 +18,11 @@ const WaterTemp = ({isMotionOn}) => {
             setTemp(temp);
         }
     },[data]);
-
-    const getCurrentTemp = () => <React.Fragment>
+    const colorClass = (Number(temp) >= 62) ? "color-neogreen" : "";
+    const getCurrentTemp = () => <div className={`${colorClass}`}>
                                     {temp}° 
                                     <span className="greet">F</span>
-                                </React.Fragment>;
+                                </div>;
     const percent = 'twentyfivePercent mt--70 mb--70';
     // eslint-disable-next-line
     const loading = () => <div className={percent}>

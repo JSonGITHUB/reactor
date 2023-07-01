@@ -44,7 +44,7 @@ const WindDirection = ({columns, setWind, height}) => {
     }
     */
    useEffect(() => {
-        console.log(`getWindData =>`)
+        //console.log(`getWindData =>`)
         if (data.data !== undefined) {
             
             const station = data.metadata.name;
@@ -52,7 +52,7 @@ const WindDirection = ({columns, setWind, height}) => {
             const angle = data.data[data.data.length - 1].d;
             const direction = data.data[data.data.length - 1].dr;
             const gusts = data.data[data.data.length - 1].g * 1.15078;
-
+            localStorage.setItem('wind', direction);
             if (status.station !== station) {
                 setStatus(prevState => ({
                     ...prevState,
@@ -98,13 +98,15 @@ const WindDirection = ({columns, setWind, height}) => {
     }
     const getSpeed = () => `${Number(status.speed).toFixed(0)}-${Number(status.gusts).toFixed(0)}`;
     const getStrength = () => (Number(status.speed)<2) ? 'light' : (Number(status.speed)>8) ? 'strong' : 'moderate';
+    const simpleSpeed = (getSpeed().split('-')[1] !== null) ? getSpeed().split('-')[1] : getSpeed();
     const getCurrentWind = () => {
+        const colorClass = (Number(simpleSpeed) < 7.1) ? "color-neogreen" : "";
         return (
             <div className='r-10 m-5 p-10 bg-lite white centeredContent' style={style}>
                 {getWindIcon()}
                 <div className='m-2'>{`${getStrength()}`}</div>
                 <div className='m-2'>{`${status.direction} ${Number(status.angle).toFixed(0)}°`}</div>
-                <div className='m-2'>{getSpeed()} <span className="greet">mph</span></div>
+                <div className={`m-2 ${colorClass}`}>{getSpeed()} <span className="greet">mph</span></div>
             </div>
         )
     }

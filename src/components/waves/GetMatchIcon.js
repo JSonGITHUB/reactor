@@ -30,6 +30,7 @@ const getMatchIcon = ({kind, status}) => {
         return classes;
     }
     // eslint-disable-next-line
+    //console.log(`status.tide: ${status.tide}`);
     const getTideIcon = <img src={status.tide} className={`mb--5 ${getStarMatchKind("tide")}`} alt="tide" />;
     // eslint-disable-next-line
     const getWaterTempIcon = <img src={waterTemp} className={`mb--7 ${getStarMatchKind("tide")}`} alt="water temp" />;

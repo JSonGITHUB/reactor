@@ -21,14 +21,16 @@ const Geolocate = ({
         (position) => {
           const { longitude, latitude } = position.coords;
           returnCurrentPosition(longitude, latitude);
-          //console.log(`getCurrentPosition => coords ^^^^^^^^^^^ ${longitude}, ${latitude}`)
-          setStatus({
-            longitude: longitude,
-            latitude: latitude,
-            errorMessage: null,
-            returnCurrentPosition: returnCurrentPosition,
-            currentPositionExists: currentPositionExists,
-          });
+          if ((Math.abs(status.longitude - longitude)>2) || (Math.abs(status.latitude - latitude)>(2))) {
+            console.log(`getCurrentPosition => coords ^^^^^^^^^^^ ${longitude}, ${latitude}`)
+            setStatus({
+              longitude: longitude,
+              latitude: latitude,
+              errorMessage: null,
+              returnCurrentPosition: returnCurrentPosition,
+              currentPositionExists: currentPositionExists,
+            });
+          }
           /*
                     try {
                         //if (!currentPositionExists()) {

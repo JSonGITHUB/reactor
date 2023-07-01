@@ -58,12 +58,13 @@ class ConditionsSelectors extends React.Component {
                                     <input className="mt-10 p-10 r-10"
                                         name="distance"
                                         type="number"
-                                        value={distance}
+                                        value={(distance=='' ? 100 : distance)}
                                         onChange={this.handleDistanceSelection}
                                     />
                                 </label>
                             </div>
     render() {
+        //console.log('ConditionsSelectors => render => this.context: ', this.context);
         return (
             <div className="p-5 r-10 m-5">
                 <div className='p-10 color-yellow'>select current conditions:</div>

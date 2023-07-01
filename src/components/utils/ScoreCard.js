@@ -7,7 +7,27 @@ const ScoreCard = ({ player, index, editPlayer, deletePlayer, game, updateTwoPla
     const [ score, setScore ] = useState(getScore());
     const [ edit, setEdit ] = useState(false);
     const updateScore = (newScore) => {
+
         localStorage.setItem(player, newScore);
+        JSON.parse(localStorage.getItem('players')).map((player, index) => {
+            console.log(`updateScore => ${index} player: ${player}: ${localStorage.getItem(player)}`);
+            if (Number(localStorage.getItem(player)) < Number(winner)) {
+                localStorage.setItem(`player${index}`, 'loser');
+                localStorage.setItem('gameStatus', 'inProgress');
+            } else {
+                localStorage.setItem(`player${index}`, 'winner');
+                localStorage.setItem('gameStatus', 'gameOver');
+            }
+        });
+        
+        console.log(`updateScore => index: ${index}`)
+        console.log(`updateScore => game: ${game}`)
+        console.log(`updateScore => winner: ${winner}`)
+        console.log(`updateScore => newScore: ${newScore}`)
+        console.log(`updateScore => player: ${player}`)
+        console.log(`updateScore => playerScore: ${localStorage.getItem(player)}`)
+        console.log(`updateScore => gameStatus: ${localStorage.getItem('gameStatus')}`)
+
         setScore(Number(localStorage.getItem(player)));
     }
     // eslint-disable-next-line

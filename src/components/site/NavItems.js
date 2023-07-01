@@ -1,23 +1,29 @@
 const NavItems = [
     'Home',
+    'Shop',
+    'Fireworks',
+    'WaveFinder',
+    'Swell',
+    'ScoreKeeper',
+    'Notes',
+    'Translator',
     //'BowlBuilder',
     'Converter',
-    'Notes',
     //'Reservation',
     //'GuestList',
     'LogDirectory',
     'SurfLog',
-    'Swell',
-    'WaveFinder',
     'Buoys',
     'Photos',
     'Videos',
     //'PhotoBlog',
     //'PhotoSequence',
-    //'Search'
+    //'Search',
     'WikiSearch',
-    'Translator',
-    'ScoreKeeper',
-    'Shop'
+    'DualVideoPlayer',
+    //'ExchangeRates',
+    'TaskTracker',
+    'ExpenseTracker',
+    'ExchangeConverter'  
 ];
 export default NavItems

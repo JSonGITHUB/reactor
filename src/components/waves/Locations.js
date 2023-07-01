@@ -377,12 +377,333 @@ export default function getLocations() {
             "tide": ["high", "medium"]
         },
         {
+            "name": "Kuta", 
+            "latitude": -8.712246,
+            "longitude": 115.167092,
+            "swell": ["S","SW"],
+            "wind": ["N"],
+            "tide": ["low", "medium", "high"]
+        },
+        {
+            "name": "Pantai Ujung",
+            "latitude": -8.441250, 
+            "longitude": 115.628332,
+            "swell": ["S","SW"],
+            "wind": ["W", "NW"],
+            "tide": ["medium", "high"]
+        },
+        {
+            "name": "Jasri Beach",
+            "latitude": -8.481000, 
+            "longitude": 115.624708,
+            "swell": ["S","SW"],
+            "wind": ["W", "NW"],
+            "tide": ["medium", "high"]
+        },
+        {
+            "name": "Ceningan",
+            "latitude": -8.706210, 
+            "longitude": 115.438362,
+            "swell": ["S","SW"],
+            "wind": ["W", "NW"],
+            "tide": ["medium", "high"]
+        },
+        {
+            "name": "Nusa Lembongan",
+            "latitude": -8.674861, 
+            "longitude": 115.446459,
+            "swell": ["S","SW"],
+            "wind": ["W", "NW"],
+            "tide": ["medium", "high"]
+        },
+        {
+            "name": "Playgrounds",
+            "latitude": -8.679103, 
+            "longitude": 115.446534,
+            "swell": ["S","SW"],
+            "wind": ["W", "NW"],
+            "tide": ["medium", "high"]
+        },
+        {
+            "name": "Lacerations",
+            "latitude": -8.675495, 
+            "longitude": 115.440282,
+            "swell": ["S","SW"],
+            "wind": ["W", "NW"],
+            "tide": ["medium", "high"]
+        },
+        {
+            "name": "Padangbai",
+            "latitude": -8.541541, 
+            "longitude": 115.506547,
+            "swell": ["S","SW"],
+            "wind": ["W", "NW"],
+            "tide": ["medium", "high"]
+        },
+        {
+            "name": "Shipwrecks & Razors",
+            "latitude": -8.664464, 
+            "longitude": 115.441342,
+            "swell": ["S","SW"],
+            "wind": ["W", "NW"],
+            "tide": ["medium", "high"]
+        },
+        {
+            "name": "Keramas",
+            "latitude": -8.599642, 
+            "longitude": 115.335284,
+            "swell": ["S","SW"],
+            "wind": ["W", "NW"],
+            "tide": ["medium", "high"]
+        },
+        {
+            "name": "Keramas KFC",
+            "latitude": -8.599642, 
+            "longitude": 115.335284,
+            "swell": ["S","SW"],
+            "wind": ["W", "NW"],
+            "tide": ["medium", "high"]
+        },
+        {
+            "name": "Ketewel",
+            "latitude": -8.643518,
+            "longitude": 115.284854,
+            "swell": ["S","SW"],
+            "wind": ["W", "NW"],
+            "tide": ["medium", "high"]
+        },
+        {
+            "name": "Sanur",
+            "latitude": -8.708116, 
+            "longitude": 115.262292,
+            "swell": ["S","SW"],
+            "wind": ["W", "NW"],
+            "tide": ["medium", "high"]
+        },
+        {
+            "name": "Sindhu Beach",
+            "latitude": -8.683479, 
+            "longitude": 115.265382,
+            "swell": ["S","SW", "W"],
+            "wind": ["W", "NW"],
+            "tide": ["medium", "high"]
+        },
+        {
+            "name": "Tanhung Sari",
+            "latitude": -8.688290,
+            "longitude": 115.265543,
+            "swell": ["S","SW", "W"],
+            "wind": ["W", "NW"],
+            "tide": ["medium", "high"]
+        },
+        {
+            "name": "Hyatt Reef",
+            "latitude": -8.703481,
+            "longitude": 115.264745,
+            "swell": ["S","SW", "W"],
+            "wind": ["W", "NW"],
+            "tide": ["medium", "high"]
+        },
+        {
+            "name": "Serangan",
+            "latitude": -8.737929,
+            "longitude": 115.252158,
+            "swell": ["S","SW", "W"],
+            "wind": ["W", "NW"],
+            "tide": ["low", "medium"]
+        },
+        {
+            "name": "Pantai Nusadua",
+            "latitude": -8.795649,
+            "longitude": 115.233057,
+            "swell": ["S","SW", "W"],
+            "wind": ["W", "NW"],
+            "tide": ["low", "medium"]
+        },
+        {
+            "name": "Nusa Dua",
+            "latitude": -8.803974,
+            "longitude": 115.240768,
+            "swell": ["S","SW", "W"],
+            "wind": ["W", "NW"],
+            "tide": ["low", "medium"]
+        },
+        {
+            "name": "Green Ball",
+            "latitude": -8.847979,
+            "longitude": 115.172189,
+            "swell": ["S","SW", "W"],
+            "wind": ["W","NW"],
+            "tide": ["medium"]
+        },
+        {
+            "name": "Nyang Nyang",
+            "latitude": -8.837901,
+            "longitude": 115.096285,
+            "swell": ["S","SW", "W"],
+            "wind": ["W","NW"],
+            "tide": ["low", "medium"]
+        },
+        {
+            "name": "Uluwatu",
+            "latitude": -8.813893,
+            "longitude": 115.088251,
+            "swell": ["S","SW"],
+            "wind": ["S", "SE", "E", "NE", "N"],
+            "tide": ["low", "medium", "high"]
+        },
+        {
+            "name": "Padang Padang",
+            "latitude": -8.810544,
+            "longitude": 115.103698,
+            "swell": ["S","SW", "WSW"],
+            "wind": ["SE"],
+            "tide": ["low", "medium"]
+        },
+        {
+            "name": "Impossibles",
+            "latitude": -8.808672,
+            "longitude": 115.107576,
+            "swell": ["S","SW"],
+            "wind": ["SE"],
+            "tide": ["low", "medium"]
+        },
+        {
+            "name": "Bingin",
+            "latitude": -8.806190, 
+            "longitude": 115.112204,
+            "swell": ["S","SW"],
+            "wind": ["E"],
+            "tide": ["medium", "low"]
+        },
+        {
+            "name": "Dreamland",
+            "latitude": -8.794446,
+            "longitude": 115.118715,
+            "swell": ["S","SW"],
+            "wind": ["SE"],
+            "tide": ["low"]
+        },
+        {
             "name": "Balangan",
-            "latitude": -8.793402,
-            "longitude": 115.122438,
+            "latitude": -8.793512,
+            "longitude": 115.122462,
+            "swell": ["S","SW"],
+            "wind": ["SE"],
+            "tide": ["medium", "low"]
+        },
+        {
+            "name": "Airport Rights",
+            "latitude": -8.740792, 
+            "longitude": 115.152650,
+            "swell": ["S","SW", "W"],
+            "wind": ["SE"],
+            "tide": ["high"]
+        },
+        {
+            "name": "Kuta Reef",
+            "latitude": -8.740844,
+            "longitude": 115.161233,
+            "swell": ["S","SW", "W"],
+            "wind": ["SE"],
+            "tide": ["high"]
+        },
+        {
+            "name": "Kuta Beach",
+            "latitude": -8.717862,
+            "longitude": 115.168326,
+            "swell": ["S","SW"],
+            "wind": ["SE"],
+            "tide": ["medium", "high"]
+        },
+        {
+            "name": "Padma",
+            "latitude": -8.705850,
+            "longitude": 115.166688,
+            "swell": ["S","SW"],
+            "wind": ["SE"],
+            "tide": ["low", "medium", "high"]
+        },
+        {
+            "name": "Legian Beach",
+            "latitude": -8.703682,
+            "longitude": 115.163184,
+            "swell": ["S","SW"],
+            "wind": ["N", "N", "SE"],
+            "tide": ["low", "medium", "high"]
+        },
+        {
+            "name": "Seminyak",
+            "latitude": -8.691377, 
+            "longitude": 115.155161,
             "swell": ["S","SW", "W"],
             "wind": ["SE"],
             "tide": ["low", "medium"]
+        },
+        {
+            "name": "Berawa",
+            "latitude": -8.662332, 
+            "longitude": 115.139058,
+            "swell": ["S","SW", "W"],
+            "wind": ["NE"],
+            "tide": ["low", "medium", "high"]
+        },
+        {
+            "name": "Nelayan Beach",
+            "latitude": -8.660919,
+            "longitude": 115.134384,
+            "swell": ["S","SW"],
+            "wind": ["N", "N", "SE"],
+            "tide": ["low", "medium", "high"]
+        },
+        {
+            "name": "Canggu",
+            "latitude": -8.655084,
+            "longitude": 115.124594,
+            "swell": ["S","SW"],
+            "wind": ["N", "N", "SE"],
+            "tide": ["low", "medium", "high"]
+        },
+        {
+            "name": "Old Mans - Batu-Balong",
+            "latitude": -8.658846,
+            "longitude": 115.134739,
+            "swell": ["SW"],
+            "wind": ["NE"],
+            "tide": ["low", "medium", "high"]
+        },
+        {
+            "name": "Pererenan",
+            "latitude": -8.651677,
+            "longitude": 115.122052,
+            "swell": ["S","SW", "W"],
+            "wind": ["N", "NW"],
+            "tide": ["low", "medium", "high"]
+        },
+        {
+            "name": "Yeh Gangga",
+            "latitude": -8.591730,
+            "longitude": 115.070753,
+            "swell": ["S","SW","SSW"],
+            "wind": ["N", "NW"],
+            "tide": ["low", "medium", "high"]
+        },
+        {
+            "name": "Balian",
+            "latitude": -8.501839,
+            "longitude": 114.969953,
+            "swell": ["S","SW"],
+            "wind": ["N", "NW"],
+            "tide": ["medium", "hi"]
+        },
+        {
+            "name": "Medewi",
+            "latitude": -8.417937,
+            "longitude": 114.791239,
+            "swell": ["S","SW", "W"],
+            "wind": ["N"],
+            "tide": ["medium", "hi"]
         }
+
     ]
 }

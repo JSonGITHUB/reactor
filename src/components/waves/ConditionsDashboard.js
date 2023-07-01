@@ -31,7 +31,7 @@ const ConditionsDashboard = ({tideDisplay, setWind}) => {
                     <AirTemp/>
                 </span>
             </div>
-            <Sunset />
+            <Sunset view='full'/>
             <BuoyReport />
         </div>
     )

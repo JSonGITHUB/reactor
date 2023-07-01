@@ -93,7 +93,7 @@ const SurfLocation = ({state, item, matches, regionMatch, tideDisplay, updateLoc
         </div>)
     }
     const getStars = (stars) => stars.map((currentStar) => star(currentStar));
-    const logLocation = (item) => (status.logged === true) ? alert('log already exists') : createLog(item, status);
+    const logLocation = (item) => (status.logged === true) ? alert('log already exists') : alert('log already exists');//createLog(item, status);
     const logLocationButton = (item) => {
         return <React.Fragment>
                     {
