@@ -1125,7 +1125,7 @@ body {
 
 .navButton {
   border-radius: 3px;
-  border: #00 1px;
+  border: #000 1px;
   background-color: #222222;
   background-color: rgba(34, 34, 34, 0.5);
   color: #00FF00;
