@@ -12,10 +12,7 @@ const VideoPlayer = React.forwardRef((props, ref) => {
     isMedium: false,
     isSlowRewind: false,
     isMediumRewind: false,
-    playbackRate: 1,
-    endTime: props.endTime,
-    startTime: props.startTime,
-    currentTime: '00:00:00'
+    playbackRate: 1
   });
   //const videoRef = useRef(playerStatus.videoRef);
   let time = (playerStatus.videoRef.current !== null) ? playerStatus.videoRef.current.currentTime : '00:00:00' ;
@@ -79,7 +76,38 @@ const VideoPlayer = React.forwardRef((props, ref) => {
     playerStatus.startTime, 
     playerStatus.videoRef
   ]);
-/*
+
+  const handleJumpToStart = () => {
+    //console.log(`handleJumpToStart startTime: ${playerStatus.startTime}`);
+    //alert(`handleJumpToStart startTime1: ${playerStatus.startTime}`);
+    playerStatus.videoRef.current.currentTime = playerStatus.startTime || 0;
+    setPlayerStatus(prevState => ({
+      ...prevState,
+      isPlaying: false,
+      isRewind: false,
+      isFast: false,
+      isSlow: false,
+      isMedium: false,
+      isSlowRewind: false,
+      isMediumRewind: false
+    }));
+  };
+  const handleJumpToEnd = () => {
+    //console.log(`handleJumpToEnd id: ${id}`);
+    //alert(`handleJumpToEnd id: ${id} endTime1: ${status.endTime1}`);
+    playerStatus.videoRef.current.currentTime = playerStatus.endTime;
+    
+    setPlayerStatus(prevState => ({
+      ...prevState,
+      isPlaying: false,
+      isRewind: false,
+      isFast: false,
+      isSlow: false,
+      isMedium: false,
+      isSlowRewind: false,
+      isMediumRewind: false
+    }));
+  };
   const handlePlayPause = () => {
     console.log("handlePlayPause");
     if (playerStatus.isPlaying) {
@@ -271,7 +299,6 @@ const VideoPlayer = React.forwardRef((props, ref) => {
     }
   };
 
-*/
   const handleScrub = e => {
     const x = e.nativeEvent.offsetX;
     const width = e.currentTarget.offsetWidth;
@@ -288,7 +315,7 @@ const VideoPlayer = React.forwardRef((props, ref) => {
     }));
   }
   const endChange = (value) => {
-    props.onStartTimeUpdate(value);
+    props.onEndTimeUpdate(value);
     setPlayerStatus(prevState => ({
       ...prevState,
       endTime: value,
@@ -375,17 +402,17 @@ const VideoPlayer = React.forwardRef((props, ref) => {
       />
       <div className='videoNavigation'>
         <VideoNavigation 
-          handleJumpToStart={() => props.handleJumpToStart(props.id)}
-          handleMinusOne={() => props.handleMinusOne(props.id)}
-          handleRewind={() => props.handleRewind(props.id)}
-          handleMediumRewind={() => props.handleMediumRewind(props.id)}
-          handleSlowRewind={() => props.handleSlowRewind(props.id)}
-          handlePlayPause={() => props.handlePlayPause(props.id)}
-          handleSlowMotion={() => props.handleSlowMotion(props.id)}
-          handleMediumMotion={() => props.handleMediumMotion(props.id)}
-          handleFastForward={() => props.handleFastForward(props.id)}
-          handleAddOne={() => props.handleAddOne(props.id)}
-          handleJumpToEnd={() => props.handleJumpToEnd(props.id)}
+          handleJumpToStart={() => handleJumpToStart()}
+          handleMinusOne={() => handleMinusOne()}
+          handleRewind={() => handleRewind()}
+          handleMediumRewind={() => handleMediumRewind()}
+          handleSlowRewind={() => handleSlowRewind()}
+          handlePlayPause={() => handlePlayPause()}
+          handleSlowMotion={() => handleSlowMotion()}
+          handleMediumMotion={() => handleMediumMotion()}
+          handleFastForward={() => handleFastForward()}
+          handleAddOne={() => handleAddOne()}
+          handleJumpToEnd={() => handleJumpToEnd()}
           playerStatus={playerStatus}
         />
       </div>

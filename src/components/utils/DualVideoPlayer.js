@@ -20,18 +20,10 @@ const DualVideoPlayer = forwardRef(({ src1, src2 }, ref) => {
   useEffect(() => {
     const speed = (status.isMediumRewind) ? 250 : 80;
     const interval = (status.isSlowRewind) ? 300 : speed;
-    console.log("status.isSlowRewind", status.isSlowRewind)
-    console.log("status.isPlaying", status.isPlaying)
-    console.log("status.videoPlayer1Ref.current.currentTime: ", status.videoPlayer1Ref.current.currentTime)
-    console.log("status.videoPlayer2Ref.current.currentTime: ", status.videoPlayer2Ref.current.currentTime)
-    console.log("isPlaying: ", status.isPlaying)
-    console.log("isSlow: ", status.isSlow)
-    console.log("isMedium: ", status.isMedium)
-    console.log("isFast: ", status.isFast)
-    console.log("isSlowRewind: ", status.isSlowRewind)
-    console.log("isMediumRewind: ", status.isMediumRewind)
-    console.log("isFastRewind: ", status.isFastRewind)
-
+    console.log(`status startTime1: ${(status.startTime1) ? status.endTime1 : '??'}`);
+    console.log(`status startTime2: ${(status.endTime2) ? status.endTime2 : '??'}`);
+    console.log(`status endTime1: ${(status.endTime1) ? status.endTime1 : '??'}`);
+    console.log(`status endTime2: ${(status.endTime2) ? status.endTime2 : '??'}`);
     const intervalId = setInterval(() => {
       const time1 = status.videoPlayer1Ref.current.currentTime - 0.05;
       const time2 = status.videoPlayer2Ref.current.currentTime - 0.05;
@@ -180,12 +172,12 @@ const DualVideoPlayer = forwardRef(({ src1, src2 }, ref) => {
   const handleJumpToStart = (id) => {
     //console.log(`handleJumpToStart id: ${id} startTime1: ${status.startTime1} startTime2: ${status.startTime2}`);
     if ((id == '1' || id == 'both') && status.videoPlayer1Ref.current) {
-      alert(`handleJumpToStart id: ${id} startTime1: ${status.startTime1}`);
+      //alert(`handleJumpToStart id: ${id} startTime1: ${status.startTime1}`);
       //status.videoPlayer1Ref.current.pause();
       status.videoPlayer1Ref.current.currentTime = status.startTime1 || 0;
     };
     if ((id == '2' || id == 'both') && status.videoPlayer2Ref.current) {
-      alert(`handleJumpToStart id: ${id} startTime2: ${status.startTime2}`);
+      //alert(`handleJumpToStart id: ${id} startTime2: ${status.startTime2}`);
       //status.videoPlayer2Ref.current.pause();
       status.videoPlayer2Ref.current.currentTime = status.startTime2 || 0;
     };
@@ -203,12 +195,12 @@ const DualVideoPlayer = forwardRef(({ src1, src2 }, ref) => {
   const handleJumpToEnd = (id) => {
     console.log(`handleJumpToEnd id: ${id}`);
     if ((id == '1' || id == 'both') && status.videoPlayer1Ref.current) {
-      alert(`handleJumpToEnd id: ${id} endTime1: ${status.endTime1}`);
+      //alert(`handleJumpToEnd id: ${id} endTime1: ${status.endTime1}`);
       status.videoPlayer1Ref.current.pause();
       status.videoPlayer1Ref.current.currentTime = status.endTime1;
     };
     if ((id == '2' || id == 'both') && status.videoPlayer2Ref.current) {
-      alert(`handleJumpToEnd id: ${id} endTime1: ${status.endTime2}`);
+      //alert(`handleJumpToEnd id: ${id} endTime1: ${status.endTime2}`);
       status.videoPlayer2Ref.current.pause();
       status.videoPlayer2Ref.current.currentTime = status.endTime2;
     };
