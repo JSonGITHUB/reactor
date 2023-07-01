@@ -7,7 +7,7 @@ import getKey from '../utils/KeyGenerator.js';
           items = {["one", "two", "three"]}
         />
 */
-const SelectorForm = ({ width, height, selected, header, items }) => {
+const SelectorForm = ({ width, height, selection, header, items }) => {
     console.log('FormSelector')
     let action = "YEWW!!!!";
     const options = () => {
@@ -18,8 +18,8 @@ const SelectorForm = ({ width, height, selected, header, items }) => {
             </option>    
         )
     }
-    const [value, setValue] = useState(selected);
-    const [selected, setSelected] = useState(selected);
+    const [value, setValue] = useState(selection);
+    const [selected, setSelected] = useState(selection);
     const [bowlIngredients, setBowlIngredients] = useState('');
     const [selectItems, setSelectedItems] = useState(options);
     

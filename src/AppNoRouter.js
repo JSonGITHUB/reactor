@@ -23,6 +23,12 @@ import './assets/css/App.css';
 import Photos from './components/utils/Photos.js';
 import Videos from './components/utils/Videos.js';
 import WikiSearch from './components/utils/WikiSearch.js';
+import DualVideoPlayer from './components/utils/DualVideoPlayer.js';
+import ExchangeRates from './components/utils/ExchangeRates.js';
+import ExchangeConverter from './components/utils/ExchangeConverter.js';
+import ExpenseTracker from './components/utils/ExpenseTracker.js';
+import TaskTracker from './components/utils/TaskTracker.js';
+import VideoPlayer from './components/utils/VideoPlayer.js';
 import Translator from './components/utils/Translator.js';
 import Accordion from './components/utils/Accordion.js';
 import Route from './components/utils/Route.js';
@@ -138,6 +144,11 @@ export default ({ props }) => {
                     <Route path='/Photos'><Photos /></Route>
                     <Route path='/Videos'><Videos /></Route>
                     <Route path='/WikiSearch'><WikiSearch /></Route>
+                    <Route path='/DualVideoPlayer'><DualVideoPlayer /></Route>
+                    <Route path='/ExchangeRates'><ExchangeRates /></Route>
+                    <Route path='/ExchangeConverter'><ExchangeConverter /></Route>
+                    <Route path='/ExpenseTracker'><ExpenseTracker /></Route>
+                    <Route path='/TaskTracker'><TaskTracker /></Route>
                     <Route path='/Translator'><Translator /></Route>
                     <Route path='/Todos'><Todos /></Route>
                     <Route path='/Reducer' ><Reducer /></Route>

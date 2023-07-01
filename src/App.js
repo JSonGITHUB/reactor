@@ -21,10 +21,16 @@ import Counter from "./components/hooks/Counter.js";
 import Todos from "./components/hooks/Todos.js";
 import "./assets/css/App.css";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import ScrollToTop from "./components/utils/ScrollToTop.js";
+//import ScrollToTop from "./components/utils/ScrollToTop.js";
 import Photos from "./components/utils/Photos.js";
 import Videos from "./components/utils/Videos.js";
 import WikiSearch from "./components/utils/WikiSearch.js";
+import DualVideoPlayer from "./components/utils/DualVideoPlayer.js";
+import ExchangeRates from "./components/utils/ExchangeRates.js";
+import ExchangeConverter from "./components/utils/ExchangeConverter.js";
+import ExpenseTracker from "./components/utils/ExpenseTracker.js";
+import TaskTracker from "./components/utils/TaskTracker.js";
+import VideoPlayer from "./components/utils/VideoPlayer.js";
 import Translator from "./components/translator/Translator.js";
 import Accordion from "./components/utils/Accordion.js";
 import Weather from "./components/weather/Weather.js";
@@ -38,6 +44,7 @@ import StreamDelete from './components/streams/StreamDelete';
 import StreamList from './components/streams/StreamList';
 import StreamShow from './components/streams/StreamShow';
 import history from './components/utils/history.js';
+import Fireworks from './components/utils/Fireworks.js';
 import CountryContext from './components/context/CountryContext.js';
 
 class App extends React.Component {
@@ -132,9 +139,9 @@ class App extends React.Component {
     const { width, height, isMotionOn, isSignedIn } = this.state;
     console.log(`App => this.state.isSignedIn: ${this.state.isSignedIn}`);
     return (
-      //AppComponent();
+      //AppComponent();<ScrollToTop loc={window.location} />
       <Router basename={this.base} history={history}>
-        <ScrollToTop loc={window.location} />
+        
         <div className="App">
           <Switch>
             <Header
@@ -205,6 +212,12 @@ class App extends React.Component {
                     distance="10"
                   />
                 )}
+              /> 
+              <Route
+                path="/Fireworks"
+                render={(props) => (
+                  <Fireworks display='true' quantity='50' />
+                )}
               />
               <Route path="/Weather" render={(props) => <Weather />} />
               <Route path="/Buoys" component={Buoys} />
@@ -228,6 +241,11 @@ class App extends React.Component {
               <Route path="/Photos" render={(props) => <Photos />} />
               <Route path="/Videos" render={(props) => <Videos />} />
               <Route path="/WikiSearch" render={(props) => <WikiSearch />} />
+              <Route path="/DualVideoPlayer" render={(props) => <DualVideoPlayer />} />
+              <Route path="/ExchangeRates" render={(props) => <ExchangeRates />} />
+              <Route path="/ExchangeConverter" render={(props) => <ExchangeConverter />} />
+              <Route path="/ExpenseTracker" render={(props) => <ExpenseTracker />} />
+              <Route path="/TaskTracker" render={(props) => <TaskTracker />} />
               <Route path="/Translator" render={(props) => <Translator />} />
               <Route path="/ScoreKeeper" render={(props) => <ScoreKeeper />} />
               <Route path="/Shop" render={(props) => <Shop />} />

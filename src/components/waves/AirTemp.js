@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Loader from '../utils/Loader.js';
 import useOceanData from './useOceanData.js';
-import useCurrentTime from './useCurrentTime.js';
+import useCurrentTime from '../utils/useCurrentTime.js';
 
 const AirTemp = ({isMotionOn}) => {
-    
     const [ time ] = useCurrentTime();
     const airUrl = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${time.startTime}&end_date=${time.endTime}&station=9410230&product=air_temperature&units=english&time_zone=lst_ldt&application=ports_screen&format=json`;
     const [temp, setTemp] = useState(null);
