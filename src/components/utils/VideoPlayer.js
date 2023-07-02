@@ -3,7 +3,7 @@ import videoFile from '../../assets/1.MP4';
 import VideoNavigation from './VideoNavigation';
 import { TextField } from '@material-ui/core';
 //const VideoPlayer = ({ src, startTime, endTime, onTimeUpdate }) => {
-const VideoPlayer = React.forwardRef((props, ref) => { 
+const VideoPlayer = React.forwardRef((props, ref) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [playerStatus, setPlayerStatus] = useState({
     videoRef: ref,
@@ -15,7 +15,7 @@ const VideoPlayer = React.forwardRef((props, ref) => {
     playbackRate: 1
   });
   //const videoRef = useRef(playerStatus.videoRef);
-  let time = (playerStatus.videoRef.current !== null) ? playerStatus.videoRef.current.currentTime : '00:00:00' ;
+  let time = (playerStatus.videoRef.current !== null) ? playerStatus.videoRef.current.currentTime : '00:00:00';
   console.log('props: ', props)
 
   useEffect(() => {
@@ -64,16 +64,16 @@ const VideoPlayer = React.forwardRef((props, ref) => {
         clearInterval(intervalId);
       }
     }, interval);
-    
+
     return () => {
       clearInterval(intervalId);
     }
   }, [
-    playerStatus.isPlaying, 
-    playerStatus.isSlowRewind, 
-    playerStatus.isMediumRewind, 
-    playerStatus.isRewind, 
-    playerStatus.startTime, 
+    playerStatus.isPlaying,
+    playerStatus.isSlowRewind,
+    playerStatus.isMediumRewind,
+    playerStatus.isRewind,
+    playerStatus.startTime,
     playerStatus.videoRef
   ]);
 
@@ -96,7 +96,7 @@ const VideoPlayer = React.forwardRef((props, ref) => {
     //console.log(`handleJumpToEnd id: ${id}`);
     //alert(`handleJumpToEnd id: ${id} endTime1: ${status.endTime1}`);
     playerStatus.videoRef.current.currentTime = playerStatus.endTime;
-    
+
     setPlayerStatus(prevState => ({
       ...prevState,
       isPlaying: false,
@@ -190,7 +190,7 @@ const VideoPlayer = React.forwardRef((props, ref) => {
       }));
     }
   };
-  
+
   const handleSlowRewind = () => {
     if (playerStatus.videoRef.current && playerStatus.isSlowRewind === false) {
       console.log("handleSlowMotionRewind");
@@ -241,7 +241,7 @@ const VideoPlayer = React.forwardRef((props, ref) => {
         isFast: false,
         playbackRate: 0.2
       }));
-    } 
+    }
   };
   const handleMediumMotion = () => {
     if (playerStatus.videoRef.current && playerStatus.isMedium === false) {
@@ -259,7 +259,7 @@ const VideoPlayer = React.forwardRef((props, ref) => {
         isFast: false,
         playbackRate: 0.5
       }));
-    } 
+    }
   };
 
   const handleFastForward = () => {
@@ -278,7 +278,7 @@ const VideoPlayer = React.forwardRef((props, ref) => {
         isRewind: false,
         playbackRate: 0.5
       }));
-    } 
+    }
   };
   const handleTimeUpdate = () => {
     props.onTimeUpdate(time);
@@ -332,7 +332,7 @@ const VideoPlayer = React.forwardRef((props, ref) => {
       currentTime: playerStatus.videoRef.current.currentTime
     }));
   }
-  
+
   function handleEndChange(event) {
     const { value } = event.target;
     props.onEndTimeUpdate(value);
@@ -345,8 +345,8 @@ const VideoPlayer = React.forwardRef((props, ref) => {
   const timeDisplay = () => {
     console.log(`timeDisplay: ${time} of ${playerStatus.videoRef.current.duration}`)
     return <div className='timerBox'>
-              {playerStatus.videoRef.current.currentTime} of {playerStatus.videoRef.current.duration}
-            </div>
+      {playerStatus.videoRef.current.currentTime} of {playerStatus.videoRef.current.duration}
+    </div>
   }
   const handleVideoUpdate = (event) => {
     const { currentTime } = event.target;
@@ -389,8 +389,8 @@ const VideoPlayer = React.forwardRef((props, ref) => {
         src={videoFile}
         onTimeUpdate={handleVideoUpdate}
         style={{
-            width: `100%`,
-            height: `auto`,
+          width: `100%`,
+          height: `auto`,
         }}
 
         onLoadedMetadata={() => {
@@ -401,26 +401,26 @@ const VideoPlayer = React.forwardRef((props, ref) => {
         }}
       />
       <div className='videoNavigation'>
-        <VideoNavigation 
-          handleJumpToStart={() => handleJumpToStart()}
-          handleMinusOne={() => handleMinusOne()}
-          handleRewind={() => handleRewind()}
-          handleMediumRewind={() => handleMediumRewind()}
-          handleSlowRewind={() => handleSlowRewind()}
-          handlePlayPause={() => handlePlayPause()}
-          handleSlowMotion={() => handleSlowMotion()}
-          handleMediumMotion={() => handleMediumMotion()}
-          handleFastForward={() => handleFastForward()}
-          handleAddOne={() => handleAddOne()}
-          handleJumpToEnd={() => handleJumpToEnd()}
-          playerStatus={playerStatus}
-        />
+          <VideoNavigation 
+            handleJumpToStart={() => handleJumpToStart()}
+            handleMinusOne={() => handleMinusOne()}
+            handleRewind={() => handleRewind()}
+            handleMediumRewind={() => handleMediumRewind()}
+            handleSlowRewind={() => handleSlowRewind()}
+            handlePlayPause={() => handlePlayPause()}
+            handleSlowMotion={() => handleSlowMotion()}
+            handleMediumMotion={() => handleMediumMotion()}
+            handleFastForward={() => handleFastForward()}
+            handleAddOne={() => handleAddOne()}
+            handleJumpToEnd={() => handleJumpToEnd()}
+            playerStatus={playerStatus}
+          />
       </div>
       <div>
         <div><span className='p-20'>{playerStatus.startTime}</span><span className='p-20'>{currentTime}</span><span className='p-20'>{playerStatus.endTime}</span></div>
       </div>
       <button onClick={() => startChange(currentTime)}>Start Mark</button><input type="text" value={playerStatus.startTime} onChange={handleStartChange} />
-      <button onClick={() => endChange(currentTime)}>End Mark</button><input type="text" value={playerStatus.endTime} onChange={handleEndChange}/>
+      <button onClick={() => endChange(currentTime)}>End Mark</button><input type="text" value={playerStatus.endTime} onChange={handleEndChange} />
       <div style={{ position: 'relative' }}>
         <div
           style={{

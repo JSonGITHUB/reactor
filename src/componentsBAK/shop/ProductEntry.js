@@ -15,7 +15,7 @@ const ProductEntry = ({ state, updateAisles, save, displayProductEntry}) => {
         'Save'
     ];
     const [Price, setPrice] = useState('');
-    const [debouncedPrice, setDebouncedPrice] = useState(Price);
+    //const [debouncedPrice, setDebouncedPrice] = useState(Price);
     const [Item, setItem] = useState(state.item);
     console.log(`ProductEntry => search: ${state.search} - Item: ${Item}`);
     const handleSubmit = (event) => {
