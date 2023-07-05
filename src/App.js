@@ -30,7 +30,7 @@ import ExchangeRates from "./components/utils/ExchangeRates.js";
 import ExchangeConverter from "./components/utils/ExchangeConverter.js";
 import ExpenseTracker from "./components/utils/ExpenseTracker.js";
 import TaskTracker from "./components/utils/TaskTracker.js";
-//import VideoPlayer from "./components/utils/VideoPlayer.js";
+import VideoPlayer from "./components/utils/VideoPlayer.js";
 import Translator from "./components/translator/Translator.js";
 import Accordion from "./components/utils/Accordion.js";
 import Weather from "./components/weather/Weather.js";
