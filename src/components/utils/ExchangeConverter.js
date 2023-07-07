@@ -1,13 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import ExchangeRatesConfig from './ExchangeRatesConfig';
 
 const ExchangeConverter = () => {
-    const exchangeRates = {
-        MXN: 17.16,   // Mexican Peso
-        NIO: 36.55,   // Nicaraguan Cordovas
-        CRC: 541.23,    // Costa Rican Colones
-        IDR: 15045.30,  // Indonesian Rupiah
-        AUD: 1.50,    // Australian Dollar
-    };
 
     const currencies = {
         MXN: `Pesos`,   // Mexican Peso
@@ -16,6 +10,8 @@ const ExchangeConverter = () => {
         IDR: `Rupiah`,  // Indonesian Rupiah
         AUD: `AUD`,    // Australian Dollar
     };
+
+    const [exchangeRates, setExchangeRates] = useState({});
 
     const [usdAmount, setUsdAmount] = useState('');
     const [selectedCurrency, setSelectedCurrency] = useState('MXN');
@@ -51,9 +47,10 @@ const ExchangeConverter = () => {
     const currencyConverting = () => {
         return currencies[selectedCurrency]
     }
-
+    
     return (
         <div>
+            <ExchangeRatesConfig onExchangeRatesChange={setExchangeRates}></ExchangeRatesConfig>
             <div className='bg-yellow size25 timerBox m-20 p-30 bold color-black' onClick={handleConversionDirection}>
                 {isToUsd ? 'Convert to USD' : 'Convert from USD'}
             </div>
@@ -75,7 +72,7 @@ const ExchangeConverter = () => {
                 <div className='size25 m-20 color-light'>
                     <label>
                         {isToUsd ? `${currencyConverting()}: $` : 'US Dollars: $'}
-                        <input className='timerBox color-black' type='number' value={usdAmount} onChange={handleInputChange} /> 
+                        <input className='timerBox color-black' type='number' value={usdAmount} onChange={handleInputChange} />
                     </label>
                 </div>
             </div>
