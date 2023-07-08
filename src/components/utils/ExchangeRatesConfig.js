@@ -3,21 +3,24 @@ import menu from '../../assets/images/menuYellow.png';
 
 const ExchangeRatesConfig = ({ onExchangeRatesChange }) => {
 
-    const [exchangeRates, setExchangeRates] = useState({
+    const defaultRates = {
         USD: 1,
         MXN: 17.16,   // Mexican Peso
         NIO: 36.55,   // Nicaraguan Cordovas
         CRC: 541.23,    // Costa Rican Colones
         IDR: 15045.30,  // Indonesian Rupiah
         AUD: 1.50,    // Australian Dollar
-    });
+    }
+
+    const [exchangeRates, setExchangeRates] = useState(defaultRates);
 
     const [settings, setSettings] = useState(false)
 
     useEffect(() => {
-        const savedExchangeRates = localStorage.getItem('exchangeRates');
-        if (savedExchangeRates) {
-            setExchangeRates(JSON.parse(savedExchangeRates));
+        const savedExchangeRates = JSON.parse(localStorage.getItem('exchangeRates'));
+        const currentExchangeRates = (savedExchangeRates != {}) ? savedExchangeRates : defaultRates;
+        if (currentExchangeRates) {
+            setExchangeRates(currentExchangeRates);
             onExchangeRatesChange(exchangeRates);
         }
     }, []);
