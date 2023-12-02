@@ -68,8 +68,8 @@ const WikiSearch = () => {
                 className='maxWidth400 button p-10 lowerBorder pointer color-yellow' 
                 key={result.pageid}
             >
-                <div className={`color-yellow bold p-10 columnLeft`}>{result.title}</div>
-                <div className='p-10 mb-5 columnLeft white'>
+                <div className={`color-yellow bold p-10 columnLeftAlign`}>{result.title}</div>
+                <div className='p-10 mb-5 columnLeftAlign white'>
                     <span dangerouslySetInnerHTML={{ __html: result.snippet }}></span>
                 </div> 
             </a>
@@ -82,8 +82,8 @@ const WikiSearch = () => {
                 className='maxWidth400 button p-10 lowerBorder pointer sides-auto color-yellow' 
                 key={result.pageid}
             >
-                <div className={`color-yellow bold p-10 columnLeft`}>{result.title}</div>
-                <div className='p-10 mb-5 columnLeft white'>
+                <div className={`color-yellow bold p-10 columnLeftAlign`}>{result.title}</div>
+                <div className='p-10 mb-5 columnLeftAlign white'>
                     <span dangerouslySetInnerHTML={{ __html: result.snippet }}></span>
                 </div> 
             </div>

@@ -19,10 +19,10 @@ class PostList extends React.Component {
                             <br />{post.userId}
                         </div>
                     </div>
-                    <div className='columnLeft p-10 color-lite size20 mr-20 ml-20'>
+                    <div className='columnLeftAlign p-10 color-lite size20 mr-20 ml-20'>
                         {post.title}
                     </div>
-                    <div className='p-10 white columnLeft color-soft  mr-20 ml-20'>
+                    <div className='p-10 white columnLeftAlign color-soft  mr-20 ml-20'>
                         {post.body}
                         <UserHeader userId={post.userId}/>
                     </div>

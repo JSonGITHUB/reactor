@@ -13,7 +13,7 @@ function FunctionalSelector(props) {
     }
     //const tagSelected = (item) => <option selected key={getKey(item)} value={item.toString()}>{item}</option>;
     const tag = (item) => <option key={getKey(item)} value={item}>{item}</option>;
-    const getTag = (item, index) => (Number(index) === Number(selected)) ? setSelected(item) : tag(item);
+    const getTag = (item, index) => (Number(item) === Number(selected)) ? setSelected(item) : tag(item);
     const selectItems = items.map((item, index) => getTag(item,index));
     const handleChange = (event) => {
         selected = event.target.value;
@@ -29,7 +29,7 @@ function FunctionalSelector(props) {
     };
     return (
         <label>    
-            <select className='glassy pt-5 pb-5 r-10 bg-dark white mt-5 button' style={getStyle} value={selected} onChange={handleChange}>
+            <select className='glassy pt-5 pb-5 r-10 bg-darker white mt-5 button' style={getStyle} value={selected} onChange={handleChange}>
                 {selectItems}
             </select>
         </label>

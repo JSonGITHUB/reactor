@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 const PostDirectory = () => {
 
-    const [postDirectory, setPostDirectory] = useState(localStorage.getItem("postDirectory") === null) ? [] : JSON.parse(localStorage.getItem("postDirectory"));        
+    const [postDirectory, setPostDirectory] = useState(localStorage.getItem("postDirectory") === 'null') ? [] : JSON.parse(localStorage.getItem("postDirectory"));        
     const [uniquePosts, setUniquePosts] = useState([...new Set(postDirectory)]);
     const [index, setIndex] = useState(uniquePosts.indexOf(null));
     if (index > -1) {
@@ -34,7 +34,7 @@ const PostDirectory = () => {
      const getLastId = () => postDirectory[getLastIndex()];
      const get2ndToLastId = () => postDirectory[getLastIndex()-1];
      const getStorageItem = (id) => localStorage.getItem(id)
-     const getLastItem = () => (localStorage.getItem(getLastId()) === null) ? JSON.parse(getStorageItem(get2ndToLastId())) : JSON.parse(getStorageItem(getLastId()));
+     const getLastItem = () => (localStorage.getItem(getLastId()) === 'null') ? JSON.parse(getStorageItem(get2ndToLastId())) : JSON.parse(getStorageItem(getLastId()));
      
      return <p>Count: {postDirectory.length}</p> 
      
@@ -47,7 +47,7 @@ class PostDirectory extends React.Component {
 
     constructor(props) {
         super(props);
-        this.postDirectory = (localStorage.getItem("postDirectory") === null) ? [] : JSON.parse(localStorage.getItem("postDirectory"));        
+        this.postDirectory = (localStorage.getItem("postDirectory'") === 'null') ? [] : JSON.parse(localStorage.getItem("postDirectory"));        
         this.uniquePosts = [...new Set(this.postDirectory)];
         const index = this.uniquePosts.indexOf(null);
         if (index > -1) {
@@ -91,7 +91,7 @@ class PostDirectory extends React.Component {
      getLastId = () => this.state.postDirectory[this.getLastIndex()];
      get2ndToLastId = () => this.state.postDirectory[this.getLastIndex()-1];
      getStorageItem = (id) => localStorage.getItem(id)
-     getLastItem = () => (localStorage.getItem(this.getLastId()) === null) ? JSON.parse(this.getStorageItem(this.get2ndToLastId())) : JSON.parse(this.getStorageItem(this.getLastId()));
+     getLastItem = () => (localStorage.getItem(this.getLastId()) === 'null') ? JSON.parse(this.getStorageItem(this.get2ndToLastId())) : JSON.parse(this.getStorageItem(this.getLastId()));
      render() {      
              return <div className='p-20'>Count: {this.state.postDirectory.length}</div> 
      }

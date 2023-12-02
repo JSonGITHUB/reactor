@@ -23,7 +23,7 @@ const GetUsers = () => {
     });
     
     return (
-        <div className='maxWidth400 columnLeft color-yellow mt-20 sides-auto p-10 r-5 bg-green'>
+        <div className='maxWidth400 columnLeftAlign color-yellow mt-20 sides-auto p-10 r-5 bg-green'>
             {renderedUsers}
         </div>
     );

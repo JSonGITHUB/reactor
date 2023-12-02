@@ -86,7 +86,7 @@ const Geolocate = ({
         }
     }
     */
-  return <div className="color-yellow greet">{geolocationStatus}</div>;
+  return <div className="r-10 m-5 bg-darker p-10 width-100-pecent color-yellow greet">{geolocationStatus}</div>;
 };
 
 export default Geolocate;

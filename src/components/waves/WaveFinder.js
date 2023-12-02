@@ -24,7 +24,7 @@ const WaveFinder = () => {
     const getLocal = (item) => localStorage.getItem(item);
     const getProps = (item) => item;
 
-    const getDefault = (item) => (getLocal(item) === null) 
+    const getDefault = (item) => (getLocal(item) === 'null') 
                                     ? getProps(item) 
                                     : getLocal(item);
 
@@ -603,9 +603,11 @@ const WaveFinder = () => {
         )
     }
     return (
-        <div className='App-content fadeIn mt--30'>
-            <Geolocator currentPositionExists={currentPositionExists} returnCurrentPosition={updateCurrentLocation}/>
-            <div className='white'>
+        <div className='r-10 p-5 fadeIn mt--40 width-100-percent bg-tinted'>
+            <div className='p-10'>
+                <Geolocator currentPositionExists={currentPositionExists} returnCurrentPosition={updateCurrentLocation}/>
+            </div>
+            <div className='white mt--10'>
                 <ConditionsDashboard tideDisplay={tideDisplay} setWind={setWind} />
                 <ConditionsContext.Provider value={status}>
                     <ConditionsSelectors 

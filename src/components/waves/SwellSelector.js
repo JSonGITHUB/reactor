@@ -18,7 +18,7 @@ import NW from '../../assets/images/windNW.png';
 
 const SwellSelector = ({id, swellDirection, status, handleSwell1Selection, handleSwell2Selection, handleSwell1Angle, handleSwell2Angle, handleSwell1Height, handleSwell2Height, handleSwell1Interval, handleSwell2Interval, handleSwellCheck, pause}) => {
     
-    const swellClass = (id) => `${isSwellSelected(id)} flex2Column r-10 m-5 p-15`;
+    const swellClass = (id) => `${isSwellSelected(id)} flex2Column contentCenter r-10 m-5 p-15`;
     const isSwellSelected = (id) => ((id === '1' && (localStorage.getItem('isSwell1') === 'true')) || (id === '2' && (localStorage.getItem('isSwell2') === 'true'))) ? 'bg-lite glassy' : 'glassy';
     const intervals = ['','5 seconds','6 seconds','7 seconds','8 seconds','9 seconds','10 seconds','11 seconds','12 seconds','13 seconds','14 seconds','15 seconds','16 seconds','17 seconds','18 seconds','19 seconds','20 seconds','21 seconds','22 seconds','23 seconds'];
 

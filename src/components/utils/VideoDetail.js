@@ -16,7 +16,7 @@ const VideoDetail = ({ video }) => {
                     <div className='flex3Column'></div>
                     <div className='flex3Column'>
                         <div className='mt-10 greet color-yellow bold'>{title}</div>
-                        <div className='p-10 columnLeft small white'>{description}</div>
+                        <div className='p-10 columnLeftAlign small white'>{description}</div>
                     </div>
                     <div className='flex3Column'></div>
                 </div>
