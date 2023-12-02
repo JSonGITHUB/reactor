@@ -27,6 +27,8 @@ import Videos from "./components/utils/Videos.js";
 import WikiSearch from "./components/utils/WikiSearch.js";
 import DualVideoPlayer from "./components/utils/DualVideoPlayer.js";
 import ExchangeRates from "./components/utils/ExchangeRates.js";
+import GallonsCalculator from "./components/utils/GallonsCalculator.js";
+import TripFuelTracker from "./components/utils/TripFuelTracker.js";
 import ExchangeConverter from "./components/utils/ExchangeConverter.js";
 import ExpenseTracker from "./components/utils/ExpenseTracker.js";
 import TaskTracker from "./components/utils/TaskTracker.js";
@@ -46,6 +48,8 @@ import StreamShow from './components/streams/StreamShow';
 import history from './components/utils/history.js';
 import Fireworks from './components/utils/Fireworks.js';
 import CountryContext from './components/context/CountryContext.js';
+import { Provider } from 'react-redux';
+import { store } from './redux/store';
 
 class App extends React.Component {
   constructor(props) {
@@ -61,7 +65,7 @@ class App extends React.Component {
   }
   base = "reactor/";
   company = "KFA";
-  path = window.location.pathname;
+  path = localStorage.getItem('path') || window.location.pathname;
   componentId = this.path.replace("/", "").toLocaleLowerCase();
   currentComponent = this.componentId;
   setMotion = () => this.setState({ isMotionOn: !this.state.isMotionOn });
@@ -119,6 +123,8 @@ class App extends React.Component {
 
   render() {
     window.addEventListener("resize", debounce(this.setIt, 250));
+    const path = `/${window.location.pathname.split('/')[2]}`
+    localStorage.setItem('path', path)
     /*
     const componentTag = (current) => <div className="App">
             <Header company={this.company} width={this.state.width} isMotionOn={this.state.isMotionOn}/>
@@ -138,146 +144,151 @@ class App extends React.Component {
     // eslint-disable-next-line
     const { width, height, isMotionOn, isSignedIn } = this.state;
     console.log(`App => this.state.isSignedIn: ${this.state.isSignedIn}`);
+
     return (
       //AppComponent();<ScrollToTop loc={window.location} />
-      <Router basename={this.base} history={history}>
-        
-        <div className="App">
-          <Switch>
-            <Header
-              company={this.company}
-              width={width}
-              isSignedIn={this.state.isSignedIn}
-              isMotionOn={isMotionOn}
-              setSignIn={this.setSignIn}
-            />
-          </Switch>
-          <div className="fadeIn">
+      <Provider store={store}>
+        <Router basename={this.base} history={history}>
+          
+          <div className="App">
             <Switch>
-              <Route
-                exact
-                path="/"
-                render={(props) => (
-                  <WaveFinder
-                    {...props}
-                    tide="medium"
-                    isSwell1="false"
-                    isSwell2="false"
-                    isTide="false"
-                    isWind="false"
-                    swell1Direction="SSW"
-                    swell2Direction="W"
-                    swell1Angle="210"
-                    swell2Angle="278"
-                    swell1Height="3"
-                    swell2Height="2"
-                    swell1Interval="17 seconds"
-                    swell2Interval="17 seconds"
-                    windDirection="W"
-                    distance="10"
+              <Header
+                company={this.company}
+                width={width}
+                isSignedIn={this.state.isSignedIn}
+                isMotionOn={isMotionOn}
+                setSignIn={this.setSignIn}
+              />
+            </Switch>
+            <div className="fadeIn">
+              <Switch>
+                <Route
+                  exact
+                  path="/"
+                  render={(props) => (
+                    <WaveFinder
+                      {...props}
+                      tide="medium"
+                      isSwell1="false"
+                      isSwell2="false"
+                      isTide="false"
+                      isWind="false"
+                      swell1Direction="SSW"
+                      swell2Direction="W"
+                      swell1Angle="210"
+                      swell2Angle="278"
+                      swell1Height="3"
+                      swell2Height="2"
+                      swell1Interval="17 seconds"
+                      swell2Interval="17 seconds"
+                      windDirection="W"
+                      distance="10"
+                    />
+                  )}
+                />
+                <Route path="/Home" component={Home} />
+                {/*<Route path="/BowlBuilder" component={BowlBuilder} />*/}
+                {/*<Route path='/BowlBuilder' render={(props) => <BowlBuilder {...props} width={width} height={height} />}/>*/}
+                <Route path="/Converter" component={Calculator} />
+                <Route path="/Notes" component={FormNotes} />
+                {/*<Route path="/Reservation" component={Reservation} />*/}
+                {/*<Route path="/GuestList" component={SignUpDialog} />*/}
+                {/*<Route path="/SurfLog" component={SurfLog} />*/}
+                <Route
+                  path="/SurfLog"
+                  render={(props) => <SurfLog {...props} logId={logId} />}
+                />
+                <Route
+                  path="/WaveFinder"
+                  render={(props) => (
+                    <WaveFinder
+                      {...props}
+                      tide="medium"
+                      isSwell1="false"
+                      isSwell2="false"
+                      isTide="false"
+                      isWind="false"
+                      swell1Direction="SSW"
+                      swell2Direction="W"
+                      swell1Angle="210"
+                      swell2Angle="278"
+                      swell1Height="3"
+                      swell2Height="2"
+                      swell1Interval="17 seconds"
+                      swell2Interval="17 seconds"
+                      windDirection="W"
+                      distance="10"
+                    />
+                  )}
+                /> 
+                <Route
+                  path="/Fireworks"
+                  render={(props) => (
+                    <Fireworks display='true' quantity='50' />
+                  )}
+                />
+                <Route path="/Weather" render={(props) => <Weather />} />
+                <Route path="/Buoys" component={Buoys} />
+                <Route path="/LogDirectory" component={LogDirectory} />
+                <Route path="/Swell" component={SlideShow} />
+                <Route path="/PhotoBlog" component={PhotoBlog} />
+                <Route path="/Blog" component={Blog} />
+                <Route path="/PhotoSequence" component={PhotoSequence} />
+                <Route
+                  path="/Adder"
+                  render={(props) => (
+                    <Adder
+                      {...props}
+                      label="How big was it?"
+                      unit="ft"
+                      count="10"
+                    />
+                  )}
+                />
+                <Route path="/Counter" render={(props) => <Counter />} />
+                <Route path="/Photos" render={(props) => <Photos />} />
+                <Route path="/Videos" render={(props) => <Videos />} />
+                <Route path="/WikiSearch" render={(props) => <WikiSearch />} />
+                <Route path="/DualVideoPlayer" render={(props) => <DualVideoPlayer />} />
+                <Route path="/ExchangeRates" render={(props) => <ExchangeRates />} />
+                <Route path="/GallonsCalculator" render={(props) => <GallonsCalculator />} />
+                <Route path="/TripFuelTracker" render={(props) => <TripFuelTracker />} />
+                <Route path="/ExchangeConverter" render={(props) => <ExchangeConverter />} />
+                <Route path="/ExpenseTracker" render={(props) => <ExpenseTracker />} />
+                <Route path="/TaskTracker" render={(props) => <TaskTracker />} />
+                <Route path="/Translator" render={(props) => <Translator />} />
+                <Route path="/ScoreKeeper" render={(props) => <ScoreKeeper />} />
+                <Route path="/Shop" render={(props) => <Shop />} />
+                <Route path="/Music" render={(props) => <MusicPlayer />} />
+                <Route
+                  path="/Accordion"
+                  render={(props) => <Accordion items={this.items} />}
+                />
+                <Route path="/Todos" render={(props) => <Todos />} />
+                <Route path="/Reducer" component={Reducer} />
+                <Route path="/streams" exact component={StreamList} />
+                <Route path="/streams/" exact component={StreamList} />
+                <Route path="/streams/list" exact component={StreamList} />
+                <Route path="/streams/new" exact component={StreamCreate} />
+                <Route path="/streams/edit/:id" exact component={StreamEdit} />
+                <Route path="/streams/delete/:id" exact component={StreamDelete} />
+                <Route path="/streams/:id" exact component={StreamShow} />
+              </Switch>
+            </div>
+            <Switch>
+              <CountryContext.Provider value={this.state.country}>
+                  <Footer
+                      isMotionOn={isMotionOn}
+                      isSignedIn={this.state.isSignedIn}
+                      setMotion={this.setMotion}
+                      setSignIn={this.setSignIn}
+                      setCountry={this.setCountry}
                   />
-                )}
-              />
-              <Route path="/Home" component={Home} />
-              {/*<Route path="/BowlBuilder" component={BowlBuilder} />*/}
-              {/*<Route path='/BowlBuilder' render={(props) => <BowlBuilder {...props} width={width} height={height} />}/>*/}
-              <Route path="/Converter" component={Calculator} />
-              <Route path="/Notes" component={FormNotes} />
-              {/*<Route path="/Reservation" component={Reservation} />*/}
-              {/*<Route path="/GuestList" component={SignUpDialog} />*/}
-              {/*<Route path="/SurfLog" component={SurfLog} />*/}
-              <Route
-                path="/SurfLog"
-                render={(props) => <SurfLog {...props} logId={logId} />}
-              />
-              <Route
-                path="/WaveFinder"
-                render={(props) => (
-                  <WaveFinder
-                    {...props}
-                    tide="medium"
-                    isSwell1="false"
-                    isSwell2="false"
-                    isTide="false"
-                    isWind="false"
-                    swell1Direction="SSW"
-                    swell2Direction="W"
-                    swell1Angle="210"
-                    swell2Angle="278"
-                    swell1Height="3"
-                    swell2Height="2"
-                    swell1Interval="17 seconds"
-                    swell2Interval="17 seconds"
-                    windDirection="W"
-                    distance="10"
-                  />
-                )}
-              /> 
-              <Route
-                path="/Fireworks"
-                render={(props) => (
-                  <Fireworks display='true' quantity='50' />
-                )}
-              />
-              <Route path="/Weather" render={(props) => <Weather />} />
-              <Route path="/Buoys" component={Buoys} />
-              <Route path="/LogDirectory" component={LogDirectory} />
-              <Route path="/Swell" component={SlideShow} />
-              <Route path="/PhotoBlog" component={PhotoBlog} />
-              <Route path="/Blog" component={Blog} />
-              <Route path="/PhotoSequence" component={PhotoSequence} />
-              <Route
-                path="/Adder"
-                render={(props) => (
-                  <Adder
-                    {...props}
-                    label="How big was it?"
-                    unit="ft"
-                    count="10"
-                  />
-                )}
-              />
-              <Route path="/Counter" render={(props) => <Counter />} />
-              <Route path="/Photos" render={(props) => <Photos />} />
-              <Route path="/Videos" render={(props) => <Videos />} />
-              <Route path="/WikiSearch" render={(props) => <WikiSearch />} />
-              <Route path="/DualVideoPlayer" render={(props) => <DualVideoPlayer />} />
-              <Route path="/ExchangeRates" render={(props) => <ExchangeRates />} />
-              <Route path="/ExchangeConverter" render={(props) => <ExchangeConverter />} />
-              <Route path="/ExpenseTracker" render={(props) => <ExpenseTracker />} />
-              <Route path="/TaskTracker" render={(props) => <TaskTracker />} />
-              <Route path="/Translator" render={(props) => <Translator />} />
-              <Route path="/ScoreKeeper" render={(props) => <ScoreKeeper />} />
-              <Route path="/Shop" render={(props) => <Shop />} />
-              <Route path="/Music" render={(props) => <MusicPlayer />} />
-              <Route
-                path="/Accordion"
-                render={(props) => <Accordion items={this.items} />}
-              />
-              <Route path="/Todos" render={(props) => <Todos />} />
-              <Route path="/Reducer" component={Reducer} />
-              <Route path="/streams" exact component={StreamList} />
-              <Route path="/streams/" exact component={StreamList} />
-              <Route path="/streams/list" exact component={StreamList} />
-              <Route path="/streams/new" exact component={StreamCreate} />
-              <Route path="/streams/edit/:id" exact component={StreamEdit} />
-              <Route path="/streams/delete/:id" exact component={StreamDelete} />
-              <Route path="/streams/:id" exact component={StreamShow} />
+              </CountryContext.Provider>
             </Switch>
           </div>
-          <Switch>
-            <CountryContext.Provider value={this.state.country}>
-                <Footer
-                    isMotionOn={isMotionOn}
-                    isSignedIn={this.state.isSignedIn}
-                    setMotion={this.setMotion}
-                    setSignIn={this.setSignIn}
-                    setCountry={this.setCountry}
-                />
-            </CountryContext.Provider>
-          </Switch>
-        </div>
-      </Router>
+        </Router>
+      </Provider>
     );
   }
 }

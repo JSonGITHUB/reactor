@@ -36,6 +36,18 @@ const initData =
       "color": "#b8e522"
     },
     {
+      "title": "Chives",
+      "aisle": "Baja",
+      "price": "0.00",
+      "quantity": 1,
+      "tax": false,
+      "cart": true,
+      "select": false,
+      "lastPurchase": "2021-02-19T22:04:34.625Z",
+      "days": 1,
+      "color": "#a0306a"
+    },
+    {
       "title": "Chia seed pudding",
       "aisle": "Baja",
       "price": "0.00",
@@ -60,6 +72,18 @@ const initData =
       "color": "#b8e522"
     },
     {
+      "title": "Fruit",
+      "aisle": "Baja",
+      "price": "3.00",
+      "quantity": 1,
+      "tax": false,
+      "cart": true,
+      "select": false,
+      "lastPurchase": "2021-02-22T20:15:00.011Z",
+      "days": 1,
+      "color": "#b8e522"
+    },
+    {
       "title": "Garlic bread",
       "aisle": "Baja",
       "price": "0.00",
@@ -73,6 +97,18 @@ const initData =
     },
     {
       "title": "Milk",
+      "aisle": "Baja",
+      "price": "0.00",
+      "quantity": 1,
+      "tax": false,
+      "cart": false,
+      "select": false,
+      "lastPurchase": "2021-02-22T20:17:08.486Z",
+      "days": 1,
+      "color": "#b8e522"
+    },
+    {
+      "title": "Oatmeal",
       "aisle": "Baja",
       "price": "0.00",
       "quantity": 1,
@@ -117,7 +153,7 @@ const initData =
       "days": 0
     },
     {
-      "title": "Eggplan",
+      "title": "Eggplant",
       "aisle": "Garden",
       "price": "6.00",
       "quantity": 1,
@@ -262,6 +298,18 @@ const initData =
     {
       "title": "Tomatoes",
       "aisle": "Tienda",
+      "price": "0.00",
+      "quantity": 5,
+      "tax": false,
+      "cart": false,
+      "select": false,
+      "lastPurchase": "2021-02-19T22:14:48.095Z",
+      "days": 1,
+      "color": "#a8195b"
+    },
+    {
+      "title": "Walnuts",
+      "aisle": "Walmart",
       "price": "0.00",
       "quantity": 5,
       "tax": false,
@@ -559,6 +607,18 @@ const initData =
       "color": "#b8e522"
     },
     {
+      "title": "Rice",
+      "aisle": "Baja",
+      "price": "0.00",
+      "quantity": 1,
+      "tax": false,
+      "cart": false,
+      "select": false,
+      "lastPurchase": "2020-12-30T16:46:58.306Z",
+      "days": 52,
+      "color": "#b8e522"
+    },
+    {
       "title": "Cheese",
       "aisle": "Baja",
       "price": "0.00",
@@ -643,6 +703,18 @@ const initData =
       "color": "#b8e522"
     },
     {
+      "title": "Fishing rode",
+      "aisle": "Baja",
+      "price": "0.00",
+      "quantity": 1,
+      "tax": false,
+      "cart": false,
+      "select": false,
+      "lastPurchase": "2020-06-18T16:26:38.333Z",
+      "days": 247,
+      "color": "#b8e522"
+    },
+    {
       "title": "Gas tanks",
       "aisle": "Baja",
       "price": "0.00",
@@ -703,6 +775,18 @@ const initData =
       "color": "#b8e522"
     },
     {
+      "title": "Rasins",
+      "aisle": "Baja",
+      "price": "3.00",
+      "quantity": 1,
+      "tax": false,
+      "cart": false,
+      "select": false,
+      "lastPurchase": "2020-12-30T16:46:58.306Z",
+      "days": 52,
+      "color": "#b8e522"
+    },
+    {
       "title": "Meatballs",
       "aisle": "Baja",
       "price": "0.00",
@@ -740,6 +824,18 @@ const initData =
     },
     {
       "title": "Passports",
+      "aisle": "Baja",
+      "price": "0.00",
+      "quantity": 1,
+      "tax": false,
+      "cart": false,
+      "select": false,
+      "lastPurchase": "2020-12-30T16:46:58.306Z",
+      "days": 52,
+      "color": "#b8e522"
+    },
+    {
+      "title": "Fork, Spoons and Knife",
       "aisle": "Baja",
       "price": "0.00",
       "quantity": 1,
@@ -919,6 +1015,30 @@ const initData =
       "color": "#b8e522"
     },
     {
+      "title": "Outlet Adapters",
+      "aisle": "Indo",
+      "price": "0.00",
+      "quantity": 1,
+      "tax": false,
+      "cart": false,
+      "select": false,
+      "lastPurchase": "2020-12-30T16:46:58.306Z",
+      "days": 52,
+      "color": "#b8e522"
+    },
+    {
+      "title": "Breakfast stuff",
+      "aisle": "Indo",
+      "price": "0.00",
+      "quantity": 1,
+      "tax": false,
+      "cart": false,
+      "select": false,
+      "lastPurchase": "2020-12-30T16:46:58.306Z",
+      "days": 52,
+      "color": "#b8e522"
+    },
+    {
       "title": "Water jug",
       "aisle": "Baja",
       "price": "0.00",
@@ -1076,6 +1196,18 @@ const initData =
     },
     {
       "title": "Ice pop",
+      "aisle": "Smart and Final",
+      "price": "0.00",
+      "quantity": 1,
+      "tax": true,
+      "cart": false,
+      "select": false,
+      "lastPurchase": "2020-09-05T01:52:20.655Z",
+      "days": 169,
+      "color": "#47f2d7"
+    },
+    {
+      "title": "Avacados",
       "aisle": "Smart and Final",
       "price": "0.00",
       "quantity": 1,
@@ -1604,6 +1736,18 @@ const initData =
     },
     {
       "title": "Paper towels",
+      "aisle": "baja",
+      "price": "0.00",
+      "quantity": 1,
+      "tax": false,
+      "cart": false,
+      "select": false,
+      "lastPurchase": "2020-12-30T16:46:58.306Z",
+      "days": 52,
+      "color": "#a0306a"
+    },
+    {
+      "title": "Butter",
       "aisle": "baja",
       "price": "0.00",
       "quantity": 1,

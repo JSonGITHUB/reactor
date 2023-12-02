@@ -37,7 +37,7 @@ class ConditionsSelectors extends React.Component {
     refresh = () => window.location.pathname = "/reactor/WaveFinder";
     
     starSelector = (stars) => <div 
-                                className="flex2Column glassy r-10 m-5 p-15" 
+                                className="flex2Column contentCenter glassy r-10 m-5 p-15" 
                                 onMouseDown={this.pause}
                                 >
                                     Match<br/>
@@ -52,7 +52,7 @@ class ConditionsSelectors extends React.Component {
                                         width='93%'
                                     />
                                 </div>
-    milesInput = (distance) => <div className="flex2Column glassy r-10 m-5 p-10">
+    milesInput = (distance) => <div className="flex2Column contentCenter glassy r-10 m-5 p-10">
                                 <label>
                                     Miles<br/>
                                     <input className="mt-10 p-10 r-10"

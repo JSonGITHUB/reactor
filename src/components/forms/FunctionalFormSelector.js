@@ -5,11 +5,11 @@ import getKey from '../utils/KeyGenerator.js';
 
 function FormSelector(props) {
     let action = "";
-    const { items, label, selected } = props;
+    const { items, label, selected} = props;
     const select = selected;
     let bowlIngredients = "";
     const tagSelected = (item) => <option selected key={getKey(item)} value={item.toString()}>{item}</option>;
-    const tag = (item) => <option key={getKey(item)} value={item.toString()}>{item}</option>;
+    const tag = (item) => <option key={getKey(item)} value={item.toString()}>{item}{suffix}</option>;
     const getTag = (item) => (item === select) ? tagSelected(item) : tag(item);
     const selectItems = items.map((item) =>
         getTag(item)     
@@ -57,8 +57,8 @@ function FormSelector(props) {
                 </div>
             </label>
             <span className="flexContainer">
-                <input type="submit" value="add" className="flex2Column bold greet p-20 r-10 width-100-percent bg-green brdr-green" onClick={add}/>
-                <input type="submit" value="remove" className="flex2Column bold greet ml-2 p-20 r-10 width-100-percent bg-red brdr-red" onClick={remove}/>
+                <input type="submit" value="add" className="flex2Column contentCenter bold greet p-20 r-10 width-100-percent bg-green brdr-green" onClick={add}/>
+                <input type="submit" value="remove" className="flex2Column contentCenter bold greet ml-2 p-20 r-10 width-100-percent bg-red brdr-red" onClick={remove}/>
             </span>
         </form>
     );

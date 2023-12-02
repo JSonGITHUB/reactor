@@ -308,22 +308,21 @@ const ProjectTaskTracker = () => {
 
     return (
         <div>
-            <div className='color-dark'>
+            <div >
                 <DropDown
                     value={tracking}
                     options={trackables}
                     onChange={handleDropdownChange}
                 />
             </div>
-            <h2>Project Task Tracker</h2>
-            <button onClick={handleToggleCollapse}>{isCollapsed ? 'Expand All' : 'Collapse All'}</button>
+            <button className='p-10 r-5 m-5' onClick={handleToggleCollapse}>{isCollapsed ? 'Expand All' : 'Collapse All'}</button>
             <br />
             <br />
             {(tracking === 'tasks') ?
                 <React.Fragment>
                     <div>
-                        <h3>Add Project</h3>
                         <input
+                            className='p-10 r-5 m-5'
                             type="text"
                             value={newProjectDescription}
                             onChange={(e) => setNewProjectDescription(e.target.value)}
@@ -335,16 +334,15 @@ const ProjectTaskTracker = () => {
                             }}
                         />
 
-                        <button onClick={handleAddProject}>Add Project</button>
+                        <button onClick={handleAddProject}>Add Tracking</button>
                     </div>
                     <br />
                     <div>
-                        <h3>Projects</h3>
                         {projects.map((project, projectIndex) => (
                             <div key={projectIndex} className='r-10 bg-darker m-5 p-10'>
                                 <div className='r-10 bg-black m-5 p-10'>
-                                    <div className='greet bold color-yellow'>{project.description}</div>
-                                    <div className='copyright color-light'>{project.createdDate} Time: {getTotalTime(getProjectTime(project))}</div>
+                                    <div className='bold color-neogreen'>{project.description}</div>
+                                    <div className='description color-lite'>{project.createdDate} Time: {getTotalTime(getProjectTime(project))}</div>
                                     <button onClick={() => addTask(projectIndex)}>
                                         Add Task
                                     </button>
@@ -355,17 +353,17 @@ const ProjectTaskTracker = () => {
                                         {project.isCollapsed ? 'Expand' : 'Collapse'}
                                     </button>
                                 </div>
-                                <div className='color-green bold'>{(isCollapsed || project.isCollapsed) ? '' : `${project.description} Task List:`}</div>
+                                <div className='color-neogreen bold'>{(isCollapsed || project.isCollapsed) ? '' : `${project.description} Task List:`}</div>
                                 <div>
                                     {(isCollapsed || project.isCollapsed) ? null : project.tasks.map((task, taskIndex) => (
                                         <div key={taskIndex} className='bg-black m-5 p-10 lowerBorder'>
                                             <div className='p-10 r-10 m-10 bg-dark'>
-                                                <div>{task.description}</div>
+                                                <div className='bold color-yellow'>{task.description}</div>
                                                 <div>{task.sessions.length} Total: {task.runningTimeDisplay} </div>
                                             </div>
                                             <div className='p-10 r-10 m-10 bg-dark'>
                                                 {task.sessions.map((session, sessionIndex) => (
-                                                    <div className='copyright color-light'>{session.startDate} - {String(session.endDate).split(', ')[1]} {session.totalTime}
+                                                    <div className='description color-lite'>{session.startDate} - {String(session.endDate).split(', ')[1]} {session.totalTime}
                                                     </div>
                                                 ))}
                                             </div>
@@ -395,6 +393,7 @@ const ProjectTaskTracker = () => {
                     <div>
                         <h3>Solar/Battery Log</h3>
                         <input
+                            className='p-10 r-5 m-5'
                             type="text"
                             value={newProjectDescription}
                             onChange={(e) => setNewProjectDescription(e.target.value)}
@@ -406,50 +405,48 @@ const ProjectTaskTracker = () => {
                             }}
                         />
 
-                        <button onClick={handleAddProject}>Add Project</button>
+                        <button className='p-10 r-5 m-5' onClick={handleAddProject}>Add Project</button>
                     </div>
                     <br />
                     <div>
-                        <h3>Projects</h3>
                         {projects.map((project, projectIndex) => (
                             <div key={projectIndex} className='r-10 bg-darker m-5 p-10'>
                                 <div className='r-10 bg-black m-5 p-10'>
-                                    <div className='greet bold color-yellow'>{project.description}</div>
-                                    <div className='copyright color-light'>{project.createdDate} Time: {getTotalTime(getProjectTime(project))}</div>
-                                    <button onClick={() => addTask(projectIndex)}>
+                                    <div className='greet bold color-neogreen'>{project.description}</div>
+                                    <div className='description color-lite'>{project.createdDate} Time: {getTotalTime(getProjectTime(project))}</div>
+                                    <button className='p-10 r-5 m-5' onClick={() => addTask(projectIndex)}>
                                         Add Task
                                     </button>
-                                    <button onClick={() => handleDeleteProject(projectIndex)}>
+                                    <button className='p-10 r-5 m-5' onClick={() => handleDeleteProject(projectIndex)}>
                                         Delete Project
                                     </button>
-                                    <button onClick={() => handleProjectToggle(projectIndex)}>
+                                    <button className='p-10 r-5 m-5' onClick={() => handleProjectToggle(projectIndex)}>
                                         {project.isCollapsed ? 'Expand' : 'Collapse'}
                                     </button>
                                 </div>
-                                <div className='color-green bold'>{(isCollapsed || project.isCollapsed) ? '' : `${project.description} Task List:`}</div>
                                 <div>
                                     {(isCollapsed || project.isCollapsed) ? null : project.tasks.map((task, taskIndex) => (
                                         <div key={taskIndex} className='bg-black m-5 p-10 lowerBorder'>
                                             <div className='p-10 r-10 m-10 bg-dark'>
-                                                <div>{task.description}</div>
+                                                <div className='bold color-yellow'>{task.description}</div>
                                                 <div>{task.sessions.length} Total: {task.runningTimeDisplay} </div>
                                             </div>
                                             <div className='p-10 r-10 m-10 bg-dark'>
                                                 {task.sessions.map((session, sessionIndex) => (
-                                                    <div className='copyright color-light'>{session.startDate} - {String(session.endDate).split(', ')[1]} {session.totalTime}
+                                                    <div className='description color-lite'>{session.startDate} - {String(session.endDate).split(', ')[1]} {session.totalTime}
                                                     </div>
                                                 ))}
                                             </div>
                                             {task.isRunning ? (
-                                                <button onClick={() => handleStopTask(projectIndex, taskIndex)}>
+                                                <button className='p-10 r-5 m-5' onClick={() => handleStopTask(projectIndex, taskIndex)}>
                                                     Stop
                                                 </button>
                                             ) : (
-                                                <button onClick={() => handleStartTask(projectIndex, taskIndex)}>
+                                                <button className='p-10 r-5 m-5' onClick={() => handleStartTask(projectIndex, taskIndex)}>
                                                     Start
                                                 </button>
                                             )}
-                                            <button onClick={() => handleDeleteTask(projectIndex, taskIndex)}>
+                                            <button className='p-10 r-5 m-5' onClick={() => handleDeleteTask(projectIndex, taskIndex)}>
                                                 Delete Task
                                             </button>
                                         </div>
@@ -472,37 +469,37 @@ const ProjectTaskTracker = () => {
                         {projects.map((project, projectIndex) => (
                             <div key={projectIndex} className='r-10 bg-darker m-5 p-10'>
                                 <div className='r-10 bg-black m-5 p-10'>
-                                    <div className='greet bold color-yellow'>{project.description}</div>
-                                    <div className='copyright color-light'>{project.createdDate} Time: {getTotalTime(getProjectTime(project))}</div>
-                                    <button onClick={() => addSet(projectIndex)}>
+                                    <div className='greet bold color-neogreen'>{project.description}</div>
+                                    <div className='description color-lite'>{project.createdDate} Time: {getTotalTime(getProjectTime(project))}</div>
+                                    <button className='p-10 r-5 m-5' onClick={() => addSet(projectIndex)}>
                                         Add Set
                                     </button>
-                                    <button onClick={() => handleDeleteProject(projectIndex)}>
+                                    <button className='p-10 r-5 m-5' onClick={() => handleDeleteProject(projectIndex)}>
                                         Delete Log
                                     </button>
                                 </div>
-                                <div className='color-green bold'>{(isCollapsed || project.isCollapsed) ? '' : `${project.description} Task List:`}</div>
+                                <div className='color-neogreen bold'>{(isCollapsed || project.isCollapsed) ? '' : `${project.description} Task List:`}</div>
                                 <div>
                                     {(isCollapsed || project.isCollapsed) ? null : project.tasks.map((task, taskIndex) => (
                                         <div key={taskIndex} className='bg-black m-5 p-10 lowerBorder'>
                                             <div className='p-10 r-10 m-10 bg-dark'>
-                                                <div>{task.description}</div>
+                                                <div className='bold color-yellow'>{task.description}</div>
                                                 <div>Waves: {task.sessions.length}</div>
                                             </div>
                                             <React.Fragment>
-                                                <button onClick={() => addWave(projectIndex, taskIndex)}>
+                                                <button className='p-10 r-5 m-5' onClick={() => addWave(projectIndex, taskIndex)}>
                                                     Wave +
                                                 </button>
-                                                <button onClick={() => subtractWave(projectIndex, taskIndex)}>
+                                                <button className='p-10 r-5 m-5' onClick={() => subtractWave(projectIndex, taskIndex)}>
                                                     Wave -
                                                 </button>
                                             </React.Fragment>
-                                            <button onClick={() => handleDeleteTask(projectIndex, taskIndex)}>
+                                            <button className='p-10 r-5 m-5' onClick={() => handleDeleteTask(projectIndex, taskIndex)}>
                                                 Delete Set
                                             </button>
                                             <div className='p-10 r-10 m-10 bg-dark'>
                                                 {task.sessions.map((session, sessionIndex) => (
-                                                    <div className='copyright color-light p-10'>
+                                                    <div className='description color-lite p-10'>
                                                         <div className="button" onClick={() => task.sessions[sessionIndex].isLiked = !task.sessions[sessionIndex].isLiked}>
                                                             <span className='mr-5'>{String(session.startDate).split(', ')[1]}  - Wave {sessionIndex + 1}</span>
                                                             <img src={(task.sessions[sessionIndex].isLiked) ? thumbsUp : thumbsDown} alt='like' className='shaka mb--10' />

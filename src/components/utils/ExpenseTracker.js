@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ExchangeRatesConfig from './ExchangeRatesConfig';
+import initData from './ExpenseTrackerInitData.js';
 
 const ExpenseTracker = () => {
 
@@ -56,13 +57,22 @@ const ExpenseTracker = () => {
     AUD: `AUD`,    // Australian Dollar
   };
 
-  const [exchangeRates, setExchangeRates] = useState({});
+  const defaultExchangeRates = {
+    'USD': 1,
+    'MXN': 17.16,   // Mexican Peso
+    'NIO': 36.55,   // Nicaraguan Cordovas
+    'CRC': 541.23,    // Costa Rican Colones
+    'IDR': 15000,  // Indonesian Rupiah
+    'AUD': 1.5,    // Australian Dollar
+  };
+
+  const [exchangeRates, setExchangeRates] = useState(defaultExchangeRates);
   const [usdAmount, setUsdAmount] = useState('');
   const [selectedCurrency, setSelectedCurrency] = useState('MXN');
   const [convertedAmount, setConvertedAmount] = useState('');
   const [settings, setSettings] = useState(false)
+  const [totalExpenses, setTotalExpenses] = useState();
   const [expenses, setExpenses] = useState([]);
-  const [countryCode, setCountryCode] = useState([]);
   const [expenseData, setExpenseData] = useState({
     date: '',
     time: '',
@@ -74,22 +84,43 @@ const ExpenseTracker = () => {
   });
 
   useEffect(() => {
+    const grandTotal = getTotalExpenses();
+    localStorage.setItem('totalExpenses', grandTotal);
+    setTotalExpenses(grandTotal);
+    console.log(`Total Expense: ${grandTotal}`)
+  }, []);
+
+  useEffect(() => {
     const savedExchangeRates = localStorage.getItem('exchangeRates');
-    if (savedExchangeRates) {
+    if (savedExchangeRates !== '{}') {
       setExchangeRates(JSON.parse(savedExchangeRates));
+    } else {
+      setExchangeRates(defaultExchangeRates);
     }
+    console.log(`IDR: ${exchangeRates.IDR}`);
   }, []);
 
   useEffect(() => {
     const savedExpenses = localStorage.getItem('expenses');
     if (savedExpenses) {
       setExpenses(JSON.parse(savedExpenses));
+    } else {
+      setExpenses(initData);
     }
   }, []);
 
   useEffect(() => {
     localStorage.setItem('expenses', JSON.stringify(expenses));
+    const grandTotal = getTotalExpenses();
+    localStorage.setItem('totalExpenses', grandTotal);
+    setTotalExpenses(grandTotal);
+    console.log(`Total Expense: ${grandTotal}`)
   }, [expenses]);
+  
+  useEffect(() => {
+    console.log(`exchangeRates changed: ${exchangeRates}`)
+    localStorage.setItem('exchangeRates', JSON.stringify(exchangeRates));
+  }, [exchangeRates]);
 
   const handleInputRateChange = (event) => {
     const { name, value } = event.target;
@@ -130,17 +161,15 @@ const ExpenseTracker = () => {
     const currentTime = new Date();
     return currentTime.toLocaleTimeString();
   };
-  useEffect(() => {
-    localStorage.setItem('exchangeRates', JSON.stringify(exchangeRates));
-  }, [exchangeRates]);
 
   const handleExpenseInputChange = (event) => {
     setUsdAmount(event.target.value);
-    console.log(`${selectedCurrency}: ${event.target.value} - USD: ${convertToUS(event.target.value)}`)
+    console.log(`${selectedCurrency}: ${event.target.value} - `)
   };
   const handleCurrencyInputChange = (event) => {
     //console.log(event.target.value)
     //alert(`USD: ${event.target.value}`)
+    //setCountryCode(event.target.value);
     setSelectedCurrency(event.target.value);
   };
   const handleInputChange = (event) => {
@@ -150,36 +179,55 @@ const ExpenseTracker = () => {
     }
     if (name === 'currency') {
       handleCurrencyInputChange(event);
+      setExpenseData((prevData) => ({
+        ...prevData,
+        [name]: value,
+        countryCode: value,
+      }));
+    } else {
+      setExpenseData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
     }
-    setExpenseData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+      
   };
 
   const handleCurrencyChange = (currency) => {
     setSelectedCurrency(currency);
   };
 
-  const convertToUS = (amount) => {
-      console.log(`convertToUS(${amount}) selectedCurrency: ${selectedCurrency}`)
-      const rate = exchangeRates['MXN'];
-      console.log(`convertToUS(${amount}) rate(${rate})`)
-      const convertedValue = amount / rate;
-      const converted = convertedValue.toFixed(2);
-      setConvertedAmount(converted);
-      return converted;
-  };
+  const getTotalExpenses = () => {
+    const total = expenses.reduce((acc, expense) => {
+      const itemTotal = convertToUS(expense.cost, expense.countryCode);
+      return acc + itemTotal;
+    }, 0);
+    return "$" + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,");
+  };  
 
   const reversedExpenses = [...expenses].reverse().map((item) => {
     // Perform your mapping logic here
     return item * 2;
   });
+  const formatNumber = (amount) => {
+    const formattedNumber = Number(amount).toLocaleString();
+    return formattedNumber
+  }
+  const convertToUS = (amount, countryCode) => {
+    console.log(`convertToUS(${amount}) selectedCurrency: ${countryCode}`)
+    const rate = exchangeRates[countryCode];
+    console.log(`convertToUS(${amount}) rate(${rate})`)
+    const convertedValue = amount / rate;
+    const converted = convertedValue.toFixed(2);
+    console.log(`convertToUS:(${amount}) rate:(${rate}) converted:(${converted})`)
+    //setConvertedAmount(converted);
+    return Number(converted);
+};
 
   return (
     <div>
       <ExchangeRatesConfig onExchangeRatesChange={setExchangeRates}></ExchangeRatesConfig>
-      <div className='bg-darker r-10 p-10 ml-20 mr-20 mb-1 bold'>
+      <div className='bg-darker r-10 p-10 ml-20 mr-20 mb-1'>
         <label>
           Expense:
           <input
@@ -187,19 +235,19 @@ const ExpenseTracker = () => {
             name="expense"
             value={expenseData.expense}
             onChange={handleInputChange}
-            className='r-10 p-10 mr-20 ml-20 bold'
+            className='r-10 p-10 mr-20 ml-20'
           />
         </label>
       </div>
       <br />
-      <div className='bg-darker r-10 p-10 ml-20 mr-20 mb-1 bold'>
+      <div className='bg-darker r-10 p-10 ml-20 mr-20 mb-1'>
         <label>
           Location:
           <select
             name="location"
             value={expenseData.location}
             onChange={handleInputChange}
-            className='r-10 p-10 mr-20 ml-20 bold'
+            className='r-10 p-10 mr-20 ml-20'
           >
             <option value="">Select Location</option>
             {Object.keys(currencyOptions).map((location) => (
@@ -211,14 +259,14 @@ const ExpenseTracker = () => {
         </label>
       </div>
       <br />
-      <div className='bg-darker r-10 p-10 ml-20 mr-20 mb-1 bold'>
+      <div className='bg-darker r-10 p-10 ml-20 mr-20 mb-1'>
         <label>
           Currency:
           <select
             name="currency"
             value={expenseData.currency}
             onChange={handleInputChange}
-            className='r-10 p-10 mr-20 ml-20 bold'
+            className='r-10 p-10 mr-20 ml-20'
           >
             <option value="">Select Currency</option>
             {currencyCode.map((currency) => (
@@ -230,7 +278,7 @@ const ExpenseTracker = () => {
         </label>
       </div>
       <br />
-      <div className='bg-darker r-10 p-10 ml-20 mr-20 mb-1 bold'>
+      <div className='bg-darker r-10 p-10 ml-20 mr-20 mb-1'>
         <label>
           Cost:
           <input
@@ -238,7 +286,7 @@ const ExpenseTracker = () => {
             name="cost"
             value={expenseData.cost}
             onChange={handleInputChange}
-            className='r-10 p-10 mr-20 ml-20 bold'
+            className='r-10 p-10 mr-20 ml-20'
           />
         </label>
       </div>
@@ -248,27 +296,28 @@ const ExpenseTracker = () => {
       </div>
       <br />
       <br />
-      <div className='bg-darker r-10 p-10 ml-20 mr-20 mb-1 bold'>
-        <h3>Expense List</h3>
+      <div className='color-yellow mb-20 size20 bold'>Grand Total: {totalExpenses}</div>
+      <div className='bg-darker r-10 p-10 ml-20 mr-20 mb-1'>
         {expenses.length === 0 ? (
           <p>No expenses recorded.</p>
         ) : (
-          <ol>
+          <div>
             {[...expenses].reverse().map((expense, index) => (
-              <li className='p-10 ml-20 mr-20 mb-1 bold lowerBorder size20' key={index}>
-                {expense.expense}: {expense.cost/*exchangeRates[expense.currency]'USD'*/} {expense.currency}
-                <div className='copyright'>
-                  {expense.date} - {expense.time} - {expense.location} : {expense.countryCode} - ${expense.cost} {expense.currency}s
+              <div className='p-10 ml-20 mr-20 mb-1 lowerBorder size20' key={index}>
+                <div className='bold'>{expense.expense}: ${formatNumber(convertToUS(expense.cost,expense.countryCode))} {/*exchangeRates[expense.currency]'USD'*/} {/*expense.currency*/}</div>
+                <div className='description'>
+                {expense.location} : {expense.date} - {expense.time}<br/>
+                  ${formatNumber(expense.cost)} {expense.currency}s
                 </div>
                 <div 
-                  className='copyright color-red brdr-red button p-10 r-5 b-1 m-5'
-                  onClick={() => removeExpense(index)}
+                  className='description color-red brdr-red button p-10 r-5 b-1 m-5'
+                  onClick={() => removeExpense(index-1)}
                 >
                   delete
                 </div>
-              </li>
+              </div>
             ))}
-          </ol>
+          </div>
         )}
       </div>
     </div>

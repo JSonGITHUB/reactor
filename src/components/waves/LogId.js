@@ -10,7 +10,7 @@ class LogId extends React.Component {
         const { logId } = props;
         this.state = {
             logId: (logId === null || logId === undefined) ? this.postDirectory.getLastId() : logId,
-            log: (JSON.parse(localStorage.getItem(logId)) === null) ? this.getLogTemplate : JSON.parse(localStorage.getItem(logId))
+            log: (JSON.parse(localStorage.getItem(logId)) === 'null') ? this.getLogTemplate : JSON.parse(localStorage.getItem(logId))
         }
     }
     getDate = () => this.state.log.Day.Date;

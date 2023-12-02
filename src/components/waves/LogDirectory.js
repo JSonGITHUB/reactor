@@ -58,10 +58,10 @@ const LogDirectory = ({ title, message }) => {
                     }}
                 >
                     <div className='flexContainer m-25Percent'>
-                        <div className='flexOneFourthColumnRight p-10'>
+                        <div className='flexOneFourthColumnRight contentRight p-10'>
                             <img src={condition} alt={conditionDescription} className='icon r-5' />
                         </div>
-                        <div className='flexThreeFourthColumnLeft m-10'>
+                        <div className='flexThreeFourthColumn contentLeft m-10'>
                             <div className='description'>
                                 {month + " " + day + suffix[Number(String(day).slice(-1))]} {year}
                             </div>

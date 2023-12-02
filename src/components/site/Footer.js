@@ -4,7 +4,7 @@ import LoginControl from '../utils/LoginControl.js';
 import CopyrightText from '../functional/CopyrightText.js';
 import js from '../../assets/images/js.png';
 import Loader from '../utils/Loader.js';
-import GoogleAuth from './GoogleAuth.js';
+//import GoogleAuth from './GoogleAuth.js';
 import CountrySelector from './CountrySelector.js';
 
 const Footer = ({ isSignedIn, isMotionOn, setMotion, setSignIn, setCountry }) => {
@@ -46,7 +46,7 @@ const Footer = ({ isSignedIn, isMotionOn, setMotion, setSignIn, setCountry }) =>
             <div id='footer' className={footerClasses}>
                 <div className='flex3Column responsive bg-dkGreen m-1 color-neogreen centeredContent'>
                 <CountrySelector setCountry={setCountry} />
-                <GoogleAuth isSignedIn={signedIn} setSignIn={setSignIn} />
+                {/*<GoogleAuth isSignedIn={signedIn} setSignIn={setSignIn} />*/}
                 </div>
                 <div className='flex3Column responsive bg-dkYellow m-1 color-yellow'>
                 {loaderTag}

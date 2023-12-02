@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import { navClassesClosed, navClassesOpen, navClassesClose } from './NavClasses.js';
 import { CgMenuGridO } from "react-icons/cg";
 import Menu from './Menu.js';
-import GoogleAuth from './GoogleAuth.js';
+//import GoogleAuth from './GoogleAuth.js';
 
 const Header = ({company, width, isMotionOn, isSignedIn, setSignIn}) => {
     //console.log(`Header => width: ${width}`)
@@ -22,13 +22,14 @@ const Header = ({company, width, isMotionOn, isSignedIn, setSignIn}) => {
         toggleMenu();
         initialize();
     }
-    const closeMenu = (event) => {
+    const closeMenu = (label) => {
+        localStorage.setItem('path', `/${label}`)
         setMenuOpen(false);
     }
     const menuClick = (event) => (event.target.nodeName === "SPAN") ? goHome() : displayMenu();
-    const logoButton = (label) => <Link key={getKey("link")} to="Home"><div className="navButton logoButton">{label}</div></Link>;
-    const closeButton = <button className="navButton menuPad" onClick={menuClick}><img src={close} alt="close menu" /></button>;
-    const burgerButton = <button className="navButton menuPad mt-2 p-10 mr-20" onClick={menuClick}><h2 className='hover'><CgMenuGridO alt="open menu"/></h2></button>;
+    const logoButton = (label) => <Link key={getKey("link")} to="Home"><div className="navButton button logoButton">{label}</div></Link>;
+    const closeButton = <button className="bg-tinted navButton menuPad" onClick={menuClick}><img src={close} alt="close menu" /></button>;
+    const burgerButton = <button className="bg-tinted navButton menuPad mt-2 p-10 mr-20" onClick={menuClick}><h2 className='hover'><CgMenuGridO alt="open menu"/></h2></button>;
     const mobileLogo = <TextColorizer class='navBranding mt-7' text={company}/>;
     const closedClasses = (initialized) ? navClassesClose : navClassesClosed;
     const navClasses = (menuOpen) ? navClassesOpen : closedClasses;

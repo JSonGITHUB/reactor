@@ -48,7 +48,7 @@ const SelectorForm = ({ width, height, selection, header, items }) => {
     };
     const add = (event) => action = "add";
     const remove = (event) => action = "remove";
-    const buttonClasses = 'flex2Column bold greet width-100-percent';
+    const buttonClasses = 'flex2Column contentCenter bold greet width-100-percent';
     const addClasses = 'p-20 r-10  bg-green brdr-green ' + buttonClasses;
     const removeClasses = 'ml-2 p-20 r-10 bg-red brdr-red ' + buttonClasses;
     

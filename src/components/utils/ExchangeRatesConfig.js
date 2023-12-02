@@ -13,16 +13,38 @@ const ExchangeRatesConfig = ({ onExchangeRatesChange }) => {
     }
 
     const [exchangeRates, setExchangeRates] = useState(defaultRates);
-
-    const [settings, setSettings] = useState(false)
+    const [settings, setSettings] = useState(false);
 
     useEffect(() => {
-        const savedExchangeRates = JSON.parse(localStorage.getItem('exchangeRates'));
-        const currentExchangeRates = (savedExchangeRates != {}) ? savedExchangeRates : defaultRates;
-        if (currentExchangeRates) {
+
+        const savedExchangeRates = JSON.parse(localStorage.getItem('exchangeRates')) || {};
+
+        const fetchRates = async () => {
+            try {
+                //const response = await fetch('https://api.exchangeratesapi.io/v1/' + endpoint + '?access_key=' + access_key + '&from=' + from + '&to=' + to + '&amount=' + amount);
+                const response = await fetch('http://localhost:3002/currency');
+                const data = await response.json();
+
+                console.log(`data: ${JSON.stringify(data.date, null, 2)}`);
+                console.log(`data: ${JSON.stringify(data.timestamp, null, 2)}`);
+                console.log(`data: ${JSON.stringify(data.rates, null, 2)}`);
+
+                setExchangeRates(data.rates);
+                onExchangeRatesChange(exchangeRates)
+            } catch (error) {
+                //console.error('Error fetching exchange rates:', error);
+                setExchangeRates(defaultRates);
+                onExchangeRatesChange(exchangeRates)
+            }
+        };
+        const isObjectEmpty = (obj) => Object.keys(obj).length === 0 && obj.constructor === Object;
+        const currentExchangeRates = (!isObjectEmpty(savedExchangeRates)) ? savedExchangeRates : fetchRates();
+        
+        if (!isObjectEmpty(currentExchangeRates) && (currentExchangeRates === savedExchangeRates)) {
             setExchangeRates(currentExchangeRates);
             onExchangeRatesChange(exchangeRates);
         }
+
     }, []);
 
     useEffect(() => {

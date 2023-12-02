@@ -14,10 +14,10 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, buttonLabel, i
     console.log(`LogEntry => logId: ${logId}`)
     const posts = new PostDirectory();
     const logIdExists = () => (logId !== undefined && logId !== "" ) ? false : true;
-    const localLastPostIdExists = () => (localStorage.getItem("lastPostId") === null) ? false : true;
+    const localLastPostIdExists = () => (localStorage.getItem("lastPostId") === 'null') ? false : true;
     const getLocalLastPostId = () => (localLastPostIdExists()) ? localStorage.getItem("lastPostId") : posts.getLastItem(); 
     const getLastPostId = () => (logIdExists()) ? logId : getLocalLastPostId();
-    const localLogExists = () => (localStorage.getItem(logId) === null) ? false : true;
+    const localLogExists = () => (localStorage.getItem(logId) === 'null') ? false : true;
     const getLog = () => (localLogExists()) ? JSON.parse(localStorage.getItem(logId)) : templateData;
     //console.log(`LogEntry => logId: ${logId}\nlog: ${JSON.stringify(getLog(), null, 2)}`)
     // eslint-disable-next-line

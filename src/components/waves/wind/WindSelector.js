@@ -10,7 +10,7 @@ const WindSelector = ({windDirection, pause, setWind, isWind, setStatus, handleW
     
     const [filterByWind, setFilterByWind] = useState(isWind);
     const backgroundColorClass = (localStorage.getItem('isWind') === 'true') ? 'bg-lite glassy fadeInFaded' : 'glassy fadeOutFaded';
-    const windClass = () => `${backgroundColorClass} flex2Column r-10 m-5 p-15`;
+    const windClass = () => `${backgroundColorClass} flex2Column contentCenter r-10 m-5 p-15`;
     const handleWindSelection = (groupTitle, label, selected) => {
         setStatus(selected)
     }

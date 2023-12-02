@@ -13,7 +13,7 @@ class Logger extends React.Component {
         super(props);
 //        console.log(`Logger => constructor -> props.logId: ${this.props.logId}`)
 //        console.log(`Logger => constructor -> localStorage.getItem: ${this.props.logId} ====> ${localStorage.getItem(this.props.logId)}`)
-        if (localStorage.getItem(this.props.logId) === null) {
+        if (localStorage.getItem(this.props.logId) === 'null') {
             this.log = this.logIdComponent.templateData;
             this.lodId = this.logIdComponent.generateNewLogId();
         } else {
@@ -39,7 +39,7 @@ class Logger extends React.Component {
         console.log(`Logger => componentDidMount -> SPOT: ${this.getSpot()}`); 
         const logId = (state === undefined) ? this.props.logId : state.logId.item;
         //console.log(`Logger => componentDidMount -> logId: ${logId}`)
-        if (localStorage.getItem(this.props.logId) === null) {
+        if (localStorage.getItem(this.props.logId) === 'null') {
             this.log = this.logIdComponent.templateData;
             this.lodId = this.logIdComponent.generateNewLogId();
         } else {

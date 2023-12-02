@@ -37,7 +37,7 @@ class ButtonAdmin extends React.Component {
     }
     burgerButton(stream){
         return (
-            <div className='columnRight pt-5'>
+            <div className='columnRightAlign pt-5'>
                 <img src={menu} alt="open menu" onClick={() => this.toggleSettings()}/>
                 {this.adminMenu(stream)}
             </div>

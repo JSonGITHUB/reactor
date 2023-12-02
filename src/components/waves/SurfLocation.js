@@ -142,12 +142,12 @@ const SurfLocation = ({state, item, matches, regionMatch, tideDisplay, updateLoc
                     <div className='greet glassy color-yellow p-5 bg-lite mt-15 mb-10 r-5'>{`${regionMatch} miles`}</div>
                 <div className='flexContainer'>
                     <div className='flexContainer m-auto'>
-                        <div className='columnRight pr-10'>
+                        <div className='columnRightAlign pr-10'>
                             <div className={preferredClasses}>Swell: </div>
                             <div className={preferredClasses}>Wind: </div>
                             <div className={preferredClasses}>Tide: </div>
                         </div>
-                        <div className='columnLeft'>
+                        <div className='columnLeftAlign'>
                             <div className='mt-5'>{item.swell.map((swell, i) => <span key={getKey('swell')} className={(swell === status.swell1Direction) ? statusClass(swell1Match(item)) : subStatusClass(swell2DirectionMatch(swell))}>{swell}{((i+1) === item.swell.length)? '' : ', '}</span>)}</div>
                             <div className='mt-5'>
                                 {item.wind.map((wind, i) => <span key={getKey('wind')} className={statusClass(windDirectionMatch({wind}))}>

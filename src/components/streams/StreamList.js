@@ -23,7 +23,7 @@ class StreamList extends React.Component {
                     onClick={() => console.log(stream.title)}
                 >
                     {/*<i className='large middle pr-5 aligned icon camera width50px'/>*/}
-                    <div className='pt-5 flex2Column'>
+                    <div className='pt-5 flex2Column contentCenter'>
                         <Link to={`/streams/${stream.id}`} className='size25 color-lite'>{stream.title}</Link>
                         <div className='description color-soft bold'>{stream.description}</div>
                     </div>
@@ -49,7 +49,7 @@ class StreamList extends React.Component {
     render() {
         return (
             <div className='pb-200'>
-                <div className='ml-20 mr-20 mt--30 columnLeft'>
+                <div className='ml-20 mr-20 mt--30 columnLeftAlign'>
                     {this.streamList()}
                 </div>
                 {this.renderCreate()}

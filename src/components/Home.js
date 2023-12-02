@@ -72,7 +72,7 @@ const Home = () => {
     const tracker =
       tracking === true ? (
         <div>
-          <div className="color-neogreen p-20 bold bigHeader bg-dkGreen r-5 m-20 glassy">
+          <div className="color-neogreen p-20 bold bigHeader bg-dkGreen r-5 m-20">
             {getDistance()}
           </div>
           <div
@@ -88,7 +88,7 @@ const Home = () => {
             {distance}
           </div>
           <div
-            className="glassy button p-20 r-5 m-20 bg-neogreen completedSelector color-black"
+            className="button p-20 r-5 m-20 bg-neogreen completedSelector color-black"
             onClick={startDistance}
           >
             Start Tracking
@@ -103,7 +103,7 @@ const Home = () => {
     <div className="App fadeIn">
       <header className="App-content">
         <a
-          className="glassy App-link bold greet p-20 r-10 w-200 bg-dkGreen brdr-green noUnderline"
+          className="App-link bold greet p-20 r-10 w-200 bg-dkGreen noUnderline"
           href="https://jsongithub.github.io/portfolio/"
           target="_self"
           rel="noopener noreferrer"
@@ -112,13 +112,15 @@ const Home = () => {
         </a>
         {/*<Lister items={[1,2,3]} />*/}
         <Timer />
-        Current position:
-        <br />
-        <Geolocator
-          currentPositionExists="false"
-          returnCurrentPosition={updateCurrentLocation}
-        />
-        <br />
+        <div className='bg-tinted p-10 r-10'>
+          <div className='p-10'>
+            Current position:
+          </div>
+          <Geolocator
+            currentPositionExists="false"
+            returnCurrentPosition={updateCurrentLocation}
+          />
+        </div>
         {getTracker()}
       </header>
     </div>

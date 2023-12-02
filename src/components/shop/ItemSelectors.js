@@ -169,7 +169,7 @@ const ItemSelectors = ({status, setStatus, index, getTotal, todo, aisleColor, it
                 </div>
                 <div>
                     <div>Days</div>
-                    <div className='lastPurchaseDays flexOneFifthColumn'>{todo.days}</div>
+                    <div className='lastPurchaseDays flexOneFifthColumn contentCenter'>{todo.days}</div>
                 </div>
                 <div>
                     <div className='mb-5'>Tax</div>

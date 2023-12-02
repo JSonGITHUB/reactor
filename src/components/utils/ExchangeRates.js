@@ -33,10 +33,14 @@ const ExchangeRates = () => {
   useEffect(() => {
     const fetchRates = async () => {
       try {
-        const response = await fetch('https://api.exchangeratesapi.io/v1/' + endpoint + '?access_key=' + access_key + '&from=' + from + '&to=' + to + '&amount=' + amount);
+        //const response = await fetch('https://api.exchangeratesapi.io/v1/' + endpoint + '?access_key=' + access_key + '&from=' + from + '&to=' + to + '&amount=' + amount);
+        const response = await fetch('http://localhost:3002/currency');
         const data = await response.json();
         //alert(JSON.stringify(data.error.code, null, 2));
-        setData(templateData);
+        console.log(`templateData: ${JSON.stringify(templateData, null, 2)}`);
+        console.log(`data: ${JSON.stringify(data, null, 2)}`);
+        setData(data);
+        //setData(templateData);
       } catch (error) {
         //console.error('Error fetching exchange rates:', error);
         setData(templateData);
@@ -51,7 +55,7 @@ const ExchangeRates = () => {
   }
   
   const rates = data.rates || templateData.rates;
-  
+  /*
   return (
     <div>
       <h2>Exchange Rates</h2>
@@ -67,7 +71,8 @@ const ExchangeRates = () => {
       Error message: {data.error?.message}
     </div>
   );
-  
+  */
+ return JSON.stringify(rates,null,2);
 };
 
 export default ExchangeRates;

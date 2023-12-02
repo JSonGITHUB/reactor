@@ -7,7 +7,7 @@ import generateNewLogId from './GenerateLogId.js';
 
 const Logger = ({logId, location}) => { 
     console.log(`Logger => logId: ${logId}\nlocalStorage.getItem('logId'): ${localStorage.getItem('logId')}`); 
-    const logExists = () => (localStorage.getItem(logId) === null) ? false : true;
+    const logExists = () => (localStorage.getItem(logId) === 'null') ? false : true;
     // eslint-disable-next-line
     const initLogId = () => (logExists()) ? logId : generateNewLogId();
     const initLog = () => (logExists()) ? JSON.parse(localStorage.getItem(logId)) : templateData;
@@ -26,7 +26,7 @@ const Logger = ({logId, location}) => {
         const logId = localStorage.getItem('logId');
         console.log(`LoggerFunctional => componentDidMount -> SPOT: ${getSpot()}\ngetLogId: ${localStorage.getItem('logId')}\nlogId: ${logId}`); 
         
-        if (localStorage.getItem(logId) === null) {
+        if (localStorage.getItem(logId) === 'null') {
             setStatus(prevState => ({
                 ...prevState,
                 log: templateData,

@@ -25,8 +25,8 @@ const FormEssay = () => {
                         <textarea rows="13" cols={window.innerWidth/15} className="mb-30 bg-black" value={value} onChange={handleChange} />
                     </label><br/>
                     <div className="flexContainer">
-                        <input type="submit" value="Submit" className="flex2Column greet p-20 r-10 width-100-percent bg-green brdr-green glassy m-5 bold"/>
-                        <div value="Submit" className="flex2Column button greet p-20 r-10 width-100-percent bg-red brdr-red glassy m-5 bold" onClick={() => clear()}>Clear</div>
+                        <input type="submit" value="Submit" className="flex2Column contentCenter greet p-20 r-10 width-100-percent bg-green brdr-green glassy m-5 bold"/>
+                        <div value="Submit" className="flex2Column contentCenter button greet p-20 r-10 width-100-percent bg-red brdr-red glassy m-5 bold" onClick={() => clear()}>Clear</div>
                     </div>
                 </form>
             </div>
