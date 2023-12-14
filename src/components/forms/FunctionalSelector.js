@@ -28,10 +28,13 @@ function FunctionalSelector(props) {
         width: width
     };
     return (
+        
         <label>    
-            <select className='glassy pt-5 pb-5 r-10 bg-darker white mt-5 button' style={getStyle} value={selected} onChange={handleChange}>
-                {selectItems}
-            </select>
+            <div>
+                <select className='r-10 p-10 bg-darker color-soft width-auto pt-5 pb-5 button' style={getStyle} value={(selected)||''} onChange={handleChange}>
+                    {selectItems}
+                </select>
+            </div>
         </label>
     );
 }

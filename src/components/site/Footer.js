@@ -1,55 +1,94 @@
 import React, { useEffect, useState } from 'react';
-import Toggle from '../utils/Toggle.js';
-import LoginControl from '../utils/LoginControl.js';
-import CopyrightText from '../functional/CopyrightText.js';
+import Toggle from '../utils/Toggle';
+import LoginControl from '../utils/LoginControl';
+import CopyrightText from '../functional/CopyrightText';
 import js from '../../assets/images/js.png';
-import Loader from '../utils/Loader.js';
+import Loader from './Loader';
 //import GoogleAuth from './GoogleAuth.js';
-import CountrySelector from './CountrySelector.js';
+import CountrySelector from './CountrySelector';
+import ScrollListener from './ScrollListener'
 
 const Footer = ({ isSignedIn, isMotionOn, setMotion, setSignIn, setCountry }) => {
     
-    const [signedIn, setSignedIn] = useState(
-        isSignedIn !== null ? isSignedIn : false || false
-    );
-    
-    const percent =
-        window.innerWidth < 700
+    const getPath = () => window.location.pathname.toLocaleLowerCase();
+   
+    const [signedIn, setSignedIn] = useState(false);
+    const [display, setDisplay] = useState(false);
+    //const [homePage, setHomePage] = useState(false);
+    //const [pageBottom, setPageBottom] = useState(false);
+    //const [path, setPath] = useState(getPath());
+
+    const percent = () => (window.innerWidth < 700)
         ? 'twentyfivePercent mt--70 mb--70'
         : 'fiftyPercent mt--30 mb--40';
     
-        const loaderTag = (
-        <div className={percent}>
-        <Loader isMotionOn={isMotionOn} />
-        </div>
-    );
+    const loaderTag = () => <div className={percent()}>
+                                <Loader isMotionOn={isMotionOn} />
+                            </div>;
 
     useEffect(() => {
         console.log(`Footer => useEffect => isSignedIn: ${isSignedIn}`);
-        setSignedIn(isSignedIn !== null ? isSignedIn : false);
+        if (isSignedIn === null) setSignedIn(false);
     }, [isSignedIn]);
 
-    const path = window.location.pathname.toLocaleLowerCase();
-    const isPageSurfLog =
-        path.includes('surflog') || window.innerHeight < 600 ? true : false;
-    const isPageHome =
-        path.includes('home') || path === '/reactor' || path === '/reactor/'
+    /*
+    useEffect(() => {
+
+        if (homePage && pageBottom) {
+            setDisplay(true);
+        } else {
+            setDisplay(false);
+        }
+        
+    }, [homePage, pageBottom]);
+    */
+    const onScrollToBottom = (status) => {
+        console.log(`onScrollToBottom => ${status}`)
+        setDisplay(status);
+    }
+    
+    const isPageHome = () => {
+        console.log(`isPageHome => path: ${getPath()}`)
+        const homePage = (getPath().includes('home') || getPath() === '/reactor' || getPath() === '/reactor/')
         ? true
-        : console.log(`path: ${path}`);
-    const bottom = isPageSurfLog || !isPageHome ? 'b-collapse' : 'bt-0';
+        : false;
+        return homePage
+    }
+    /*
+    const checkScroll = () => {
+        
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const totalHeight = document.documentElement.scrollHeight;
+        const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+
+        if (isPageHome()) {
+
+        } else 
+        if ((scrollTop + windowHeight >= totalHeight - 10) && ) {
+            setDisplay(true);
+        } else {
+            setDisplay(false);
+        }
+
+    };
+    window.addEventListener('scroll', checkScroll);
+    */
+    //const bottom = (!display) ? 'b-collapse' : 'bt-0';
+    const bottom = (!display) ? 'b-collapse' : 'b-collapse';
     const footerClasses =
         bottom +
         ' fixed subfooter flexContainer width-100-percent responsive height200';
     console.log(`Footer 2 =>\nisSignedIn: ${isSignedIn}\nsignedIn: ${signedIn}`);
    return (
         <div>
+            <ScrollListener onScrollToBottom={onScrollToBottom}/>
             <div id='footer' className={footerClasses}>
                 <div className='flex3Column responsive bg-dkGreen m-1 color-neogreen centeredContent'>
                 <CountrySelector setCountry={setCountry} />
                 {/*<GoogleAuth isSignedIn={signedIn} setSignIn={setSignIn} />*/}
                 </div>
                 <div className='flex3Column responsive bg-dkYellow m-1 color-yellow'>
-                {loaderTag}
+                {loaderTag()}
                 <img className='mb-1' src={js} alt='js' />
                 <CopyrightText />
                 </div>

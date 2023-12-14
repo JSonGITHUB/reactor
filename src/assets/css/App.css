@@ -56,6 +56,15 @@
 .ht-105 {
   height: 105px;
 }
+.ht-140 {
+  height: 140px;
+}
+.ht-150 {
+  height: 150px;
+}
+.ht-155 {
+  height: 155px;
+}
 .ht-200 {
   height: 200px;
 }
@@ -168,6 +177,9 @@
 .mb--10 {
   margin-bottom: -10px;
 }
+.mb-auto {
+  margin-bottom: auto;
+}
 
 .height100Percent-30 {
   height: calc(100% - 30px) !important;
@@ -182,53 +194,65 @@
 }
 
 .scrollHeight250 {
+  scroll-snap-type: y mandatory;
   overflow-y: scroll;
   overflow-x: hidden;
   height: 250px;
 }
 .scrollHeight300 {
+  scroll-snap-type: y mandatory;
   overflow-y: scroll;
   overflow-x: hidden;
   height: 300px;
 }
 .scrollHeight325 {
+  scroll-snap-type: y mandatory;
   overflow-y: scroll;
   overflow-x: hidden;
   height: 325px;
 }
 .scrollHeight350 {
+  scroll-snap-type: y mandatory;
   overflow-y: scroll;
   overflow-x: hidden;
   height: 350px;
 }
 .scrollHeight400 {
+  scroll-snap-type: y mandatory;
   overflow-y: scroll;
   overflow-x: hidden;
   height: 400px;
 }
 .scrollHeight450 {
+  scroll-snap-type: y mandatory;
   overflow-y: scroll;
   overflow-x: hidden;
   height: 450px;
 }
 .scrollHeight500 {
+  scroll-snap-type: y mandatory;
   overflow-y: scroll;
   overflow-x: hidden;
   height: 500px;
 }
 .scrollHeight550 {
+  scroll-snap-type: y mandatory;
   overflow-y: scroll;
   overflow-x: hidden;
-  height: 550px;
+  /*height: 550px;*/
+  height: calc(100% - 52px);
+  position: inherit;
 }
 
 .height50Percent {
+  scroll-snap-type: y mandatory;
   overflow-y: scroll;
   overflow-x: hidden;
   height: 50%;
 }
 
 .height75Percent {
+  scroll-snap-type: y mandatory;
   overflow-y: scroll;
   overflow-x: hidden;
   height: 75%;
@@ -250,9 +274,30 @@
 .tenPercent {
   transform: scale(.1);
 }
-
+.max-height-40 {
+  max-height: 40px;
+}
+.min-height-100 {
+  min-height: 100px;
+}
+.min-height-95 {
+  min-height: 95px;
+}
+.min-height-60 {
+  min-height: 60px;
+}
+.min-height-50 {
+  min-height: 50px;
+}
 .lh-sm {
   line-height: 5px;
+}
+
+.lh-15 {
+  line-height: 15px;
+}
+.lh-30 {
+  line-height: 30px;
 }
 
 .mb-1 {
@@ -302,6 +347,9 @@
 .mb-100-percent {
   margin-bottom: 100%;
 }
+.pb-1 {
+  padding-bottom: 1px;
+}
 .pb-50 {
   padding-bottom: 50px;
 }
@@ -343,6 +391,20 @@
 .mt--100 {
   margin-top: -100px;
 }
+.mt--95 {
+  margin-top: -95px;
+}
+.mt--94 {
+  margin-top: -94px;
+}
+
+.mt--90 {
+  margin-top: -90px;
+}
+
+.mt--80 {
+  margin-top: -80px;
+}
 
 .mt--70 {
   margin-top: -70px;
@@ -364,8 +426,16 @@
   margin-top: -30px;
 }
 
+.mt--25 {
+  margin-top: -25px;
+}
+
 .mt--20 {
   margin-top: -20px;
+}
+
+.mt--15 {
+  margin-top: -15px;
 }
 
 .mt--14 {
@@ -386,7 +456,9 @@
 .mt--2 {
   margin-top: -2px;
 }
-
+.mt--1 {
+  margin-top: -1px;
+}
 .mb--2 {
   margin-bottom: -2px;
 }
@@ -495,6 +567,14 @@ select {
   margin-right: auto;
 }
 
+.mr--5 {
+  margin-right: -5px;
+}
+
+.mr--10 {
+  margin-right: -10px;
+}
+
 .mr-auto {
   margin-right: auto;
 }
@@ -568,6 +648,14 @@ select {
 }
 
 .greet {
+  font-size: 15px;
+}
+
+.size12 {
+  font-size: 12px;
+}
+
+.size15 {
   font-size: 15px;
 }
 
@@ -674,9 +762,6 @@ select {
   height: 125px;
 }
 
-.height400 {
-  height: 400px;
-}
 .contentCenter {
   justify-content: center;
   align-items: center;
@@ -696,7 +781,52 @@ select {
   display: flex;
   height: auto;
 }
-
+.container {
+  display: flex;
+  overflow-x: auto;
+  width: 100%;
+  align-items: flex-start;
+}
+.containerBox {
+  border-radius: 10px;
+  padding: 10px;
+  margin: 5px;
+  background-color: rgba(0, 0, 0, 0.2);
+  font-size: 20px;
+}
+.containerDetail {
+  border-radius: 10px;
+  padding: 5px;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.containerInput {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  margin: 5px;
+  padding: 10px;
+  min-width: 320px;
+}
+.inputText {
+  border-radius: 5px;
+  margin-right: 10px;
+  font-weight: bold;
+  color: #999999;
+}
+.inputField {
+  border-radius: 5px;
+  padding: 10px;
+  width: 100%;
+  background-color: #111111;
+  color: #999999;
+}
+.inputSelect {
+  margin-top: -2px;
+  width: 100%;
+  background-color: #111111; 
+  color: #999999;
+  border-radius: 5px;
+  padding: 10px;
+}
 .flexOneFifthColumn {
   height: auto;
   margin: auto;
@@ -810,13 +940,6 @@ select {
   min-height: 2px;
   flex: 5%;
 }
-.container {
-  display: flex;
-  overflow-x: auto;
-  width: 100%;
-  align-items: flex-start;
-}
-
 .column {
   flex: 0 0 50px;
   height: auto;
@@ -977,6 +1100,7 @@ select {
 }
 input {
   border-radius: 3px;
+  max-width: 230px;
   /*
   color:#dddddd;
   border-color: #222222;
@@ -1009,7 +1133,22 @@ textarea {
 body {
   background-color: #222222;
 }
-
+.locationScroller {
+  height: 580px;
+  width: 100%;
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  background-color: #222222;
+}
+.scrollSnap {
+  scroll-snap-align: center;
+}
+.scrollSnapBottom {
+  scroll-snap-align: end;
+}
+.scrollSnapTop {
+  scroll-snap-align: start;
+}
 .Percent95 {
   width: 97%;
 }
@@ -1043,7 +1182,7 @@ body {
 }
 
 .bg-lite {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .bg-veryLite {
@@ -1052,6 +1191,12 @@ body {
 
 .bg-tinted {
   background-color: rgba(0, 0, 0, 0.2);
+}
+.bg-tintedMedium {
+  background-color: rgba(0, 0, 0, .4);
+}
+.bg-tintedDark {
+  background-color: rgba(0, 0, 0, .99);
 }
 
 .bg-black {
@@ -1065,7 +1210,7 @@ body {
   background-color: hwb(244 0% 77%);
 }
 .bg-dark {
-  background-color: hsl(258, 100%, 10%);
+  background-color: #010101
 }
 
 .bg-darker {
@@ -1228,12 +1373,14 @@ body {
 }
 
 .menuHeight {
+  scroll-snap-type: y mandatory;
   overflow-y: scroll;
   overflow-x: hidden;
   height: 50%;
 }
 
 .menuHeightExpanded {
+  scroll-snap-type: y mandatory;
   overflow-y: scroll;
   overflow-x: hidden;
   height: 75%;
@@ -1539,7 +1686,7 @@ input.error {
 }
 
 .t-collapse {
-  top: -800px;
+  top: -1800px;
   position: fixed;
   animation: topCollapse .2s ease;
 }
@@ -1627,6 +1774,21 @@ input.error {
 
 .pl-20 {
   padding-left: 20px;
+}
+.pl-50-percent {
+  padding-left: 50%;
+}
+.pr-50-percent {
+  padding-right: 50%;
+}
+.pr-20-percent {
+  padding-right: 20%;
+}
+.pr-15-percent {
+  padding-right: 15%;
+}
+.pr-10-percent {
+  padding-right: 10%;
 }
 
 .pr-5 {
@@ -1797,6 +1959,14 @@ input.error {
   margin-top: 60px;
 }
 
+.mt-65 {
+  margin-top: 65px;
+}
+
+.mt-70 {
+  margin-top: 70px;
+}
+
 .mt-88 {
   margin-top: 88px;
 }
@@ -1822,7 +1992,7 @@ input.error {
 }
 
 .fadedDark {
-  opacity: .95;
+  opacity: .97;
 }
 
 .logo {
@@ -1903,7 +2073,9 @@ input.error {
 .largScaleFont {
   font-size: calc(10px + 2vmin);
 }
-
+.capitalize {
+  text-transform: capitalize;
+}
 .burger {
   height: 50px;
   width: 50px;
@@ -1938,7 +2110,27 @@ input.error {
   text-shadow: 0px 1px 0px #ffee66;
   opacity: .9;
 }
-
+.box-shadow {
+  box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.5);
+}
+.box-outline {
+  box-shadow: -1px -1px 0 #fff,  
+                1px -1px 0 #fff,
+               -1px 1px 0 #fff,
+                1px 1px 0 #fff;
+}
+.box-highlight {
+  box-shadow: 0px -1px 0 #00ff004b,  
+                0px -1px 0 #00ff004b,
+               0px 1px 0 #00ff004b,
+                0px -1px 0 #00ff004b;
+}
+.box-top {
+  box-shadow: 0px -1px 0 #ffffff4b,  
+                0px -1px 0 #ffffff4b,
+               0px 1px 0 #ffffff4b,
+                0px -1px 0 #ffffff4b;
+}
 .myButton:hover {
   background: linear-gradient(to bottom, #ffab23 5%, #ffec64 100%);
   background-color: #ffab23;
@@ -2137,6 +2329,18 @@ input.error {
   animation: blinking-fade 1.5s ease-in-out infinite;
 }
 
+.width--90 {
+  width: calc(100% - 90px);
+}
+.width--80 {
+  width: calc(100% - 80px);
+}
+.width--75 {
+  width: calc(100% - 75px);
+}
+.width--60 {
+  width: calc(100% - 60px);
+}
 
 @media only screen and (min-width: 701px) {
   .mobileFull {
@@ -2164,6 +2368,7 @@ input.error {
   }
 
   .h-scroll {
+    scroll-snap-type: x mandatory;
     overflow-x: scroll;
     white-space: nowrap;
   }

@@ -53,36 +53,40 @@ const ExchangeConverter = () => {
     }
 
     return (
-        <div>
+        <div className='p-10 r-10 bg-tinted m-10'>
             <ExchangeRatesConfig onExchangeRatesChange={setExchangeRates}></ExchangeRatesConfig>
-            <div className='bg-yellow size20 timerBox m-20 p-30 bold color-black' onClick={handleConversionDirection}>
+            <div className='button bg-lite size25 timerBox m-20 p-30 bold color-lite' onClick={handleConversionDirection}>
                 {isToUsd ? 'Convert to USD' : 'Convert from USD'}
             </div>
-            <div className='bg-darker r-10 p-10 ml-20 mr-20 mb-1 bold'>
-                <div className='size20 color-lite mb-20 mt-10'>
-                    <label>
-                        {!isToUsd ? 'Convert to:' : 'Convert from:'}
-                        <select className='dualVideoPlayer color-black p-10 r-5' value={selectedCurrency} onChange={handleCurrencyChange}>
-                            <option value="MXN">Mexican Peso ({exchangeRates.MXN})</option>
-                            <option value="NIO">Nicaraguan Córdoba ({exchangeRates.NIO})</option>
-                            <option value="CRC">Costa Rican Colone ({exchangeRates.CRC})</option>
-                            <option value="IDR">Indonesian Rupiah ({exchangeRates.IDR})</option>
-                            <option value="AUD">Australian Dollar ({exchangeRates.AUD})</option>
+            <div className='bg-tinted r-10 p-20 ml-20 mr-20 mb-1 bold'>
+                <div className='size20 color-lite'>
+                    <label className='flexContainer'>
+                        <div className="flex2Column m-10 columnRightAlign size25">
+                            {!isToUsd ? 'To:' : 'From:'}
+                        </div>
+                        <select className='dualVideoPlayer color-white bg-dark p-10 r-10 mt-20 mb-10 width-auto' value={selectedCurrency} onChange={handleCurrencyChange}>
+                            <option value="MXN">Mexican Peso ({Number(exchangeRates.MXN).toFixed(3)})</option>
+                            <option value="NIO">Nicaraguan Córdoba ({Number(exchangeRates.NIO).toFixed(3)})</option>
+                            <option value="CRC">Costa Rican Colone ({Number(exchangeRates.CRC).toFixed(3)})</option>
+                            <option value="IDR">Indonesian Rupiah ({Number(exchangeRates.IDR).toFixed(3)})</option>
+                            <option value="AUD">Australian Dollar ({Number(exchangeRates.AUD).toFixed(3)})</option>
                         </select>
                     </label>
                 </div>
             </div>
-            <div className='bg-darker r-10 p-10 mr-20 ml-20 bold'>
-                <div className='size20 m-20 color-lite'>
-                    <label>
-                        {isToUsd ? `${currencyConverting()}: $` : 'US Dollars: $'}
-                        <input className='dualVideoPlayer p-10 r-5 color-black m-5' type='number' value={usdAmount} onChange={handleInputChange} />
+            <div className='bg-tinted r-10 p-20 mr-20 ml-20 bold'>
+                <div className='size20 color-lite'>
+                    <label className='flexContainer'>
+                        <div className="flex2Column m-10 columnRightAlign size25">
+                            {isToUsd ? `${currencyConverting()}: $` : 'US Dollars: $'}
+                        </div>
+                        <input className='width-auto flex2Column columnLeftAlign dualVideoPlayer p-10 r-10 color-white bg-dark' type='number' value={usdAmount} onChange={handleInputChange} />
                     </label>
                 </div>
             </div>
-            <div className='bg-orange size20 timerBox m-20 color-black bold p-30' onClick={handleConversion}>Convert</div>
+            <div className='button p-30 r-10 m-20 size25 color-lite bg-lite bold' onClick={handleConversion}>Convert</div>
             {convertedAmount && (
-                <div className='size20 color-lite bold p-30 bold m-20 r-10 bg-green'>
+                <div className='p-10 r-5 m-5 flex3Column size15 color-lite bg-lite bold'>
                     {isToUsd
                         ? `Converted Amount: ${convertedAmount} USD`
                         : `Converted Amount: ${formatNumber(convertedAmount)} ${selectedCurrency}`}

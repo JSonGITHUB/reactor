@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import LogEntry from './LogEntryFunctional.js';
-import Loader from '../utils/Loader.js';
+import Loader from '../site/Loader.js';
 import interfaceData from './InterfaceData.js'
 import templateData from './LogTemplateData.js';
 import generateNewLogId from './GenerateLogId.js';

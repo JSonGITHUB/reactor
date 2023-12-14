@@ -9,7 +9,7 @@ const WindSelector = ({windDirection, pause, setWind, isWind, setStatus, handleW
     //console.log(`WindSelector => isWind: ${isWind}`);
     
     const [filterByWind, setFilterByWind] = useState(isWind);
-    const backgroundColorClass = (localStorage.getItem('isWind') === 'true') ? 'bg-lite glassy fadeInFaded' : 'glassy fadeOutFaded';
+    const backgroundColorClass = (localStorage.getItem('isWind') === 'true') ? 'bg-veryLite fadeInFaded' : 'bg-tinted fadeOutFaded';
     const windClass = () => `${backgroundColorClass} flex2Column contentCenter r-10 m-5 p-15`;
     const handleWindSelection = (groupTitle, label, selected) => {
         setStatus(selected)
@@ -18,20 +18,23 @@ const WindSelector = ({windDirection, pause, setWind, isWind, setStatus, handleW
     return (
         <div className={windClass()} onMouseDown={pause}>
             {/*console.log(`windSelector => windDirection: ${status.windDirection}`)*/}
-            Wind<br/>
-            <div className="pt-10">
-                <WindDirection columns="1" setWind={setWind} height='150px'/>
+            <div className='p-10 r-10 bg-tinted'>
+                <div className='p-10 mb-15 r-10 bg-tinted'>
+                    Wind
+                </div>
+                <div className='mt-5 size20 p-10'>
+                    <Selector
+                        groupTitle="Wind" 
+                        selected={windDirection} 
+                        label="Direction"
+                        items={directions}
+                        onChange={handleWindSelection}
+                        fontSize='20'
+                        padding='5px'
+                        width='93%'
+                    />
+                </div>
             </div>
-            <Selector
-                groupTitle="Wind" 
-                selected={windDirection} 
-                label="Direction"
-                items={directions}
-                onChange={handleWindSelection}
-                fontSize='20'
-                padding='5px'
-                width='93%'
-            />
             <div className="button mt-15" onClick={handleWindCheck}>
                 {(localStorage.getItem('isWind') === 'true') ? <img src={thumbsUp} alt='wind' className='p-10 r-20' /> : <img src={thumbsDown} alt='wind' className='p-10 r-20' /> }
             </div>

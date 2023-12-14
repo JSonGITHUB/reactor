@@ -869,30 +869,36 @@ const ScoreKeeper = () => {
     return (
         <div className='fadeIn mt--30 mb-55 pb-50'>
             <div className='mb-10'>
-                <Selector
-                    groupTitle='game'
-                    label='item.description'
-                    items={games}
-                    selected={game}
-                    onChange={selectGame}
-                    fontSize='25'
-                    padding='10px'
-                    width={(darts || dominos) ? '98%' : '65%'}
-                />
-                {
-                    (darts || golf)
-                        ? <React.Fragment></React.Fragment>
-                        : <Selector className='fl-left'
-                            groupTitle='winner'
-                            label='i.description'
-                            items={(dominos) ? dominoWinners : ((surf) ? heatLengths : winners)}
-                            selected={winner}
-                            onChange={selectWinner}
+                <div className='flexContainer'>
+                    <div className='flex2Column'>
+                      <Selector
+                            groupTitle='game'
+                            label='item.description'
+                            items={games}
+                            selected={game}
+                            onChange={selectGame}
                             fontSize='25'
                             padding='10px'
-                            width='30%'
-                        />
-                }
+                            width={(darts || dominos) ? '98%' : '65%'}
+                        />  
+                    </div>
+                    <div className='flex2Column'>
+                    {
+                        (darts || golf)
+                            ? <React.Fragment></React.Fragment>
+                            : <Selector className='fl-left flex2Column'
+                                groupTitle='winner'
+                                label='i.description'
+                                items={(dominos) ? dominoWinners : ((surf) ? heatLengths : winners)}
+                                selected={winner}
+                                onChange={selectWinner}
+                                fontSize='25'
+                                padding='10px'
+                                width='30%'
+                            />
+                    }
+                    </div>
+                </div>
                 {(surf) ?
                     <SurfScores
                         players={players}

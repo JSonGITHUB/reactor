@@ -19,7 +19,7 @@ import NW from '../../assets/images/windNW.png';
 const SwellSelector = ({id, swellDirection, status, handleSwell1Selection, handleSwell2Selection, handleSwell1Angle, handleSwell2Angle, handleSwell1Height, handleSwell2Height, handleSwell1Interval, handleSwell2Interval, handleSwellCheck, pause}) => {
     
     const swellClass = (id) => `${isSwellSelected(id)} flex2Column contentCenter r-10 m-5 p-15`;
-    const isSwellSelected = (id) => ((id === '1' && (localStorage.getItem('isSwell1') === 'true')) || (id === '2' && (localStorage.getItem('isSwell2') === 'true'))) ? 'bg-lite glassy' : 'glassy';
+    const isSwellSelected = (id) => ((id === '1' && (localStorage.getItem('isSwell1') === 'true')) || (id === '2' && (localStorage.getItem('isSwell2') === 'true'))) ? 'bg-veryLite' : 'bg-tinted';
     const intervals = ['','5 seconds','6 seconds','7 seconds','8 seconds','9 seconds','10 seconds','11 seconds','12 seconds','13 seconds','14 seconds','15 seconds','16 seconds','17 seconds','18 seconds','19 seconds','20 seconds','21 seconds','22 seconds','23 seconds'];
 
     const getSwellIcon = (id) => {
@@ -49,33 +49,30 @@ const SwellSelector = ({id, swellDirection, status, handleSwell1Selection, handl
             return <img src={NW} className={classes} alt={swellDirection} />;
         }
     }
-    const getSwellIndicator = () => {
-        //console.log(`getSwellIndicator => swellDirection: ${swellDirection}`)
-        return (
-            getDirectionIcon()
-        )
-    }
     const isSelected = () => ((id === '1' && (localStorage.getItem('isSwell1') === 'true')) || (id === '2' && (localStorage.getItem('isSwell2') === 'true'))) ? true : false;
     return (
-            <div className={swellClass(id)} onMouseDown={pause}>
+        <div className={`${swellClass(id)}`} onMouseDown={pause}>
             {getSwellIcon(id)}
             <div className="ml-5">Swell{id}</div>
-            <div className='p-10'>{getSwellIndicator()}</div>
-            <div className='bg-lite r-10 mt-20 pt-10 pb-15'>
-                <div className="ml-5 color-yellow pt-10">direction</div>
-                <Selector
-                    groupTitle={`Swell${id}`}
-                    selected={swellDirection} 
-                    //getState(`swell1`)
-                    label="Direction" 
-                    items={directions}
-                    onChange={(id === '1') ? handleSwell1Selection : handleSwell2Selection}
-                    fontSize='20'
-                    padding='10px'
-                    width='70%'
-                />
-                <br/>
-                <div className="ml-5 color-yellow pt-10">angle</div>
+            <div className='p-10'>{getDirectionIcon()}</div>
+            <div className='p-10 r-10 bg-tinted mt-20'>
+                <div className='flex2Column size20'>
+                    <div className='color-yellow bg-tinted r-10 p-10 width-auto'>direction</div>
+                    <Selector
+                        groupTitle={`Swell${id}`}
+                        selected={swellDirection} 
+                        //getState(`swell1`)
+                        label="Direction" 
+                        items={directions}
+                        onChange={(id === '1') ? handleSwell1Selection : handleSwell2Selection}
+                        fontSize='20'
+                        padding='10px'
+                        width='70%'
+                    />
+                </div>
+            </div>
+            <div className='p-10 r-10 bg-tinted mt-20'>
+                <div className='color-yellow bg-tinted r-10 p-10 width-auto'>angle</div>
                 <Selector
                     groupTitle={`SwellAngle${id}`}
                     selected={(id === '1') ? status.swell1Angle : status.swell2Angle} 
@@ -86,8 +83,9 @@ const SwellSelector = ({id, swellDirection, status, handleSwell1Selection, handl
                     padding='5px'
                     width='70%'
                 />
-                <br/>
-                <div className="ml-5 color-yellow pt-10">height</div>
+            </div>
+            <div className='p-10 r-10 bg-tinted mt-20'>
+                <div className='color-yellow bg-tinted r-10 p-10 width-auto'>height</div>
                 <Selector
                     groupTitle={`SwellHeight${id}`}
                     selected={(id === '1') ? status.swell1Height : status.swell2Height} 
@@ -98,8 +96,9 @@ const SwellSelector = ({id, swellDirection, status, handleSwell1Selection, handl
                     padding='5px'
                     width='70%'
                 />
-                <br/>
-                <div className="ml-5 color-yellow pt-10">interval</div>
+            </div>
+            <div className='p-10 r-10 bg-tinted mt-20'>
+                <div className='color-yellow bg-tinted r-10 p-10 width-auto'>interval</div>
                 <Selector
                     groupTitle={`SwellInterval${id}`}
                     selected={(id === '1') ? status.swell1Interval : status.swell2Interval} 

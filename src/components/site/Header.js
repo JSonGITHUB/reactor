@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Loader from '../utils/Loader.js';
+import Loader from './Loader.js';
 import TextColorizer from '../utils/TextColorizer.js';
 import close from '../../assets/images/menuClose.png';
 import getKey from '../utils/KeyGenerator.js';
@@ -29,7 +29,7 @@ const Header = ({company, width, isMotionOn, isSignedIn, setSignIn}) => {
     const menuClick = (event) => (event.target.nodeName === "SPAN") ? goHome() : displayMenu();
     const logoButton = (label) => <Link key={getKey("link")} to="Home"><div className="navButton button logoButton">{label}</div></Link>;
     const closeButton = <button className="bg-tinted navButton menuPad" onClick={menuClick}><img src={close} alt="close menu" /></button>;
-    const burgerButton = <button className="bg-tinted navButton menuPad mt-2 p-10 mr-20" onClick={menuClick}><h2 className='hover'><CgMenuGridO alt="open menu"/></h2></button>;
+    const burgerButton = <button className="bg-tinted navButton menuPad mt-2 mb-10 pb-5 pl-10 pr-10 mr-20 r-10" onClick={menuClick}><h2 className='hover'><CgMenuGridO alt="open menu"/></h2></button>;
     const mobileLogo = <TextColorizer class='navBranding mt-7' text={company}/>;
     const closedClasses = (initialized) ? navClassesClose : navClassesClosed;
     const navClasses = (menuOpen) ? navClassesOpen : closedClasses;
@@ -52,7 +52,7 @@ const Header = ({company, width, isMotionOn, isSignedIn, setSignIn}) => {
                                 <div className="flex3Column"></div>
                                 <div className="flex3ColumnRight">{getMenuButton}</div>
                             </div>
-                            <div className="t-50 lowerBorder bg-dark width-100-percent h-scroll">
+                            <div className="t-50 lowerBorder scroll width-100-percent bg-black">
                                 <Menu closeMenu={closeMenu} />
                             </div>
                         </div>
@@ -62,10 +62,10 @@ const Header = ({company, width, isMotionOn, isSignedIn, setSignIn}) => {
                                     <div className="flex3Column centeredContent pb-3"></div>
                                     <div className="flex3ColumnRight">{burgerButton}</div>
                                 </div>
-                                <div className="t-collapse t-50 lowerBorder bg-dark width-100-percent h-scroll">
+                                <div className="t-collapse t-50 lowerBorder width-100-percent scroll bg-black">
                                     <Menu closeMenu={closeMenu}/>
                                 </div>
-                        </div>
+                            </div>
                             
     const hamburgerNav = (menuOpen === true) ? hamburgerOpen : hamburgerClosed;
         
