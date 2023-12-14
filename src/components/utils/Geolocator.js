@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Loader from "../utils/Loader.js";
+import Loader from "../site/Loader.js";
 
 const Geolocate = ({
   isMotionOn,
@@ -7,6 +7,7 @@ const Geolocate = ({
   currentPositionExists,
 }) => {
   const [status, setStatus] = useState({
+    paused: false,
     longitude: null,
     latitude: null,
     errorMessage: null,
@@ -19,17 +20,20 @@ const Geolocate = ({
       window.navigator.geolocation.getCurrentPosition(
         //position => console.log(position.coords.longitude),
         (position) => {
-          const { longitude, latitude } = position.coords;
-          returnCurrentPosition(longitude, latitude);
-          if ((Math.abs(status.longitude - longitude)>2) || (Math.abs(status.latitude - latitude)>(2))) {
-            console.log(`getCurrentPosition => coords ^^^^^^^^^^^ ${longitude}, ${latitude}`)
-            setStatus({
-              longitude: longitude,
-              latitude: latitude,
-              errorMessage: null,
-              returnCurrentPosition: returnCurrentPosition,
-              currentPositionExists: currentPositionExists,
-            });
+          if (!status.paused) {
+            const { longitude, latitude } = position.coords;
+            returnCurrentPosition(longitude, latitude);
+            if ((Math.abs(status.longitude - longitude)>2) || (Math.abs(status.latitude - latitude)>(2))) {
+              console.log(`getCurrentPosition => paused?: ${status.paused} coords ^^^^^^^^^^^ ${longitude}, ${latitude}`)
+                setStatus(prevState => ({
+                  ...prevState,
+                  longitude: longitude,
+                  latitude: latitude,
+                  errorMessage: null,
+                  returnCurrentPosition: returnCurrentPosition,
+                  currentPositionExists: currentPositionExists,
+                }));
+            }
           }
           /*
                     try {
@@ -60,6 +64,15 @@ const Geolocate = ({
       clearInterval(timerID);
     };
   }, [currentPositionExists, returnCurrentPosition, status]);
+  const togglePause = () => {
+    const newStatus = Array.isArray(status) ? [...status] : status;
+    console.log(`togglePause1 => newStatus.paused: ${newStatus.paused} newStatus: ${JSON.stringify(newStatus,null,2)}`)
+    newStatus.paused = !newStatus.paused;
+    console.log(`togglePause2 => newStatus.paused: ${newStatus.paused} newStatus: ${JSON.stringify(newStatus,null,2)}`)
+    setStatus(newStatus);
+    console.log(`togglePause3 => status.paused: ${status.paused}`)
+    returnCurrentPosition(status.longitude, status.latitude);
+  }
   const getLocation = () =>
     `${status.latitude.toFixed(6)}, ${status.longitude.toFixed(6)} `;
   const percent =
@@ -86,7 +99,7 @@ const Geolocate = ({
         }
     }
     */
-  return <div className="r-10 m-5 bg-darker p-10 width-100-pecent color-yellow greet">{geolocationStatus}</div>;
+  return <div className={`button r-10 m-5 bg-tinted p-10 width-100-pecent ${(status.paused)?'color-red':'color-yellow'} greet`} onClick={() => togglePause()}>{geolocationStatus}</div>;
 };
 
 export default Geolocate;

@@ -10,27 +10,25 @@ const ConditionsDashboard = ({tideDisplay, setWind}) => {
 
     return (
         <div className='m-10'>
-            <div className="flexContainer">
-                <div className="flex2Column contentCenter p-5 r-10 color-orange glassy m-5">
-                    tide<br/>
-                    {tideDisplay('wide')}
-                </div>
-                <div className="flex2Column contentCenter p-5 r-10 color-yellow glassy m-5">
-                    wind
-                    <WindDirection columns="2" setWind={setWind} height='157px'/>
-                </div>
+            <div className="r-10 bg-tinted p-10 m-5">
+                <div className='bold color-yellow p-10 r-10 bg-tinted'>TIDE</div>
+                <div>{tideDisplay('wide')}</div>
+            </div>
+            <div className="r-10 bg-tinted p-10 m-5">
+                <div className='bold color-yellow p-10 r-10 bg-tinted'>WIND</div>
+                <WindDirection columns="2" setWind={setWind} height='157px'/>
             </div>
             <div className="flexContainer">
-                <span className="flex2Column contentCenter p-5 r-10 color-blue glassy m-5">
+                <div className="flex2Column p-10 r-10 color-lite bg-tinted m-5">
                     {/*getWaterTempIcon*/}
-                    <span className="ml-2">water</span><br/>
+                    <div className="bold color-yellow p-10 r-10 bg-tinted">WATER</div>
                     <WaterTemp/>
-                </span>
-                <span className="flex2Column contentCenter p-5 r-10 color-white glassy m-5">
+                </div>
+                <div className="flex2Column p-10 r-10 color-white bg-tinted m-5">
                     {/*getAirTempIcon*/}
-                    <span className="ml-2">air</span><br/>
+                    <div className="bold color-yellow p-10 r-10 bg-tinted">AIR</div>
                     <AirTemp/>
-                </span>
+                </div>
             </div>
             <Sunset view='full'/>
             <BuoyReport />

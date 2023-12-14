@@ -328,28 +328,28 @@ const TripFuelTracker = () => {
     const getUSInputs = () => {
         if (currencies[currency] === 'Dollar') {
             return <div>
-                <label className='flexContainer bg-veryLite r-10 m-5'>
+                <label className='flexContainer containerInput'>
                     <div className='columnRightAlign width-50-percent'>
-                        <span className='size20 r-5 w-200 p-10 bold color-soft'>
+                        <span className='inputText'>
                             {currencies[currency]} per Gallon:
                         </span>
                     </div>
-                    <div className='size20 p-10 columnLeftAlign width-50-percent'>
-                        <input className='r-5 p-10 w-150 bg-darker color-soft'
+                    <div className='columnLeftAlign width-50-percent'>
+                        <input className='inputField'
                             type='number'
                             value={pricePerGallon}
                             onChange={(e) => setPricePerGallon(e.target.value)}
                         />
                     </div>
                 </label>
-                <label className='flexContainer bg-veryLite r-10 m-5'>
+                <label className='flexContainer containerInput'>
                     <div className='columnRightAlign width-50-percent'>
-                        <span className='size20 r-5 w-200 p-10 bold color-soft'>
+                        <span className='inputText'>
                             Total Gallons:
                         </span>
                     </div>
-                    <div className='size20 p-10 columnLeftAlign width-50-percent'>
-                        <input className='r-5 p-10 w-150 bg-darker color-soft'
+                    <div className='columnLeftAlign width-50-percent'>
+                        <input className='inputField'
                             type='number'
                             value={gallonsPurchased}
                             onChange={(e) => setGallonsPurchased(e.target.value)}
@@ -362,42 +362,42 @@ const TripFuelTracker = () => {
     const getInternationalInputs = () => {
         if (currencies[currency] !== 'Dollar') {
             return <div>
-                <label className='flexContainer bg-veryLite r-10 m-5'>
+                <label className='flexContainer containerInput'>
                     <div className='columnRightAlign width-50-percent'>
-                        <span className='size20 r-5 w-200 p-10 bold color-soft'>
+                        <span className='inputText'>
                             Exchange Rate:
                         </span>
                     </div>
-                    <div className='size20 p-10 columnLeftAlign width-50-percent'>
-                        <input className='r-5 p-10 w-150 bg-darker color-soft'
+                    <div className='columnLeftAlign width-50-percent'>
+                        <input className='inputField'
                             type='number'
                             value={exchangeRate}
                             onChange={(e) => setExchangeRate(e.target.value)}
                         />
                     </div>
                 </label>
-                <label className='flexContainer bg-veryLite r-10 m-5'>
+                <label className='flexContainer containerInput'>
                     <div className='columnRightAlign width-50-percent'>
-                        <span className='size20 r-5 w-200 p-10 bold color-soft'>
+                        <span className='inputText'>
                             {currencies[currency]} per Liter:
                         </span>
                     </div>
-                    <div className='size20 p-10 columnLeftAlign width-50-percent'>
-                        <input className='r-5 p-10 w-150 bg-darker color-soft'
+                    <div className='columnLeftAlign width-50-percent'>
+                        <input className='inputField'
                             type='number'
                             value={pricePerLiter}
                             onChange={(e) => setPricePerLiter(e.target.value)}
                         />
                     </div>
                 </label>
-                <label className='flexContainer bg-veryLite r-10 m-5'>
+                <label className='flexContainer containerInput'>
                     <div className='columnRightAlign width-50-percent'>
-                        <span className='size20 r-5 w-200 p-10 bold color-soft'>
+                        <span className='inputText'>
                             Total Liters:
                         </span>
                     </div>
-                    <div className='size20 p-10 columnLeftAlign width-50-percent'>
-                        <input className='r-5 p-10 w-150 bg-darker color-soft'
+                    <div className='columnLeftAlign width-50-percent'>
+                        <input className='inputField'
                             type='number'
                             value={litersPurchased}
                             onChange={(e) => setLitersPurchased(e.target.value)}
@@ -412,7 +412,7 @@ const TripFuelTracker = () => {
             `UPDATING CURRENT POSITION ======> longitude: ${longitude} latitude: ${latitude}`
         );
         setLongitude(longitude);
-        setLatitude(latitude);
+        setLatitude(latitude+.000001);
         //setDistance(calculateDistance());
     };
     const getDailyTotalsDisplay = (index) => {
@@ -422,76 +422,84 @@ const TripFuelTracker = () => {
         if (date == nextDate) {
             return
         }
-        return <div className='flexContainer bg-veryLite color-yellow mt-20 r-5 m-5 p-5 size20'>
-            <div className='flex4Column'>
-                <div className='p-5'>distance</div>
-                <div className='p-5 bold bg-darker m-1 r-5 mt-5 mb-5'>{getTotalMiles(index)}</div>
+        return <div className='flexContainer scrollSnapBottom r-10 bg-dkGreen'>
+            <div className='flex4Column containerDetail m-1'>
+                <div className='containerDetail bold color-yellow'>distance</div>
+                <div className='bold color-lite'>{getTotalMiles(index)}</div>
             </div>
-            <div className='flex4Column'>
-                <div className='p-5'>time</div>
-                <div className='p-5 bold bg-darker m-1 r-5 mt-5 mb-5'>{getTotalHours(index)}</div>
+            <div className='flex4Column containerDetail m-1'>
+                <div className='containerDetail bold color-yellow'>time</div>
+                <div className='bold color-lite'>{getTotalHours(index)}</div>
             </div>
-            <div className='flex4Column'>
-                <div className='p-5'>stops</div>
-                <div className='p-5 bold bg-darker m-1 r-5 mt-5 mb-5'>{getTotalStops(index)}</div>
+            <div className='flex4Column containerDetail m-1'>
+                <div className='containerDetail bold color-yellow'>stops</div>
+                <div className='bold color-lite'>{getTotalStops(index)}</div>
             </div>
-            <div className='flex4Column'>
-                <div className='p-5'>gallons</div>
-                <div className='p-5 bold bg-darker m-1 r-5 mt-5 mb-5'>{getTotalGallons(index)}</div>
+            <div className='flex4Column containerDetail m-1'>
+                <div className='containerDetail bold color-yellow'>gallons</div>
+                <div className='bold color-lite'>{getTotalGallons(index)}</div>
             </div>
-            <div className='flex4Column'>
-                <div className='p-5'>USD</div>
-                <div className='p-5 bold bg-darker m-1 r-5 mt-5 mb-5'>${getTotalUSD(index)}</div>
+            <div className='flex4Column containerDetail m-1'>
+                <div className='containerDetail bold color-yellow'>USD</div>
+                <div className='bold color-lite'>${getTotalUSD(index)}</div>
             </div>
         </div>
     }
+    const getTripTime = (trip) => {
+        const time = trip.time.split(', ')[1];
+        const hours = time.split(':')[0];
+        const minutes = time.split(':')[1];
+        const half = time.split(' ')[1];
+        const display = `${hours}:${minutes} ${half}`;
+        return display;
+    }
     return (
-        <div className='mt--20'>
-            <div className='bg-tinted r-10 p-10 m-5'>
+        <div className='mt--20 mr-10 ml-10'>
+            <div className='containerBox'>
                 <Geolocator
                     currentPositionExists="false"
                     returnCurrentPosition={updateCurrentLocation}
                 />
-                <label className='flexContainer bg-veryLite r-10 m-5'>
+                <label className='flexContainer containerInput'>
                     <div className='columnRightAlign width-50-percent'>
-                        <span className='size20 r-5 w-200 p-10 bold color-soft'>
+                        <span className='inputText'>
                             Location:
                         </span>
                     </div>
-                    <div className='size20 p-10 columnLeftAlign width-50-percent'>
-                        <input className='r-5 p-10 w-150 bg-darker color-soft'
+                    <div className='columnLeftAlign width-50-percent'>
+                        <input className='inputField'
                             type='string'
                             value={location}
                             onChange={(e) => setLocation(e.target.value)}
                         />
                     </div>
                 </label>
-                <label className='flexContainer bg-veryLite r-10 m-5'>
+                <label className='flexContainer containerInput'>
                     <div className='columnRightAlign width-50-percent'>
-                        <span className='size20 r-5 w-200 p-10 bold color-soft'>
+                        <span className='inputText'>
                             Odometer:
                         </span>
                     </div>
-                    <div className='size20 p-10 columnLeftAlign width-50-percent'>
-                        <input className='r-5 p-10 w-150 bg-darker color-soft'
+                    <div className='columnLeftAlign width-50-percent'>
+                        <input className='inputField'
                             type='number'
                             value={odometer}
                             onChange={(e) => setOdometer(e.target.value)}
                         />
                     </div>
                 </label>
-                <label className='flexContainer bg-veryLite r-10 m-5'>
+                <label className='flexContainer containerInput'>
                     <div className='columnRightAlign width-50-percent'>
-                        <span className='size20 r-5 w-200 p-10 bold color-soft'>
+                        <span className='inputText'>
                             Currency:
                         </span>
                     </div>
-                    <div className='size20 p-10 columnLeftAlign width-50-percent'>
+                    <div className='columnLeftAlign width-50-percent'>
                         <select
                             name="currency"
                             value={currency}
                             onChange={handleInputChange}
-                            className='mt--2 w-150 bg-darker color-soft r-5 p-10'
+                            className='inputSelect'
                         >
                             <option value="">Select Currency</option>
                             {currencyCode.map((currency) => (
@@ -502,13 +510,13 @@ const TripFuelTracker = () => {
                         </select>
                     </div>
                 </label>
-                <label className='flexContainer bg-veryLite r-10 m-5'>
-                    <div className='size20 p-10 columnRightAlign width-50-percent'>
+                <label className='flexContainer containerInput'>
+                    <div className='columnRightAlign width-50-percent'>
                         <select
                             name="guageStart"
                             value={guageStart}
                             onChange={handleGuageStartChange}
-                            className='mt--2 bg-darker color-soft r-5 p-10'
+                            className='inputSelect'
                         >
                             <option value="">Tank Start</option>
                             {fuelGuageReadings.map((readingValue) => (
@@ -518,12 +526,12 @@ const TripFuelTracker = () => {
                             ))}
                         </select>
                     </div>
-                    <div className='size20 p-10 columnLeftAlign width-50-percent'>
+                    <div className='columnLeftAlign width-50-percent'>
                         <select
                             name="guageEnd"
                             value={guageEnd}
                             onChange={handleGuageEndChange}
-                            className='mt--2 w-150 bg-darker color-soft r-5 p-10'
+                            className='inputSelect'
                         >
                             <option value="">Tank End</option>
                             {fuelGuageReadings.map((readingValue) => (
@@ -538,67 +546,77 @@ const TripFuelTracker = () => {
                 {getUSInputs()}
             </div>
             <div>
-                <div className='flexContainer'>
-                    <div className='flex2Column contentCenter'>
-                        <button className='myButton mt-20 p-20 w-150' onClick={calculateAndRecord}>Add</button>
+                <div className='flexContainer containerBox'>
+                    {/*<div className='columnRightAlign width-50-percent mr-10'>*/}
+                        <button className='myButton p-20 width-100-percent m-5' onClick={calculateAndRecord}>Add</button>
+                    {/*</div>*/}
+                    {/*
+                    <div className='columnLeftAlign width-50-percent ml-10'>
+                        <button className='myButton p-20 width-100-percent' onClick={clearRecord}>Clear</button>
                     </div>
-                    <div className='flex2Column contentCenter'>
-                        <button className='myButton mt-20 p-20 w-150' onClick={clearRecord}>Clear</button>
-                    </div>
+                    */}
                 </div>
-                <div className='scrollHeight250 r-10 m-5 mt-20'>
+                <div className='scrollHeight350 r-10 m-5 mt-20'>
                     {
-                        trips.map((trip, index) => <div className='mt-1 r-10 color-soft bg-darker pb-10' key={getKey(`trip${index}`)}>
-                            <div className="p-10 w-100-percent flexContainer">
-                                <div className="bold size30 color-yellow flexOneFifthColumn contentLeft" onClick={() => editLocation(index, trip.location)}>{index + 1}. {trip.location}</div>
-                                <div className="rt-25 t-0 mt-5 r-5 size15 bg-lite bold color-yellow button pr-20 pl-20 pt-10 pb-10 contentRight" onClick={() => deleteLocation(index)}>X</div>
-                            </div>
-                            <div className='ml-40 w-auto'>
-                                <div className='p-5 r-5 bg-darker mt-5 width-100-percent flexContainer'>
-                                    <span onClick={() => editLatitude(index, trip.latitude)}>{trip.latitude}</span>, <span onClick={() => editLongitude(index, trip.longitude)}>{trip.longitude}</span>
-                                    <span className="ml-10">
-                                        <a className="p-5 bg-green r-5 mt-35 color-lite" href={`https://www.google.com/maps?q=${trip.latitude},${trip.longitude}`} target="_blank">Map</a>
-                                    </span>
-                                </div>
-                            </div>
-                            <div className='flexContainer r-5 pb-5 bg-veryLite m-10'>
-                                <div className='m-auto w-auto'>
-                                    <div className='p-5' onClick={() => editTime(index)}>{`${trip.time.split(', ')[1]}`}</div>
-                                    <div className='p-10 bold bg-darker r-5 size25' onClick={() => editDate(index)}>{`${trip.time.split(', ')[0].split('/')[0]}/${trip.time.split(', ')[0].split('/')[1]}`}</div>
-                                </div>
-                                <div className='m-auto'>
-                                    <div className='p-5'>Gallons</div>
-                                    <div className='p-10 bold bg-darker r-5 size25' onClick={() => editGallons(index, trip.gallons)}>{trip.gallons}</div>
-                                </div>
-                                <div className='m-auto'>
-                                    <div className='p-5'>$/Gallons</div>
-                                    <div className='p-10 bold bg-darker r-5 size25' onClick={() => editUSDGallons(index, trip.usdPerGallon)}>${trip.usdPerGallon}</div>
-                                </div>
-                                <div className='m-auto'>
-                                    <div className='p-5'>USD</div>
-                                    <div className='p-10 bold bg-darker r-5 size25' onClick={() => editTotalUSD(index, trip.totalUSD)}>${trip.totalUSD}</div>
-                                </div>
-                            </div>
-                            <div className='ml-10 mt--5 mr-10 mb-5 r-5 greet color-lite bg-veryLite flexContainer'>
-                                <div className='m-auto w-auto p-5' onClick={() => editOdometer(index, trip.odometer)}>
-                                    <div className='bold'>odometer:</div>
-                                    <div className='p-5 r-5 bg-darker mt-5'>{trip.odometer}</div>
-                                </div>
-                                <div className='m-auto w-auto p-5'>
-                                    <div className='bold'>tank:</div>
-                                    <div className='p-5 r-5 bg-darker mt-5' onClick={() => editGuageStart(index, trip.guageStart)}>{trip.guageStart}% to <span onClick={() => editGuageEnd(index, trip.guageEnd)}>{trip.guageEnd}</span>%</div>
-                                </div>
-                                <div className='m-auto w-auto p-5' onClick={() => editDistance(index, trip.distance)}>
-                                    <div className='bold'>
-                                        distance:
+                        trips.map((trip, index) => <div>
+                                <div className='containerDetail color-soft scrollSnap mb-5 bg-veryLite' key={getKey(`trip${index}`)}>
+                                    <div className="containerBox flexContainer">
+                                        <div className="bold size25 color-yellow flexOneFifthColumn contentLeft lh-15" onClick={() => editLocation(index, trip.location)}>{index + 1}. {trip.location}</div>
+                                        <div className="rt-25 t-0 mt-5 r-5 size15 bg-lite bold color-yellow button pr-20 pl-20 pt-10 pb-10 contentRight" onClick={() => deleteLocation(index)}>X</div>
                                     </div>
-                                    <div className='p-5 r-5 bg-darker mt-5'>
-                                        {trip.distance} miles
+                                    <div className='containerDetail mr-5 ml-5'>
+                                        <div className='p-5 flexContainer'>
+                                            <span>
+                                                <div 
+                                                    className="button p-5 bg-green mr-10 r-5 color-lite" 
+                                                    onClick={() => window.location = `https://www.google.com/maps?q=${trip.latitude},${trip.longitude}`}>
+                                                        Map
+                                                </div>
+                                            </span>
+                                            <span className='color-yellow p-5' onClick={() => editLatitude(index, trip.latitude)}>{trip.latitude}, </span><span  className='color-yellow p-5' onClick={() => editLongitude(index, trip.longitude)}>{trip.longitude}</span>
+                                        </div>
+                                    </div>
+                                    <div className=''>
+                                        <div className='flexContainer m-5'>
+                                            <div className='flex4Column containerDetail'>
+                                                <div className='containerDetail color-lite bold' onClick={() => editTime(index)}>{`${getTripTime(trip)}`}</div>
+                                                <div className='bold size20 p-5' onClick={() => editDate(index)}>{`${trip.time.split(', ')[0].split('/')[0]}/${trip.time.split(', ')[0].split('/')[1]}`}</div>
+                                            </div>
+                                            <div className='flex4Column ml-5 containerDetail'>
+                                                <div className='containerDetail color-lite bold'>Gallons</div>
+                                                <div className='bold size20 p-5' onClick={() => editGallons(index, trip.gallons)}>{trip.gallons}</div>
+                                            </div>
+                                            <div className='flex4Column ml-5 containerDetail'>
+                                                <div className='containerDetail color-lite bold'>$/Gallons</div>
+                                                <div className='bold size20 p-5' onClick={() => editUSDGallons(index, trip.usdPerGallon)}>${trip.usdPerGallon}</div>
+                                            </div>
+                                            <div className='flex4Column ml-5 containerDetail'>
+                                                <div className='containerDetail color-lite bold'>USD</div>
+                                                <div className='bold size20 p-5' onClick={() => editTotalUSD(index, trip.totalUSD)}>${trip.totalUSD}</div>
+                                            </div>
+                                        </div>
+                                        <div className='flexContainer m-5'>
+                                            <div className='containerDetail flex3Column' onClick={() => editOdometer(index, trip.odometer)}>
+                                                <div className='containerDetail color-lite bold'>odometer</div>
+                                                <div className='bold size20 p-5'>{trip.odometer}</div>
+                                            </div>
+                                            <div className='containerDetail flex3Column ml-5 mr-5'>
+                                                <div className='containerDetail color-lite bold'>tank</div>
+                                                <div className='bold size20 p-5' onClick={() => editGuageStart(index, trip.guageStart)}>{trip.guageStart}% to <span onClick={() => editGuageEnd(index, trip.guageEnd)}>{trip.guageEnd}</span>%</div>
+                                            </div>
+                                            <div className='containerDetail flex3Column' onClick={() => editDistance(index, trip.distance)}>
+                                                <div className='containerDetail color-lite bold'>
+                                                    distance
+                                                </div>
+                                                <div className='bold size20 p-5'>
+                                                    {trip.distance} miles
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                                {getDailyTotalsDisplay(index)}
                             </div>
-                            {getDailyTotalsDisplay(index)}
-                        </div>
                         )
                     }
                 </div>

@@ -37,30 +37,42 @@ class ConditionsSelectors extends React.Component {
     refresh = () => window.location.pathname = "/reactor/WaveFinder";
     
     starSelector = (stars) => <div 
-                                className="flex2Column contentCenter glassy r-10 m-5 p-15" 
+                                className="flex2Column bg-tinted r-10 m-5 p-10" 
                                 onMouseDown={this.pause}
                                 >
-                                    Match<br/>
-                                    <Selector
-                                        groupTitle="Matches" 
-                                        selected={stars} 
-                                        label="Quality"
-                                        items={[0,1,2,3,4,5]}
-                                        onChange={this.handleStarSelection}
-                                        fontSize='20'
-                                        padding='5px'
-                                        width='93%'
-                                    />
+                                    <div className='p-10 r-10 bg-tinted'>
+                                        <div className='p-10 r-10 bg-tinted'>
+                                            Match
+                                        </div>
+                                        <div className='m-5 size20 p-10 width-auto'>
+                                            <Selector
+                                                groupTitle="Matches" 
+                                                selected={stars} 
+                                                label="Quality"
+                                                items={[0,1,2,3,4,5]}
+                                                onChange={this.handleStarSelection}
+                                                fontSize='20'
+                                                padding='5px'
+                                                width='93%'
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
-    milesInput = (distance) => <div className="flex2Column contentCenter glassy r-10 m-5 p-10">
+    milesInput = (distance) => <div className="flex2Column bg-tinted r-10 m-5 p-10">
                                 <label>
-                                    Miles<br/>
-                                    <input className="mt-10 p-10 r-10"
-                                        name="distance"
-                                        type="number"
-                                        value={(distance=='' ? 100 : distance)}
-                                        onChange={this.handleDistanceSelection}
-                                    />
+                                    <div className='p-10 r-10 bg-tinted'>
+                                        <div className='p-10 r-10 bg-tinted'>
+                                            Miles
+                                        </div>
+                                        <div className="m-5 p-10 white">
+                                            <input className="mt-10 p-10 r-10 maxWidth100"
+                                                name="distance"
+                                                type="number"
+                                                value={(distance=='' ? 100 : distance)}
+                                                onChange={this.handleDistanceSelection}
+                                            />
+                                        </div>
+                                    </div>
                                 </label>
                             </div>
     render() {
@@ -123,7 +135,9 @@ class ConditionsSelectors extends React.Component {
                     {this.milesInput(this.context.distance)}
                     {this.starSelector(this.context.stars)} 
                 </div>
-                <div className="button bg-neogreen r-10 m-5 p-15 color-black bold glassy" onClick={this.refresh}>Refresh</div>
+                <div className="button bg-neogreen r-10 m-5 p-15 color-black bold" onClick={this.refresh}>
+                    Refresh
+                </div>
             </div>
         ) 
     }

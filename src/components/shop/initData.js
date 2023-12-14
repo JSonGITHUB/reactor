@@ -10,7 +10,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-25T22:18:07.164Z",
       "days": 1,
-      "color": "#338a80"
+      "color": "#338a80",
+      "display": true
     },
     {
       "title": "Almond milk",
@@ -33,7 +34,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-26T15:18:13.934Z",
       "days": 1,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Chives",
@@ -45,7 +47,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-19T22:04:34.625Z",
       "days": 1,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Chia seed pudding",
@@ -57,7 +60,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-19T22:04:34.625Z",
       "days": 1,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "French fries",
@@ -69,7 +73,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-22T20:15:00.011Z",
       "days": 1,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Fruit",
@@ -81,7 +86,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-22T20:15:00.011Z",
       "days": 1,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Garlic bread",
@@ -93,7 +99,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-22T20:17:01.801Z",
       "days": 1,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Milk",
@@ -105,7 +112,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-22T20:17:08.486Z",
       "days": 1,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Oatmeal",
@@ -117,7 +125,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-22T20:17:08.486Z",
       "days": 1,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Raisans",
@@ -173,7 +182,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-19T22:15:30.328Z",
       "days": 1,
-      "color": "#f963a5"
+      "color": "#f963a5",
+      "display": true
     },
     {
       "title": "Bulgar",
@@ -185,7 +195,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-22T20:17:37.083Z",
       "days": 1,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Celery",
@@ -197,7 +208,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-22T20:19:13.797Z",
       "days": 1,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Garlic",
@@ -209,7 +221,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-19T22:15:20.498Z",
       "days": 1,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Pizza",
@@ -221,7 +234,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-19T22:15:08.139Z",
       "days": 1,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Spinach",
@@ -233,7 +247,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-19T22:26:53.259Z",
       "days": 1,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Seafood",
@@ -245,7 +260,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-22T20:19:53.160Z",
       "days": 1,
-      "color": "#aa5887"
+      "color": "#aa5887",
+      "display": true
     },
     {
       "title": "Avacados",
@@ -257,7 +273,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-19T22:15:05.526Z",
       "days": 1,
-      "color": "#a8195b"
+      "color": "#a8195b",
+      "display": true
     },
     {
       "title": "Bananas",
@@ -269,7 +286,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-19T22:15:01.279Z",
       "days": 1,
-      "color": "#a8195b"
+      "color": "#a8195b",
+      "display": true
     },
     {
       "title": "Eggs",
@@ -281,7 +299,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-19T22:14:55.356Z",
       "days": 1,
-      "color": "#a8195b"
+      "color": "#a8195b",
+      "display": true
     },
     {
       "title": "Serranos",
@@ -293,7 +312,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-26T15:19:45.069Z",
       "days": 1,
-      "color": "#a8195b"
+      "color": "#a8195b",
+      "display": true
     },
     {
       "title": "Tomatoes",
@@ -305,7 +325,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-19T22:14:48.095Z",
       "days": 1,
-      "color": "#a8195b"
+      "color": "#a8195b",
+      "display": true
     },
     {
       "title": "Walnuts",
@@ -317,7 +338,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-19T22:14:48.095Z",
       "days": 1,
-      "color": "#a8195b"
+      "color": "#a8195b",
+      "display": true
     },
     {
       "title": "Hose 75' brass bullet",
@@ -329,7 +351,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-19T22:14:33.795Z",
       "days": 1,
-      "color": "#a923e4"
+      "color": "#a923e4",
+      "display": true
     },
     {
       "title": "BBQ Sauce",
@@ -341,7 +364,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-19T22:14:29.643Z",
       "days": 1,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Buns",
@@ -353,7 +377,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-19T22:14:26.977Z",
       "days": 1,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Chips",
@@ -365,7 +390,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-19T22:14:15.295Z",
       "days": 1,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Hamburgers",
@@ -377,7 +403,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-19T22:13:16.596Z",
       "days": 1,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Yellow squash",
@@ -400,7 +427,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-22T20:19:22.468Z",
       "days": 1,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Camping lighter",
@@ -412,7 +440,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#338a80"
+      "color": "#338a80",
+      "display": true
     },
     {
       "title": "Cash",
@@ -424,7 +453,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-11-02T14:14:49.732Z",
       "days": 110,
-      "color": "#338a80"
+      "color": "#338a80",
+      "display": true
     },
     {
       "title": "Cat food",
@@ -436,7 +466,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-15T14:55:58.004Z",
       "days": 5,
-      "color": "#338a80"
+      "color": "#338a80",
+      "display": true
     },
     {
       "title": "Charcoal",
@@ -448,7 +479,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#338a80"
+      "color": "#338a80",
+      "display": true
     },
     {
       "title": "Dry ice",
@@ -460,7 +492,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-08-06T16:54:27.228Z",
       "days": 198,
-      "color": "#338a80"
+      "color": "#338a80",
+      "display": true
     },
     {
       "title": "Duct tape",
@@ -472,7 +505,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-11-03T19:35:31.900Z",
       "days": 109,
-      "color": "#338a80"
+      "color": "#338a80",
+      "display": true
     },
     {
       "title": "Ice blocks",
@@ -484,7 +518,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-09T01:07:06.594Z",
       "days": 12,
-      "color": "#338a80"
+      "color": "#338a80",
+      "display": true
     },
     {
       "title": "Key",
@@ -496,7 +531,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#338a80"
+      "color": "#338a80",
+      "display": true
     },
     {
       "title": "Pulled pork",
@@ -508,7 +544,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-29T17:09:53.538Z",
       "days": 53,
-      "color": "#338a80"
+      "color": "#338a80",
+      "display": true
     },
     {
       "title": "Sausage",
@@ -520,7 +557,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-08-07T02:31:23.460Z",
       "days": 198,
-      "color": "#338a80"
+      "color": "#338a80",
+      "display": true
     },
     {
       "title": "Squid",
@@ -532,7 +570,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-02T21:34:56.615Z",
       "days": 80,
-      "color": "#338a80"
+      "color": "#338a80",
+      "display": true
     },
     {
       "title": "Sun block",
@@ -544,7 +583,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-29T17:09:53.538Z",
       "days": 53,
-      "color": "#338a80"
+      "color": "#338a80",
+      "display": true
     },
     {
       "title": "Wax",
@@ -556,7 +596,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#338a80"
+      "color": "#338a80",
+      "display": true
     },
     {
       "title": "Acai",
@@ -568,7 +609,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Apple juice",
@@ -580,7 +622,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-08-13T20:07:06.214Z",
       "days": 191,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Broccoli",
@@ -592,7 +635,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Brown rice and broccoli",
@@ -604,7 +648,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Rice",
@@ -616,7 +661,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Cheese",
@@ -628,7 +674,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Coffee pot",
@@ -640,7 +687,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-10T23:49:41.458Z",
       "days": 10,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Corn",
@@ -652,7 +700,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Ear plugs",
@@ -664,7 +713,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Fat wood",
@@ -676,7 +726,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Fishing license",
@@ -688,7 +739,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-06-18T16:26:38.333Z",
       "days": 247,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Fishing line",
@@ -700,7 +752,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-06-18T16:26:38.333Z",
       "days": 247,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Fishing rode",
@@ -712,7 +765,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-06-18T16:26:38.333Z",
       "days": 247,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Gas tanks",
@@ -724,7 +778,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Green beans",
@@ -736,7 +791,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Ice",
@@ -748,7 +804,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Ice cream",
@@ -760,7 +817,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Mango",
@@ -772,7 +830,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Rasins",
@@ -784,7 +843,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Meatballs",
@@ -796,7 +856,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Memory card",
@@ -808,7 +869,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-07-10T16:50:54.906Z",
       "days": 225,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Mosquito net",
@@ -820,7 +882,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Passports",
@@ -832,7 +895,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Fork, Spoons and Knife",
@@ -844,7 +908,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Peas",
@@ -856,7 +921,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Pineapple",
@@ -868,7 +934,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-08T21:28:23.144Z",
       "days": 12,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Propane",
@@ -880,7 +947,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Ranch",
@@ -892,7 +960,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Shovel",
@@ -904,7 +973,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-07-09T18:47:32.167Z",
       "days": 226,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Shrimp",
@@ -916,7 +986,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Sleeping bags",
@@ -928,7 +999,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Solar charger",
@@ -940,7 +1012,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Strawberries",
@@ -952,7 +1025,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "SX-530 Battery",
@@ -964,7 +1038,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-07-10T16:50:54.906Z",
       "days": 225,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Tackle box",
@@ -976,7 +1051,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T03:30:52.686Z",
       "days": 53,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Throw net",
@@ -988,7 +1064,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-06-18T16:26:38.333Z",
       "days": 247,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Toilet paper",
@@ -1000,7 +1077,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Toothpaste",
@@ -1012,7 +1090,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Outlet Adapters",
@@ -1024,7 +1103,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Breakfast stuff",
@@ -1036,7 +1116,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Water jug",
@@ -1048,7 +1129,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Yogurt",
@@ -1060,7 +1142,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T03:30:52.686Z",
       "days": 53,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Zip lock bags",
@@ -1072,7 +1155,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-23T22:18:35.686Z",
       "days": 59,
-      "color": "#b8e522"
+      "color": "#b8e522",
+      "display": true
     },
     {
       "title": "Seat post 30.9",
@@ -1084,7 +1168,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-09-12T21:16:21.480Z",
       "days": 161,
-      "color": "#772c25"
+      "color": "#772c25",
+      "display": true
     },
     {
       "title": "Beans 15 mix",
@@ -1096,7 +1181,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-05-23T17:04:53.945Z",
       "days": 273,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Bison",
@@ -1108,7 +1194,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-09-26T04:15:57.249Z",
       "days": 148,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Cherries",
@@ -1120,7 +1207,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-07-11T20:33:48.501Z",
       "days": 224,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Chicken",
@@ -1132,7 +1220,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-08T19:43:38.050Z",
       "days": 12,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Chowder",
@@ -1144,7 +1233,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-29T03:31:57.198Z",
       "days": 54,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Club soda",
@@ -1156,7 +1246,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-11-28T19:05:25.206Z",
       "days": 84,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Dishwasher detergent",
@@ -1168,7 +1259,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-04-29T00:57:35.566Z",
       "days": 298,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Ham",
@@ -1180,7 +1272,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-05-13T21:35:34.774Z",
       "days": 283,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Hummus",
@@ -1192,7 +1285,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-09-12T21:17:00.180Z",
       "days": 161,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Ice pop",
@@ -1204,7 +1298,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-09-05T01:52:20.655Z",
       "days": 169,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Avacados",
@@ -1216,7 +1311,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-09-05T01:52:20.655Z",
       "days": 169,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "kaffir lime leaves 2",
@@ -1228,7 +1324,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-10-19T23:21:08.552Z",
       "days": 124,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Laundry detergent",
@@ -1240,7 +1337,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-04-29T00:57:35.566Z",
       "days": 298,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Lemons",
@@ -1252,7 +1350,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-08-04T18:25:05.628Z",
       "days": 200,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Lentils",
@@ -1264,7 +1363,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-05-05T03:00:13.099Z",
       "days": 292,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Limes",
@@ -1276,7 +1376,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-08-07T02:31:23.460Z",
       "days": 198,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Pancake mix",
@@ -1288,7 +1389,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-11-11T16:10:08.006Z",
       "days": 101,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Parmisean",
@@ -1300,7 +1402,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-05-13T15:34:16.785Z",
       "days": 283,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Pasta",
@@ -1312,7 +1415,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-06-11T15:02:41.191Z",
       "days": 254,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Pesto",
@@ -1324,7 +1428,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-04-29T00:57:35.566Z",
       "days": 298,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Ponzu",
@@ -1336,7 +1441,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-04-29T00:57:35.566Z",
       "days": 298,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Quinuao",
@@ -1348,7 +1454,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-05-05T03:00:13.099Z",
       "days": 292,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Shallots 6",
@@ -1360,7 +1467,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-10-19T23:21:08.552Z",
       "days": 124,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "shrimp paste / terasi .5tbls",
@@ -1372,7 +1480,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-10-19T23:21:08.552Z",
       "days": 124,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Soy",
@@ -1384,7 +1493,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-04-29T00:57:35.566Z",
       "days": 298,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Sugar",
@@ -1396,7 +1506,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-09T14:40:23.620Z",
       "days": 11,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Tumurick",
@@ -1408,7 +1519,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-04-29T00:57:35.566Z",
       "days": 298,
-      "color": "#47f2d7"
+      "color": "#47f2d7",
+      "display": true
     },
     {
       "title": "Alcohol",
@@ -1420,7 +1532,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-29T17:09:53.538Z",
       "days": 53,
-      "color": "#a8195b"
+      "color": "#a8195b",
+      "display": true
     },
     {
       "title": "Beer",
@@ -1432,7 +1545,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-02T21:34:56.615Z",
       "days": 80,
-      "color": "#a8195b"
+      "color": "#a8195b",
+      "display": true
     },
     {
       "title": "Cilantro",
@@ -1444,7 +1558,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-06-27T16:47:17.221Z",
       "days": 238,
-      "color": "#a8195b"
+      "color": "#a8195b",
+      "display": true
     },
     {
       "title": "Salad",
@@ -1456,7 +1571,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-11-02T14:14:49.732Z",
       "days": 110,
-      "color": "#a8195b"
+      "color": "#a8195b",
+      "display": true
     },
     {
       "title": "Salsa",
@@ -1468,7 +1584,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-06-27T16:47:17.221Z",
       "days": 238,
-      "color": "#a8195b"
+      "color": "#a8195b",
+      "display": true
     },
     {
       "title": "Tortillas",
@@ -1480,7 +1597,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-04-29T01:14:33.544Z",
       "days": 298,
-      "color": "#a8195b"
+      "color": "#a8195b",
+      "display": true
     },
     {
       "title": "Litter",
@@ -1492,7 +1610,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-11-14T16:35:02.547Z",
       "days": 98,
-      "color": "#bdb286"
+      "color": "#bdb286",
+      "display": true
     },
     {
       "title": "Vodka",
@@ -1504,7 +1623,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-29T03:31:57.198Z",
       "days": 54,
-      "color": "#bdb286"
+      "color": "#bdb286",
+      "display": true
     },
     {
       "title": "Pressure washer",
@@ -1516,7 +1636,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-18T00:15:38.784Z",
       "days": 3,
-      "color": "#a923e4"
+      "color": "#a923e4",
+      "display": true
     },
     {
       "title": "22\" pole ",
@@ -1528,7 +1649,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-11-02T14:14:49.732Z",
       "days": 110,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Apple sauce",
@@ -1540,7 +1662,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Beans",
@@ -1552,7 +1675,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Black Pepper",
@@ -1564,7 +1688,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Cinnimon",
@@ -1576,7 +1701,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Coconut",
@@ -1588,7 +1714,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Coffee",
@@ -1600,7 +1727,8 @@ const initData =
       "select": false,
       "lastPurchase": "2021-02-10T23:50:43.026Z",
       "days": 10,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Crackers",
@@ -1612,7 +1740,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Cyan Pepper",
@@ -1624,7 +1753,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Dish soap",
@@ -1636,7 +1766,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Garlic Powder",
@@ -1648,7 +1779,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Ginger beer",
@@ -1660,7 +1792,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Granola",
@@ -1672,7 +1805,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Juice",
@@ -1684,7 +1818,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Ketchup",
@@ -1696,7 +1831,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Olive oil",
@@ -1708,7 +1844,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Onion",
@@ -1720,7 +1857,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Outmeal",
@@ -1732,7 +1870,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Paper towels",
@@ -1744,7 +1883,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Butter",
@@ -1756,7 +1896,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Peanut butter",
@@ -1768,7 +1909,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Pina Colada",
@@ -1780,7 +1922,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Potatoes",
@@ -1792,7 +1935,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Rice",
@@ -1804,7 +1948,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Salt",
@@ -1816,7 +1961,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Soap",
@@ -1828,7 +1974,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Tomato sauce",
@@ -1840,7 +1987,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Tylenol 500 mg",
@@ -1852,7 +2000,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Vegetable oil",
@@ -1864,7 +2013,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Wipes",
@@ -1876,7 +2026,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#a0306a"
+      "color": "#a0306a",
+      "display": true
     },
     {
       "title": "Burner",
@@ -1888,7 +2039,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-30T16:46:58.306Z",
       "days": 52,
-      "color": "#69019c"
+      "color": "#69019c",
+      "display": true
     },
     {
       "title": "Hatch lock",
@@ -1900,7 +2052,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-09-29T19:38:14.408Z",
       "days": 144,
-      "color": "#69019c"
+      "color": "#69019c",
+      "display": true
     },
     {
       "title": "Tent fan light",
@@ -1912,7 +2065,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-12-29T17:09:53.538Z",
       "days": 53,
-      "color": "#69019c"
+      "color": "#69019c",
+      "display": true
     },
     {
       "title": "Mint",
@@ -1924,7 +2078,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-11-28T19:05:25.206Z",
       "days": 84,
-      "color": "#5344be"
+      "color": "#5344be",
+      "display": true
     },
     {
       "title": "Spider plant",
@@ -1936,7 +2091,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-09-02T20:19:23.258Z",
       "days": 171,
-      "color": "#cf11a3"
+      "color": "#cf11a3",
+      "display": true
     },
     {
       "title": "Telancias",
@@ -1948,7 +2104,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-09-22T03:31:57.811Z",
       "days": 152,
-      "color": "#cf11a3"
+      "color": "#cf11a3",
+      "display": true
     },
     {
       "title": "Lobster roll",
@@ -1960,7 +2117,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-09-28T00:21:54.593Z",
       "days": 146,
-      "color": "#bf33a5"
+      "color": "#bf33a5",
+      "display": true
     },
     {
       "title": "Octopus",
@@ -1972,7 +2130,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-09-28T00:21:54.593Z",
       "days": 146,
-      "color": "#bf33a5"
+      "color": "#bf33a5",
+      "display": true
     },
     {
       "title": "Oysters",
@@ -1984,7 +2143,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-09-28T00:21:54.593Z",
       "days": 146,
-      "color": "#bf33a5"
+      "color": "#bf33a5",
+      "display": true
     },
     {
       "title": "Uni",
@@ -1996,7 +2156,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-09-28T00:21:54.593Z",
       "days": 146,
-      "color": "#bf33a5"
+      "color": "#bf33a5",
+      "display": true
     },
     {
       "title": "Battery 100 AH",
@@ -2008,7 +2169,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-08-07T17:48:32.045Z",
       "days": 197,
-      "color": "#5f2e83"
+      "color": "#5f2e83",
+      "display": true
     },
     {
       "title": "Oil Filter K&N HP-1008",
@@ -2020,7 +2182,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-11-02T14:14:49.732Z",
       "days": 110,
-      "color": "#5f2e83"
+      "color": "#5f2e83",
+      "display": true
     },
     {
       "title": "Cat feeder Let Bistro 5lb",
@@ -2032,7 +2195,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-08-06T16:53:57.102Z",
       "days": 198,
-      "color": "#35468f"
+      "color": "#35468f",
+      "display": true
     },
     {
       "title": "Cheesy poofs",
@@ -2044,7 +2208,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-10-02T18:56:59.519Z",
       "days": 141,
-      "color": "#35468f"
+      "color": "#35468f",
+      "display": true
     },
     {
       "title": "Grass garden",
@@ -2056,7 +2221,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-07-28T15:50:33.685Z",
       "days": 207,
-      "color": "#35468f"
+      "color": "#35468f",
+      "display": true
     },
     {
       "title": "Motor oil SAE 5w 30",
@@ -2068,7 +2234,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-11-02T14:14:49.732Z",
       "days": 110,
-      "color": "#35468f"
+      "color": "#35468f",
+      "display": true
     },
     {
       "title": "Petmate portion right",
@@ -2080,7 +2247,8 @@ const initData =
       "select": false,
       "lastPurchase": "2020-09-29T19:38:14.408Z",
       "days": 144,
-      "color": "#35468f"
+      "color": "#35468f",
+      "display": true
     },
 ];
 export default initData;

@@ -71,24 +71,24 @@ const Home = () => {
   const getTracker = () => {
     const tracker =
       tracking === true ? (
-        <div>
+        <div className='containerBox'>
           <div className="color-neogreen p-20 bold bigHeader bg-dkGreen r-5 m-20">
             {getDistance()}
           </div>
           <div
-            className="button p-20 r-5 m-20 bg-red incompletedSelector color-yellow"
+            className="size20 bold button p-20 r-5 m-20 bg-red incompletedSelector color-yellow"
             onClick={stopTracking}
           >
             Stop Tracking
           </div>
         </div>
       ) : (
-        <div>
+        <div className='containerBox'>
           <div className="color-neogreen p-20 bold bigHeader bg-dkGreen r-5 m-20">
             {distance}
           </div>
           <div
-            className="button p-20 r-5 m-20 bg-neogreen completedSelector color-black"
+            className="size20 bold button p-20 r-5 m-20 bg-neogreen completedSelector color-black"
             onClick={startDistance}
           >
             Start Tracking
@@ -99,31 +99,28 @@ const Home = () => {
     return tracker;
   };
 
-  return (
-    <div className="App fadeIn">
-      <header className="App-content">
-        <a
-          className="App-link bold greet p-20 r-10 w-200 bg-dkGreen noUnderline"
-          href="https://jsongithub.github.io/portfolio/"
-          target="_self"
-          rel="noopener noreferrer"
-        >
-          portfolio
-        </a>
-        {/*<Lister items={[1,2,3]} />*/}
-        <Timer />
-        <div className='bg-tinted p-10 r-10'>
-          <div className='p-10'>
-            Current position:
+  return (<div>
+            <div className="containerBox color-lite">
+              <div className="containerBox">
+                <div className='button p-20 bold size20 r-10 bg-dkGreen' onClick={()=>window.location="https://jsongithub.github.io/portfolio/"}>
+                    portfolio
+                </div>
+              </div>
+              <div className="containerBox">
+                <Timer />
+              </div>
+              <div className='containerBox'>
+                <div className='p-10 size20 bold'>
+                  Current position:
+                </div>
+                <Geolocator
+                  currentPositionExists="false"
+                  returnCurrentPosition={updateCurrentLocation}
+                />
+              </div>
+              {getTracker()}
+            </div>
           </div>
-          <Geolocator
-            currentPositionExists="false"
-            returnCurrentPosition={updateCurrentLocation}
-          />
-        </div>
-        {getTracker()}
-      </header>
-    </div>
   );
 };
 

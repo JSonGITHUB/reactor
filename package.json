@@ -76,6 +76,7 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "7.21.0-placeholder-for-preset-env.2",
+    "@types/react-router-dom": "^5.3.3",
     "eslint-plugin-react-hooks": "^4.0.8",
     "html-webpack-plugin": "^4.5.1",
     "webpack-cli": "^4.4.0"

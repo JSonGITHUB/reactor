@@ -219,56 +219,58 @@ export default function Todos(props) {
                 <div className='p-5 r-10 bg-tinted'>
                     <label className='flexContainer'>
                         <input className='ht-30 m-5 flex2Column contentCenter p-15 r-10 bg-darker color-white bold size25' type='text' id='todo' name='todo' placeholder='Enter a todo' onKeyDown={handleKeyDown} />
-                        <button className='r-10 greet bold bg-green m-5 p-10 flex2Column10Percent contentCenter' onClick={() => addTodo()}>ADD</button>
+                        {/*<button className='r-10 greet bold bg-green m-5 p-20 flex2Column10Percent contentCenter' onClick={() => addTodo()}>ADD</button>*/}
                     </label>
                 </div>
             </div>
             <div className='p-5 r-10'>
                 <div id='list' className='p-5 r-10 bg-tinted'>
                     {todos.map((todo, index) => (
-                        <div key={getKey('todo')} className='p-10 flexContainer bg-darker r-10 m-5'>
-                            <div className='color-lite flex2Column p-10 size25 columnLeftAlign'>
-                                <input className='regular-checkbox button mr-10' checked={todo.completed} type='checkbox' id='completed' onChange={() => toggleCheckbox(index)} />
-                                {todo.description}
-                            </div>
-                            <div className='flex2Column10Percent columnRightAlign'>
-                                {
-                                    ((todo.type == 'timer' || todo.type == 'track') && !edit)
-                                    ? <div className='flexContainer'>
-                                        <button id={`toggleTimer${index}`} name={`toggleTimer${todo.description}`} className={`flex2Column r-10 p-15 greet bold bg-tinted m-5 ${(todo.activated)?'bg-dkRed color-red':'bg-dkGreen color-neogreen'}`} onClick={() => toggleTimer(index)}>
-                                            {(todo.activated)?'STOP':'START'}
-                                        </button>
-                                        <div className='flex2Column'>
-                                            {getClock(index)}
+                        <div key={getKey('todo')} className='p-10 bg-tinted r-10 m-5'>
+                            <div className='color-lite size25 r-10'>
+                                    <div className='width-100-percent p-20 contentLeft bg-tinted r-10 mb-1'>
+                                        <input className='regular-checkbox button mr-10' checked={todo.completed} type='checkbox' id='completed' onChange={() => toggleCheckbox(index)} />
+                                        {todo.description}
+                                    </div>
+                                <div>
+                                    {
+                                        ((todo.type == 'timer' || todo.type == 'track') && !edit)
+                                        ? <div className='flexContainer r-10'>
+                                            <button id={`toggleTimer${index}`} name={`toggleTimer${todo.description}`} className={`width-100-percent r-10 p-15 greet bold bg-tinted ${(todo.activated)?'bg-dkRed color-red':'bg-dkGreen color-neogreen'}`} onClick={() => toggleTimer(index)}>
+                                                {(todo.activated)?'STOP':'START'}
+                                            </button>
+                                            <div className='flex2Column'>
+                                                {getClock(index)}
+                                            </div>
                                         </div>
-                                    </div>
-                                    : null
-                                }
-                                {
-                                    (edit)
-                                    ? <div className='flexContainer'>
-                                        <button id={`setTimert${index}`} name={`setTimer${todo.description}`} className='r-10 p-15 greet bold bg-tinted m-5 color-lite' onClick={() => timerTodo(index)}>set timer</button>
-                                        <button id={`time${index}`} name={`time${todo.description}`} className='r-10 p-15 greet bold bg-tinted m-5 color-lite' onClick={() => trackTodo(index)}>track time</button>
-                                        <button id={`edit${index}`} name={`edit${todo.description}`} className='r-10 p-15 greet bold bg-tinted m-5 color-lite' onClick={() => editTodo(index)}>edit</button>
-                                        <button id={`remove${index}`} name={`remove${todo.description}`} className='r-10 p-15 greet bold bg-tinted m-5 color-lite' onClick={() => removeTodo(index)}>X</button>
-                                    </div>
-                                    : null
-                                }
+                                        : null
+                                    }
+                                    {
+                                        (edit)
+                                        ? <div className='flexContainer'>
+                                            <button id={`setTimert${index}`} name={`setTimer${todo.description}`} className='r-10 p-15 greet bold bg-tinted m-5 color-lite' onClick={() => timerTodo(index)}>set timer</button>
+                                            <button id={`time${index}`} name={`time${todo.description}`} className='r-10 p-15 greet bold bg-tinted m-5 color-lite' onClick={() => trackTodo(index)}>track time</button>
+                                            <button id={`edit${index}`} name={`edit${todo.description}`} className='r-10 p-15 greet bold bg-tinted m-5 color-lite' onClick={() => editTodo(index)}>edit</button>
+                                            <button id={`remove${index}`} name={`remove${todo.description}`} className='r-10 p-15 greet bold bg-tinted m-5 color-lite' onClick={() => removeTodo(index)}>X</button>
+                                        </div>
+                                        : null
+                                    }
+                                </div>
                             </div>
                         </div>
                     ))}
                     {/*makeMenu()*/}
-                    <div className='button color-lite r-10 bg-lite m-5 bold flex3Column p-10 size25 columnCenterAlign' onClick={() => togglePause()}>
+                    <div className='button color-lite r-10 bg-lite m-5 bold flex3Column p-20 size25 columnCenterAlign' onClick={() => togglePause()}>
                             {(paused)?'UNPAUSE':'PAUSE ALL CLOCKS'}
                     </div>
                     <div className='flexContainer'>
-                        <div className='button color-neogreen r-10 bg-dkGreen m-5 bold flex3Column p-10 size25 columnCenterAlign' onClick={() => reset()}>
+                        <div className='button color-neogreen r-10 bg-dkGreen m-5 bold flex3Column p-20 size25 columnCenterAlign' onClick={() => reset()}>
                             RESET
                         </div>
-                        <div className='button color-yellow r-10 bg-dkYellow m-5 bold flex3Column p-10 size25 columnCenterAlign' onClick={() => editTodos()}>
+                        <div className='button color-yellow r-10 bg-dkYellow m-5 bold flex3Column p-20 size25 columnCenterAlign' onClick={() => editTodos()}>
                             EDIT
                         </div>
-                        <div className='button color-red r-10 bg-dkRed m-5 bold flex3Column p-10 size25 columnCenterAlign' onClick={() => clear()}>
+                        <div className='button color-red r-10 bg-dkRed m-5 bold flex3Column p-20 size25 columnCenterAlign' onClick={() => clear()}>
                             CLEAR
                         </div>
                     </div>

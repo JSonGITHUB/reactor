@@ -50,7 +50,6 @@ const Shop = () => {
         displaySettings: false,
         displayProductEntry: false,
         search: '',
-        list: <div></div>,
         fontSize: 25,
         tax: 8.75,
         todos: getTodos(),
@@ -222,7 +221,7 @@ const Shop = () => {
     }
     const getSelectors = (todo, index, aisleColor) => {
         return (
-            <div className='itemSelectors' style={{backgroundColor: aisleColor}}>
+            <div className='itemSelectors r-10-b' style={{backgroundColor: aisleColor}}>
                 <div className='flex-container'>
                     <div>
                         <div className='button'>
@@ -273,15 +272,15 @@ const Shop = () => {
     const daItem = (todo, index) => {
         //console.log(`daItem =>\ntodo: ${JSON.stringify(todo, null, 2)}\nindex: ${index}`);
         
-        const shopNavClasses = () => (todo.select) ? 'itemRemove glassyShopNav' : 'itemRemove';
+        const shopNavClasses = () => (todo.select) ? 'itemRemove box-highlight' : 'itemRemove box-top';
         const titleClasses = () => (todo.select) ? 'title white' : 'title';
         const aisleColor = getColor(todo.aisle);
         if (todo !== undefined) {
             return (
-                <div key={getKey(status.todos[index].title)}>
-                    <div className='height1px' style={{backgroundColor: aisleColor}}></div>
-                    <div className={shopNavClasses()} onClick={() => toggleSelect(index)}>
-                        <span className={titleClasses()}>{ status.todos[index].title }</span>
+                <div key={getKey(status.todos[index].title)} className='mt-5 ml-5 mr-5'>
+                    {/*<div className='height1px' style={{backgroundColor: aisleColor}}></div>*/}
+                    <div className={`r-10-t bg-tinted ${shopNavClasses()}`} onClick={() => toggleSelect(index)}>
+                        <span className={`${titleClasses()}`}>{ status.todos[index].title }</span>
                         {getSelectIcon(index)}
                     </div>                 
                     {getSelectors(todo,index, aisleColor)}
@@ -302,43 +301,44 @@ const Shop = () => {
     }
     const getItems = (context) => {
         const newAisles = (status.aisles !== undefined) ? status.aisles : aislesInit;
-        let newList = <React.Fragment></React.Fragment>;
         //console.log(`daList => todos: ${JSON.stringify(status.todos, null,2)}`);
         const pushNewAisle = (aisle) => (newAisles.indexOf(aisle) > -1) ? '' : newAisles.push(aisle);
-        /*
-        status.todos.forEach((todo,index) => {
+    
+        const newList = [...status.todos];
+        const displayItem = (item) => {
+            const include = item.title.toLowerCase().includes(status.search.toLowerCase());
+            if (include) {
+               console.log(`displayItem => title: ${item.title.toLowerCase()} search: ${status.search.toLowerCase()}`);
+            }
+            return include;
+        };
+        newList.map((todo,index) => {
             pushNewAisle(todo.aisle);
-            //console.log(`daList =>\nnewAisles: ${newAisles}\nquantities: ${todo.quantity}\ntitle: ${todo.title}\ndays: ${todo.days}\nprice: ${todo.price}\ntax: ${todo.tax}\nquantity: ${todo.quantity}`)
-            newList = <div>
-                    {newList}
-                    {daItem(todo, index)}
-                </div>;
+            if (displayItem(todo)) {
+                todo.display = true;
+            } else {
+                todo.display = false;
+            }
         })
-        */
-        const filteredTodos = status.todos.filter(todo => {
-            return todo.title.toLowerCase().includes(status.search.toLowerCase());
-        });
 
-        filteredTodos.forEach((todo, index) => {
-            pushNewAisle(todo.aisle);
-            newList = <div>
-                {newList}
-                {daItem(todo, index)}
-            </div>;
-        });
-
-        //console.log(`daList => newList: ${JSON.stringify(newList,null,2)}`)
         localStorage.setItem('aisles', JSON.stringify(newAisles));
         if (context === 'display') {
-            return newList;
+            const itemsDisplay = () => status.todos.map((todo, index) => (todo.display) ? daItem(todo, index):null);
+            return <div>{itemsDisplay()}</div>;
         } else if (context === 'effect') {
             //console.log(`useEffect => newAisles: ${newAisles}`)
             setStatus(prevState => ({
                 ...prevState,
-                list: newList,
                 aisles: newAisles
             }));
         }
+        /*
+        setStatus(prevState => ({
+            ...prevState,
+            todos: newList
+        }));
+        */
+        localStorage.setItem('vueTodos', JSON.stringify(newList));
     };
     
     useEffect(() => {
@@ -640,7 +640,7 @@ const Shop = () => {
                         </div>
                     </div>
     const getMenuHeight = (status.displaySettings) ? 'mt-180 visible bottomPadding' : 'mt-850 visible bottomPadding';
-    const menuClasses = (!status.displaySettings && !status.displayProductEntry) ? 'mt-60 visible bottomPadding' : getMenuHeight;
+    const menuClasses = (!status.displaySettings && !status.displayProductEntry) ? 'mt-70 visible bottomPadding' : getMenuHeight;
     console.log(`Shop ==> REFRESH
                     displaySettings: ${status.displaySettings}
                     displayProductEntry: ${status.displayProductEntry}

@@ -19,6 +19,7 @@ import Geolocator from '../utils/Geolocator.js';
 import useOceanData from './useOceanData.js';
 import useCurrentTime from '../utils/useCurrentTime.js';
 import ConditionsContext from '../context/ConditionsContext.js';
+import ArrowsNorthSouth from './ArrowsNorthSouth.js';
 
 const WaveFinder = () => {
     const getLocal = (item) => localStorage.getItem(item);
@@ -72,7 +73,7 @@ const WaveFinder = () => {
     const time = useCurrentTime();
     const startTime = time[0].startTime;
     const endTime = time[0].endTime;
-    //console.log(`WaveFinder => time: ${JSON.stringify(time, null, 2)}\nstartTime: ${startTime} \nendTime: ${endTime}`);
+    console.log(`WaveFinder => time: ${JSON.stringify(time, null, 2)}\nstartTime: ${startTime} \nendTime: ${endTime}`);
     const tideNowLink = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${startTime}&end_date=${endTime}&station=9410660&product=water_level&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
     const uriMLL = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=NOS.COOPS.TAC.WL&begin_date=${startTime}&end_date=${endTime}&datum=MLLW&station=9410230&time_zone=lst_ldt&units=english&interval=hilo&format=json`;
     // eslint-disable-next-line
@@ -451,9 +452,9 @@ const WaveFinder = () => {
         const html = document.documentElement; // Chrome, Firefox, IE and Opera places the overflow at the html level, unless else is specified. Therefore, we use the documentElement property for these browsers
         const height = document.getElementById('north').clientHeight;
         body.scrollLeft = 0;
-        body.scrollTop = height+1700;
+        body.scrollTop = height+2000;
         html.scrollLeft = 0;
-        html.scrollTop = height+1700;
+        html.scrollTop = height+2000;
     }
     const currentConditions = () => {
         const body = document.body; // For Safari
@@ -527,6 +528,8 @@ const WaveFinder = () => {
         //console.log(`sortedSpots =>\nsortedNorth: ${JSON.stringify(north,null,2)}`)
         //console.log(`sortedSpots =>\nsortedSouth: ${JSON.stringify(south,null,2)}`)
         const sortedLocations = sorted.map((item) => getMatchingLocation(item));
+        
+        /*
         return <div>
                 <div id='north' className='p-10 r-10 glassy mb-1'>
                     {northLocations}<br/>north
@@ -536,6 +539,16 @@ const WaveFinder = () => {
                     {southLocations}
                 </div>
             </div>;
+        */
+        return <div className='locationScroller m-1 r-10'>
+                    <div id='north'>
+                        {northLocations}
+                    </div>
+                    <ArrowsNorthSouth/>
+                    <div>
+                        {southLocations}
+                    </div>
+                </div>;
     }
     const matchingLocations = locations().map((item) => getMatchingLocation(item));
     //localStorage.setItem('locations', JSON.stringify(locations()))
@@ -583,31 +596,31 @@ const WaveFinder = () => {
     }
     const repositionButton = () => {
         return (
-            <div onClick={() => setScroll()} className='p-10 button r-5 color-lite bold bg-green glassy m-1'>
+            <div onClick={() => setScroll()} className='p-10 button r-5 color-lite bold bg-green m-1 box-shadow'>
                 Reposition
             </div>
         )
     }
     const conditionsButton = () => {
         return (
-            <div onClick={() => conditionsEntry()} className='p-10 button r-5 color-lite bold bg-green glassy m-1'>
+            <div onClick={() => conditionsEntry()} className='p-10 button r-5 color-lite bold bg-green m-1 box-shadow'>
                 Conditions
             </div>
         )
     }
     const currentButton = () => {
         return (
-            <div onClick={() => currentConditions()} className='p-10 button r-5 color-lite bold bg-green glassy m-1'>
+            <div onClick={() => currentConditions()} className='p-10 button r-5 color-lite bold bg-green m-1 box-shadow'>
                 Current
             </div>
         )
     }
     return (
-        <div className='r-10 p-5 fadeIn mt--40 width-100-percent bg-tinted'>
+        <div className='r-10 p-5 mt--40 width-100-percent size25'>
             <div className='p-10'>
                 <Geolocator currentPositionExists={currentPositionExists} returnCurrentPosition={updateCurrentLocation}/>
             </div>
-            <div className='white mt--10'>
+            <div className='color-soft mt--10'>
                 <ConditionsDashboard tideDisplay={tideDisplay} setWind={setWind} />
                 <ConditionsContext.Provider value={status}>
                     <ConditionsSelectors 
@@ -636,12 +649,27 @@ const WaveFinder = () => {
                     />
                 </ConditionsContext.Provider>
                 <div className='mt-10 mb-20'>
-                    <div className='m-5'><span className='color-neogreen bold'>{(getCount() === 1) ? `1 wave` : `${count} waves`}</span> out of {locations().length}</div>
-                    <div className='m-5'>are in a <span className='color-neogreen bold'>{status.distance}</span> mile radius</div>
-                    <div className='m-5'>and prefer <span className='color-neogreen bold'>{status.swell1Direction} </span>and <span className='color-orange bold '>{status.swell2Direction} </span>swell </div>
-                    <div className='m-5'>with a <span className='color-neogreen bold'>{localStorage.getItem('height')}' {localStorage.getItem('tide')} </span>tide and {localStorage.getItem('windDirection')} winds.</div>
+                    <div className='m-5'>
+                        <span className='bold color-lite'>
+                            {(getCount() === 1) ? `1 wave` : `${count} waves`}
+                        </span> of {locations().length}
+                    </div>
+                    <div className='m-5'>
+                        <span className='bold color-lite'>{status.distance} mile</span> radius
+                    </div>
+                    <div className='m-5 bold'>
+                        prefer:
+                    </div>
+                    <div className='m-5'>
+                        <span className='bold color-neogreen'>{status.swell1Direction} </span>and <span className='color-orange bold'>{status.swell2Direction} </span>swell
+                    </div>
+                    <div className='m-5'>
+                        <span className='bold color-lite'>{localStorage.getItem('tide')} </span>tide
+                    </div>
+                    <div className='m-5'>
+                        <span className='bold color-lite'>{localStorage.getItem('windDirection')}</span> winds.
+                    </div>
                 </div>
-                <Sunset view='simple'/>
                 {sortedSpots()}
                 <WaveUtils status={status} item={status} updateLocations={updateLocations}></WaveUtils>
                 <div className='flexContainer bt-15'>

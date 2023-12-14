@@ -225,29 +225,36 @@ const ExpenseTracker = () => {
 };
 
   return (
-    <div>
+    <div className='containerBox mt--30'>
       <ExchangeRatesConfig onExchangeRatesChange={setExchangeRates}></ExchangeRatesConfig>
-      <div className='bg-darker r-10 p-10 ml-20 mr-20 mb-1'>
-        <label>
-          Expense:
+      <label className='flexContainer containerInput'>
+        <div className='columnRightAlign width-50-percent'>
+          <span className='inputText'>
+            Expense:
+          </span>
+        </div>
+        <div className='columnLeftAlign width-50-percent'>
           <input
             type="text"
             name="expense"
             value={expenseData.expense}
             onChange={handleInputChange}
-            className='r-10 p-10 mr-20 ml-20'
+            className='inputField'
           />
-        </label>
-      </div>
-      <br />
-      <div className='bg-darker r-10 p-10 ml-20 mr-20 mb-1'>
-        <label>
-          Location:
+        </div>
+      </label>
+      <label className='flexContainer containerInput'>
+        <div className='columnRightAlign width-50-percent'>
+          <span className='inputText'>
+            Location:
+          </span>
+        </div>
+        <div className='columnLeftAlign width-50-percent'>
           <select
             name="location"
             value={expenseData.location}
             onChange={handleInputChange}
-            className='r-10 p-10 mr-20 ml-20'
+            className='inputSelect'
           >
             <option value="">Select Location</option>
             {Object.keys(currencyOptions).map((location) => (
@@ -256,17 +263,20 @@ const ExpenseTracker = () => {
               </option>
             ))}
           </select>
-        </label>
-      </div>
-      <br />
-      <div className='bg-darker r-10 p-10 ml-20 mr-20 mb-1'>
-        <label>
-          Currency:
+        </div>
+      </label>
+      <label className='flexContainer containerInput'>
+        <div className='columnRightAlign width-50-percent'>
+          <span className='inputText'>
+            Currency:
+          </span>
+        </div>
+        <div className='columnLeftAlign width-50-percent'>
           <select
             name="currency"
             value={expenseData.currency}
             onChange={handleInputChange}
-            className='r-10 p-10 mr-20 ml-20'
+            className='inputSelect'
           >
             <option value="">Select Currency</option>
             {currencyCode.map((currency) => (
@@ -275,51 +285,54 @@ const ExpenseTracker = () => {
               </option>
             ))}
           </select>
-        </label>
-      </div>
-      <br />
-      <div className='bg-darker r-10 p-10 ml-20 mr-20 mb-1'>
-        <label>
-          Cost:
+        </div>
+      </label>
+      <label className='flexContainer containerInput'>
+        <div className='columnRightAlign width-50-percent'>
+          <span className='inputText'>
+            Cost:
+          </span>
+        </div>
+        <div className='columnLeftAlign width-50-percent'>
           <input
             type="number"
             name="cost"
             value={expenseData.cost}
             onChange={handleInputChange}
-            className='r-10 p-10 mr-20 ml-20'
+            className='inputField'
           />
-        </label>
+        </div>
+      </label>
+      <div className='bold bg-soft color-dark size25 r-10 mt-10 mb-10 ml-5 mr-5 p-10 ht-50 centeredContent button' onClick={handleAddExpense}>
+        Add Expense
       </div>
-      <br />
+      <div className='containerBox'>
+        <div className='containerBox'>
+          <span className='color-lite size25 bold'>Grand Total: {totalExpenses}</span>
+        </div>
+        
+      </div>
       <div>
-        <div className='bg-orange greet timerBox m-20 color-black' onClick={handleAddExpense}>Add Expense</div>
-      </div>
-      <br />
-      <br />
-      <div className='color-yellow mb-20 size20 bold'>Grand Total: {totalExpenses}</div>
-      <div className='bg-darker r-10 p-10 ml-20 mr-20 mb-1'>
-        {expenses.length === 0 ? (
-          <p>No expenses recorded.</p>
-        ) : (
-          <div>
-            {[...expenses].reverse().map((expense, index) => (
-              <div className='p-10 ml-20 mr-20 mb-1 lowerBorder size20' key={index}>
-                <div className='bold'>{expense.expense}: ${formatNumber(convertToUS(expense.cost,expense.countryCode))} {/*exchangeRates[expense.currency]'USD'*/} {/*expense.currency*/}</div>
-                <div className='description'>
-                {expense.location} : {expense.date} - {expense.time}<br/>
-                  ${formatNumber(expense.cost)} {expense.currency}s
+          {expenses.length === 0 ? (
+            <p>No expenses recorded.</p>
+          ) : (
+            <div className='scrollHeight250 r-10 m-5'>
+              {[...expenses].reverse().map((expense, index) => (
+                <div className='relative containerDetail scrollSnapTop m-5 bg-veryLite' key={index}>
+                  <div className='containerBox min-height-60'>
+                    {/*<div className='absolute w-50 rt-20 t-10 r-5 color-dkRed bg-red brdr-red p-5 m-5 button bold' onClick={() => removeExpense(index-1)}>X</div>*/}
+                    <div className="absolute w-50 rt-20 t-0 r-5 size15 bg-lite bold color-yellow button pr-20 pl-20 pt-10 pb-10 contentRight" onClick={() => removeExpense(index-1)}>X</div>
+                    <div className='columnLeftAlign color-yellow width--60'>{expense.expense}: ${formatNumber(convertToUS(expense.cost,expense.countryCode))} {/*exchangeRates[expense.currency]'USD'*/} {/*expense.currency*/}</div>
+                  </div>
+                  <div className='ml-15 mt-2 columnLeftAlign color-lite size15 mb-5'>
+                  {expense.location} : {expense.date} - {expense.time}<br/>
+                    ${formatNumber(expense.cost)} {expense.currency}s
+                  </div>
                 </div>
-                <div 
-                  className='description color-red brdr-red button p-10 r-5 b-1 m-5'
-                  onClick={() => removeExpense(index-1)}
-                >
-                  delete
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+              ))}
+            </div>
+          )}
+        </div>
     </div>
   );
 };
