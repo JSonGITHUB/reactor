@@ -322,7 +322,9 @@ const ExpenseTracker = () => {
                   <div className='containerBox min-height-60'>
                     {/*<div className='absolute w-50 rt-20 t-10 r-5 color-dkRed bg-red brdr-red p-5 m-5 button bold' onClick={() => removeExpense(index-1)}>X</div>*/}
                     <div className="absolute w-50 rt-20 t-0 r-5 size15 bg-lite bold color-yellow button pr-20 pl-20 pt-10 pb-10 contentRight" onClick={() => removeExpense(index-1)}>X</div>
-                    <div className='columnLeftAlign color-yellow width--60'>{expense.expense}: ${formatNumber(convertToUS(expense.cost,expense.countryCode))} {/*exchangeRates[expense.currency]'USD'*/} {/*expense.currency*/}</div>
+                    <div className='min-height-40 columnLeftAlign color-yellow width--60'>
+                      {expense.expense}: ${formatNumber(convertToUS(expense.cost,expense.countryCode))} {/*exchangeRates[expense.currency]'USD'*/} {/*expense.currency*/}
+                      </div>
                   </div>
                   <div className='ml-15 mt-2 columnLeftAlign color-lite size15 mb-5'>
                   {expense.location} : {expense.date} - {expense.time}<br/>
