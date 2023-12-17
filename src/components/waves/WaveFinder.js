@@ -25,16 +25,16 @@ const WaveFinder = () => {
     const getLocal = (item) => localStorage.getItem(item);
     const getProps = (item) => item;
 
-    const getDefault = (item) => (getLocal(item) === 'null') 
-                                    ? getProps(item) 
-                                    : getLocal(item);
+    const getDefault = (item) => (getLocal(item) === 'null')
+        ? getProps(item)
+        : getLocal(item);
 
     const getSwell1Direction = () => localStorage.getItem('swell1Direction') ? localStorage.getItem('swell1Direction') : 'SSW';
     const getSwell2Direction = () => localStorage.getItem('swell2Direction') ? localStorage.getItem('swell2Direction') : 'SSW';
     const getLocalLocations = () => (localStorage.getItem('locations')) ? JSON.parse(localStorage.getItem('locations')) : locations();
     const getLocations = () => getLocalLocations() || locations();
-    
-    const [status, setStatus] = useState({            
+
+    const [status, setStatus] = useState({
         module: 'WaveFinder',
         pause: true,
         date: new Date(),
@@ -81,9 +81,9 @@ const WaveFinder = () => {
     // eslint-disable-next-line
     console.log(`$$$$$$$$$$$$$$$$$$$$$$$$$$$TIDE: ${tideNowLink}`);
     const tideNow = useOceanData('tide', tideNowLink);
-    
+
     //console.log(`isWind: ${getDefault('isWind')}`)
-    
+
     const tick = () => {
         console.log(`tick => pause: ${status.pause}`)
         if (status.pause === false) {
@@ -94,26 +94,26 @@ const WaveFinder = () => {
             }));
         }
     }
-    useEffect(() => {		
+    useEffect(() => {
         const timerID = setInterval(
             () => tick(),
             3000000
         );
-        return function cleanUp () {
+        return function cleanUp() {
             clearInterval(timerID);
         }
-    },[]);
-    
+    }, []);
+
     useEffect(() => {
         setScroll();
-    },[]);
+    }, []);
 
     const currentPositionExists = () => (status.longitude) ? true : false;
     const updateCurrentLocation = (longitude, latitude) => {
-//      console.log(`UPDATING CURRENT POSITION ======> longitude: ${longitude} latitude: ${latitude}`)
+        //      console.log(`UPDATING CURRENT POSITION ======> longitude: ${longitude} latitude: ${latitude}`)
         if (currentPositionExists()) {
 
-            if ((Math.abs(status.longitude - longitude)>.0001) || (Math.abs(status.latitude - latitude)>.0001) || (status.init === false)) {
+            if ((Math.abs(status.longitude - longitude) > .0001) || (Math.abs(status.latitude - latitude) > .0001) || (status.init === false)) {
                 console.log(`updateCurrentLocation => satus coords ^^^^^^^^^^^ ${longitude}, ${latitude}`)
                 localStorage.setItem('longitude', longitude);
                 localStorage.setItem('latitude', latitude);
@@ -124,7 +124,7 @@ const WaveFinder = () => {
                     init: true
                 }));
             }
-        } else if ((Math.abs(Number(localStorage.getItem('longitude')) - longitude)>.000003) || (Math.abs(localStorage.getItem('latitude') - latitude)>.000003)) {
+        } else if ((Math.abs(Number(localStorage.getItem('longitude')) - longitude) > .000003) || (Math.abs(localStorage.getItem('latitude') - latitude) > .000003)) {
             console.log(`updateCurrentLocation => local coords ^^^^^^^^^^^ ${longitude}, ${latitude}`)
             localStorage.setItem('longitude', longitude);
             localStorage.setItem('latitude', latitude);
@@ -143,7 +143,7 @@ const WaveFinder = () => {
             locations: getLocations(),
             edit: false
         }));
-    }; 
+    };
     const getDefaultHeights = (tideSelected) => {
         if (tideSelected === 'high') {
             return 5;
@@ -190,7 +190,7 @@ const WaveFinder = () => {
         // eslint-disable-next-line
         const swellAngle = directionObject[selected];
         //console.log(`handleSwellSelection => \nselected: ${selected} \nswellAngle: ${swellAngle}\n directionObject: ${JSON.stringify(directionObject, null, 2)}`)
-        if(id === '1') {
+        if (id === '1') {
             localStorage.setItem('swell1Angle', swellAngle);
             localStorage.setItem('swell1Direction', selected);
             setStatus(prevState => ({
@@ -330,13 +330,13 @@ const WaveFinder = () => {
             }));
         }
     }
-    const tideDisplay = (display) => <Tide 
-                                    tideNow={tideNow} 
-                                    data={data} 
-                                    time={time} 
-                                    setTide={setTide} 
-                                    display={`${display}`}
-                                />
+    const tideDisplay = (display) => <Tide
+        tideNow={tideNow}
+        data={data}
+        time={time}
+        setTide={setTide}
+        display={`${display}`}
+    />
 
     // eslint-disable-next-line
     const getState = (kind) => {
@@ -366,7 +366,7 @@ const WaveFinder = () => {
                             <div className='greet'>{getState(matchKind)}{getStarDetails(matchKind)}</div>
                         </div>;
     */
-    
+
     const handleTideSelection = (groupTitle, label, selected) => {
         const height = getDefaultHeights(selected);
         setTide(selected, height);
@@ -389,10 +389,10 @@ const WaveFinder = () => {
     }
 
     //console.log(`currentPositionExists: ${currentPositionExists()}`);
-    const swell1Match = (item) => (item.swell.indexOf(status.swell1Direction)>-1) ? true : false;
-    const swell2Match = (item) => (item.swell.indexOf(status.swell2Direction)>-1) ? true : false;
-    const windMatch = (item) => (item.wind.indexOf(status.windDirection)>-1) ? true : false;
-    const tideMatch = (item) => (item.tide.indexOf(status.tide)>-1) ? true : false;
+    const swell1Match = (item) => (item.swell.indexOf(status.swell1Direction) > -1) ? true : false;
+    const swell2Match = (item) => (item.swell.indexOf(status.swell2Direction) > -1) ? true : false;
+    const windMatch = (item) => (item.wind.indexOf(status.windDirection) > -1) ? true : false;
+    const tideMatch = (item) => (item.tide.indexOf(status.tide) > -1) ? true : false;
     //const swell1DirectionMatch = (direction) => (direction.swell===status.swell1Direction) ? true : false;
     //const swell2DirectionMatch = (direction) => (direction===status.swell2Direction) ? true : false;
     //const windDirectionMatch = (direction) => (direction.wind === windDirection) ? true : false;
@@ -401,7 +401,7 @@ const WaveFinder = () => {
     //Math.abs(item.latitude - status.latitude)+Math.abs(item.longitude - status.longitude);
     //.01 - 1 mile
     const distanceRange = Number(status.distance);
-    const regionMatch = (item) => ((getDistance(item)<distanceRange) || (distanceRange > 999999999999)) ? getDistance(item) : false;
+    const regionMatch = (item) => ((getDistance(item) < distanceRange) || (distanceRange > 999999999999)) ? getDistance(item) : false;
     let count = 0;
     const match = (item) => {
         const matches = [];
@@ -415,9 +415,9 @@ const WaveFinder = () => {
         return matches;
     }
     // eslint-disable-next-line
-    const statusClass = (status) => (status === true) ? 'color-neogreen' : 'color-yellow'; 
+    const statusClass = (status) => (status === true) ? 'color-neogreen' : 'color-yellow';
     // eslint-disable-next-line
-    const subStatusClass = (status) => (status === true) ? 'color-orange' : 'color-yellow'; 
+    const subStatusClass = (status) => (status === true) ? 'color-orange' : 'color-yellow';
     const swell1Confirm = (matches) => ((status.isSwell1 && matches.includes('swell1')) || status.isSwell1 === false) ? true : false;
     const swell2Confirm = (matches) => ((status.isSwell2 && matches.includes('swell2')) || status.isSwell2 === false) ? true : false;
     const tideConfirm = (matches) => ((status.isTide && matches.includes('tide')) || status.isTide === false) ? true : false;
@@ -432,17 +432,17 @@ const WaveFinder = () => {
                 if (matches.length >= Number(status.stars)) {
                     //console.log(`STARS ==================> Matches: ${matches.length} status stars:${status.stars}`)
                     count = count + 1;
-                    return <SurfLocation 
-                                key={getKey('link')} 
-                                state={status} 
-                                item={item} 
-                                matches={matches} 
-                                calculateDistance={calculateDistance} 
-                                regionMatch={inRegion} 
-                                tideDisplay={tideDisplay} 
-                                updateLocations={updateLocations}
-                            >
-                            </SurfLocation>
+                    return <SurfLocation
+                        key={getKey('link')}
+                        state={status}
+                        item={item}
+                        matches={matches}
+                        calculateDistance={calculateDistance}
+                        regionMatch={inRegion}
+                        tideDisplay={tideDisplay}
+                        updateLocations={updateLocations}
+                    >
+                    </SurfLocation>
                 }
             }
         }
@@ -451,19 +451,32 @@ const WaveFinder = () => {
         const body = document.body; // For Safari
         const html = document.documentElement; // Chrome, Firefox, IE and Opera places the overflow at the html level, unless else is specified. Therefore, we use the documentElement property for these browsers
         const height = document.getElementById('north').clientHeight;
-        body.scrollLeft = 0;
-        body.scrollTop = height+2000;
-        html.scrollLeft = 0;
-        html.scrollTop = height+2000;
+        //body.scrollLeft = 0;
+        //body.scrollTop = height+2000;
+        //html.scrollLeft = 0;
+        //html.scrollTop = height+2000;
+
+        window.scrollTo({
+            top: height,
+            left: 0,
+            behavior: 'smooth',
+        });
     }
     const currentConditions = () => {
         const body = document.body; // For Safari
         const html = document.documentElement; // Chrome, Firefox, IE and Opera places the overflow at the html level, unless else is specified. Therefore, we use the documentElement property for these browsers
-        body.scrollLeft = 0;
-        body.scrollTop = 25;
-        html.scrollLeft = 0;
-        html.scrollTop = 25;
-        const localTide = Number(JSON.parse(localStorage.getItem("tideData")).data[JSON.parse(localStorage.getItem("tideData")).data.length-1].v).toFixed(1);
+        //body.scrollLeft = 0;
+        //body.scrollTop = 25;
+        //html.scrollLeft = 0;
+        //html.scrollTop = 25;
+
+        window.scrollTo({
+            top: 25,
+            left: 0,
+            behavior: 'smooth',
+        });
+
+        const localTide = Number(JSON.parse(localStorage.getItem("tideData")).data[JSON.parse(localStorage.getItem("tideData")).data.length - 1].v).toFixed(1);
         const waterLevel = (tideNow.data !== undefined) ? Number(tideNow.data[tideNow.data.length - 1].v).toFixed(1) : localTide;
         const getCurrentTide = (waterLevel > 3) ? "high" : (waterLevel < 2) ? "low" : "medium";
         //localStorage.setItem('tide', getCurrentTide);
@@ -474,10 +487,16 @@ const WaveFinder = () => {
     const conditionsEntry = () => {
         const body = document.body; // For Safari
         const html = document.documentElement; // Chrome, Firefox, IE and Opera places the overflow at the html level, unless else is specified. Therefore, we use the documentElement property for these browsers
-        body.scrollLeft = 0;
-        body.scrollTop = 740;
-        html.scrollLeft = 0;
-        html.scrollTop = 740;
+        //body.scrollLeft = 0;
+        //body.scrollTop = 740;
+        //html.scrollLeft = 0;
+        //html.scrollTop = 740;
+
+        window.scrollTo({
+            top: 740,
+            left: 0,
+            behavior: 'smooth',
+        });
     }
     const sortedNorthSpots = () => {
         const latitude = (status.latitude !== undefined) ? status.latitude : 33.079940;
@@ -528,7 +547,7 @@ const WaveFinder = () => {
         //console.log(`sortedSpots =>\nsortedNorth: ${JSON.stringify(north,null,2)}`)
         //console.log(`sortedSpots =>\nsortedSouth: ${JSON.stringify(south,null,2)}`)
         const sortedLocations = sorted.map((item) => getMatchingLocation(item));
-        
+
         /*
         return <div>
                 <div id='north' className='p-10 r-10 glassy mb-1'>
@@ -541,14 +560,14 @@ const WaveFinder = () => {
             </div>;
         */
         return <div className='locationScroller m-1 r-10'>
-                    <div id='north'>
-                        {northLocations}
-                    </div>
-                    <ArrowsNorthSouth/>
-                    <div>
-                        {southLocations}
-                    </div>
-                </div>;
+            <div id='north'>
+                {northLocations}
+            </div>
+            <ArrowsNorthSouth />
+            <div>
+                {southLocations}
+            </div>
+        </div>;
     }
     const matchingLocations = locations().map((item) => getMatchingLocation(item));
     //localStorage.setItem('locations', JSON.stringify(locations()))
@@ -565,7 +584,7 @@ const WaveFinder = () => {
     const tideButton = () => {
         return (
             <div className='p-10 button r-5 color-lite bold bg-green glassy m-1'>
-                <GetMatchIcon kind='tide' status={status}/>
+                <GetMatchIcon kind='tide' status={status} />
                 Tide
             </div>
         )
@@ -573,7 +592,7 @@ const WaveFinder = () => {
     const windButton = () => {
         return (
             <div className='p-10 button r-5 color-lite bold bg-green glassy m-1'>
-                <GetMatchIcon kind='wind' status={status}/>
+                <GetMatchIcon kind='wind' status={status} />
                 Wind
             </div>
         )
@@ -581,7 +600,7 @@ const WaveFinder = () => {
     const swell1Button = () => {
         return (
             <div className='p-10 button r-5 color-lite bold bg-green glassy m-1'>
-                <GetMatchIcon kind='swell1' status={status}/>
+                <GetMatchIcon kind='swell1' status={status} />
                 Swell1
             </div>
         )
@@ -589,7 +608,7 @@ const WaveFinder = () => {
     const swell2Button = () => {
         return (
             <div className='p-10 button r-5 color-lite bold bg-green glassy m-1'>
-                <GetMatchIcon kind='swell2' status={status}/>
+                <GetMatchIcon kind='swell2' status={status} />
                 Swell2
             </div>
         )
@@ -618,18 +637,18 @@ const WaveFinder = () => {
     return (
         <div className='r-10 p-5 mt--40 width-100-percent size25'>
             <div className='p-10'>
-                <Geolocator currentPositionExists={currentPositionExists} returnCurrentPosition={updateCurrentLocation}/>
+                <Geolocator currentPositionExists={currentPositionExists} returnCurrentPosition={updateCurrentLocation} />
             </div>
             <div className='color-soft mt--10'>
                 <ConditionsDashboard tideDisplay={tideDisplay} setWind={setWind} />
                 <ConditionsContext.Provider value={status}>
-                    <ConditionsSelectors 
+                    <ConditionsSelectors
                         setTide={setTide}
                         setWind={setWind}
                         setWindStatus={setWindStatus}
                         handleTideCheck={handleTideCheck}
                         handleTideSelection={handleTideSelection}
-                        handleWindCheck={handleWindCheck} 
+                        handleWindCheck={handleWindCheck}
                         handleSwellCheck={handleSwellCheck}
                         handleSwell1Selection={handleSwell1Selection}
                         handleSwell2Selection={handleSwell2Selection}
@@ -644,7 +663,7 @@ const WaveFinder = () => {
                         pause={pause}
                         setStatus={setStatus}
                         tideNow={tideNow}
-                        data={data} 
+                        data={data}
                         tideDisplay={tideDisplay}
                     />
                 </ConditionsContext.Provider>
@@ -685,8 +704,8 @@ const WaveFinder = () => {
                         <div className='flex4Column'>{windButton()}</div>
                     </div>
                 */}
-            </div> 
-        </div>  
+            </div>
+        </div>
     )
 }
 export default WaveFinder;
