@@ -123,16 +123,11 @@ const WindDirection = ({columns, setWind}) => {
             return <img src={NW} className={classes} alt={windDirection} />;
         }
     }
-    const getCurrentWind = () => {
-        return (
-            <div className="r-10 m-5 p-10 bg-lite white">
-                <div>{getWindIcon()}</div>
-                <div>{`${status.direction} ${Number(status.angle).toFixed(0)}°`}</div>
-                <div>{`${Number(status.speed).toFixed(0)}-${Number(status.gusts).toFixed(0)}`} <span className="greet">knots</span></div>
-            </div>
-        )
-    }
-    return <div>{getCurrentWind()}</div>
+    return <div className="r-10 p-10 white">
+        <div>{getWindIcon()}</div>
+        <div className='mb-10'>{`${status.direction} ${Number(status.angle).toFixed(0)}°`}</div>
+        <div>{`${Number(status.speed).toFixed(0)}-${Number(status.gusts).toFixed(0)}`} <span className="">knots</span></div>
+    </div>
 }
 
 export default WindDirection;

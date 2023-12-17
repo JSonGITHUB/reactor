@@ -2,6 +2,9 @@ import React from 'react';
 import LogEntry from './LogEntryFunctional.js';
 import Loader from '../utils/Loader.js';
 import LogId from './LogId.js';
+import angles from './Angles.js';
+import directions from './Directions.js';
+
 class Logger extends React.Component {
 
     logIdComponent = new LogId(this.props.logId);
@@ -10,7 +13,7 @@ class Logger extends React.Component {
         super(props);
 //        console.log(`Logger => constructor -> props.logId: ${this.props.logId}`)
 //        console.log(`Logger => constructor -> localStorage.getItem: ${this.props.logId} ====> ${localStorage.getItem(this.props.logId)}`)
-        if (localStorage.getItem(this.props.logId) === null) {
+        if (localStorage.getItem(this.props.logId) === 'null') {
             this.log = this.logIdComponent.templateData;
             this.lodId = this.logIdComponent.generateNewLogId();
         } else {
@@ -29,14 +32,14 @@ class Logger extends React.Component {
         this.getStateLog = this.getStateLog.bind(this);
     }
     //getSpot = () => (this.state.spot) ? this.state.spot : this.log.Location.Break;
-    getSpot = () => localStorage.getItem("spot");
+    getSpot = () => localStorage.getItem('spot');
     componentDidMount() {
         //const logId = (this.props.location.state === undefined) ? this.logIdComponent.getLastRecordId() : this.props.location.state.logId.item;
         const { state } = this.props.location;
         console.log(`Logger => componentDidMount -> SPOT: ${this.getSpot()}`); 
         const logId = (state === undefined) ? this.props.logId : state.logId.item;
         //console.log(`Logger => componentDidMount -> logId: ${logId}`)
-        if (localStorage.getItem(this.props.logId) === null) {
+        if (localStorage.getItem(this.props.logId) === 'null') {
             this.log = this.logIdComponent.templateData;
             this.lodId = this.logIdComponent.generateNewLogId();
         } else {
@@ -46,748 +49,508 @@ class Logger extends React.Component {
         //console.log(`logId$$$$$$$$$$: ${this.props.logId} --- localStorage.${this.props.logId} ==== ${JSON.stringify(this.log,null,2)} AND logId::::: ${logId}`)
 //      console.log(`Logger => constructor -> log: ${JSON.stringify(this.log,null,2)}`)
         let data = [{
-            "description": "Location",
-            "group": [
+            'description': 'Location',
+            'group': [
                 {
-                    "type": "selector",
-                    "description": "Break", 
-                    "selections": [
-                        "",
-                        "HB: 17th St.",
-                        "HB: Taco Bell Reef",
-                        "HB: Sanchos",
-                        "HB: North Peir",
-                        "HB: South Peir",
-                        "HB: River Jetties",
-                        "Salt Creek",
-                        "Lowers",
-                        "O-Side: Harbor North",
-                        "O-Side: Harbor Middles",
-                        "O-Side: Harbor South",
-                        "O-Side: Jettie Southside",
-                        "O-Side: Pier North",
-                        "O-Side: Pier South",
-                        "O-Side: Tyson",
-                        "O-Side: Trenchtown",
-                        "O-Side: Blvd",
-                        "O-Side: Rock",
-                        "O-Side: Poo Poos",
-                        "C-Bad: Northend",
-                        "C-Bad: Southside",
-                        "Ponto: North",
-                        "Ponto: Proper",
-                        "Ponto: South",
-                        "Sea Bluff",
-                        "Sandbags",
-                        "Grandview: Proper",
-                        "Avocados",
-                        "Beacons: North",
-                        "Beacons: Out Front",
-                        "Beacons: Wall",
-                        "D Street: North",
-                        "D Street: Diamond House",
-                        "D Street: Hollywood Squares",
-                        "Boneyards",
-                        "Swamis",
-                        "Brown House",
-                        "Pipes",
-                        "Traps",
-                        "Barneys",
-                        "Turtles",
-                        "85s",
-                        "Tippers",
-                        "Suckouts",
-                        "Cardiff Reef",
-                        "Cardiff Reef South",
-                        "Georges",
-                        "Bus Stops",
-                        "P-Lots",
-                        "Seaside Reef",
-                        "Palis",
-                        "Tabletops",
-                        "Cherry Hill",
-                        "Rock Piles",
-                        "Del Mar Rivermouth",
-                        "Del Mar: 29th",
-                        "Del Mar: 19th",
-                        "Del Mar: 15th",
-                        "Del Mar: 11th",
-                        "Del Mar: 8th",
-                        "Del Mar: The Mouse Hole",
-                        "Torrey Pines: North",
-                        "Torrey Pines: South",
-                        "Blacks",
-                        "Scripps",
-                        "La Jolla Shores",
-                        "Mission Drive",
-                        "Mission: San Fernando",
-                        "South Mission Jetti",
-                        "OB Jetti",
-                        "OB Avalanche",
-                        "OB Pier",
-                        "Loscombs",
-                        "Rosarito: Smoke Stacks",
-                        "Rosarito: Peir",
-                        "K-38s",
-                        "Gaviotas",
-                        "La Fonda",
-                        "Punta Baja",
-                        "Elijandros",
-                        "Harbor",
-                        "Notch",
-                        "Wall",
-                        "Abreojos",
-                        "Abreojos: 3 pole",
-                        "Abreojos: Razors",
-                        "Scorpion Bay",
-                        "Estuary",
-                        "Colorados"
+                    'type': 'selector',
+                    'description': 'Break', 
+                    'selections': [
+                        '',
+                        'HB: 17th St.',
+                        'HB: Taco Bell Reef',
+                        'HB: Sanchos',
+                        'HB: North Peir',
+                        'HB: South Peir',
+                        'HB: River Jetties',
+                        'Salt Creek',
+                        'Lowers',
+                        'O-Side: Harbor North',
+                        'O-Side: Harbor Middles',
+                        'O-Side: Harbor South',
+                        'O-Side: Jettie Southside',
+                        'O-Side: Pier North',
+                        'O-Side: Pier South',
+                        'O-Side: Tyson',
+                        'O-Side: Trenchtown',
+                        'O-Side: Blvd',
+                        'O-Side: Rock',
+                        'O-Side: Poo Poos',
+                        'C-Bad: Northend',
+                        'C-Bad: Southside',
+                        'Ponto: North',
+                        'Ponto: Proper',
+                        'Ponto: South',
+                        'Sea Bluff',
+                        'Sandbags',
+                        'Grandview: Proper',
+                        'Avocados',
+                        'Beacons: North',
+                        'Beacons: Out Front',
+                        'Beacons: Wall',
+                        'D Street: North',
+                        'D Street: Diamond House',
+                        'D Street: Hollywood Squares',
+                        'Boneyards',
+                        'Swamis',
+                        'Brown House',
+                        'Pipes',
+                        'Traps',
+                        'Barneys',
+                        'Turtles',
+                        '85s',
+                        'Tippers',
+                        'Suckouts',
+                        'Cardiff Reef',
+                        'Cardiff Reef South',
+                        'Georges',
+                        'Bus Stops',
+                        'P-Lots',
+                        'Seaside Reef',
+                        'Palis',
+                        'Tabletops',
+                        'Cherry Hill',
+                        'Rock Piles',
+                        'Del Mar Rivermouth',
+                        'Del Mar: 29th',
+                        'Del Mar: 19th',
+                        'Del Mar: 15th',
+                        'Del Mar: 11th',
+                        'Del Mar: 8th',
+                        'Del Mar: The Mouse Hole',
+                        'Torrey Pines: North',
+                        'Torrey Pines: South',
+                        'Blacks',
+                        'Scripps',
+                        'La Jolla Shores',
+                        'Mission Drive',
+                        'Mission: San Fernando',
+                        'South Mission Jetti',
+                        'OB Jetti',
+                        'OB Avalanche',
+                        'OB Pier',
+                        'Loscombs',
+                        'Rosarito: Smoke Stacks',
+                        'Rosarito: Peir',
+                        'K-38s',
+                        'Gaviotas',
+                        'La Fonda',
+                        'Punta Baja',
+                        'Elijandros',
+                        'Harbor',
+                        'Notch',
+                        'Wall',
+                        'Abreojos',
+                        'Abreojos: 3 pole',
+                        'Abreojos: Razors',
+                        'Scorpion Bay',
+                        'Estuary',
+                        'Colorados',
+                        'Kuta',
+                        'Pantai Ujung',
+                        'Jasri Beach',
+                        'Ceningan',
+                        'Nusa Lembongan',
+                        'Playgrounds',
+                        'Lacerations',
+                        'Padangbai',
+                        'Shipwrecks & Razors',
+                        'Keramas',
+                        'Keramas KFC',
+                        'Ketewel',
+                        'Sanur',
+                        'Sindhu Beach',
+                        'Tanhung Sari',
+                        'Hyatt Reef',
+                        'Serangan',
+                        'Pantai Nusadua',
+                        'Nusa Dua',
+                        'Green Ball',
+                        'Nyang Nyang',
+                        'Uluwatu',
+                        'Padang Padang',
+                        'Impossibles',
+                        'Bingin',
+                        'Dreamland',
+                        'Balangan',
+                        'Airport Rights',
+                        'Kuta Reef',
+                        'Kuta Beach',
+                        'Padma',
+                        'Legian Beach',
+                        'Seminyak',
+                        'Berawa',
+                        'Nelayan Beach',
+                        'Canggu',
+                        'Old Mans - Batu-Balong',
+                        'Pererenan',
+                        'Yeh Gangga',
+                        'Balian',
+                        'Medewi'
                     ]
                 }
             ]
         },
         {
-            "description": "Surf",
-            "group": [
+            'description': 'Surf',
+            'group': [
                 {
-                    "type": "selector",
-                    "description": "Height", 
-                    "selections": [
-                        "",
-                        "knee high", 
-                        "waist high", 
-                        "shoulder high", 
-                        "head high", 
-                        "over head", 
-                        "foot over head", 
-                        "couple of feet over head", 
-                        "double over head",
-                        "triple over head"
+                    'type': 'selector',
+                    'description': 'Height', 
+                    'selections': [
+                        '',
+                        'knee high', 
+                        'waist high', 
+                        'chest high',
+                        'shoulder high', 
+                        'head high', 
+                        'over head', 
+                        'foot over head', 
+                        'couple of feet over head', 
+                        'double over head',
+                        'triple over head'
                     ]
                 },
                 {
-                    "type": "selector",
-                    "description": "Report", 
-                    "selections": [
-                        "",
-                        "1ft",
-                        "2ft",
-                        "3ft",
-                        "4ft",
-                        "5ft",
-                        "6ft",
-                        "7ft",
-                        "8ft",
-                        "9ft",
-                        "10ft",
-                        "11ft",
-                        "12ft",
-                        "13ft",
-                        "14ft",
-                        "15ft",
-                        "16ft",
-                        "17ft",
-                        "18ft"
+                    'type': 'selector',
+                    'description': 'Report', 
+                    'selections': [
+                        '',
+                        '1ft',
+                        '2ft',
+                        '3ft',
+                        '4ft',
+                        '5ft',
+                        '6ft',
+                        '7ft',
+                        '8ft',
+                        '9ft',
+                        '10ft',
+                        '11ft',
+                        '12ft',
+                        '13ft',
+                        '14ft',
+                        '15ft',
+                        '16ft',
+                        '17ft',
+                        '18ft'
                     ]
                 },
                 {
-                    "type": "selector",
-                    "description": "Shape", 
-                    "selections": [
-                        "",
-                        "speedy runners",
-                        "peaky",
-                        "bowly",
-                        "close-outs",
-                        "barreling",
-                        "skatepark",
-                        "mush burgers",
-                        "slopey",
-                        "slabbing"
+                    'type': 'selector',
+                    'description': 'Shape', 
+                    'selections': [
+                        '',
+                        'speedy runners',
+                        'peaky',
+                        'bowly',
+                        'close-outs',
+                        'barreling',
+                        'skatepark',
+                        'mush burgers',
+                        'slopey',
+                        'slabbing'
                     ]
                 }
             ]
         },
         {
-            "description": "Swell1",
-            "group": [
+            'description': 'Swell1',
+            'group': [
                 {
-                    "type": "selector",
-                    "description": "Height", 
-                    "selections": [
-                        "",
-                        "1ft",
-                        "2ft",
-                        "3ft",
-                        "4ft",
-                        "5ft",
-                        "6ft",
-                        "7ft",
-                        "8ft",
-                        "9ft",
-                        "10ft",
-                        "11ft",
-                        "12ft",
-                        "13ft",
-                        "14ft",
-                        "15ft",
-                        "16ft",
-                        "17ft",
-                        "18ft"
+                    'type': 'selector',
+                    'description': 'Height', 
+                    'selections': [
+                        '',
+                        '1ft',
+                        '2ft',
+                        '3ft',
+                        '4ft',
+                        '5ft',
+                        '6ft',
+                        '7ft',
+                        '8ft',
+                        '9ft',
+                        '10ft',
+                        '11ft',
+                        '12ft',
+                        '13ft',
+                        '14ft',
+                        '15ft',
+                        '16ft',
+                        '17ft',
+                        '18ft'
                     ]
                 },
                 {
-                    "type": "selector",
-                    "description": "Direction", 
-                    "selections": [
-                        "",
-                        "N",
-                        "NE",
-                        "ENE",
-                        "NNE",
-                        "NW",
-                        "NNW",
-                        "W",
-                        "WNW",
-                        "E",
-                        "ESE",
-                        "S",
-                        "SE",
-                        "SSE",
-                        "WSW",
-                        "SW",
-                        "SSW"
-                    ]
+                    'type': 'selector',
+                    'description': 'Direction', 
+                    'selections': directions
                 },
                 {
-                    "type": "selector",
-                    "description": "Angle", 
-                    "selections": [
-                        "0",
-                        "5",
-                        "10",
-                        "15",
-                        "20",
-                        "25",
-                        "30",
-                        "35",
-                        "40",
-                        "45",
-                        "50",
-                        "55",
-                        "60",
-                        "65",
-                        "70",
-                        "75",
-                        "80",
-                        "85",
-                        "90",
-                        "95",
-                        "100",
-                        "105",
-                        "110",
-                        "115",
-                        "120",
-                        "125",
-                        "130",
-                        "135",
-                        "140",
-                        "145",
-                        "150",
-                        "155",
-                        "160",
-                        "165",
-                        "170",
-                        "175",
-                        "180",
-                        "185",
-                        "190",
-                        "195",
-                        "200",
-                        "205",
-                        "210",
-                        "215",
-                        "220",
-                        "225",
-                        "230",
-                        "235",
-                        "240",
-                        "245",
-                        "250",
-                        "255",
-                        "260",
-                        "265",
-                        "270",
-                        "275",
-                        "280",
-                        "285",
-                        "290",
-                        "295",
-                        "300",
-                        "305",
-                        "310",
-                        "315",
-                        "320",
-                        "325",
-                        "330",
-                        "335",
-                        "340"
-                    ]
+                    'type': 'selector',
+                    'description': 'Angle', 
+                    'selections': angles
                 },
                 {
-                    "type": "selector",
-                    "description": "Interval", 
-                    "selections": [
-                        "",
-                        "5 seconds",
-                        "6 seconds",
-                        "7 seconds",
-                        "8 seconds",
-                        "9 seconds",
-                        "10 seconds",
-                        "11 seconds",
-                        "12 seconds",
-                        "13 seconds",
-                        "14 seconds",
-                        "15 seconds",
-                        "16 seconds",
-                        "17 seconds",
-                        "18 seconds",
-                        "19 seconds",
-                        "20 seconds",
-                        "21 seconds",
-                        "22 seconds",
-                        "23 seconds"
+                    'type': 'selector',
+                    'description': 'Interval', 
+                    'selections': [
+                        '',
+                        '5 seconds',
+                        '6 seconds',
+                        '7 seconds',
+                        '8 seconds',
+                        '9 seconds',
+                        '10 seconds',
+                        '11 seconds',
+                        '12 seconds',
+                        '13 seconds',
+                        '14 seconds',
+                        '15 seconds',
+                        '16 seconds',
+                        '17 seconds',
+                        '18 seconds',
+                        '19 seconds',
+                        '20 seconds',
+                        '21 seconds',
+                        '22 seconds',
+                        '23 seconds'
                     ]
                 }
             ]
         },
         {
-            "description": "Swell2",
-            "group": [
+            'description': 'Swell2',
+            'group': [
                 {
-                    "type": "selector",
-                    "description": "Height", 
-                    "selections": [
-                        "",
-                        "1ft",
-                        "2ft",
-                        "3ft",
-                        "4ft",
-                        "5ft",
-                        "6ft",
-                        "7ft",
-                        "8ft",
-                        "9ft",
-                        "10ft",
-                        "11ft",
-                        "12ft",
-                        "13ft",
-                        "14ft",
-                        "15ft",
-                        "16ft",
-                        "17ft",
-                        "18ft"
+                    'type': 'selector',
+                    'description': 'Height', 
+                    'selections': [
+                        '',
+                        '1ft',
+                        '2ft',
+                        '3ft',
+                        '4ft',
+                        '5ft',
+                        '6ft',
+                        '7ft',
+                        '8ft',
+                        '9ft',
+                        '10ft',
+                        '11ft',
+                        '12ft',
+                        '13ft',
+                        '14ft',
+                        '15ft',
+                        '16ft',
+                        '17ft',
+                        '18ft'
                     ]
                 },
                 {
-                    "type": "selector",
-                    "description": "Direction", 
-                    "selections": [
-                        "",
-                        "N",
-                        "NE",
-                        "ENE",
-                        "NNE",
-                        "NW",
-                        "NNW",
-                        "W",
-                        "WNW",
-                        "E",
-                        "ESE",
-                        "S",
-                        "SE",
-                        "SSE",
-                        "WSW",
-                        "SW",
-                        "SSW"
-                    ]
+                    'type': 'selector',
+                    'description': 'Direction', 
+                    'selections': directions
                 },
                 {
-                    "type": "selector",
-                    "description": "Angle", 
-                    "selections": [
-                        "0",
-                        "5",
-                        "10",
-                        "15",
-                        "20",
-                        "25",
-                        "30",
-                        "35",
-                        "40",
-                        "45",
-                        "50",
-                        "55",
-                        "60",
-                        "65",
-                        "70",
-                        "75",
-                        "80",
-                        "85",
-                        "90",
-                        "95",
-                        "100",
-                        "105",
-                        "110",
-                        "115",
-                        "120",
-                        "125",
-                        "130",
-                        "135",
-                        "140",
-                        "145",
-                        "150",
-                        "155",
-                        "160",
-                        "165",
-                        "170",
-                        "175",
-                        "180",
-                        "185",
-                        "190",
-                        "195",
-                        "200",
-                        "205",
-                        "210",
-                        "215",
-                        "220",
-                        "225",
-                        "230",
-                        "235",
-                        "240",
-                        "245",
-                        "250",
-                        "255",
-                        "260",
-                        "265",
-                        "270",
-                        "275",
-                        "280",
-                        "285",
-                        "290",
-                        "295",
-                        "300",
-                        "305",
-                        "310",
-                        "315",
-                        "320",
-                        "325",
-                        "330",
-                        "335",
-                        "340"
-                    ]
+                    'type': 'selector',
+                    'description': 'Angle', 
+                    'selections': angles
                 },
                 {
-                    "type": "selector",
-                    "description": "Interval", 
-                    "selections": [
-                        "",
-                        "5 seconds",
-                        "6 seconds",
-                        "7 seconds",
-                        "8 seconds",
-                        "9 seconds",
-                        "10 seconds",
-                        "11 seconds",
-                        "12 seconds",
-                        "13 seconds",
-                        "14 seconds",
-                        "15 seconds",
-                        "16 seconds",
-                        "17 seconds",
-                        "18 seconds",
-                        "19 seconds",
-                        "20 seconds",
-                        "21 seconds",
-                        "22 seconds",
-                        "23 seconds"
+                    'type': 'selector',
+                    'description': 'Interval', 
+                    'selections': [
+                        '',
+                        '5 seconds',
+                        '6 seconds',
+                        '7 seconds',
+                        '8 seconds',
+                        '9 seconds',
+                        '10 seconds',
+                        '11 seconds',
+                        '12 seconds',
+                        '13 seconds',
+                        '14 seconds',
+                        '15 seconds',
+                        '16 seconds',
+                        '17 seconds',
+                        '18 seconds',
+                        '19 seconds',
+                        '20 seconds',
+                        '21 seconds',
+                        '22 seconds',
+                        '23 seconds'
                     ]
                 }
             ]
         },
         {
-            "description": "Swell3",
-            "group": [
+            'description': 'Swell3',
+            'group': [
                 {
-                    "type": "selector",
-                    "description": "Height", 
-                    "selections": [
-                        "",
-                        "1ft",
-                        "2ft",
-                        "3ft",
-                        "4ft",
-                        "5ft",
-                        "6ft",
-                        "7ft",
-                        "8ft",
-                        "9ft",
-                        "10ft",
-                        "11ft",
-                        "12ft",
-                        "13ft",
-                        "14ft",
-                        "15ft",
-                        "16ft",
-                        "17ft",
-                        "18ft"
+                    'type': 'selector',
+                    'description': 'Height', 
+                    'selections': [
+                        '',
+                        '1ft',
+                        '2ft',
+                        '3ft',
+                        '4ft',
+                        '5ft',
+                        '6ft',
+                        '7ft',
+                        '8ft',
+                        '9ft',
+                        '10ft',
+                        '11ft',
+                        '12ft',
+                        '13ft',
+                        '14ft',
+                        '15ft',
+                        '16ft',
+                        '17ft',
+                        '18ft'
                     ]
                 },
                 {
-                    "type": "selector",
-                    "description": "Direction", 
-                    "selections": [
-                        "",
-                        "N",
-                        "NE",
-                        "ENE",
-                        "NNE",
-                        "NW",
-                        "NNW",
-                        "W",
-                        "WNW",
-                        "E",
-                        "ESE",
-                        "S",
-                        "SE",
-                        "SSE",
-                        "WSW",
-                        "SW",
-                        "SSW"
-                    ]
+                    'type': 'selector',
+                    'description': 'Direction', 
+                    'selections': directions
                 },
                 {
-                    "type": "selector",
-                    "description": "Angle", 
-                    "selections": [
-                        "0",
-                        "5",
-                        "10",
-                        "15",
-                        "20",
-                        "25",
-                        "30",
-                        "35",
-                        "40",
-                        "45",
-                        "50",
-                        "55",
-                        "60",
-                        "65",
-                        "70",
-                        "75",
-                        "80",
-                        "85",
-                        "90",
-                        "95",
-                        "100",
-                        "105",
-                        "110",
-                        "115",
-                        "120",
-                        "125",
-                        "130",
-                        "135",
-                        "140",
-                        "145",
-                        "150",
-                        "155",
-                        "160",
-                        "165",
-                        "170",
-                        "175",
-                        "180",
-                        "185",
-                        "190",
-                        "195",
-                        "200",
-                        "205",
-                        "210",
-                        "215",
-                        "220",
-                        "225",
-                        "230",
-                        "235",
-                        "240",
-                        "245",
-                        "250",
-                        "255",
-                        "260",
-                        "265",
-                        "270",
-                        "275",
-                        "280",
-                        "285",
-                        "290",
-                        "295",
-                        "300",
-                        "305",
-                        "310",
-                        "315",
-                        "320",
-                        "325",
-                        "330",
-                        "335",
-                        "340"
-                    ]
+                    'type': 'selector',
+                    'description': 'Angle', 
+                    'selections': angles
                 },
                 {
-                    "type": "selector",
-                    "description": "Interval", 
-                    "selections": [
-                        "",
-                        "5 seconds",
-                        "6 seconds",
-                        "7 seconds",
-                        "8 seconds",
-                        "9 seconds",
-                        "10 seconds",
-                        "11 seconds",
-                        "12 seconds",
-                        "13 seconds",
-                        "14 seconds",
-                        "15 seconds",
-                        "16 seconds",
-                        "17 seconds",
-                        "18 seconds",
-                        "19 seconds",
-                        "20 seconds",
-                        "21 seconds",
-                        "22 seconds",
-                        "23 seconds"
+                    'type': 'selector',
+                    'description': 'Interval', 
+                    'selections': [
+                        '',
+                        '5 seconds',
+                        '6 seconds',
+                        '7 seconds',
+                        '8 seconds',
+                        '9 seconds',
+                        '10 seconds',
+                        '11 seconds',
+                        '12 seconds',
+                        '13 seconds',
+                        '14 seconds',
+                        '15 seconds',
+                        '16 seconds',
+                        '17 seconds',
+                        '18 seconds',
+                        '19 seconds',
+                        '20 seconds',
+                        '21 seconds',
+                        '22 seconds',
+                        '23 seconds'
                     ]
                 }
             ]
         },
         {
-            "description": "Wind",
-            "group": [
+            'description': 'Wind',
+            'group': [
                 {
-                    "type": "selector",
-                    "description": "Direction", 
-                    "selections": [
-                        "",
-                        "N",
-                        "NE",
-                        "ENE",
-                        "NNE",
-                        "NW",
-                        "NNW",
-                        "W",
-                        "WNW",
-                        "E",
-                        "ESE",
-                        "S",
-                        "SE",
-                        "SSE",
-                        "WSW",
-                        "SW",
-                        "SSW"
+                    'type': 'selector',
+                    'description': 'Direction', 
+                    'selections': directions
+                },
+                {
+                    'type': 'selector',
+                    'description': 'Orientation', 
+                    'selections': [
+                        '',
+                        'offshore',
+                        'onshore',
+                        'sideshore => rights',
+                        'sideshore => lefts'
                     ]
                 },
                 {
-                    "type": "selector",
-                    "description": "Orientation", 
-                    "selections": [
-                        "",
-                        "offshore",
-                        "onshore",
-                        "sideshore => rights",
-                        "sideshore => lefts"
+                    'type': 'selector',
+                    'description': 'MPH', 
+                    'selections': [
+                        '',
+                        '1mph',
+                        '2mph',
+                        '3mph',
+                        '4mph',
+                        '5mph',
+                        '6mph',
+                        '7mph',
+                        '8mph',
+                        '9mph',
+                        '10mph',
+                        '11mph',
+                        '12mph',
+                        '13mph',
+                        '14mph',
+                        '15mph'
                     ]
                 },
                 {
-                    "type": "selector",
-                    "description": "MPH", 
-                    "selections": [
-                        "",
-                        "1mph",
-                        "2mph",
-                        "3mph",
-                        "4mph",
-                        "5mph",
-                        "6mph",
-                        "7mph",
-                        "8mph",
-                        "9mph",
-                        "10mph",
-                        "11mph",
-                        "12mph",
-                        "13mph",
-                        "14mph",
-                        "15mph"
-                    ]
-                },
-                {
-                    "type": "selector",
-                    "description": "Surface", 
-                    "selections": [
-                        "",
-                        "oily glass",
-                        "glassy",
-                        "textured",
-                        "choppy",
-                        "victory at sea"
+                    'type': 'selector',
+                    'description': 'Surface', 
+                    'selections': [
+                        '',
+                        'oily glass',
+                        'glassy',
+                        'textured',
+                        'choppy',
+                        'victory at sea'
                     ]
                 }
             ]
         },
         {
-            "description": "Tide",
-            "group": [
+            'description': 'Tide',
+            'group': [
                 {
-                    "type": "selector",
-                    "description": "Phase", 
-                    "selections": [
-                        "",
-                        "high",
-                        "medium",
-                        "low"
+                    'type': 'selector',
+                    'description': 'Phase', 
+                    'selections': [
+                        '',
+                        'high',
+                        'medium',
+                        'low'
                     ]
                 },
                 {
-                    "type": "selector",
-                    "description": "Height", 
-                    "selections": [
-                        "",
-                        "-2ft",
-                        "-1ft",
-                        "0ft",
-                        "1ft",
-                        "2ft",
-                        "3ft",
-                        "4ft",
-                        "5ft",
-                        "6ft",
-                        "7ft",
-                        "8ft",
-                        "9ft",
-                        "10ft"
+                    'type': 'selector',
+                    'description': 'Height', 
+                    'selections': [
+                        '',
+                        '-2ft',
+                        '-1ft',
+                        '0ft',
+                        '1ft',
+                        '2ft',
+                        '3ft',
+                        '4ft',
+                        '5ft',
+                        '6ft',
+                        '7ft',
+                        '8ft',
+                        '9ft',
+                        '10ft'
                     ]
                 }
             ]
         },
         {
-            "description": "Conditions",
-            "group": [
+            'description': 'Conditions',
+            'group': [
                 {
-                    "type": "radio",
-                    "description": "Conditions", 
-                    "selections": [
-                        "Firing",
-                        "Good",
-                        "Bad"
+                    'type': 'radio',
+                    'description': 'Conditions', 
+                    'selections': [
+                        'Firing',
+                        'Good',
+                        'Bad'
                     ]
                 }
             ]
@@ -810,19 +573,7 @@ class Logger extends React.Component {
         //GOOD const uri = 'https://jsongithub.github.io/portfolio/assets/data/appData.json';
         const uri = 'https://jsongithub.github.io/portfolio/assets/data/appData.json';
         //const uri = 'localhost:8080/writeSurfLog.json';
-        /*
-        fetch(uri)
-            .then(response => validate(response))
-            .then(data => {
-                this.setState({
-                    isLoaded: true,
-                    items: data,
-                    //logId: this.props.logId
-                    logId: logId
-                })
-            })
-            .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
-        */
+        
         this.setState({
             isLoaded: true,
             items: data,
@@ -842,29 +593,29 @@ class Logger extends React.Component {
     render() {      
         let {isLoaded, items} = this.state;
             console.log(`Logger ===> ${JSON.stringify(items, null, 2)}`);
-            let appInterface = <div className="App-content fadeIn">
-                                    <div className="flex3Column"></div>
-                                    <div className="flex3Column">
+            let appInterface = <div className='App-content fadeIn'>
+                                    <div className='flex3Column'></div>
+                                    <div className='flex3Column'>
                                         <Loader />
                                     </div>
-                                    <div className="flex3Column"></div>
+                                    <div className='flex3Column'></div>
                                 </div>;
             if (isLoaded) {
-                appInterface = <div className="App-content fadeIn">
-                    <div className="flex3Column"></div>
-                    <div className="flex3Column">
+                appInterface = <div className='App-content fadeIn'>
+                    <div className='flex3Column'></div>
+                    <div className='flex3Column'>
                         <LogEntry
                         // logId={this.props.logId}
                             logId={this.state.logId}
                             onChange={this.updateLog} 
                             getStateLog={this.getStateLog} 
-                            title="Session Log" 
-                            message="Add your session data"  
-                            buttonLabel="submit" 
+                            title='Session Log' 
+                            message='Add your session data'  
+                            buttonLabel='submit' 
                             items={items}
                         />
                     </div>
-                    <div className="flex3Column"></div>
+                    <div className='flex3Column'></div>
                 </div>
                 
             }
