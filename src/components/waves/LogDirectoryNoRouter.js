@@ -54,11 +54,11 @@ class LogDirectory extends React.Component {
                     }}
                 >
                     <div key={getKey("log")} className="flexContainer button color-graphite pointer greet m-1 r-5 incompletedSelector bg-yellow myButton" onClick={() => this.sessionClick(item, spot)}>
-                            <div className="flexOneFourthColumn p-10">
+                            <div className="flexOneFourthColumn contentCenter p-10">
                                 {/*<img src={this.condition(item)} alt={item} className='shaka' />*/}
                                 <img src={condition} alt={conditionDescription} className='shaka' />
                             </div>
-                            <div className="flexThreeFourthColumnLeft pt-10 pb-10">
+                            <div className="flexThreeFourthColumn contentLeft pt-10 pb-10">
                                 {month + " " + day + this.suffix[Number(String(day).slice(-1))] + " " + year + ": "}
                                 <br/>{spot}
                             </div>

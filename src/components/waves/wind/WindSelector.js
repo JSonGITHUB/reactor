@@ -1,0 +1,44 @@
+import React, { useState } from 'react';
+import Selector from '../../forms/FunctionalSelector.js';
+import WindDirection from '../WindDirection.js';
+import directions from '../Directions.js';
+import thumbsUp from '../../../assets/images/ThumbsUp.png';
+import thumbsDown from '../../../assets/images/ThumbsDown.png';
+
+const WindSelector = ({windDirection, pause, setWind, isWind, setStatus, handleWindCheck}) => {
+    //console.log(`WindSelector => isWind: ${isWind}`);
+    
+    const [filterByWind, setFilterByWind] = useState(isWind);
+    const backgroundColorClass = (localStorage.getItem('isWind') === 'true') ? 'bg-veryLite fadeInFaded' : 'bg-tinted fadeOutFaded';
+    const windClass = () => `${backgroundColorClass} flex2Column contentCenter r-10 m-5 p-15`;
+    const handleWindSelection = (groupTitle, label, selected) => {
+        setStatus(selected)
+    }
+
+    return (
+        <div className={windClass()} onMouseDown={pause}>
+            {/*console.log(`windSelector => windDirection: ${status.windDirection}`)*/}
+            <div className='p-10 r-10 bg-tinted'>
+                <div className='p-10 mb-15 r-10 bg-tinted'>
+                    Wind
+                </div>
+                <div className='mt-5 size20 p-10'>
+                    <Selector
+                        groupTitle="Wind" 
+                        selected={windDirection} 
+                        label="Direction"
+                        items={directions}
+                        onChange={handleWindSelection}
+                        fontSize='20'
+                        padding='5px'
+                        width='93%'
+                    />
+                </div>
+            </div>
+            <div className="button mt-15" onClick={handleWindCheck}>
+                {(localStorage.getItem('isWind') === 'true') ? <img src={thumbsUp} alt='wind' className='p-10 r-20' /> : <img src={thumbsDown} alt='wind' className='p-10 r-20' /> }
+            </div>
+        </div>
+    );
+}
+export default WindSelector;

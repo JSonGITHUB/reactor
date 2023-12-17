@@ -1,0 +1,721 @@
+[
+{
+    "name": "C St.",
+    "latitude": 34.273282,
+    "longitude": -119.304653,
+    "swell": ["S", "SW", "W", "NW"],
+    "wind": ["E"],
+    "tide": ["low", "medium"]
+},
+{
+    "name": "HB: 17th St.",
+    "latitude": 33.663781,
+    "longitude": -118.013605,
+    "swell": ["SSE", "S", "SW", "WSW", "W", "WNW"],
+    "wind": ["E", "NE"],
+    "tide": ["medium"]
+},
+{
+    "name": "HB: Taco Bell Reef",
+    "latitude": 33.657999,
+    "longitude": -118.006578,
+    "swell": ["SSE", "S", "SW", "WSW", "W", "WNW"],
+    "wind": ["E", "NE"],
+    "tide": ["medium"]
+},
+{
+    "name": "HB: Sanchos",
+    "latitude": 33.656320,
+    "longitude": -118.004604,
+    "swell": ["SSE", "S", "SW", "WSW", "W", "WNW"],
+    "wind": ["E", "NE"],
+    "tide": ["medium"]
+},
+{
+    "name": "HB: North Peir",
+    "latitude": 33.655927,
+    "longitude": -118.003874,
+    "swell": ["SSE", "S", "SW", "WSW", "W", "WNW"],
+    "wind": ["E", "NE"],
+    "tide": ["medium"]
+},
+{
+    "name": "HB: South Peir",
+    "latitude": 33.655534,
+    "longitude": -118.003145,
+    "swell": ["SSE", "S", "SW", "WSW", "W", "WNW"],
+    "wind": ["E", "NE"],
+    "tide": ["medium"]
+},
+{
+    "name": "HB: River Jetties",
+    "latitude": 33.630302,
+    "longitude": -117.961721,
+    "swell": ["SSE", "S", "SW","W", "WNW"],
+    "wind": ["E", "NE"],
+    "tide": ["low", "medium", "high"]
+},
+{
+    "name": "Salt Creek",
+    "latitude": 33.475456,
+    "longitude": -117.722133,
+    "swell": ["S", "SW", "W", "WNW"],
+    "wind": ["E", "SE", "S"],
+    "tide": ["medium"]
+},
+{
+    "name": "Lowers",
+    "latitude": 33.382848,
+    "longitude": -117.588214,
+    "swell": ["S", "SW","W", "WNW"],
+    "wind": ["E", "NE"],
+    "tide": ["medium"]
+},
+{
+    "name": "O-Side: Harbor North",
+    "latitude": 33.206684,
+    "longitude": -117.397452,
+    "swell": ["SSW", "SW", "W", "WNW", "SSE"],
+    "wind": ["E"],
+    "tide": ["medium"]
+},
+{
+    "name": "O-Side: Harbor Middles",
+    "latitude": 33.205139,
+    "longitude": -117.394813,
+    "swell": ["SSW", "SW", "W", "WNW", "SSE"],
+    "wind": ["E"],
+    "tide": ["medium"]
+},
+{
+    "name": "O-Side: Harbor South",
+    "latitude": 33.202483,
+    "longitude": -117.392796,
+    "swell": ["SSW", "SW", "W", "WNW"],
+    "wind": ["E", "NE"],
+    "tide": ["medium"]
+},
+{
+    "name": "O-Side: Jettie Southside",
+    "latitude": 33.201763,
+    "longitude": -117.392596,
+    "swell": ["SSW", "SW", "W", "WNW"],
+    "wind": ["E", "NE"],
+    "tide": ["medium"]
+},
+{
+    "name": "O-Side: Pier North",
+    "latitude": 33.194686,
+    "longitude": -117.385226,
+    "swell": ["SSW", "SW", "W", "WNW"],
+    "wind": ["E", "NE"],
+    "tide": ["medium"]
+},
+{
+    "name": "O-Side: Pier South",
+    "latitude": 33.193630,
+    "longitude": -117.384826,
+    "swell": ["SSW", "SW", "W", "WNW"],
+    "wind": ["E", "NE"],
+    "tide": ["medium"]
+},
+{
+    "name": "O-Side: Tyson",
+    "latitude": 33.190731,
+    "longitude": -117.381540,
+    "swell": ["SSW", "SW", "W", "WNW"],
+    "wind": ["E", "NE"],
+    "tide": ["medium"]
+},
+{
+    "name": "O-Side: Trenchtown",
+    "latitude": 33.186862,
+    "longitude": -117.378257,
+    "swell": ["SSW", "SW", "W", "WNW"],
+    "wind": ["E", "NE"],
+    "tide": ["medium"]
+},
+{
+    "name": "O-Side: Blvd",
+    "latitude": 33.181210,
+    "longitude": -117.373200,
+    "swell": ["SSW", "SW", "W", "WNW"],
+    "wind": ["E", "NE"],
+    "tide": ["medium"]
+},
+{
+    "name": "O-Side: Rock",
+    "latitude": 33.179439,
+    "longitude": -117.371792,
+    "swell": ["SSW", "SW", "W", "WNW"],
+    "wind": ["E", "NE"],
+    "tide": ["medium"]
+},
+{
+    "name": "O-Side: Poo Poos",
+    "latitude": 33.178651,
+    "longitude": -117.371036,
+    "swell": ["SSW", "SW", "W", "WNW"],
+    "wind": ["E", "NE"],
+    "tide": ["medium"]
+},
+{
+    "name": "C-Bad: Northend",
+    "latitude": 33.163313,
+    "longitude": -117.358294,
+    "swell": ["WNW", "W", "SW", "SSW"],
+    "wind": ["E", "NE"],
+    "tide": ["low", "medium"]
+},
+{
+    "name": "C-Bad: Southside",
+    "latitude": 33.144850,
+    "longitude": -117.343638,
+    "swell": ["WNW", "W", "SW", "SSW"],
+    "wind": ["E", "NE"],
+    "tide": ["low", "medium"]
+},
+{
+    "name": "Ponto: North",
+    "latitude": 33.089705,
+    "longitude": -117.314392,
+    "swell": ["W", "NW", "SW"],
+    "wind": ["E", "NE"],
+    "tide": ["low", "medium"]
+},
+{
+    "name": "Ponto: Proper",
+    "latitude": 33.086801,
+    "longitude": -117.313695,
+    "swell": ["W", "NW", "SW"],
+    "wind": ["E", "NE"],
+    "tide": ["low", "medium"]
+},
+{
+    "name": "Ponto: South",
+    "latitude": 33.085351,
+    "longitude": -117.312802,
+    "swell": ["W", "NW", "SW"],
+    "wind": ["E", "NE"],
+    "tide": ["low", "medium"]
+},
+{
+    "name": "Sea Bluff",
+    "latitude": 33.081980,
+    "longitude": -117.311783,
+    "swell": ["W", "NW", "SW", "SSW", "WNW"],
+    "wind": ["E", "NE"],
+    "tide": ["low", "medium"]
+},
+{
+    "name": "Sandbags",
+    "latitude": 33.076725,
+    "longitude": -117.310464,
+    "swell": ["W", "NW", "SW", "SSW", "WNW"],
+    "wind": ["E", "NE"],
+    "tide": ["low", "medium"]
+},
+{
+    "name": "Grandview: Proper",
+    "latitude": 33.076397,
+    "longitude": -117.310334,
+    "swell": ["W", "NW", "SW", "SSW", "WNW"],
+    "wind": ["E", "NE"],
+    "tide": ["low", "medium"]
+},
+{
+    "name": "Avocados",
+    "latitude": 33.074587,
+    "longitude": -117.309660,
+    "swell": ["W", "NW", "SW", "SSW", "WNW"],
+    "wind": ["E", "NE"],
+    "tide": ["low", "medium"]
+},
+{
+    "name": "Beacons: North",
+    "latitude": 33.065709,
+    "longitude": -117.305491,
+    "swell": ["W", "NW", "SW", "SSW"],
+    "wind": ["E", "NE"],
+    "tide": ["low", "medium"]
+},
+{
+    "name": "Beacons: Out Front",
+    "latitude": 33.065118,
+    "longitude": -117.305518,
+    "swell": ["W", "NW", "SW", "SSW"],
+    "wind": ["E", "NE"],
+    "tide": ["low", "medium"]
+},
+{
+    "name": "Beacons: Wall",
+    "latitude": 33.064475,
+    "longitude": -117.305172,
+    "swell": ["W", "NW", "SW", "SSW"],
+    "wind": ["E", "NE"],
+    "tide": ["low", "medium"]
+},
+{
+    "name": "D Street: North",
+    "latitude": 33.046486,
+    "longitude": -117.298161,
+    "swell": ["W", "WNW", "NW", "SW"],
+    "wind": ["E", "NE"],
+    "tide": ["low", "medium"]
+},
+{
+    "name": "D Street: Diamond House",
+    "latitude": 33.044860,
+    "longitude": -117.297763,
+    "swell": ["W", "WNW", "NW", "SW"],
+    "wind": ["E", "NE"],
+    "tide": ["low", "medium"]
+},
+{
+    "name": "D Street: Hollywood Squares",
+    "latitude": 33.040801,
+    "longitude": -117.296827,
+    "swell": ["W", "WNW", "NW", "SW"],
+    "wind": ["E", "NE"],
+    "tide": ["low", "medium"]
+},
+{
+    "name": "Boneyards",
+    "latitude": 33.035698,
+    "longitude": -117.294805,
+    "swell": ["W", "NW"],
+    "wind": ["E"],
+    "tide": ["low", "medium"]
+},
+{
+    "name": "Swamis",
+    "latitude": 33.034592,
+    "longitude": -117.292734,
+    "swell": ["W", "NW"],
+    "wind": ["E"],
+    "tide": ["low", "medium"]
+},
+{
+    "name": "Brown House",
+    "latitude": 33.029250,
+    "longitude": -117.289086,
+    "swell": ["W", "NW", "SW"],
+    "wind": ["E", "NE"],
+    "tide": ["low"]
+},
+{
+    "name": "Pipes",
+    "latitude": 33.026892,
+    "longitude": -117.287915,
+    "swell": ["W", "NW", "SW"],
+    "wind": ["E", "NE"],
+    "tide": ["low"]
+},
+{
+    "name": "Traps",
+    "latitude": 33.025580,
+    "longitude": -117.287165,
+    "swell": ["NW","W"],
+    "wind": ["E"],
+    "tide": ["low"]
+},
+{
+    "name": "Barneys",
+    "latitude": 33.024607,
+    "longitude": -117.286618,
+    "swell": ["NW","W"],
+    "wind": ["E"],
+    "tide": ["low"]
+},
+{
+    "name": "Turtles",
+    "latitude": 33.024224,
+    "longitude": -117.286431,
+    "swell": ["NW","W"],
+    "wind": ["E"],
+    "tide": ["low"]
+},
+{
+    "name": "85s",
+    "latitude": 33.020604,
+    "longitude": -117.284885,
+    "swell": ["NW","W"],
+    "wind": ["E"],
+    "tide": ["low"]
+},
+{
+    "name": "Tippers",
+    "latitude": 33.017004,
+    "longitude": -117.282893,
+    "swell": ["NW","W"],
+    "wind": ["E"],
+    "tide": ["low"]
+},
+{
+    "name": "Suckouts",
+    "latitude": 33.016164,
+    "longitude": -117.282229,
+    "swell": ["NW","W"],
+    "wind": ["E"],
+    "tide": ["low"]
+},
+{
+    "name": "Cardiff Reef",
+    "latitude": 33.015631,
+    "longitude": -117.282085,
+    "swell": ["NW","W"],
+    "wind": ["E"],
+    "tide": ["low", "medium"]
+},
+{
+    "name": "Cardiff Reef South",
+    "latitude": 33.014520,
+    "longitude": -117.281458,
+    "swell": ["NW","W"],
+    "wind": ["E"],
+    "tide": ["low", "medium"]
+},
+{
+    "name": "Georges",
+    "latitude": 33.010952,
+    "longitude": -117.280085,
+    "swell": ["NW","W"],
+    "wind": ["E"],
+    "tide": ["low"]
+},
+{
+    "name": "Bus Stops",
+    "latitude": 33.004533,
+    "longitude": -117.278871,
+    "swell": ["NW","W"],
+    "wind": ["E"],
+    "tide": ["low"]
+},
+{
+    "name": "P-Lots",
+    "latitude": 33.002792,
+    "longitude": -117.278704,
+    "swell": ["NW","W"],
+    "wind": ["E"],
+    "tide": ["low"]
+},
+{
+    "name": "Seaside Reef",
+    "latitude": 33.001613,
+    "longitude": -117.278393,
+    "swell": ["NW","W"],
+    "wind": ["E"],
+    "tide": ["low"]
+},
+{
+    "name": "Palis",
+    "latitude": 33.000762,
+    "longitude": -117.278478,
+    "swell": ["NW","W"],
+    "wind": ["E"],
+    "tide": ["low"]
+},
+{
+    "name": "Tabletops",
+    "latitude": 32.999399,
+    "longitude": -117.278167,
+    "swell": ["NW","W"],
+    "wind": ["E"],
+    "tide": ["low"]
+},
+{
+    "name": "Cherry Hill",
+    "latitude": 32.985469,
+    "longitude": -117.273486,
+    "swell": ["NW","W"],
+    "wind": ["E"],
+    "tide": ["low"]
+},
+{
+    "name": "Rock Piles",
+    "latitude": 32.982007,
+    "longitude": -117.273340,
+    "swell": ["NW","W"],
+    "wind": ["E"],
+    "tide": ["low"]
+},
+{
+    "name": "Del Mar Rivermouth",
+    "latitude": 32.976395,
+    "longitude": -117.270974,
+    "swell": ["SW", "W", "NW"],
+    "wind": ["E"],
+    "tide": ["low", "medium", "high"]
+},
+{
+    "name": "Del Mar: 29th",
+    "latitude": 32.972089,
+    "longitude": -117.269942,
+    "swell": ["SW", "W", "NW"],
+    "wind": ["E"],
+    "tide": ["medium", "high"]
+},
+{
+    "name": "Del Mar: 19th",
+    "latitude": 32.964523,
+    "longitude": -117.268745,
+    "swell": ["SW", "W", "NW"],
+    "wind": ["E"],
+    "tide": ["medium", "high"]
+},
+{
+    "name": "Del Mar: 15th",
+    "latitude": 32.958995,
+    "longitude": -117.268398,
+    "swell": ["SW", "W", "NW"],
+    "wind": ["E"],
+    "tide": ["low", "medium", "high"]
+},
+{
+    "name": "Del Mar: 11th",
+    "latitude": 32.954491,
+    "longitude": -117.267320,
+    "swell": ["SW", "W", "NW"],
+    "wind": ["E"],
+    "tide": ["low", "medium", "high"]
+},
+{
+    "name": "Del Mar: 8th",
+    "latitude": 32.951322,
+    "longitude": -117.266138,
+    "swell": ["SW", "W", "NW"],
+    "wind": ["E"],
+    "tide": ["low", "medium", "high"]
+},
+{
+    "name": "Del Mar: The Mouse Hole",
+    "latitude": 32.942317,
+    "longitude": -117.262772,
+    "swell": ["SW", "W", "NW"],
+    "wind": ["E"],
+    "tide": ["low", "medium", "high"]
+},
+{
+    "name": "Torrey Pines: North",
+    "latitude": 32.938600,
+    "longitude": -117.261978,
+    "swell": ["SW", "WNW", "NW"],
+    "wind": ["NE", "E", "SE"],
+    "tide": ["medium", "high"]
+},
+{
+    "name": "Torrey Pines: South",
+    "latitude": 32.925971,
+    "longitude": -117.25968,
+    "swell": ["SW", "WNW", "NW"],
+    "wind": ["NE", "E", "SE"],
+    "tide": ["medium", "high"]
+},
+{
+    "name": "Blacks",
+    "latitude": 32.881882,
+    "longitude": -117.252467,
+    "swell": ["W","NW", "SW"],
+    "wind": ["E", "SE"],
+    "tide": ["low", "medium"]
+},
+{
+    "name": "Scripps",
+    "latitude": 32.865358,
+    "longitude": -117.254981,
+    "swell": ["W", "NW", "SW"],
+    "wind": ["E", "SE", "S"],
+    "tide": ["medium"]
+},
+{
+    "name": "La Jolla Shores",
+    "latitude": 32.858424,
+    "longitude": -117.256791,
+    "swell": ["W", "NW"],
+    "wind": ["E"],
+    "tide": ["medium"]
+},
+{
+    "name": "Mission Drive",
+    "latitude": 32.790505,
+    "longitude": -117.255297,
+    "swell": ["W", "NW", "SW"],
+    "wind": ["E", "S"],
+    "tide": ["medium"]
+},
+{
+    "name": "Mission: San Fernando",
+    "latitude": 32.767649,
+    "longitude": -117.252731,
+    "swell": ["W", "NW", "SW"],
+    "wind": ["E", "S"],
+    "tide": ["medium"]
+},
+{
+    "name": "South Mission Jetti",
+    "latitude": 32.759582,
+    "longitude": -117.254073,
+    "swell": ["W", "NW", "SW"],
+    "wind": ["E", "S"],
+    "tide": ["medium"]
+},
+{
+    "name": "OB Jetti",
+    "latitude": 32.754755,
+    "longitude": -117.253815,
+    "swell": ["W", "NW", "SW"],
+    "wind": ["E"],
+    "tide": ["medium"]
+},
+{
+    "name": "OB Avalanche",
+    "latitude": 32.751873,
+    "longitude": -117.252972,
+    "swell": ["W", "NW", "SW"],
+    "wind": ["E"],
+    "tide": ["medium"]
+},
+{
+    "name": "OB Pier",
+    "latitude": 32.747869,
+    "longitude": -117.253615,
+    "swell": ["W", "NW", "SW"],
+    "wind": ["E"],
+    "tide": ["medium"]
+},
+{
+    "name": "Loscombs",
+    "latitude": 32.725570,
+    "longitude": -117.258111,
+    "swell": ["W", "NW", "SW"],
+    "wind": ["E"],
+    "tide": ["medium"]
+},
+{
+    "name": "Rosarito: Pemex Smoke Stacks",
+    "latitude": 32.370379,
+    "longitude": -117.076403,
+    "swell": ["S", "SW"],
+    "wind": ["E"],
+    "tide": ["medium"]
+},
+{
+    "name": "Rosarito: Peir",
+    "latitude": 32.333760,
+    "longitude": -117.056838,
+    "swell": ["S", "SW"],
+    "wind": ["E"],
+    "tide": ["medium"]
+},
+{
+    "name": "K-38s",
+    "latitude": 32.259594,
+    "longitude": -116.987307,
+    "swell": ["S", "SW", "W", "WNW"],
+    "wind": ["NE","E"],
+    "tide": ["medium", "low"]
+},
+{
+    "name": "Gaviotas",
+    "latitude": 32.252500,
+    "longitude": -116.961600,
+    "swell": ["S", "SW", "W", "WNW"],
+    "wind": ["NE", "ENE", "E", "ESE", "SE"],
+    "tide": ["high", "medium", "low"]
+},
+{
+    "name": "La Fonda",
+    "latitude": 32.121058,
+    "longitude": -116.885713,
+    "swell": ["SW", "W"],
+    "wind": ["E"],
+    "tide": ["medium", "low"]
+},
+{
+    "name": "Punta Baja",
+    "latitude": 29.954293,
+    "longitude": -115.807737,
+    "swell": ["SW", "SSW", "S", "WNW", "W"],
+    "wind": ["N", "NE"],
+    "tide": ["high", "medium", "low"]
+},
+{
+    "name": "Elijandros",
+    "latitude": 28.706507,
+    "longitude": -114.288678,
+    "swell": ["W", "WNW", "NW"],
+    "wind": ["N", "NE", "E", "NW"],
+    "tide": ["high", "medium", "low"]
+},
+{
+    "name": "Harbor",
+    "latitude": 28.666795,
+    "longitude": -114.239317,
+    "swell": ["WNW", "NW"],
+    "wind": ["N"],
+    "tide": ["medium", "low"]
+},
+{
+    "name": "Notch",
+    "latitude": 28.666800,
+    "longitude": -114.224431,
+    "swell": ["WNW", "NW"],
+    "wind": ["N"],
+    "tide": ["medium", "low"]
+},
+{
+    "name": "Wall",
+    "latitude": 28.566481,
+    "longitude": -114.158590,
+    "swell": ["W", "WNW", "NW"],
+    "wind": ["N", "NE", "ENE"],
+    "tide": ["high", "medium", "low"]
+},
+{
+    "name": "Abreojos",
+    "latitude": 26.722327,
+    "longitude": -113.546932,
+    "swell": ["S"],
+    "wind": ["N", "NE"],
+    "tide": ["high", "medium"]
+},
+{
+    "name": "Abreojos: 3 pole",
+    "latitude": 26.727440,
+    "longitude": -113.545537,
+    "swell": ["S"],
+    "wind": ["N", "NE"],
+    "tide": ["high", "medium"]
+},
+{
+    "name": "Abreojos: Razors",
+    "latitude": 26.728834,
+    "longitude": -113.546288,
+    "swell": ["S"],
+    "wind": ["N", "NE"],
+    "tide": ["high", "medium"]
+},
+{
+    "name": "Scorpion Bay",
+    "latitude": 26.239488,
+    "longitude": -112.477709,
+    "swell": ["S", "SE"],
+    "wind": ["N"],
+    "tide": ["high", "medium", "low"]
+},
+{
+    "name": "Estuary",
+    "latitude": 23.050415,
+    "longitude": -109.678612,
+    "swell": ["S", "SE"],
+    "wind": ["N"],
+    "tide": ["high", "medium", "low"]
+},
+{
+    "name": "Colorados",
+    "latitude": 11.406466,
+    "longitude": -86.048310,
+    "swell": ["SW"],
+    "wind": ["E", "NE"],
+    "tide": ["high", "medium"]
+}]

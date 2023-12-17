@@ -11,10 +11,10 @@ const VideoItem = ({videoObj, onVideoSelect}) => {
 
     return (
         <div className='flexContainer button p-10 lowerBorder pointer color-yellow' onClick={() => onVideoSelect(videoObj)}>
-            <div className="flex2Column columnRight">
+            <div className="flex2Column columnRightAlign">
                 <img alt={title} src={thumb} />
             </div>
-            <div className="flex2Column columnLeft pl-10">
+            <div className="flex2Column columnLeftAlign pl-10">
                 <div className='copyright bold'>{channel}</div>
                 <div className='small bold white'>{title}</div>
                 <div className='copyright'>{publishDate}</div>
