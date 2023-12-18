@@ -60,27 +60,40 @@ const ExchangeConverter = () => {
             </div>
             <div className='bg-tinted r-10 p-20 ml-20 mr-20 mb-1 bold'>
                 <div className='size20 color-lite'>
-                    <label className='flexContainer'>
-                        <div className="flex2Column m-10 columnRightAlign size25">
-                            {!isToUsd ? 'To:' : 'From:'}
+                    <label className='flexContainer containerInput'>
+                        <div className='columnRightAlign'>
+                            <span className='inputText'>
+                                {!isToUsd ? 'To:' : 'From:'}
+                            </span>
                         </div>
-                        <select className='dualVideoPlayer color-white bg-dark p-10 r-10 mt-20 mb-10 width-auto' value={selectedCurrency} onChange={handleCurrencyChange}>
-                            <option value="MXN">Mexican Peso ({Number(exchangeRates.MXN).toFixed(3)})</option>
-                            <option value="NIO">Nicaraguan Córdoba ({Number(exchangeRates.NIO).toFixed(3)})</option>
-                            <option value="CRC">Costa Rican Colone ({Number(exchangeRates.CRC).toFixed(3)})</option>
-                            <option value="IDR">Indonesian Rupiah ({Number(exchangeRates.IDR).toFixed(3)})</option>
-                            <option value="AUD">Australian Dollar ({Number(exchangeRates.AUD).toFixed(3)})</option>
-                        </select>
+                        <div className='columnLeftAlign'>
+                            <select className='inputSelect' value={selectedCurrency} onChange={handleCurrencyChange}>
+                                <option value="MXN">Mexican Peso ({Number(exchangeRates.MXN).toFixed(3)})</option>
+                                <option value="NIO">Nicaraguan Córdoba ({Number(exchangeRates.NIO).toFixed(3)})</option>
+                                <option value="CRC">Costa Rican Colone ({Number(exchangeRates.CRC).toFixed(3)})</option>
+                                <option value="IDR">Indonesian Rupiah ({Number(exchangeRates.IDR).toFixed(3)})</option>
+                                <option value="AUD">Australian Dollar ({Number(exchangeRates.AUD).toFixed(3)})</option>
+                            </select>
+                        </div>
                     </label>
                 </div>
             </div>
             <div className='bg-tinted r-10 p-20 mr-20 ml-20 bold'>
                 <div className='size20 color-lite'>
-                    <label className='flexContainer'>
-                        <div className="flex2Column m-10 columnRightAlign size25">
-                            {isToUsd ? `${currencyConverting()}: $` : 'US Dollars: $'}
+                    <label className='flexContainer containerInput'>
+                        <div className='columnRightAlign'>
+                            <span className='inputText'>
+                                {isToUsd ? `${currencyConverting()}: $` : 'US Dollars: $'}
+                            </span>
                         </div>
-                        <input className='width-auto flex2Column columnLeftAlign dualVideoPlayer p-10 r-10 color-white bg-dark' type='number' value={usdAmount} onChange={handleInputChange} />
+                        <div className='columnLeftAlign width-50-percent'>
+                            <input
+                                className='inputField' 
+                                type='number' 
+                                value={usdAmount} 
+                                onChange={handleInputChange} 
+                            />
+                        </div>
                     </label>
                 </div>
             </div>

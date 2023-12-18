@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import getKey from '../utils/KeyGenerator.js';
 import Sounds from '../utils/Sounds.js';
-import { SettingsApplicationsOutlined } from '@material-ui/icons';
 
 export default function Todos(props) {
     const initTodos = [
@@ -40,6 +39,8 @@ export default function Todos(props) {
     const todoInput = () => document.getElementById('todo').value;
     const clearInput = () => document.getElementById('todo').value = '';
     const getNewTodo = (todo) => todo.charAt(0).toUpperCase() + todo.slice(1);
+    const [clock, setClock] = useState('00:00:00');
+    const [timerWorker, setTimerWorker] = useState(null);
 
     useEffect(() => {
         storeIt();
@@ -47,6 +48,14 @@ export default function Todos(props) {
         setTimerOn(timerActive);
     }, [todos]);
     
+    useEffect(() => {
+        if (timerWorker !== null) {
+          timerWorker.onmessage = (event) => {
+             setClock(event.data);
+          }
+        }
+    }, [timerWorker]);
+
     useEffect(() => {
         let intervalId;
         if (timerOn) {
@@ -117,13 +126,13 @@ export default function Todos(props) {
         Sounds.playSound(0, 1);
     }
     const timerTodo = (id) => {
-        console.log(`edit todo: ${todos[id].description} time:${todos[id].time/60}`);
+        console.log(`edit todo: ${todos[id].description} time:${todos[id].time / 60}`);
         const newTodos = [...todos];
         newTodos[id].type = 'timer';
-        newTodos[id].time = todos[id].time/60;
+        newTodos[id].time = todos[id].time / 60;
         const modifiedTodo = prompt('enter time (minutes): ', newTodos[id].time);
-        newTodos[id].time = (Number(modifiedTodo*60));
-        newTodos[id].currentTime = (Number(modifiedTodo*60));
+        newTodos[id].time = (Number(modifiedTodo * 60));
+        newTodos[id].currentTime = (Number(modifiedTodo * 60));
         setTodos(newTodos);
         setEdit(!edit);
         Sounds.playSound(0, 1);
@@ -138,6 +147,38 @@ export default function Todos(props) {
         setTodos(newTodos);
         Sounds.playSound(0, 1);
     }
+    ///////////////////
+
+
+
+
+
+
+    const startTimer = () => {
+        if (typeof (Worker) !== 'undefined') {
+            if (timerWorker == null) {
+                const worker = new Worker("timerWorker.js");
+                setTimerWorker(worker);
+            }
+        } else {
+            // Web workers are not supported by your browser
+            setClock("Web Workers not supported...");
+        }
+    }
+
+    const stopTimer = () => {
+        if (timerWorker != null) {
+            timerWorker.terminate();
+            //timerStart = true;
+            setTimerWorker(null);
+        }
+    }
+
+
+
+
+
+    //////////////
     const formatTime = (timeInSeconds) => {
         const hours = Math.floor(timeInSeconds / 3600);
         const minutes = Math.floor((timeInSeconds % 3600) / 60);
@@ -149,11 +190,11 @@ export default function Todos(props) {
     };
     const getClock = (id) => {
         const todoTime = todos[id].currentTime;
-        return <div className='m-5 r-10 bg-tinted bold size25 p-20 color-lite'>
-                    <span>
-                        {formatTime(todoTime)}
-                    </span>
-                </div>
+        return <div className='containerBox bold color-lite p-30'>
+            <span className='size40'>
+                {formatTime(todoTime)}
+            </span>
+        </div>
     }
     function makeMenu() {
         const makeMenu = (menu) => menu.map(item => <div className='button bg-green r-10 m-5 p-5'>{item}</div>);
@@ -182,7 +223,7 @@ export default function Todos(props) {
             const newPausedTodos = [...todos];
             localStorage.setItem('pausedTodos', JSON.stringify(newPausedTodos))
             setPausedTodos(JSON.parse(localStorage.getItem('pausedTodos')));
-            newTodos.map((todo,index) => {
+            newTodos.map((todo, index) => {
                 todo.activated = false;
             })
         } else {
@@ -215,10 +256,19 @@ export default function Todos(props) {
     }
     return (
         <div className='mt--30'>
+            <div className='containerBox'>
+                <div className='flex2Column p-10 m-10 r-10 bg-dark color-neogreen bold'>
+                    {clock}
+                </div>
+            </div>
+            <div className='containerBox'>
+                <button className='flex2Column button p-10 m-10 r-10 bg-green color-lite bold' onClick={() => startTimer()} id="button1">Start</button>
+                <button className='flex2Column button p-10 m-10 r-10 bg-dkRed color-lite bold' onClick={() => stopTimer()} id="button2">Stop</button>
+            </div>
             <div className='color-yellow p-5 r-10'>
-                <div className='p-5 r-10 bg-tinted'>
-                    <label className='flexContainer'>
-                        <input className='ht-30 m-5 flex2Column contentCenter p-15 r-10 bg-darker color-white bold size25' type='text' id='todo' name='todo' placeholder='Enter a todo' onKeyDown={handleKeyDown} />
+                <div className='containerBox'>
+                    <label className='flexContainer containerInput'>
+                        <input className='inputField p-15 bold size25 r-10' type='text' id='todo' name='todo' placeholder='Enter a todo' onKeyDown={handleKeyDown} />
                         {/*<button className='r-10 greet bold bg-green m-5 p-20 flex2Column10Percent contentCenter' onClick={() => addTodo()}>ADD</button>*/}
                     </label>
                 </div>
@@ -226,34 +276,34 @@ export default function Todos(props) {
             <div className='p-5 r-10'>
                 <div id='list' className='p-5 r-10 bg-tinted'>
                     {todos.map((todo, index) => (
-                        <div key={getKey('todo')} className='p-10 bg-tinted r-10 m-5'>
+                        <div key={getKey('todo')} className='p-10 m-5 containerBox bold color-lite'>
                             <div className='color-lite size25 r-10'>
-                                    <div className='width-100-percent p-20 contentLeft bg-tinted r-10 mb-1'>
-                                        <input className='regular-checkbox button mr-10' checked={todo.completed} type='checkbox' id='completed' onChange={() => toggleCheckbox(index)} />
-                                        {todo.description}
-                                    </div>
+                                <div className='width-100-percent p-20 contentLeft bg-tinted r-10 mb-1'>
+                                    <input className='regular-checkbox button mr-10' checked={todo.completed} type='checkbox' id='completed' onChange={() => toggleCheckbox(index)} />
+                                    <span className='size40'>{todo.description}</span>
+                                </div>
                                 <div>
                                     {
                                         ((todo.type == 'timer' || todo.type == 'track') && !edit)
-                                        ? <div className='flexContainer r-10'>
-                                            <button id={`toggleTimer${index}`} name={`toggleTimer${todo.description}`} className={`width-100-percent r-10 p-15 greet bold bg-tinted ${(todo.activated)?'bg-dkRed color-red':'bg-dkGreen color-neogreen'}`} onClick={() => toggleTimer(index)}>
-                                                {(todo.activated)?'STOP':'START'}
-                                            </button>
-                                            <div className='flex2Column'>
-                                                {getClock(index)}
+                                            ? <div className='flexContainer r-10'>
+                                                <button id={`toggleTimer${index}`} name={`toggleTimer${todo.description}`} className={`size40 width-100-percent r-10 p-15 greet bold bg-tinted ${(todo.activated) ? 'bg-dkRed color-red' : 'bg-dkGreen color-neogreen'}`} onClick={() => toggleTimer(index)}>
+                                                    {(todo.activated) ? 'STOP' : 'START'}
+                                                </button>
+                                                <div className='flex2Column'>
+                                                    {getClock(index)}
+                                                </div>
                                             </div>
-                                        </div>
-                                        : null
+                                            : null
                                     }
                                     {
                                         (edit)
-                                        ? <div className='flexContainer'>
-                                            <button id={`setTimert${index}`} name={`setTimer${todo.description}`} className='r-10 p-15 greet bold bg-tinted m-5 color-lite' onClick={() => timerTodo(index)}>set timer</button>
-                                            <button id={`time${index}`} name={`time${todo.description}`} className='r-10 p-15 greet bold bg-tinted m-5 color-lite' onClick={() => trackTodo(index)}>track time</button>
-                                            <button id={`edit${index}`} name={`edit${todo.description}`} className='r-10 p-15 greet bold bg-tinted m-5 color-lite' onClick={() => editTodo(index)}>edit</button>
-                                            <button id={`remove${index}`} name={`remove${todo.description}`} className='r-10 p-15 greet bold bg-tinted m-5 color-lite' onClick={() => removeTodo(index)}>X</button>
-                                        </div>
-                                        : null
+                                            ? <div className='flexContainer'>
+                                                <button id={`setTimert${index}`} name={`setTimer${todo.description}`} className='r-10 p-15 greet bold bg-tinted m-5 color-lite' onClick={() => timerTodo(index)}>set timer</button>
+                                                <button id={`time${index}`} name={`time${todo.description}`} className='r-10 p-15 greet bold bg-tinted m-5 color-lite' onClick={() => trackTodo(index)}>track time</button>
+                                                <button id={`edit${index}`} name={`edit${todo.description}`} className='r-10 p-15 greet bold bg-tinted m-5 color-lite' onClick={() => editTodo(index)}>edit</button>
+                                                <button id={`remove${index}`} name={`remove${todo.description}`} className='r-10 p-15 greet bold bg-tinted m-5 color-lite' onClick={() => removeTodo(index)}>X</button>
+                                            </div>
+                                            : null
                                     }
                                 </div>
                             </div>
@@ -261,7 +311,7 @@ export default function Todos(props) {
                     ))}
                     {/*makeMenu()*/}
                     <div className='button color-lite r-10 bg-lite m-5 bold flex3Column p-20 size25 columnCenterAlign' onClick={() => togglePause()}>
-                            {(paused)?'UNPAUSE':'PAUSE ALL CLOCKS'}
+                        {(paused) ? 'UNPAUSE' : 'PAUSE ALL CLOCKS'}
                     </div>
                     <div className='flexContainer'>
                         <div className='button color-neogreen r-10 bg-dkGreen m-5 bold flex3Column p-20 size25 columnCenterAlign' onClick={() => reset()}>
