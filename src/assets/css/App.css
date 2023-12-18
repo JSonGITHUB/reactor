@@ -674,7 +674,7 @@ select {
   font-size: 30px;
 }
 .size35 {
-  font-size: 30px;
+  font-size: 35px;
 }
 
 .size40 {
@@ -1103,8 +1103,7 @@ select {
 }
 input {
   border-radius: 3px;
-  max-width: 230px;
-  /*
+  /*max-width: 230px;
   color:#dddddd;
   border-color: #222222;
   background: #222222;
