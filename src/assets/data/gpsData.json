@@ -32,7 +32,7 @@
     "tide": ["medium"]
 },
 {
-    "name": "HB: North Peir",
+    "name": "HB: North Pier",
     "latitude": 33.655927,
     "longitude": -118.003874,
     "swell": ["SSE", "S", "SW", "WSW", "W", "WNW"],
@@ -40,7 +40,7 @@
     "tide": ["medium"]
 },
 {
-    "name": "HB: South Peir",
+    "name": "HB: South Pier",
     "latitude": 33.655534,
     "longitude": -118.003145,
     "swell": ["SSE", "S", "SW", "WSW", "W", "WNW"],
@@ -256,7 +256,7 @@
     "tide": ["low", "medium"]
 },
 {
-    "name": "D Street: North",
+    "name": "D St.: North",
     "latitude": 33.046486,
     "longitude": -117.298161,
     "swell": ["W", "WNW", "NW", "SW"],
@@ -264,7 +264,7 @@
     "tide": ["low", "medium"]
 },
 {
-    "name": "D Street: Diamond House",
+    "name": "D St.: Diamond House",
     "latitude": 33.044860,
     "longitude": -117.297763,
     "swell": ["W", "WNW", "NW", "SW"],
@@ -272,7 +272,7 @@
     "tide": ["low", "medium"]
 },
 {
-    "name": "D Street: Hollywood Squares",
+    "name": "D St.: Hollywood Squares",
     "latitude": 33.040801,
     "longitude": -117.296827,
     "swell": ["W", "WNW", "NW", "SW"],
@@ -488,7 +488,7 @@
     "tide": ["low", "medium", "high"]
 },
 {
-    "name": "Del Mar: The Mouse Hole",
+    "name": "Del Mar: Mouse Hole",
     "latitude": 32.942317,
     "longitude": -117.262772,
     "swell": ["SW", "W", "NW"],
@@ -600,7 +600,7 @@
     "tide": ["medium"]
 },
 {
-    "name": "Rosarito: Peir",
+    "name": "Rosarito: Pier",
     "latitude": 32.333760,
     "longitude": -117.056838,
     "swell": ["S", "SW"],
@@ -639,6 +639,7 @@
     "wind": ["N", "NE"],
     "tide": ["high", "medium", "low"]
 },
+/*
 {
     "name": "Elijandros",
     "latitude": 28.706507,
@@ -703,6 +704,7 @@
     "wind": ["N"],
     "tide": ["high", "medium", "low"]
 },
+*/
 {
     "name": "Estuary",
     "latitude": 23.050415,

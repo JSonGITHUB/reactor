@@ -1,21 +1,30 @@
-import React, { useState } from "react";
-import Timer from "./utils/Timer.js";
-import Geolocator from "./utils/Geolocator.js";
+import React, { useState } from 'react';
+import Timer from './utils/Timer';
+import Geolocator from './location/Geolocator';
+import NavItems from './site/NavItems';
+import getKey from './utils/KeyGenerator';
+import icons from './site/icons';
+
+//import Menu from './site/Menu';
 
 const Home = () => {
+
   const [longitude, setLongitude] = useState(null);
   const [latitude, setLatitude] = useState(null);
   const [distance, setDistance] = useState(0);
   const [tracking, setTracking] = useState(false);
   const [markedLongitude, setMarkedLongitude] = useState(null);
   const [markedLatitude, setMarkedLatitude] = useState(null);
+  //const [menuOpen, setMenuOpen] = useState(false);
+
+  const menuItems = NavItems.slice(1);
 
   const calculateDistance = () => {
     const lat1 = markedLatitude;
     const lat2 = latitude;
     const lon1 = markedLongitude;
     const lon2 = longitude;
-    let unit = "feet";
+    let unit = 'feet';
     console.log(
       `lat1: ${lat1} === lat2: ${lat2}) && (lon1: ${lon1} === lon2: ${lon2}`
     );
@@ -40,10 +49,10 @@ const Home = () => {
       dist = (dist * 180) / Math.PI;
       dist = dist * 60 * 1.1515;
       dist = dist < 0.25 ? feetOrYards(dist) : `${dist.toFixed(2)} miles`;
-      if (unit === "Kilometers") {
+      if (unit === 'Kilometers') {
         dist = dist * 1.609344;
       }
-      if (unit === "Nautical") {
+      if (unit === 'Nautical') {
         dist = dist * 0.8684;
       }
       console.log(`DISTANCE => ${dist}`);
@@ -72,11 +81,12 @@ const Home = () => {
     const tracker =
       tracking === true ? (
         <div className='containerBox'>
-          <div className="color-neogreen p-20 bold bigHeader bg-dkGreen r-5 m-20">
+          <div className='color-neogreen p-20 bold bigHeader bg-dkGreen r-5 m-20'>
             {getDistance()}
           </div>
           <div
-            className="size20 bold button p-20 r-5 m-20 bg-red incompletedSelector color-yellow"
+            title='stop tracking'
+            className='size20 bold button p-20 r-5 m-20 bg-red incompletedSelector color-yellow'
             onClick={stopTracking}
           >
             Stop Tracking
@@ -84,11 +94,12 @@ const Home = () => {
         </div>
       ) : (
         <div className='containerBox'>
-          <div className="color-neogreen p-20 bold bigHeader bg-dkGreen r-5 m-20">
+          <div className='color-neogreen p-20 bold bigHeader bg-dkGreen r-5 m-20'>
             {distance}
           </div>
           <div
-            className="size20 bold button p-20 r-5 m-20 bg-neogreen completedSelector color-black"
+            title='start tracking'
+            className='size20 bold button p-20 r-5 m-20 bg-neogreen completedSelector color-black'
             onClick={startDistance}
           >
             Start Tracking
@@ -98,29 +109,55 @@ const Home = () => {
 
     return tracker;
   };
+  const classes = 'containerBox button bg-lite w-150 height-100 ml-auto mr-10 mt-10 mb-10';
 
-  return (<div>
-            <div className="containerBox color-lite">
-              <div className="containerBox">
-                <div className='button p-20 bold size20 r-10 bg-dkGreen' onClick={()=>window.location="https://jsongithub.github.io/portfolio/"}>
-                    portfolio
-                </div>
-              </div>
-              <div className="containerBox">
-                <Timer />
-              </div>
-              <div className='containerBox'>
-                <div className='p-10 size20 bold'>
-                  Current position:
-                </div>
-                <Geolocator
-                  currentPositionExists="false"
-                  returnCurrentPosition={updateCurrentLocation}
-                />
-              </div>
-              {getTracker()}
-            </div>
+  const portraitButton = (label) => <div
+    className='ml-auto pl-10 pr-10 mr-auto'
+    title={`${label}`}
+    key={getKey('homeLink')}
+    onClick={() => window.location = `/reactor/${label}`}
+  >
+    <div key={getKey(label)} className={classes}>
+      <div className='size30 m-10 mt-20'>
+        {icons[String(label).toLowerCase()]}
+      </div>
+      <div className='color-yellow'>
+        {label}
+      </div>
+    </div>
+  </div>;
+
+  return (
+    <div className=''>
+      <div className='containerBox size20 bold'>
+        {
+          /*Current position:
+          <Geolocator
+            currentPositionExists='false'
+            returnCurrentPosition={updateCurrentLocation}
+          />*/
+        }
+        <div className='containerBox bg-gren'>
+          <Timer />
+        </div>
+      </div>
+      {/*<Menu closeMenu={closeMenu} />*/}
+      <div className='containerBoxNoPad waveBackground bg-dark width-100-20 mt-10'>
+        <div className='containerFade'>
+          <div className='menu-container containerBox'>
+            {menuItems.map((item, index) => portraitButton(item))}
           </div>
+        </div>
+      </div>
+      <div className='containerBox'>
+        <div className='containerBox'>
+          <div className='button p-20 bold size20 r-10 bg-dkGreen' onClick={() => window.location = 'https://jsongithub.github.io/portfolio/'}>
+            portfolio
+          </div>
+        </div>
+        {/*getTracker()*/}
+      </div>
+    </div>
   );
 };
 

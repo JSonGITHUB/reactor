@@ -1,7 +1,7 @@
 import React, { useState, useRef, useImperativeHandle, forwardRef, useEffect } from 'react';
 import VideoPlayer from './VideoPlayer';
 
-const DualVideoPlayer = forwardRef(({ src1, src2}, ref) => {
+const Video = forwardRef(({ src1, src2}, ref) => {
 
   const [currentTime1, setCurrentTime1] = useState(0);
   const [currentTime2, setCurrentTime2] = useState(0);
@@ -189,4 +189,4 @@ const DualVideoPlayer = forwardRef(({ src1, src2}, ref) => {
   );
 });
 
-export default DualVideoPlayer;
+export default Video;

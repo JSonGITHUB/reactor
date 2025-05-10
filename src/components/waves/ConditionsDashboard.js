@@ -1,38 +1,113 @@
-import React from 'react';
-import WaterTemp from './WaterTemp.js';
-import AirTemp from './AirTemp.js';
-import WindDirection from './WindDirection.js';
-import Sunset from './Sunset.js';
-import BuoyReport from './BuoyReport.js';
-import BuoyData from './BuoyData.js';
+import React, { useState, useEffect, useContext } from 'react';
+import WaterTemp from './WaterTemp';
+import AirTemp from './AirTemp';
+import WindDirection from './WindDirection';
+import SunTracker from './SunTracker';
+import CollapseToggleButton from '../utils/CollapseToggleButton';
+import BuoysDisplay from './BouysDisplay';
+import icons from '../site/icons';
+import SwellDisplay from './SwellDisplay';
+import initializeData from '../utils/InitializeData';
+import useCurrentTime from '../utils/useCurrentTime';
+import { OceanContext } from '../context/OceanContext';
 
-const ConditionsDashboard = ({tideDisplay, setWind}) => {
+const ConditionsDashboard = ({
+    tideDisplay
+}) => {
 
+    const {
+        status,
+        setStatus,
+        setWind
+    } = useContext(OceanContext);
+
+    const getLocalData = (localItem) => initializeData(localItem, 'false');
+    const collapseStateInit = (localItem) => getLocalData(localItem) ? getLocalData(localItem) === 'true' : true;
+    const [conditionCollapse, setConditionCollapse] = useState(collapseStateInit('conditionCollapse'));
+    const [buoyCollapse, setBuoyCollapse] = useState(collapseStateInit('buoyCollapse'));
+    
+    //console.log(`ConditionsDashboard => status: ${JSON.stringify(status, null, 2)}`)
+    const time = useCurrentTime();
+    
+    useEffect(() => {
+        localStorage.setItem('conditionCollapse', conditionCollapse);
+    }, [conditionCollapse]);
+    useEffect(() => {
+        localStorage.setItem('buoyCollapse', buoyCollapse);
+    }, [buoyCollapse]);
+
+    const windDisplay = () => <WindDirection columns='2' setWind={setWind} height='0px' collapse={conditionCollapse}/>
+    const windHeader = () => <div>
+            {icons.wind} {status.windDirection} {status.windGusts}
+            <span className='size12'>
+                mph
+            </span> 
+            {icons.water}{initializeData('waterTemp', 0)}°
+            <span className='size12'>
+                F
+            </span> 
+            {icons.temperature} {initializeData('airTemp', 0)}°
+            <span className='size12'>
+                F
+            </span>
+        </div>
+    
+    const swellDisplay = () => <SwellDisplay
+        time={time}
+        //status={status}
+        //setStatus={setStatus}
+    />
     return (
-        <div className='m-10'>
-            <div className="r-10 bg-tinted p-10 m-5">
-                <div className='bold color-yellow p-10 r-10 bg-tinted'>TIDE</div>
-                <div>{tideDisplay('wide')}</div>
+        <div className=''>
+            {swellDisplay()}
+            {tideDisplay('wide')}
+            <div className='containerBox bold color-yellow bg-lite p-20'>
+                <CollapseToggleButton
+                    title={''}
+                    component={windHeader()}
+                    isCollapsed={conditionCollapse}
+                    setCollapse={setConditionCollapse}
+                    align='left'
+                />
             </div>
-            <div className="r-10 bg-tinted p-10 m-5">
-                <div className='bold color-yellow p-10 r-10 bg-tinted'>WIND</div>
-                <WindDirection columns="2" setWind={setWind} height='157px'/>
-            </div>
-            <div className="flexContainer">
-                <div className="flex2Column p-10 r-10 color-lite bg-tinted m-5">
-                    {/*getWaterTempIcon*/}
-                    <div className="bold color-yellow p-10 r-10 bg-tinted">WATER</div>
-                    <WaterTemp/>
+            <div className={`${(conditionCollapse)?' hidden ht-0 mb--5':'containerBox'}`}>
+                <div className='flexContainer'>
+                    <div className='containerBox flex2Column'>
+                        <div className='containerBox bold color-yellow'>
+                            WIND {icons.wind}
+                        </div>
+                        {windDisplay()}
+                    </div>
+                    <div className='containerBox flex2Column'>
+                        <div className='containerBox bold color-yellow'>
+                            WATER {icons.water}
+                        </div>
+                        <WaterTemp
+                            setStatus={setStatus}
+                        />
+                        <div className='containerBox bold color-yellow'>
+                            AIR {icons.temperature}
+                        </div>
+                        <AirTemp/>
+                    </div>
                 </div>
-                <div className="flex2Column p-10 r-10 color-white bg-tinted m-5">
-                    {/*getAirTempIcon*/}
-                    <div className="bold color-yellow p-10 r-10 bg-tinted">AIR</div>
-                    <AirTemp/>
-                </div>
             </div>
-            <Sunset view='full'/>
-            <BuoyReport />
-            {/*<BuoyData />*/}
+            <SunTracker />
+            <div className='containerBox bold color-yellow bg-lite p-20'>
+                <CollapseToggleButton
+                    title={`${icons.buoys} BUOYS`}
+                    isCollapsed={buoyCollapse}
+                    setCollapse={setBuoyCollapse}
+                    align='left'
+                />
+            </div>
+            {
+                (buoyCollapse)
+                ? null
+                : <BuoysDisplay />
+                /*<BuoyReport />*/
+                /*<LuecadiaRSS/>*/
+            }
         </div>
     )
 }

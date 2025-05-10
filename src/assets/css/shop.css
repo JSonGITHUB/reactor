@@ -300,10 +300,10 @@ select {
     width: 17%;
     text-align: center;
 }
-.flex-container > #aisle {
+/* .flex-container > #aisle {
     width: 32%;
     text-align: center;
-}
+} */
 .itemTitle {
     margin-right:55px;
 }

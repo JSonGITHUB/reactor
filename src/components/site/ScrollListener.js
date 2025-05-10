@@ -25,9 +25,9 @@ const ScrollListener = ({ onScrollToBottom }) => {
 
   useEffect(() => {
 
-    window.addEventListener('scroll', checkScroll);
+    window.addEventListener('scroll', checkScroll, { passive: true });
     return () => {
-      window.removeEventListener('scroll', checkScroll);
+      window.removeEventListener('scroll', checkScroll, { passive: true });
     };
   }, [onScrollToBottom, location.pathname, scrolledToBottom]);
 

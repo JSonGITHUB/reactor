@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Loader from '../utils/Loader.js';
 import TextColorizer from '../utils/TextColorizer.js';
 import getKey from '../utils/KeyGenerator.js';
-import Link from '../Link.js';
+import LinkButton from '../LinkButton.js';
 import HamburgerNav from './HamburgerNav';
 import navItems from './NavItems.js';
 
@@ -15,7 +15,7 @@ const Header = ({ company, width, isMotionOn }) => {
     const navClassesClosed = "width-100-percent navigation mt-2 pointer fadedDark bg-dark";
     const navClassesOpen = "width-100-percent navigation mt-2 pointer fadeInFaded fadedDark bg-dark";
     const navClassesClose = "width-100-percent navigation mt-2 pointer fadeOutFaded faded bg-dark";
-    const landscapeButton = (label) => <Link label={label} href={label} className="fl-left" key={getKey("link")}></Link>;
+    const landscapeButton = (label) => <LinkButton label={label} href={label} className="fl-left" key={getKey("link")}></LinkButton>;
     const logoButton = (label) => <div key={getKey("link")} to="Home"><div className="navButton logoButton">{label}</div></div>;
     const headerLogo = <TextColorizer class='navBranding mt-7' text={company}/>;    
     const isWideScreen = (width >= 1080) ? true : false;

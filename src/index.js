@@ -5,15 +5,13 @@ import './assets/css/index.css';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
-
 import App from './App';
 //import reducers from './reducers/MusicReducers.js';
 //import reducers from './reducers/BlogReducers.js';
-//import reducers from './reducers/StreamReducers.js';
 import reducers from './reducers/SitewideReducers.js';
-
-
 import * as serviceWorker from './webWorkers/serviceWorker';
+import { BrowserRouter as Router } from 'react-router-dom';
+
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const store = createStore(
     reducers, 
@@ -23,7 +21,9 @@ const store = createStore(
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <App />
+      <Router>
+        <App />
+      </Router>
     </Provider>
   </React.StrictMode>,
   document.getElementById('root')

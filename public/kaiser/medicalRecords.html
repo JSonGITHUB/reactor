@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medical Records</title>
+  <link rel="stylesheet" href="http://localhost:3000/reactor/kaiser/styles.css">
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+
+<body>
+
+  <h1>Medical Records</h1>
+
+  <div id="infoContainer">
+    <div id="filterSort flexContainer" class="nav">
+      <div class='container flex3Column'>
+        <label for="genderFilter">Filter Gender:</label>
+        <select id="genderFilter">
+          <option value="">All</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </div>
+      
+      <div class='container flex3Column'>
+        <label for="sortOptions">Sort:</label>
+        <select id="sortOptions">
+          <option value="none">None</option>
+          <option value="age">Age</option>
+          <option value="lastName">Last Name</option>
+          <option value="diagnosis">Diagnosis</option>
+        </select>
+      </div>
+      <div class='container flex3Column' id="countDisplay"></div>
+    </div>
+    <div id="patientInfo" role="region" aria-live="polite" aria-relevant="additions">
+      <!-- Patient records will be dynamically added here -->
+    </div>
+  </div>
+
+
+  <script>
+    $(document).ready(function () {
+      var xmlData; // Variable to store the XML data
+
+      // Load and parse XML data
+      $.ajax({
+        type: "GET",
+        url: "http://localhost:3000/reactor/kaiser/medicalRecords.xml",
+        dataType: "xml",
+        success: function (xml) {
+          xmlData = $(xml); // Convert XML data to jQuery object
+          //displayPatientInfo(xmlData);
+          applyFilterSort()
+        },
+        error: function (xhr, status, error) {
+          console.error("Error loading XML file:", error);
+        }
+      });
+
+      // Event listeners for filter and sort
+      $('#genderFilter, #sortOptions').on('change', function () {
+        applyFilterSort();
+      });
+
+      function applyFilterSort() {
+        var genderFilter = $('#genderFilter').val();
+        var sortOption = $('#sortOptions').val();
+
+        // Filter and sort logic
+        var filteredSortedData = xmlData.find('patient');
+
+        if (genderFilter) {
+          filteredSortedData = filteredSortedData.filter(function () {
+            return $(this).find('gender').text() === genderFilter;
+          });
+        }
+
+        switch (sortOption) {
+          case 'age':
+            filteredSortedData.sort(function (a, b) {
+              var dobA = new Date($(a).find('dob').text());
+              var dobB = new Date($(b).find('dob').text());
+              return dobA - dobB;
+            });
+            break;
+          case 'lastName':
+            filteredSortedData.sort(function (a, b) {
+              var lastNameA = $(a).find('name').text().split(' ').pop();
+              var lastNameB = $(b).find('name').text().split(' ').pop();
+              return lastNameA.localeCompare(lastNameB);
+            });
+            break;
+          case 'diagnosis':
+            filteredSortedData.sort(function (a, b) {
+              var diagnosisA = $(a).find('diagnosis').text();
+              var diagnosisB = $(b).find('diagnosis').text();
+              return diagnosisA.localeCompare(diagnosisB);
+            });
+            break;
+          default:
+          // No sorting
+        }
+
+        // Display the updated list
+        displayPatientInfo(filteredSortedData);
+
+      }
+
+      function displayPatientInfo(data) {
+        // Clear existing patient records
+        $('#patientInfo').empty();
+        $('#countDisplay').empty();
+
+
+        // Extract and display patient information
+        data.each(function () {
+          var patientInfo = "<div class='patientRecord'>" +
+            "<div class='IdName'>" +
+              "<p><b>ID: </b>" + $(this).find('id').text() + "</p>" +
+              "<p><b>Name: </b>" + $(this).find('name').text() + "</p>" +
+            "</div>" +
+            "<div class='patientDetails'>" +
+              "<p><b>DOB: </b>" + $(this).find('dob').text() + "</p>" +
+              "<p><b>Gender: </b>" + $(this).find('gender').text() + "</p>" +
+              "<p><b>Diagnosis: </b>" + $(this).find('diagnosis').text() + "</p>" +
+              "<p><b>Medications: </b>" + $(this).find('medication').map(function () {
+                return $(this).text();
+              }).get().join(", ") + "</p></div>";
+            "</div>" +
+
+          $('#patientInfo').append(patientInfo);
+        });
+        var countDisplay = "count: " + data.length;
+        $('#countDisplay').append(countDisplay);
+      }
+    });
+
+  </script>
+
+</body>
+
+</html>

@@ -1,20 +1,23 @@
 import React from 'react';
 import FunctionalSelector from '../forms/FunctionalSelector.js';
+import getKey from '../utils/KeyGenerator.js';
+import getSurfSpots from './SurfSpots.js';
+import initializeData from '../utils/InitializeData';
 
 const getLocalSpots = () => {
-    let uniqueSpots = [...new Set(getUnique(JSON.parse(localStorage.getItem('spots'))))];
+    const spotNames = () => getSurfSpots().map((spot,index) => spot.name)
+    let uniqueSpots = [...new Set(getUnique(spotNames ()))];
     return uniqueSpots;
 }
 const getUnique = (array) => {
     let uniqueSpots = [...new Set(array)];
     return uniqueSpots;
-}
-const selectorColor = (item, groupTitle, selected) => (selected(item,groupTitle)) ? "completedSelector" : "incompletedSelector";
-    
+}    
 const Selector = (item, groupTitle, spot, defaultSelection, handleSelection, selected) => {
-    //console.log(`Selector: \nitem: ${JSON.stringify(item, null,2)}\ngroupTitle: ${groupTitle}\nspot: ${spot}\ndefaultSelection: ${defaultSelection}\nhandleSelection: ${handleSelection}\nselected: ${selected}`)
     const isLocation = (groupTitle === 'Location') ? true : false;
-    const localLocations = (localStorage.getItem('spots')) ? true : false;
+    const localLocations = (initializeData('locations', false)) 
+                            ? true 
+                            : false;
     let items = item.selections;
     const setLocal = () => (isLocation && !localLocations) ? localStorage.setItem('spots', JSON.stringify(items)) : null;
     setLocal();
@@ -29,16 +32,16 @@ const Selector = (item, groupTitle, spot, defaultSelection, handleSelection, sel
     const verifySpot = () => {
         return (isLocation && !item.selections.includes(spot)) ? addSpot() : items;
     }
-    //console.log(`spot: ${spot} \n verifySpot(): ${verifySpot()} \nselected: ${defaultSelection(item,groupTitle)}`)
     
-    return <div className={"r-vw p-vw"}>
-        <div className="mb-5">{item.description}: </div>
-        <div className="mb-5">
+    return <div key={getKey('selectorContainer')} className='containerBox'>
+        <div className='containerBox'>{item.description}: </div>
+        <div className='pr-10'>
             <FunctionalSelector 
                 groupTitle={groupTitle}  
                 label={item.description} 
                 items={verifySpot()}
-                selected={defaultSelection(item,groupTitle)}
+                //selected={defaultSelection(item,groupTitle)}
+                selected={selected}
                 onChange={handleSelection}
                 fontSize='25'
                 padding='20px'
