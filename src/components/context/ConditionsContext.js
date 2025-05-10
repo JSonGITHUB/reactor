@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default React.createContext({
-    module: 'WaveFinder',
+    module: 'Waves',
     pause: true,
     date: new Date(),
     edit: false,
@@ -41,7 +41,7 @@ export default React.createContext({
             "tide": ["low", "medium"]
         },
         {
-            "name": "HB: North Peir",
+            "name": "HB: North Pier",
             "latitude": 33.655927,
             "longitude": -118.003874,
             "swell": ["SSE", "S", "SW", "WSW", "W", "WNW"],
@@ -49,7 +49,7 @@ export default React.createContext({
             "tide": ["low", "medium"]
         },
         {
-            "name": "HB: South Peir",
+            "name": "HB: South Pier",
             "latitude": 33.655534,
             "longitude": -118.003145,
             "swell": ["SSE", "S", "SW", "WSW", "W", "WNW"],
@@ -153,7 +153,7 @@ export default React.createContext({
             "tide": ["low", "medium"]
         },
         {
-            "name": "D Street",
+            "name": "D St.",
             "latitude": 33.046486,
             "longitude": -117.298161,
             "swell": ["W", "WNW", "NW", "SW"],

@@ -1,100 +1,67 @@
-/* backup pre hooks 1/7/21
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import initializeData from '../utils/InitializeData';
+
 const PostDirectory = () => {
 
-    const [postDirectory, setPostDirectory] = useState(localStorage.getItem("postDirectory") === 'null') ? [] : JSON.parse(localStorage.getItem("postDirectory"));        
-    const [uniquePosts, setUniquePosts] = useState([...new Set(postDirectory)]);
-    const [index, setIndex] = useState(uniquePosts.indexOf(null));
-    if (index > -1) {
-        setUniquePosts(uniquePosts.splice(index, 1));
-    }
-    localStorage.setItem("postDirectory", JSON.stringify(uniquePosts));
-    
-    useEffect(() => {
-        setPostDirectory(uniquePosts);
-    }, []);
+    const localPostDirectory = initializeData('postDirectory', []);
+    const [postDirectory, setPostDirectory] = useState(localPostDirectory);
 
-    const getDirectory = () => postDirectory;
-    const removeLastId = () => setPostDirectory(postDirectory.pop());
+    useEffect(() => {
+        localStorage.setItem('postDirectory', JSON.stringify(postDirectory));
+    }, [postDirectory]);
+
+    const getLastIndex = () => Number(postDirectory.length - 1);
+    const getLastId = () => {
+        const lastId = postDirectory[getLastIndex()];
+        console.log(`PostDirectory => getLastId: ${lastId}`);
+        return lastId;
+    }
+    const get2ndToLastId = () => postDirectory[getLastIndex() - 1];
+    const getPost = (id) => initializeData(id, null);
+    const getLastPost = () => {
+        const lastPost = (initializeData(getLastId(), null) === null) 
+                            ? getPost(get2ndToLastId()) 
+                            : getPost(getLastId());
+        console.log(`PostDirectory => getLastPost: ${JSON.stringify(lastPost,null,2)}`);
+        return lastPost;
+    }
+
+    console.log(`PostDirectory => getLastId: ${getLastId()}`);
+
+    const addPost = (id, post) => {
+        const newPost = JSON.stringify(post);
+        localStorage.setItem(id, newPost);
+        const postExists = postDirectory.includes(id);
+        if (!postExists) {
+            console.log(`PostDirectory => add(${id})`);
+            const newPostDirectory = [...postDirectory];
+            newPostDirectory.push(id);
+            setPostDirectory(newPostDirectory);
+        }
+    }
+
+    const savePost = (id, post) => {
+        const newPost = JSON.stringify(post);
+        localStorage.setItem(id, newPost);
+        console.log(`PostDirectory => save(${id})`);
+    }
+
+    const deletePost = (id) => {
+        const newPostDirectory = [...postDirectory];
+        const index = newPostDirectory.indexOf(String(id));
+        newPostDirectory.splice(index, 1);
+        localStorage.removeItem(id);
+        localStorage.setItem('lastPostId', `${newPostDirectory[getLastIndex()]}`);
+        setPostDirectory(newPostDirectory);
+    }
 
     const deleteLast = () => {
-         console.log(`PostDirectory => deleteLast()`)
-         setPostDirectory(removeLastId());
-         localStorage.setItem("postDirectory", JSON.stringify(postDirectory))
-     }
-     const add = (id) => {
-         console.log(`PostDirectory => add(${id})`);
-         const pDirectory = postDirectory;
-         pDirectory.push(id)
-         setPostDirectory(pDirectory);
-         localStorage.setItem("postDirectory", JSON.stringify(pDirectory))
-     }
-     
-     const getLastIndex = () => Number(postDirectory.length-1);
-     const getLastId = () => postDirectory[getLastIndex()];
-     const get2ndToLastId = () => postDirectory[getLastIndex()-1];
-     const getStorageItem = (id) => localStorage.getItem(id)
-     const getLastItem = () => (localStorage.getItem(getLastId()) === 'null') ? JSON.parse(getStorageItem(get2ndToLastId())) : JSON.parse(getStorageItem(getLastId()));
-     
-     return <p>Count: {postDirectory.length}</p> 
-     
- }
- export default PostDirectory;
-
-*/
-import React from 'react';
-class PostDirectory extends React.Component {
-
-    constructor(props) {
-        super(props);
-        this.postDirectory = (localStorage.getItem("postDirectory'") === 'null') ? [] : JSON.parse(localStorage.getItem("postDirectory"));        
-        this.uniquePosts = [...new Set(this.postDirectory)];
-        const index = this.uniquePosts.indexOf(null);
-        if (index > -1) {
-            this.uniquePosts.splice(index, 1);
-        }
-        localStorage.setItem("postDirectory", JSON.stringify(this.uniquePosts))
-        this.state = {
-            postDirectory: this.uniquePosts,
-        };
+        const newPostDirectory = [...postDirectory];
+        newPostDirectory.pop();
+        setPostDirectory(newPostDirectory);
     }
-    
-     getDirectory = () => this.postDirectory;
-     removeLastId = () => this.postDirectory.pop();
-     deleteLast = () => {
-         console.log(`PostDirectory => deleteLast()`)
-         this.postDirectory = this.removeLastId();
-         localStorage.setItem("postDirectory", JSON.stringify(this.postDirectory))
-         this.setState({
-             postDirectory: this.postDirectory
-         }); 
-     }
-     add = (id) => {
-         console.log(`PostDirectory => add(${id})`);
-         this.postDirectory.push(id);
-         localStorage.setItem("postDirectory", JSON.stringify(this.postDirectory))
-     }
-     delete = (id) => {
-         console.log(`PostDirectory => delete(${id})`)
-         const index = this.postDirectory.indexOf(String(id));
-         console.log(`${index} of ${this.postDirectory.length}`)
-         this.postDirectory.splice(index, 1);
-         console.log(`${index} of ${this.postDirectory.length}`)
-         localStorage.setItem("postDirectory", JSON.stringify(this.postDirectory))
-         localStorage.removeItem(id);
-         localStorage.setItem("lastPostId", `${this.postDirectory[this.postDirectory.length-1]}`);
-         this.setState({
-             postDirectory: this.postDirectory
-         });
-     }
-     getLastIndex = () => Number(this.state.postDirectory.length-1);
-     getLastId = () => this.state.postDirectory[this.getLastIndex()];
-     get2ndToLastId = () => this.state.postDirectory[this.getLastIndex()-1];
-     getStorageItem = (id) => localStorage.getItem(id)
-     getLastItem = () => (localStorage.getItem(this.getLastId()) === 'null') ? JSON.parse(this.getStorageItem(this.get2ndToLastId())) : JSON.parse(this.getStorageItem(this.getLastId()));
-     render() {      
-             return <div className='p-20'>Count: {this.state.postDirectory.length}</div> 
-     }
-     
- }
- export default PostDirectory;
+
+    return [postDirectory, setPostDirectory, getPost, getLastIndex, getLastPost, addPost, savePost, deletePost, deleteLast];
+};
+
+export default PostDirectory;

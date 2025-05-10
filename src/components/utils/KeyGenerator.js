@@ -1,9 +1,9 @@
-const getKey = (label) => {
-    const timeKey = Number(String(Date.now()).substring(7,13));
-    const firstRandomKey = Math.random()*10;
-    const secondRandomKey = Math.random()*10;
-    const key = label+(timeKey + firstRandomKey + secondRandomKey).toFixed(3);
-//    console.log(`key: ${key}`);
-    return key            
+import { v4 as uuidv4 } from 'uuid';
+
+const getKey = () => {
+    const key = uuidv4();
+    //console.log(`key: ${key}`);
+    return key;
 }
-export default getKey;  
+
+export default getKey;

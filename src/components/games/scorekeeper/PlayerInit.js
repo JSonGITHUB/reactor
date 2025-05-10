@@ -1,0 +1,78 @@
+export const initPlayers = [
+    {
+        name: 'You',
+        score: 0,
+        standard: false, 
+        'ping pong': false, 
+        golf: false,
+        cornhole: false,
+        darts: false,
+        dominos: false, 
+        horse: false,
+        horseshoes: false, 
+        bocci: false,
+        surf: false,
+        dominoScore: 0,
+        golfScores: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        golfGIR: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+        golfFW: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+        golfPutts: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        surfScore: 0,
+        surfScores: ['', '', '', '', '', '', '', '', '', ''],
+        surfJerseyColor: 0,
+        surfPriority: 0,
+        cricketScores: [0, 0, 0, 0, 0, 0, 0]
+    },
+    {
+        name: 'Me',
+        score: 0,
+        standard: false, 
+        'ping pong': false, 
+        golf: false,
+        cornhole: false,
+        darts: false,
+        dominos: false, 
+        horse: false,
+        horseshoes: false, 
+        bocci: false,
+        surf: false,
+        surfScore: 0,
+        dominoScore: 0,
+        golfScores: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        golfGIR: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+        golfFW: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+        golfPutts: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        surfScores: ['', '', '', '', '', '', '', '', '', ''],
+        surfJerseyColor: 0,
+        surfPriority: 0,
+        cricketScores: [0, 0, 0, 0, 0, 0, 0]
+    }
+];
+export const initNewPlayer = (name, game) => {
+    const newPlayer = {
+        name: name,
+        score: 0,
+        standard: false, 
+        'ping pong': false, 
+        golf: false,
+        cornhole: false,
+        darts: false,
+        dominos: false, 
+        horse: false,
+        horseshoes: false, 
+        bocci: false,
+        surf: false,
+        surfScore: 0,
+        dominoScore: 0,
+        golfScores: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        golfGIR: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+        golfFW: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+        golfPutts: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        surfScores: ['', '', '', '', '', '', '', '', '', ''],
+        surfJerseyColor: 0,
+        surfPriority: 0,
+        cricketScores: [0, 0, 0, 0, 0, 0, 0]
+    }
+    newPlayer[game] = true;
+    return newPlayer;
+};

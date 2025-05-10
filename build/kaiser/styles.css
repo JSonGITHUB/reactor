@@ -1,0 +1,97 @@
+/* styles.css */
+
+body {
+    font-family: Arial, sans-serif;
+    color: #dddddd;
+    background-color: #222222;
+}
+
+.flexContainer {
+    display: flex;
+    height: auto;
+}
+
+.flex3Column {
+    height: auto;
+    min-height: 2px;
+    flex: 33%;
+}
+.container {
+    margin: 10px;
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    border-radius: 10px;
+}
+
+h1 {
+    background-color: #fc4e19;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.IdName {
+    background-color: #333333;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 1px;
+}
+
+.patientDetails {
+    background-color: #222222;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+#infoContainer {
+    margin-right: 10px;
+    position: absolute;
+    height: calc(100% - 180px);
+    padding: 10px;
+    background-color: #555555;
+    border-radius: 10px;
+}
+
+#patientInfo {
+    overflow-y: auto;
+    height: 100%;
+    padding: 10px;
+    background-color: #333333;
+    border-radius: 10px;
+    height: calc(100% - 75px);
+}
+
+.patientRecord {
+    /* border: 1px solid #ccc; */
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #111111;
+}
+
+.patientRecord p {
+    margin: 5px 0;
+}
+
+p {
+    padding: 5px;
+}
+
+.nav {
+    background-color: #040c9c;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+#filterSort {
+    background-color: #040c9c;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+label {
+    background-color: #040c9c;
+}
+
+/* Add additional styling as needed */

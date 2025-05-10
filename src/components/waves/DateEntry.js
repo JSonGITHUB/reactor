@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import DatePicker from 'react-date-picker';
+import validate from '../utils/validate';
 
 const dateEntry = (state, handleSelection) => {
     const {log, date} = state;
-    const logExists = (log !== undefined && log !== null && JSON.stringify(log, null, 2) !== "{}") ? true : false;
+    //const logExists = (log !== undefined && log !== null && JSON.stringify(log, null, 2) !== "{}") ? true : false;
+    const logExists = (validate(log) !== null && JSON.stringify(log) !== "{}") ? true : false;
     const stateLogDate = () => log.Day.Date;
     const getDate = () => (logExists === true) ? new Date(stateLogDate()) : new Date(date);
     const onDateChange = (date) => {

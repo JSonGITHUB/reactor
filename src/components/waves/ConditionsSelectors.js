@@ -1,146 +1,106 @@
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import WindSelector from './wind/WindSelector.js';
 import TideSelector from './tide/TideSelector.js';
 import SwellSelector from './SwellSelector.js';
-import ConditionsContext from '../context/ConditionsContext.js';
 import Selector from '../forms/FunctionalSelector.js';
+import CollapseToggleButton from '../utils/CollapseToggleButton';
+import icons from '../site/icons.js';
+import initializeData from '../utils/InitializeData';
+import { OceanContext } from '../context/OceanContext';
 
-class ConditionsSelectors extends React.Component {
-    constructor(props) {
-        super(props);
-        this.setWindStatus = props.setWindStatus;
-        this.setTide = props.setTide;
-        this.setWind = props.setWind;
-        this.setWindStatus = props.setWindStatus;
-        this.handleWindCheck = props.handleWindCheck;
-        this.handleTideCheck = props.handleTideCheck;
-        this.handleTideSelection = props.handleTideSelection;
-        this.handleSwellCheck = props.handleSwellCheck;
-        this.handleSwell1Selection = props.handleSwell1Selection;
-        this.handleSwell2Selection = props.handleSwell2Selection;
-        this.handleSwell1Angle = props.handleSwell1Angle;
-        this.handleSwell2Angle = props.handleSwell2Angle;
-        this.handleSwell1Height = props.handleSwell1Height;
-        this.handleSwell2Height = props.handleSwell2Height;
-        this.handleSwell1Interval = props.handleSwell1Interval;
-        this.handleSwell2Interval = props.handleSwell2Interval;
-        this.handleStarSelection = props.handleStarSelection;
-        this.handleDistanceSelection = props.handleDistanceSelection;
-        this.pause = props.pause;
-        this.setStatus = props.setStatus;
-        this.data = props.data;
-        this.tideDisplay = props.tideDisplay;
-    }
+const ConditionsSelectors = ({
+    tideDisplay
+}) => {
 
-    static contextType = ConditionsContext;
+    const {
+        status,
+        handleStarSelection,
+        handleDistanceSelection
+    } = useContext(OceanContext);
 
-    refresh = () => window.location.pathname = "/reactor/WaveFinder";
-    
-    starSelector = (stars) => <div 
-                                className="flex2Column bg-tinted r-10 m-5 p-10" 
-                                onMouseDown={this.pause}
-                                >
-                                    <div className='p-10 r-10 bg-tinted'>
-                                        <div className='p-10 r-10 bg-tinted'>
-                                            Match
-                                        </div>
-                                        <div className='m-5 size20 p-10 width-auto'>
-                                            <Selector
-                                                groupTitle="Matches" 
-                                                selected={stars} 
-                                                label="Quality"
-                                                items={[0,1,2,3,4,5]}
-                                                onChange={this.handleStarSelection}
-                                                fontSize='20'
-                                                padding='5px'
-                                                width='93%'
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-    milesInput = (distance) => <div className="flex2Column bg-tinted r-10 m-5 p-10">
-                                <label>
-                                    <div className='p-10 r-10 bg-tinted'>
-                                        <div className='p-10 r-10 bg-tinted'>
-                                            Miles
-                                        </div>
-                                        <div className="m-5 p-10 white">
-                                            <input className="mt-10 p-10 r-10 maxWidth100"
-                                                name="distance"
-                                                type="number"
-                                                value={(distance=='' ? 100 : distance)}
-                                                onChange={this.handleDistanceSelection}
-                                            />
-                                        </div>
-                                    </div>
-                                </label>
-                            </div>
-    render() {
-        //console.log('ConditionsSelectors => render => this.context: ', this.context);
-        return (
-            <div className="p-5 r-10 m-5">
-                <div className='p-10 color-yellow'>select current conditions:</div>
-                <div className="flexContainer">
-                    <SwellSelector 
-                        id='1' 
-                        swellDirection={this.context.swell1Direction} 
-                        status={this.context} 
-                        handleSwell1Selection={this.handleSwell1Selection} 
-                        handleSwell2Selection={this.handleSwell2Selection} 
-                        handleSwell1Angle={this.handleSwell1Angle} 
-                        handleSwell2Angle={this.handleSwell2Angle} 
-                        handleSwell1Height={this.handleSwell1Height} 
-                        handleSwell2Height={this.handleSwell2Height} 
-                        handleSwell1Interval={this.handleSwell1Interval} 
-                        handleSwell2Interval={this.handleSwell2Interval} 
-                        handleSwellCheck={this.handleSwellCheck}  
-                        pause={this.pause}>
-                    </SwellSelector>
-                    <SwellSelector 
-                        id='2' 
-                        swellDirection={this.context.swell2Direction} 
-                        status={this.context} 
-                        handleSwell1Selection={this.handleSwell1Selection} 
-                        handleSwell2Selection={this.handleSwell2Selection} 
-                        handleSwell1Angle={this.handleSwell1Angle} 
-                        handleSwell2Angle={this.handleSwell2Angle} 
-                        handleSwell1Height={this.handleSwell1Height} 
-                        handleSwell2Height={this.handleSwell2Height} 
-                        handleSwell1Interval={this.handleSwell1Interval} 
-                        handleSwell2Interval={this.handleSwell2Interval} 
-                        handleSwellCheck={this.handleSwellCheck} 
-                        pause={this.pause}>
-                    </SwellSelector>
-                </div>
-                <div className="flexContainer">
-                    <TideSelector 
-                        tideNow={this.tideNow} 
-                        data={this.data} 
-                        status={this.context}
-                        pause={this.pause} 
-                        tideDisplay={this.tideDisplay} 
-                        handleTideCheck={this.handleTideCheck} 
-                        handleTideSelection={this.handleTideSelection}
-                    />
-                    <WindSelector 
-                        windDirection={this.context.windDirection} 
-                        pause={this.pause} 
-                        setWind={this.setWind} 
-                        isWind={this.context.isWind} 
-                        setStatus={this.setWindStatus} 
-                        handleWindCheck={this.handleWindCheck}
-                    />
-                </div>
-                <div className="flexContainer">
-                    {this.milesInput(this.context.distance)}
-                    {this.starSelector(this.context.stars)} 
-                </div>
-                <div className="button bg-neogreen r-10 m-5 p-15 color-black bold" onClick={this.refresh}>
-                    Refresh
-                </div>
+    const refresh = () => window.location.pathname = '/reactor/Waves';
+    const getLocalData = (localItem) => initializeData(localItem, null);
+    const collapseStateInit = (localItem) => getLocalData(localItem) ? getLocalData(localItem) === 'true' : true;
+    const [conditionsCollapse, setConditionsCollapse] = useState(collapseStateInit('conditionsCollapse'));
+
+    useEffect(() => {
+        localStorage.setItem('conditionsCollapse', conditionsCollapse);
+    }, [conditionsCollapse]);
+
+    const starSelector = (stars) => <div className='containerBox flex2Column mt-5' >
+        <div className='containerBox bg-lite'>
+            Match
+        </div>
+        <div className='size20 width-auto mr-10'>
+            <Selector
+                groupTitle='Matches'
+                selected={stars}
+                label='Quality'
+                items={[0, 1, 2, 3, 4, 5]}
+                onChange={handleStarSelection}
+                fontSize='20'
+                padding='5px'
+                width='93%'
+            />
+        </div>
+    </div>
+    const milesInput = (distance) => <div className='containerBox flex2Column mt-5'>
+        <label>
+            <div className='containerBox bg-lite'>
+                Miles
             </div>
-        ) 
-    }
-    
+            <input className='containerBox width--10'
+                id='distance'
+                name='distance'
+                type='number'
+                value={isNaN(Number(distance) || distance === '' || Number(distance) < 1) ? 10 : Number(distance)}
+                onChange={handleDistanceSelection}
+            />
+        </label>
+    </div>
+
+    return <div>
+        <div className='containerBox bold color-yellow bg-lite p-20'>
+            <CollapseToggleButton
+                title={`${icons.save} SELECT CONDITIONS`}
+                isCollapsed={conditionsCollapse}
+                setCollapse={setConditionsCollapse}
+                align='left'
+            />
+        </div>
+        {
+            (conditionsCollapse)
+                ? <div></div>
+                : <div className='containerBox'>
+                    <div className='flexContainer'>
+                        <SwellSelector
+                            id='1'
+                            swellDirection={status.swell1Direction}
+                        >
+                        </SwellSelector>
+                        <SwellSelector
+                            id='2'
+                            swellDirection={status.swell2Direction}
+                        >
+                        </SwellSelector>
+                    </div>
+                    <div className='flexContainer'>
+                        <TideSelector
+                            tideDisplay={tideDisplay}
+                        />
+                        <WindSelector
+                            windDirection={status.windDirection}
+                        />
+                    </div>
+                    <div className='flexContainer'>
+                        {milesInput(status.distance)}
+                        {starSelector(status.stars)}
+                    </div>
+                </div>
+        }
+        <div className='button bg-neogreen r-10 m-5 p-15 color-black bold' onClick={refresh}>
+            Refresh
+        </div>
+    </div>
 }
 export default ConditionsSelectors;

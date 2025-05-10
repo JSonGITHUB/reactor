@@ -1,5 +1,5 @@
-import React from "react";
-import { connect } from "react-redux";
+import React from 'react';
+import { connect } from 'react-redux';
 import { signIn, signOut } from '../../actions';
 
 class LocalAuth extends React.Component {
@@ -24,16 +24,24 @@ class LocalAuth extends React.Component {
             return null;
         } else if (this.props.isSignedIn === true) {
             return (
-                <button onClick={this.onSignOutClick} className="ui google button">
-                <i className="larger middle aligned icon user" />
-                Local Sign Out
+                <button 
+                    title='Local Sign Out'
+                    onClick={this.onSignOutClick} 
+                    className='ui google button'
+                >
+                    <i className='larger middle aligned icon user' />
+                    Local Sign Out
                 </button>
             );
         } else {
             return (
-                <button onClick={this.onSignInClick} className="ui google button">
-                <i className="larger middle aligned icon user" />
-                Local Sign In
+                <button 
+                    title='Local Sign In'
+                    onClick={this.onSignInClick} 
+                    className='ui google button'
+                >
+                    <i className='larger middle aligned icon user' />
+                    Local Sign In
                 </button>
             );
         }

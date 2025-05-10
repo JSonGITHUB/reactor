@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 const GallonsCalculator = () => {
   const [exchangeRate, setExchangeRate] = useState(0);
   const [pricePerLiter, setPricePerLiter] = useState(0);
-  const [pricePerLiterUSD, setPricePerLiterUSD] = useState(0);
+  //const [pricePerLiterUSD, setPricePerLiterUSD] = useState(0);
   const [litersPurchased, setLitersPurchased] = useState(0);
   const [gallons, setGallons] = useState(0);
   const [usdPerGallon, setUsdPerGallon] = useState(0);
@@ -39,37 +39,44 @@ const GallonsCalculator = () => {
   return (
     <div>
       <h1 className='color-soft'>Gas Price Converter</h1>
-      <label className="flexContainer bg-veryLite r-10 m-5">
-        <div className="columnRightAlign width-50-percent">
+      <label className='flexContainer bg-veryLite r-10 m-5'>
+        <div className='columnRightAlign width-50-percent'>
           <span className='bg-tinted r-5 w-200 p-10 bold color-soft'>Exchange Rate:</span>
         </div>
-        <div className="p-10 columnLeftAlign width-50-percent">
+        <div className='p-10 columnLeftAlign width-50-percent'>
           <input className='r-5 p-10 w-200 bg-darker color-soft'
-            type="number"
+            id='exchangeRate'
+            name='exchangeRate'
+            type='number'
             value={exchangeRate}
             onChange={(e) => setExchangeRate(e.target.value)}
           />
         </div>
       </label>
-      <label className="flexContainer bg-veryLite r-10 m-5">
-        <div className="columnRightAlign width-50-percent">
+      <label className='flexContainer bg-veryLite r-10 m-5'>
+        <div className='columnRightAlign width-50-percent'>
           <span className='bg-tinted r-5 w-200 p-10 bold color-soft'>Pesos per Liter:</span>
         </div>
-        <div className="p-10 columnLeftAlign width-50-percent">
+        <div className='p-10 columnLeftAlign width-50-percent'>
           <input className='r-5 p-10 w-200 bg-darker color-soft'
-            type="number"
+            id='pricePerLiter'
+            name='pricePerLiter'
+            type='number'
             value={pricePerLiter}
             onChange={(e) => setPricePerLiter(e.target.value)}
           />
         </div>
       </label>
-      <label className="flexContainer bg-veryLite r-10 m-5">
-        <div className="columnRightAlign width-50-percent">
+      <label className='flexContainer bg-veryLite r-10 m-5'>
+        <div className='columnRightAlign width-50-percent'>
           <span className='bg-tinted r-5 w-200 p-10 bold color-soft'>Total Liters:</span>
         </div>
-        <div className="p-10 columnLeftAlign width-50-percent">
-          <input className='r-5 p-10 w-200 bg-darker color-soft'
-            type="number"
+        <div className='p-10 columnLeftAlign width-50-percent'>
+          <input 
+            id='litersPurchased'
+            name='litersPurchased'
+            className='r-5 p-10 w-200 bg-darker color-soft'
+            type='number'
             value={litersPurchased}
             onChange={(e) => setLitersPurchased(e.target.value)}
           />
@@ -77,21 +84,21 @@ const GallonsCalculator = () => {
       </label>
       <button className='myButton mt-20' onClick={handleCalculate}>Calculate</button>
       <div className='mt-20 color-soft'>
-        <div className="flexContainer bg-tinted r-5 m-5">
-          <div className="columnRightAlign width-50-percent p-5 bold">{gallons}</div>
-          <div className="columnLeftAlign width-50-percent p-5">gallons</div>
+        <div className='flexContainer bg-tinted r-5 m-5'>
+          <div className='columnRightAlign width-50-percent p-5 bold'>{gallons}</div>
+          <div className='columnLeftAlign width-50-percent p-5'>gallons</div>
         </div>
-        <div className="flexContainer bg-tinted r-5 m-5">
-          <div className="columnRightAlign width-50-percent p-5 bold">${usdPerGallon}</div>
-          <div className="columnLeftAlign width-50-percent p-5">per gallon</div>
+        <div className='flexContainer bg-tinted r-5 m-5'>
+          <div className='columnRightAlign width-50-percent p-5 bold'>${usdPerGallon}</div>
+          <div className='columnLeftAlign width-50-percent p-5'>per gallon</div>
         </div>
-        <div className="flexContainer bg-tinted r-5 m-5">
-          <div className="columnRightAlign width-50-percent p-5 bold">${totalUSD}</div>
-          <div className="columnLeftAlign width-50-percent p-5">dollars</div>
+        <div className='flexContainer bg-tinted r-5 m-5'>
+          <div className='columnRightAlign width-50-percent p-5 bold'>${totalUSD}</div>
+          <div className='columnLeftAlign width-50-percent p-5'>dollars</div>
         </div>
-        <div className="flexContainer bg-tinted r-5 m-5">
-          <div className="columnRightAlign width-50-percent p-5 bold">${totalPesos}</div>
-          <div className="columnLeftAlign width-50-percent p-5">pesos</div>
+        <div className='flexContainer bg-tinted r-5 m-5'>
+          <div className='columnRightAlign width-50-percent p-5 bold'>${totalPesos}</div>
+          <div className='columnLeftAlign width-50-percent p-5'>pesos</div>
         </div>
       </div>
     </div>

@@ -7,7 +7,7 @@ const FormLogin = ({isLoggedIn, user, handleClick}) => {
 
     // eslint-disable-next-line
     const handleChange = (event) => {
-        //console.log("value: " + event.target.value)
+        //console.log('value: ' + event.target.value)
         setValue(event.target.value);
         //setLoggedIn(true);
     }
@@ -20,26 +20,40 @@ const FormLogin = ({isLoggedIn, user, handleClick}) => {
     }
 
     const handleLogoutClick = () => {
-        setValue("")
+        setValue('')
         setLoggedIn(false);
-        handleClick(false, "");
+        handleClick(false, '');
     }
     const LoginButton = () => <div>
-                <input type="text" value={value} onChange={(e) => setValue(e.target.value)}/>
-                <button className="button-green" onClick={handleLoginClick}>
+                <input 
+                    id='login'
+                    name='login'
+                    type='text' 
+                    value={value} 
+                    onChange={(e) => setValue(e.target.value)}
+                />
+                <button 
+                    title='login'
+                    className='button-green' 
+                    onClick={handleLoginClick}
+                >
                     Login
                 </button>
             </div>
     
-    const LogoutButton = () => <button  className="button-green" onClick={handleLogoutClick}>
+    const LogoutButton = () => <button 
+                                title='logout'
+                                className='button-green' 
+                                onClick={handleLogoutClick}
+                                >
                                     Logout
                                 </button>
     let button;
 
     if (loggedIn) {
-        button = <LogoutButton type="submit" value={value} className="greet p-20 r-10 w-200 bg-green brdr-green ml-2" />;
+        button = <LogoutButton type='submit' value={value} className='greet p-20 r-10 w-200 bg-green brdr-green ml-2' />;
     } else {
-        button = <LoginButton type="submit" value={value} className="greet p-20 r-10 w-200 bg-green brdr-green ml-2" />;
+        button = <LoginButton type='submit' value={value} className='greet p-20 r-10 w-200 bg-green brdr-green ml-2' />;
     }
 
     return (
