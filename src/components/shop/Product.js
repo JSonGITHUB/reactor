@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import productList from './productList'
 import getKey from '../utils/KeyGenerator';
 import icons from '../site/icons';
+import CollapseToggleButton from '../utils/CollapseToggleButton';
 
 const Product = ({
     
@@ -10,6 +11,7 @@ const Product = ({
 
     const productDisplay = useRef(null);
     const cartDisplay = useRef(null);
+    const [cartCollapse, setCartCollapse] = useState(false);
 
     const [quantity, setQuantity] = useState(1);
     const [cart, setCart] = useState([]);
@@ -45,10 +47,12 @@ const Product = ({
     const nextProduct = () => {
         const nextIndex = (productList.indexOf(product) + 1) % productList.length;
         setProduct(productList[nextIndex]);
+        gotoTop();
     }
     const previousProduct = () => {
         const nextIndex = (productList.indexOf(product) - 1) % productList.length;
         setProduct(productList[(nextIndex > -1) ? nextIndex : productList.length-1]);
+        gotoTop();
     }
     const toggleFront = () => setIsFront(!isFront);
     const getTotal = () => {
@@ -57,6 +61,12 @@ const Product = ({
             total = total + item.total;
         });
         return total;
+    }
+    const gotoTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth',
+        });
     }
     const gotoCart = () => {
         if (cartDisplay.current !== null) {
@@ -72,24 +82,31 @@ const Product = ({
     const handleAddToCart = () => {
         const newCart = [...cart];
         console.log(`size: ${size}`)
+        console.log(`product: ${JSON.stringify(product, null, 2)}`);
+        let sizeSelect = false;
         const getSize = () => {
             const selectedSize = (size !== null && size !== undefined) ? size : prompt('enter size (S,M,L,XL): ', 'L').toUpperCase();
-            if (!product.sizes.contains(selectedSize)) {
-                getSize();
+            if (product && !product.sizes.includes(selectedSize)) {
+                alert('select a size');
+                return
             }
+            setSize(selectedSize)
+            sizeSelect = true;
             return selectedSize;
         }
         const item = {
             ...product,
             quantity,
             total: product.price * quantity,
-            size: getSize,
+            size: getSize(),
             color: color,
             image: displayImage
         };
-        newCart.push(item);
-        setCart(newCart);
-        gotoCart();
+        if (sizeSelect) {
+            newCart.push(item);
+            setCart(newCart);
+            gotoCart();
+        }
     };
     const removeItem = (index) => {
         const newCart = [...cart];
@@ -198,50 +215,83 @@ const Product = ({
                 {
                     cart.length > 0 && (
                         <div className='containerBox' ref={cartDisplay}>
-                            <div className='containerBox flexContainer color-yellow centerVertical'>
-                                <div className='flex2Column contentRight'>🛒</div> 
-                                <div className='flex2Column contentLeft size15 ml-5'>{cart.length}</div>
+                            <div className='containerBox'>
+                                <CollapseToggleButton
+                                    title={<span className='color-yellow'>{icons.shop} {cart.length}</span>}
+                                    isCollapsed={cartCollapse}
+                                    setCollapse={setCartCollapse}
+                                    align='left'
+                                />
                             </div>
-                            {
-                                cart.map((item, index) => <div className='containerBox flexContainer' key={getKey(index)}>
-                                            <div className='flex2Column contentRight'>
-                                                <img
-                                                    title={`${item.name}:  ${item.color} ${item.size} X ${item.quantity} = ${formatCurrency(item.total)}`}
-                                                    src={item.image}
-                                                    alt={item.name}
-                                                    className='containerBox bg-white ht-150'
-                                                />
-                                            </div>
-                                            <div className='containerDetail flex2Column contentLeft bg-lite m-5'>
-                                                <div className='containerDetail flexContainer mb-5 pb-5 pt-5'>
-                                                    <div className='flex2Column contentLeft color-yellow pl-5'>{item.name}</div>
-                                                    <div className='flex2Column contentRight'><span onClick={()=>removeItem(index)} title='remove item' className='r-5 button pt-5 pb-5 pl-10 pr-5 size15'>{icons.delete}</span></div>
+                            <div>
+                                {
+                                    (cartCollapse)
+                                    ? null
+                                    : cart.map((item, index) => <div className='containerBox flexContainer' key={getKey(index)}>
+                                                <div className='flex2Column contentRight'>
+                                                    <img
+                                                        title={`${item.name}:  ${item.color} ${item.size} X ${item.quantity} = ${formatCurrency(item.total)}`}
+                                                        src={item.image}
+                                                        alt={item.name}
+                                                        className='containerBox bg-white ht-150'
+                                                    />
                                                 </div>
-                                                <div className='containerDetail size12 p-10 m-1'>
-                                                    <div>quantity: {item.quantity}</div>
-                                                    <div>size: {item.size}</div>
-                                                    <div>color: {item.color}</div>
-                                                    <div>price: {formatCurrency(item.total)}</div>
+                                                <div className='containerDetail flex2Column contentLeft bg-lite m-5'>
+                                                    <div className='containerDetail flexContainer mb-5 pb-5 pt-5'>
+                                                        <div className='flex2Column contentLeft color-yellow pl-5'>{item.name}</div>
+                                                        <div className='flex2Column contentRight'><span onClick={()=>removeItem(index)} title='remove item' className='r-5 button pt-5 pb-5 pl-10 pr-5 size15'>{icons.delete}</span></div>
+                                                    </div>
+                                                    <div className='containerDetail size12 p-10 m-1'>
+                                                        <div>quantity: {item.quantity}</div>
+                                                        <div>size: {item.size}</div>
+                                                        <div>color: {item.color}</div>
+                                                        <div>price: {formatCurrency(item.total)}</div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                )
-                            }
-                            <div className='containerBox bold color-yellow'>Cart Total: ${getTotal()}</div>
+                                    )
+                                }
+                                {
+                                    
+                                    (cartCollapse)
+                                    ? null
+                                    : <div className='containerBox bold color-yellow'>Cart Total: ${getTotal()}</div>
+                                }
+                            </div>
+                        
                         </div>
                     )
                 }
             </div>
             <div className='ht-100'></div>
-            <div className='containerDetail ml--10 width--10 footer'>
-                <button onClick={handleAddToCart} className='containerBox button mt-20' >
-                    Add to Cart
+            <div className='containerDetail ml--10 width--10 footer flexContainer'>
+                <button 
+                    title={`add to cart ${quantity} ${size} ${color} ${(product) ? `${product.name} ${(product.price * quantity)}` : null}`} 
+                    onClick={handleAddToCart} 
+                    className='flex4Column containerBox button mt-20 bg-neogreen'
+                >
+                    {icons.plus} {icons.shop}
                 </button>
-                <button onClick={previousProduct} className='containerBox button mt-20' >
-                    Previous
+                <button 
+                    title='previous product' 
+                    onClick={previousProduct} 
+                    className='flex4Column containerBox button mt-20 bg-yellow'
+                >
+                    {icons.leftArrow} 👕
                 </button>
-                <button onClick={nextProduct} className='containerBox button mt-20' >
-                    Next
+                <button 
+                    title='next product' 
+                    onClick={nextProduct} 
+                    className='flex4Column containerBox button mt-20 bg-yellow'
+                >
+                    👕 {icons.rightArrow}
+                </button>
+                <button 
+                    title={`add to cart ${quantity} ${size} ${color} ${(product) ? `${product.name} ${(product.price * quantity)}` : null}`} 
+                    onClick={gotoCart} 
+                    className='flex4Column containerBox button mt-20 bg-neogreen color-dark'
+                >
+                    {`${(cart.length > 0) ? cart.length : ''}`} {icons.shop} {`${(cart.length>0) ? `$${getTotal()}` : ''}`}
                 </button>
             </div>
         </div>
