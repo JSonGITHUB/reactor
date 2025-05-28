@@ -320,6 +320,7 @@ const Tracker = () => {
     }, [tasks]);
 
     useEffect(() => {
+        console.log(`charges: ${JSON.stringify(charges, null, 2)}`);
         localStorage.setItem('chargeTracking', JSON.stringify(charges));
     }, [charges]);
 
@@ -427,7 +428,7 @@ const Tracker = () => {
                 });
                 setWaves(filteredWaves);
             } else if (tracking === 'charges' && charges !== undefined) {
-                const inChargeGoupDescription = (chargeGroup) => chargeGroup.description.toLowerCase().includes(searchTerm);
+                const inChargeGoupDescription = (chargeGroup) => String(chargeGroup.description).toLowerCase().includes(searchTerm);
                 const inChargeDescription = (charge) => {
                     const result = charge.description.toLowerCase().includes(searchTerm);
                     console.log(`Tracker => inChargeDescription => charge.description: ${charge.description} searchTerm: ${searchTerm} result: ${result}`);
@@ -607,6 +608,22 @@ const Tracker = () => {
                 setCircuits(updatedCircuits);
             }
         };
+        const addChargeGroup = () => {
+            const updatedCharges = [...charges];
+            const title = newProjectDescription;
+            if (title) {
+                const chargeGroup = {
+                    description: title,
+                    createdDate: currentDate(),
+                    startTime: currentTime(),
+                    display: true,
+                    tasks: [],
+                    isCollapsed: false
+                };
+                updatedCharges.push(chargeGroup)
+                setCharges(updatedCharges);
+            }
+        };
 
         /*
         if (tracking === 'project') 
@@ -634,6 +651,9 @@ const Tracker = () => {
         }
         if (tracking === 'recipes') {
             addRecipeGroup();
+        }
+        if (tracking === 'charges') {
+            addChargeGroup();
         }
     };
 
@@ -958,6 +978,7 @@ const Tracker = () => {
                 setCharges={setCharges}
                 newProjectDescription={newProjectDescription}
                 getProjectTime={getProjectTime}
+                searchTerm={newProjectDescription}
             />
             : <React.Fragment></React.Fragment>
         }
