@@ -10,7 +10,8 @@ const TrackCharge = ({
     charges,
     setCharges,
     newProjectDescription,
-    getProjectTime
+    getProjectTime,
+    searchTerm
 }) => {
 
     useEffect(() => {
@@ -102,10 +103,6 @@ const TrackCharge = ({
         }
     }, []);
 
-    useEffect(() => {
-        localStorage.setItem('chargeTracking', JSON.stringify(charges));
-    }, [charges]);
-
     const addCharge = (index) => {
 
         const batteryDescription = prompt('Battery Type:');
@@ -139,7 +136,7 @@ const TrackCharge = ({
             {
                 (charges !== null)
                 ? charges.map((chargeProject, chargeProjectIndex) => (
-                    (chargeProject.display && chargeProject.display === true)
+                    (searchTerm === '' || (chargeProject.description && chargeProject.description.toLowerCase().includes(searchTerm.toLowerCase())) || (chargeProject.tasks && chargeProject.tasks.some(task => task.description && task.description.toLowerCase().includes(searchTerm.toLowerCase()))))
                     ? <div key={getKey(`chargeProject${chargeProjectIndex}`)}>
                         <ChargeProject
                             charges={charges}

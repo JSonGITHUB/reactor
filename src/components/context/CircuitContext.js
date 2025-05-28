@@ -84,8 +84,9 @@ const CircuitsParent = ({
     setCountdown(savedCountdown);
     setTicker(savedTicker);
     setBreathing(savedBreathing);
+    const newGroupIndex = getGroupIndex(circuitGroup);
+    setGroupIndex(newGroupIndex);
     setGroup(circuitGroup);
-    //setGroupIndex(getGroupIndex(circuitGroup));
 
     const playerWidth = Math.min(window.innerWidth - 65, 800); // Maximum width of 800px
     const aspectRatio = 560 / 349; // Default aspect ratio of the player
@@ -107,7 +108,7 @@ const CircuitsParent = ({
       //console.log(`CircuitContext => getGroups => newGroups: ${JSON.stringify(newGroups, null, 2)}`);
       setGroups(newGroups);
       //setGroupIndex(getGroupIndex(circuitGroup))
-      circuits[0].circuits[activeIndex].excersizes.forEach((excersize) => {
+      circuits[0].circuits[activeIndex]?.excersizes.forEach((excersize) => {
         console.log(`CircuitContext => Circuit: ${circuits[0].circuits[activeIndex].title} excersize: ${excersize.title} display: ${excersize.display}`);
       });
     }

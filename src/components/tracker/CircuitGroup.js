@@ -109,7 +109,7 @@ const CircuitGroup = () => {
     //console.log(`CircuitGroup => ${circuitGroup.title} circuitGroup.display: ${circuitGroup.display}`);
     //console.log(`CircuitGroup => circuitGroup: ${JSON.stringify(circuitGroup, null, 2)}`);
     return (
-        (circuitGroup && (group === 'All' || (circuitGroup.display && circuitGroup.display === true)))
+        (circuitGroup)
         ? <div key={getKey(`circuit${groupIndex}`)} ref={targetElementRef}>
             <div className=''>
                 <div className='containerBox flexContainer bg-lite'>
