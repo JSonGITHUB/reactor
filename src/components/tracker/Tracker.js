@@ -312,10 +312,12 @@ const Tracker = () => {
     }, [waves]);
 
     useEffect(() => {
+        //console.log(`Tracker => links: ${JSON.stringify(links, null, 2)}`);
         localStorage.setItem('linkTracking', JSON.stringify(links));
     }, [links]);
 
     useEffect(() => {
+        console.log(`Tracker => tasks: ${JSON.stringify(tasks, null, 2)}`);
         localStorage.setItem('taskTracking', JSON.stringify(tasks));
     }, [tasks]);
 
@@ -387,7 +389,11 @@ const Tracker = () => {
                 });
                 setRecipes(filteredRecipes);
             } else if (tracking === 'tasks' && tasks !== undefined) {
-                const inTaskGoupDescription = (taskGroup) => taskGroup.description.toLowerCase().includes(searchTerm);
+                const inTaskGoupDescription = (taskGroup) => {
+                    const result = taskGroup.description.toLowerCase().includes(searchTerm);
+                    console.log(`Tracker => inTaskGoupDescription => task.description: ${taskGroup.description} searchTerm: ${searchTerm} result: ${result}`);
+                    return result;
+                }
                 const inTaskDescription = (task) => {
                     const result = task.description.toLowerCase().includes(searchTerm);
                     console.log(`Tracker => inTaskDescription => task.description: ${task.description} searchTerm: ${searchTerm} result: ${result}`);
@@ -405,8 +411,9 @@ const Tracker = () => {
                 };
                 const category = localStorage.getItem('tasksCategory') || 'all';
                 const filteredTasks = [...tasks];
+                
                 filteredTasks.map((taskGroup) => {
-                    taskGroup.display = false;
+                    taskGroup.display = inTaskGoupDescription(taskGroup);
                     taskGroup.tasks.map((task) => {
                         if ((inTaskGoupDescription(taskGroup) || inTaskDescription(task) || inTaskSessionDescription(task) || searchTerm === '' || searchTerm === ' ' || searchTerm === null) && (category === 'all' || taskGroup.category === category)) {
                             task.display = true;
@@ -455,12 +462,14 @@ const Tracker = () => {
                 const filteredLinks = [...links];
                 filteredLinks.map((linkGroup) => {
                     linkGroup.display = false;
-                    linkGroup.links.map((link) => {
-                        if ((inLinkGroupTitle(linkGroup) || inLinkDescription(link) || searchTerm === '' || searchTerm === ' ' || searchTerm === null)) {
-                            link.display = true;
-                            linkGroup.display = true;
-                        }
-                    });
+                    if (linkGroup.links !== undefined) {
+                        linkGroup.links.map((link) => {
+                            if ((inLinkGroupTitle(linkGroup) || inLinkDescription(link) || searchTerm === '' || searchTerm === ' ' || searchTerm === null)) {
+                                link.display = true;
+                                linkGroup.display = true;
+                            }
+                        });
+                    }
                 });
                 setLinks(filteredLinks);
             } else if (tracking === 'notes' && notes !== undefined) {
@@ -545,9 +554,16 @@ const Tracker = () => {
             const updatedLinks = [...links];
             const title = newProjectDescription;
             if (title) {
+                const linkDescription = prompt('Link description:');
+                const linkURL = prompt('Link url:');
+                const firstLink = {
+                    description: linkDescription || 'New Link',
+                    link: linkURL || 'https://',
+                    display: true
+                }
                 const linkGroup = {
                     title: title,
-                    links: [],
+                    links: [firstLink],
                     isCollapsed: false
                 };
                 updatedLinks.push(linkGroup)
@@ -655,6 +671,7 @@ const Tracker = () => {
         if (tracking === 'charges') {
             addChargeGroup();
         }
+        setNewProjectDescription('');
     };
 
     const deleteProject = (index) => {
@@ -729,7 +746,7 @@ const Tracker = () => {
         window.location.reload();
     }
 
-    return <div className='mt--30 bg-lite'>
+    return <div className='mt--30 containerDetail bg-lite'>
         <div className='pt-5'>
             <div className='flexContainer containerBox'>
                 <div className='flex2Column containerBox p-15 columnRightAlign width-50-percent size25 r-5 bold color-soft'>
@@ -765,288 +782,292 @@ const Tracker = () => {
                 : <React.Fragment></React.Fragment>
             }
         </div>
-        {
-            (tracking === 'journals')
-            ? <div>
-                <div className='containerBox color-yellow'>
-                    <CollapseToggleButton
-                        title={`Current Goals`}
-                        isCollapsed={currentGoalsCollapse}
-                        setCollapse={setCurrentGoalsCollapse}
-                        align='left'
-                    />
-                </div>
-                {
-                    (!currentGoalsCollapse)
-                    ? <div className='containerBox'>
-                        {
-                            journals.map((journalGroup, journalGroupIndex) => (
-                                journalGroup.journals.map((journal, journalIndex) => (
-                                    journal.todaysGoals.map((currentGoal, currentGoalIndex) => (
-                                        (!currentGoal[1])
-                                            ? <div className='containerBox flexContainer centerVertical' key={getKey(`currentGoal${currentGoal}`)}>
-                                                <div className='flex2Column contentLeft'>
-                                                    {currentGoal[0]}
+        <div className='containerBox'>
+            {
+                (tracking === 'journals')
+                ? <div>
+                    <div className='containerBox color-yellow'>
+                        <CollapseToggleButton
+                            title={`Current Goals`}
+                            isCollapsed={currentGoalsCollapse}
+                            setCollapse={setCurrentGoalsCollapse}
+                            align='left'
+                        />
+                    </div>
+                    {
+                        (!currentGoalsCollapse)
+                        ? <div className='containerBox'>
+                            {
+                                journals.map((journalGroup, journalGroupIndex) => (
+                                    journalGroup.journals.map((journal, journalIndex) => (
+                                        journal.todaysGoals.map((currentGoal, currentGoalIndex) => (
+                                            (!currentGoal[1])
+                                                ? <div className='containerBox flexContainer centerVertical' key={getKey(`currentGoal${currentGoal}`)}>
+                                                    <div className='flex2Column contentLeft'>
+                                                        {currentGoal[0]}
+                                                    </div>
+                                                    <div className='flexColumn contentRight'>
+                                                        <div
+                                                            title='toggle checkbox'
+                                                            className='containerBox bg-lite p-20 button'
+                                                            onClick={() => toggleCheckbox('todaysGoals', journalGroupIndex, journalIndex, currentGoalIndex)}
+                                                        >
+                                                            <input
+                                                                id='completed'
+                                                                name='completed'
+                                                                className='regular-checkbox'
+                                                                checked={currentGoal[1]}
+                                                                type='checkbox'
+                                                            />
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div className='flexColumn contentRight'>
+                                                : null
+                                        ))
+                                    ))
+                                ))
+                            }
+                        </div>
+                        : null
+                    }
+                    <div className='containerBox color-yellow'>
+                        <CollapseToggleButton
+                            title={'Future Goals'}
+                            isCollapsed={futureGoalsCollapse}
+                            setCollapse={setFutureGoalsCollapse}
+                            align='left'
+                        />
+                    </div>
+                    {
+                        (!futureGoalsCollapse)
+                        ? <div className='containerBox'>
+                            {
+                                journals.map((journalGroup, journalGroupIndex) => (
+                                    journalGroup.journals.map((journal, journalIndex) => (
+                                        journal.futureGoals.map((futureGoal, futureGoalIndex) => (
+                                            (!futureGoal[1])
+                                            ? <div className='containerBox flexContainer centerVertical' key={getKey(`futureGoal${futureGoal}`)}>
+                                                <div className='flex2Column contentLeft'>
+                                                    {futureGoal[0]}
+                                                </div>
+                                                <div
+                                                    title='toggle checkbox'
+                                                    className='containerBox bg-lite p-20 button'
+                                                    onClick={() => toggleCheckbox('futureGoals', journalGroupIndex, journalIndex, futureGoalIndex)}
+                                                >
+                                                    <input
+                                                        id='completed'
+                                                        name='completed'
+                                                        className='regular-checkbox button'
+                                                        checked={futureGoal[1]}
+                                                        type='checkbox'
+                                                    />
+                                                </div>
+                                            </div>
+                                            : null
+                                        ))
+                                    ))
+                                ))
+                            }
+                        </div>
+                        : null
+                    }
+                    <div className='containerBox color-yellow'>
+                        <CollapseToggleButton
+                            title={'Completed Goals'}
+                            isCollapsed={completedGoalsCollapse}
+                            setCollapse={setCompletedGoalsCollapse}
+                            align='left'
+                        />
+                    </div>
+                    {
+                        (!completedGoalsCollapse)
+                        ? <div className='containerBox'>
+                            {
+                                journals.map((journalGroup, journalGroupIndex) => (
+                                    journalGroup.journals.map((journal, journalIndex) => (
+                                        journal.todaysGoals.map((todaysGoal, todaysGoalIndex) => (
+                                            (todaysGoal[1])
+                                            ? <div className='containerBox flexContainer centerVertical' key={getKey(`todaysGoal${todaysGoal}`)}>
+                                                <div className='flex2Column contentLeft'>
+                                                    {todaysGoal[0]}
+                                                </div>
+                                                <div
+                                                    title='toggle checkbox'
+                                                    className='containerBox bg-lite p-20 button'
+                                                    onClick={() => toggleCheckbox('todaysGoals', journalGroupIndex, journalIndex, todaysGoalIndex)}
+                                                >
+                                                    <input
+                                                        id='completed'
+                                                        name='completed'
+                                                        className='regular-checkbox button'
+                                                        checked={todaysGoal[1]}
+                                                        type='checkbox'
+                                                    />
+                                                </div>
+                                            </div>
+                                            : null
+                                        ))
+                                    ))
+                                ))
+                            }
+                            {
+                                journals.map((journalGroup, journalGroupIndex) => {
+                                    if (journalGroup.journals && journalGroup.journals.length > 0) {
+                                        return journalGroup.journals.map((journal, journalIndex) => (
+                                            journal.futureGoals.map((futureGoal, futureGoalIndex) => (
+                                                (futureGoal[1])
+                                                ? <div className='containerBox flexContainer centerVertical' key={getKey(`futureGoal${futureGoal}`)}>
+                                                    <div className='flex2Column contentLeft'>
+                                                        {futureGoal[0]}
+                                                    </div>
                                                     <div
                                                         title='toggle checkbox'
                                                         className='containerBox bg-lite p-20 button'
-                                                        onClick={() => toggleCheckbox('todaysGoals', journalGroupIndex, journalIndex, currentGoalIndex)}
+                                                        onClick={() => toggleCheckbox('futureGoals', journalGroupIndex, journalIndex, futureGoalIndex)}
                                                     >
                                                         <input
                                                             id='completed'
                                                             name='completed'
-                                                            className='regular-checkbox'
-                                                            checked={currentGoal[1]}
+                                                            className='regular-checkbox button'
+                                                            checked={futureGoal[1]}
                                                             type='checkbox'
                                                         />
                                                     </div>
                                                 </div>
-                                            </div>
-                                            : null
-                                    ))
-                                ))
-                            ))
-                        }
-                    </div>
-                    : null
-                }
-                <div className='containerBox color-yellow'>
+                                                : null
+                                            ))
+                                        ))
+                                    }
+                                })
+                            }
+                        </div>
+                        : null
+                    }
+                </div>
+                : null
+            }
+            {
+                (tracking === 'circuits')
+                ? null
+                : <div className='containerBox'>
                     <CollapseToggleButton
-                        title={'Future Goals'}
-                        isCollapsed={futureGoalsCollapse}
-                        setCollapse={setFutureGoalsCollapse}
+                        title={isCollapsed ? `Expand All` : `Collapse All`}
+                        isCollapsed={isCollapsed}
+                        setCollapse={setIsCollapsed}
                         align='left'
                     />
                 </div>
-                {
-                    (!futureGoalsCollapse)
-                    ? <div className='containerBox'>
-                        {
-                            journals.map((journalGroup, journalGroupIndex) => (
-                                journalGroup.journals.map((journal, journalIndex) => (
-                                    journal.futureGoals.map((futureGoal, futureGoalIndex) => (
-                                        (!futureGoal[1])
-                                        ? <div className='containerBox flexContainer centerVertical' key={getKey(`futureGoal${futureGoal}`)}>
-                                            <div className='flex2Column contentLeft'>
-                                                {futureGoal[0]}
-                                            </div>
-                                            <div
-                                                title='toggle checkbox'
-                                                className='containerBox bg-lite p-20 button'
-                                                onClick={() => toggleCheckbox('futureGoals', journalGroupIndex, journalIndex, futureGoalIndex)}
-                                            >
-                                                <input
-                                                    id='completed'
-                                                    name='completed'
-                                                    className='regular-checkbox button'
-                                                    checked={futureGoal[1]}
-                                                    type='checkbox'
-                                                />
-                                            </div>
-                                        </div>
-                                        : null
-                                    ))
-                                ))
-                            ))
-                        }
-                    </div>
-                    : null
-                }
-                <div className='containerBox color-yellow'>
-                    <CollapseToggleButton
-                        title={'Completed Goals'}
-                        isCollapsed={completedGoalsCollapse}
-                        setCollapse={setCompletedGoalsCollapse}
-                        align='left'
-                    />
-                </div>
-                {
-                    (!completedGoalsCollapse)
-                    ? <div className='containerBox'>
-                        {
-                            journals.map((journalGroup, journalGroupIndex) => (
-                                journalGroup.journals.map((journal, journalIndex) => (
-                                    journal.todaysGoals.map((todaysGoal, todaysGoalIndex) => (
-                                        (todaysGoal[1])
-                                        ? <div className='containerBox flexContainer centerVertical' key={getKey(`todaysGoal${todaysGoal}`)}>
-                                            <div className='flex2Column contentLeft'>
-                                                {todaysGoal[0]}
-                                            </div>
-                                            <div
-                                                title='toggle checkbox'
-                                                className='containerBox bg-lite p-20 button'
-                                                onClick={() => toggleCheckbox('todaysGoals', journalGroupIndex, journalIndex, todaysGoalIndex)}
-                                            >
-                                                <input
-                                                    id='completed'
-                                                    name='completed'
-                                                    className='regular-checkbox button'
-                                                    checked={todaysGoal[1]}
-                                                    type='checkbox'
-                                                />
-                                            </div>
-                                        </div>
-                                        : null
-                                    ))
-                                ))
-                            ))
-                        }
-                        {
-                            journals.map((journalGroup, journalGroupIndex) => (
-                                journalGroup.journals.map((journal, journalIndex) => (
-                                    journal.futureGoals.map((futureGoal, futureGoalIndex) => (
-                                        (futureGoal[1])
-                                        ? <div className='containerBox flexContainer centerVertical' key={getKey(`futureGoal${futureGoal}`)}>
-                                            <div className='flex2Column contentLeft'>
-                                                {futureGoal[0]}
-                                            </div>
-                                            <div
-                                                title='toggle checkbox'
-                                                className='containerBox bg-lite p-20 button'
-                                                onClick={() => toggleCheckbox('futureGoals', journalGroupIndex, journalIndex, futureGoalIndex)}
-                                            >
-                                                <input
-                                                    id='completed'
-                                                    name='completed'
-                                                    className='regular-checkbox button'
-                                                    checked={futureGoal[1]}
-                                                    type='checkbox'
-                                                />
-                                            </div>
-                                        </div>
-                                        : null
-                                    ))
-                                ))
-                            ))
-                        }
-                    </div>
-                    : null
-                }
-            </div>
-            : null
-        }
-        {
-            (tracking === 'circuits')
-            ? null
-            : <div className='containerBox'>
-                <CollapseToggleButton
-                    title={isCollapsed ? `Expand All` : `Collapse All`}
-                    isCollapsed={isCollapsed}
-                    setCollapse={setIsCollapsed}
-                    align='left'
+            }
+            {
+                (tracking === 'tasks')
+                ? <TrackTasks
+                    tracking={tracking}
+                    tasks={tasks}
+                    setTasks={setTasks}
+                    deleteProject={deleteProject}
                 />
-            </div>
-        }
-        {
-            (tracking === 'tasks')
-            ? <TrackTasks
-                tracking={tracking}
-                tasks={tasks}
-                setTasks={setTasks}
-                deleteProject={deleteProject}
-            />
-            : <React.Fragment></React.Fragment>
-        }
-        {
-            (tracking === 'projects')
-            ? <TrackTasks
-                tracking={tracking}
-                tasks={projects}
-                setTasks={setProjects}
-                deleteProject={deleteProject}
-            />
-            : <React.Fragment></React.Fragment>
-        }
-        {
-            (tracking === 'events')
-            ? <TrackEvents
-                events={events}
-                setEvents={setEvents}
-                getProjectTime={getProjectTime}
-                deleteProject={deleteProject}
-                toggleCollapseSubmenu={toggleCollapseSubmenu}
-                toggleParentTimer={toggleParentTimer}
-            />
-            : <React.Fragment></React.Fragment>
-        }
-        {
-            (tracking === 'charges')
-            ? <TrackCharge
-                charges={charges}
-                setCharges={setCharges}
-                newProjectDescription={newProjectDescription}
-                getProjectTime={getProjectTime}
-                searchTerm={newProjectDescription}
-            />
-            : <React.Fragment></React.Fragment>
-        }
-        {
-            (tracking === 'waves')
-            ? <TrackWaves
-                waves={waves}
-                setWaves={setWaves}
-                getProjectTime={getProjectTime}
-                deleteProject={deleteProject}
-            />
-            : <React.Fragment></React.Fragment>
-        }
-        {
-            (tracking === 'links')
-            ? <LinkSaver
-                links={links}
-                setLinks={setLinks}
-                deleteGroup={deleteGroup}
-            />
-            : <React.Fragment></React.Fragment>
-        }
-        {
-            (tracking === 'notes')
-            ? <TrackNote
-                notes={notes}
-                setNotes={setNotes}
-                targetElementRef={targetElementRef}
-                scrollToBottom={scrollToBottom}
-            />
-            : <React.Fragment></React.Fragment>
-        }
-        {
-            (tracking === 'journals')
-            ? <TrackJournal
-                journals={journals}
-                setJournals={setJournals}
-                targetElementRef={targetElementRef}
-                scrollToBottom={scrollToBottom}
-            />
-            : <React.Fragment></React.Fragment>
-        }
-        {
-            (tracking === 'circuits')
-            ? <CircuitsParent targetElementRef={targetElementRef} scrollToBottom={scrollToBottom}>
-                <TrackCircuit
-                //circuits={circuits}
-                //setCircuits={setCircuits}
-                //targetElementRef={targetElementRef}
-                //scrollToBottom={scrollToBottom}
-                //isCollapsed={isCollapsed}
+                : <React.Fragment></React.Fragment>
+            }
+            {
+                (tracking === 'projects')
+                ? <TrackTasks
+                    tracking={tracking}
+                    tasks={projects}
+                    setTasks={setProjects}
+                    deleteProject={deleteProject}
                 />
-            </CircuitsParent>
-            : <React.Fragment></React.Fragment>
-        }
-        {
-            (tracking === 'recipes')
-            ? <IngredientParent targetElementRef={targetElementRef}>
-                <TrackRecipe
+                : <React.Fragment></React.Fragment>
+            }
+            {
+                (tracking === 'events')
+                ? <TrackEvents
+                    events={events}
+                    setEvents={setEvents}
+                    getProjectTime={getProjectTime}
+                    deleteProject={deleteProject}
+                    toggleCollapseSubmenu={toggleCollapseSubmenu}
+                    toggleParentTimer={toggleParentTimer}
+                />
+                : <React.Fragment></React.Fragment>
+            }
+            {
+                (tracking === 'charges')
+                ? <TrackCharge
+                    charges={charges}
+                    setCharges={setCharges}
+                    newProjectDescription={newProjectDescription}
+                    getProjectTime={getProjectTime}
+                    searchTerm={newProjectDescription}
+                />
+                : <React.Fragment></React.Fragment>
+            }
+            {
+                (tracking === 'waves')
+                ? <TrackWaves
+                    waves={waves}
+                    setWaves={setWaves}
+                    getProjectTime={getProjectTime}
+                    deleteProject={deleteProject}
+                />
+                : <React.Fragment></React.Fragment>
+            }
+            {
+                (tracking === 'links')
+                ? <LinkSaver
+                    links={links}
+                    setLinks={setLinks}
+                    deleteGroup={deleteGroup}
+                />
+                : <React.Fragment></React.Fragment>
+            }
+            {
+                (tracking === 'notes')
+                ? <TrackNote
+                    notes={notes}
+                    setNotes={setNotes}
                     targetElementRef={targetElementRef}
                     scrollToBottom={scrollToBottom}
-                    recipes={recipes}
-                    setRecipes={setRecipes}
-                    getIngredients={getIngredients}
                 />
-            </IngredientParent>
-            : <React.Fragment></React.Fragment>
-        }
+                : <React.Fragment></React.Fragment>
+            }
+            {
+                (tracking === 'journals')
+                ? <TrackJournal
+                    journals={journals}
+                    setJournals={setJournals}
+                    targetElementRef={targetElementRef}
+                    scrollToBottom={scrollToBottom}
+                />
+                : <React.Fragment></React.Fragment>
+            }
+            {
+                (tracking === 'circuits')
+                ? <CircuitsParent targetElementRef={targetElementRef} scrollToBottom={scrollToBottom}>
+                    <TrackCircuit
+                    //circuits={circuits}
+                    //setCircuits={setCircuits}
+                    //targetElementRef={targetElementRef}
+                    //scrollToBottom={scrollToBottom}
+                    //isCollapsed={isCollapsed}
+                    />
+                </CircuitsParent>
+                : <React.Fragment></React.Fragment>
+            }
+            {
+                (tracking === 'recipes')
+                ? <IngredientParent targetElementRef={targetElementRef}>
+                    <TrackRecipe
+                        targetElementRef={targetElementRef}
+                        scrollToBottom={scrollToBottom}
+                        recipes={recipes}
+                        setRecipes={setRecipes}
+                        getIngredients={getIngredients}
+                    />
+                </IngredientParent>
+                : <React.Fragment></React.Fragment>
+            }
+        </div>
     </div>
 };
 

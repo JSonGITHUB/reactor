@@ -267,7 +267,8 @@ const WavesNew = () => {
         setScroll();
     }
     useEffect(() => {
-        handleSwellLiveSelection()
+        handleSwellLiveSelection();
+        //setConditionsCollapse(false);
     }, []);
     useEffect(() => {
         const newLocations = [...locations];
@@ -447,75 +448,82 @@ const WavesNew = () => {
                     </div>
                     {
                         (conditionsCollapse)
-                            ? <div>
-                                <div className='containerBox button color-red brdr-red' onClick={handleSwellLiveSelection}>
-                                    GET CURRENT BUOY REPORT
-                                </div>
+                        ? <div>
+                            <Location currentPositionExists={currentPositionExists} returnCoordinates={updateCurrentLocation} />
+                            <div className='color-soft'>
+                                <ConditionsDashboard
+                                    tideDisplay={tideDisplay}
+                                    conditionsCollapse={conditionsCollapse}
+                                />
                             </div>
-                            : <div className='containerDetail p-5'>
+                            <div className='containerBox button color-red brdr-red' onClick={handleSwellLiveSelection}>
+                                GET CURRENT BUOY REPORT
+                            </div>
+                        </div>
+                        : <div className='containerDetail p-5'>
+                            <div className='containerBox color-yellow bg-lite p-20'>
+                                <CollapseToggleButton
+                                    title={'GPS'}
+                                    isCollapsed={gpsCollapse}
+                                    setCollapse={setGpsCollapse}
+                                    align='left'
+                                    icon={settings}
+                                />
+                            </div>
+                            {
+                                (gpsCollapse)
+                                ? null
+                                : <Location currentPositionExists={currentPositionExists} returnCoordinates={updateCurrentLocation} />
+                            }
+                            <div className='color-soft'>
+                                <ConditionsDashboard
+                                    tideDisplay={tideDisplay}
+                                />
+                            </div>
+
+                            <ConditionsContext.Provider value={status}>
+                                <ConditionsSelectors
+                                    tideDisplay={tideDisplay}
+                                />
+                            </ConditionsContext.Provider>
+                            <div className=''>
                                 <div className='containerBox color-yellow bg-lite p-20'>
                                     <CollapseToggleButton
-                                        title={'GPS'}
-                                        isCollapsed={gpsCollapse}
-                                        setCollapse={setGpsCollapse}
+                                        title={`${icons.wave} WAVE SUMMARY`}
+                                        isCollapsed={matchCollapse}
+                                        setCollapse={setMatchCollapse}
                                         align='left'
-                                        icon={settings}
                                     />
                                 </div>
                                 {
-                                    (gpsCollapse)
-                                        ? null
-                                        : <Location currentPositionExists={currentPositionExists} returnCoordinates={updateCurrentLocation} />
-                                }
-                                <div className='color-soft'>
-                                    <ConditionsDashboard
-                                        tideDisplay={tideDisplay}
-                                    />
-                                </div>
-
-                                <ConditionsContext.Provider value={status}>
-                                    <ConditionsSelectors
-                                        tideDisplay={tideDisplay}
-                                    />
-                                </ConditionsContext.Provider>
-                                <div className=''>
-                                    <div className='containerBox color-yellow bg-lite p-20'>
-                                        <CollapseToggleButton
-                                            title={`${icons.wave} WAVE SUMMARY`}
-                                            isCollapsed={matchCollapse}
-                                            setCollapse={setMatchCollapse}
-                                            align='left'
-                                        />
-                                    </div>
-                                    {
-                                        (matchCollapse)
-                                            ? <div></div>
-                                            : <div>
-                                                <div className='m-10 mt-20'>
-                                                    <span className='bold color-lite'>
-                                                        {(getCount() === 1) ? `1 wave` : `${getCount()} waves`}
-                                                    </span> of {locations.length}
-                                                </div>
-                                                <div className='m-5'>
-                                                    <span className='bold color-lite'>{status.distance} mile</span> radius
-                                                </div>
-                                                <div className='m-5 bold'>
-                                                    prefer:
-                                                </div>
-                                                <div className='m-5'>
-                                                    <span className='bold color-neogreen'>{status.swell1Direction} </span>and <span className='color-orange bold'>{status.swell2Direction} </span>swell
-                                                </div>
-                                                <div className='m-5'>
-                                                    <span className='bold color-lite'>{status.tide} </span>tide
-                                                </div>
-                                                <div className='m-5'>
-                                                    <span className='bold color-lite'>{status.windDirection}</span> winds.
-                                                </div>
+                                    (matchCollapse)
+                                        ? <div></div>
+                                        : <div>
+                                            <div className='m-10 mt-20'>
+                                                <span className='bold color-lite'>
+                                                    {(getCount() === 1) ? `1 wave` : `${getCount()} waves`}
+                                                </span> of {locations.length}
                                             </div>
+                                            <div className='m-5'>
+                                                <span className='bold color-lite'>{status.distance} mile</span> radius
+                                            </div>
+                                            <div className='m-5 bold'>
+                                                prefer:
+                                            </div>
+                                            <div className='m-5'>
+                                                <span className='bold color-neogreen'>{status.swell1Direction} </span>and <span className='color-orange bold'>{status.swell2Direction} </span>swell
+                                            </div>
+                                            <div className='m-5'>
+                                                <span className='bold color-lite'>{status.tide} </span>tide
+                                            </div>
+                                            <div className='m-5'>
+                                                <span className='bold color-lite'>{status.windDirection}</span> winds.
+                                            </div>
+                                        </div>
 
-                                    }
-                                </div>
+                                }
                             </div>
+                        </div>
                     }
                     <div className='containerBox bold color-yellow bg-lite p-20'>
                         <SearchBar

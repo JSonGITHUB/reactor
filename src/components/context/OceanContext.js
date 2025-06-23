@@ -270,6 +270,7 @@ const OceanParent = ({
     }
     const handleSwell1Selection = (groupTitle, label, selected) => {
         const swell1Angle = directionObject[selected];
+        console.log(`OceanContext => handleSwell1Selection: ${selected} swell1Angle: ${swell1Angle}`);
         localStorage.setItem('swell1Direction', selected);
         localStorage.setItem('swell1Angle', swell1Angle);
         setStatus(prevState => ({

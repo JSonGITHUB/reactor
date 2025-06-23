@@ -508,9 +508,9 @@ const Fuel = () => {
                 (gpsCollapse)
                     ? null
                     : <Geolocator
-                        currentPositionExists='false'
-                        returnCurrentPosition={updateCurrentLocation}
-                    />
+                            currentPositionExists='false'
+                            returnCurrentPosition={updateCurrentLocation}
+                        />
             }
             <label className='flexContainer containerInput'>
                 <div className='columnRightAlign width-50-percent'>
