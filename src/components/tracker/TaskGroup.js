@@ -105,7 +105,7 @@ const TaskGroup = ({
                         (collapsed)
                         ? null
                         : taskGroup.tasks.map((task, taskIndex) => (
-                            (task.display && task.display === true)
+                            (!task.display || (task.display && task.display === true))
                             ? <div key={getKey(`Task${taskIndex}`)} className='containerBox lowerBorder'>
                                 <Task
                                     projects={tasks}

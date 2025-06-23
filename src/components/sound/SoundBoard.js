@@ -6,6 +6,7 @@ import Breathing from '../breathing/Breathing';
 import BreathingPath from '../breathing/BreathingPath';
 import AnimatedLine from '../breathing/AnimatedLine';
 import LoungeBeatPlayer from './LoungeBeatPlayer';
+import DogWhistle from './DogWhistle';
 
 const SoundBoard = () => {
 
@@ -13,11 +14,6 @@ const SoundBoard = () => {
     const times = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 'Continuous'];
 
     const boardItems = [
-        {
-            //title: '532 Hz (ADHD)',
-            title: 'Dog Whistle',
-            sound: 'play25kHz'
-        },
         {
             //title: '532 Hz (ADHD)',
             title: 'ADHD (532Hz)',
@@ -192,6 +188,7 @@ const SoundBoard = () => {
                     />
                 </div>
             </div>
+            <DogWhistle />
             <LoungeBeatPlayer />
             <div className='containerBox grid300'>
                 {

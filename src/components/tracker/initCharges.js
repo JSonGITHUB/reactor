@@ -1,4 +1,4 @@
-const initCharges = [{"createdDate":"1/8/2024, 11:15:25 AM","startTime":1704741325534,"tasks":[{"startTime":1704776260276,"endTime":"","description":"Battery + Solar: 40-100%","sessions":[{"startDate":"1/8/2024, 8:57:40 PM","startTime":1704776260275,"subTasks":[{"startDate":"1/8/2024, 8:57:40 PM","startTime":1704776260275,"endDate":"1/8/2024, 8:57:55 PM","endTime":1704776275422}],"endDate":"1/8/2024, 8:57:55 PM","endTime":1704776275422,"totalTime":"00:00:15","runningTime":15147,"runningTimeDisplay":"00:00:15"},{"startDate":"1/8/2024, 8:59:30 PM","startTime":1704776370295,"subTasks":[{"startDate":"1/8/2024, 8:59:30 PM","startTime":1704776370295,"endDate":"1/8/2024, 8:59:40 PM","endTime":1704776380928}],"endDate":"1/8/2024, 8:59:40 PM","endTime":1704776380928,"totalTime":"00:00:10","runningTime":10633,"runningTimeDisplay":"00:00:10"}],"isRunning":false,"runningTime":25780,"runningTimeDisplay":"00:00:25","totalTime":null,"timerId":7}],"totalTime":null,"isCollapsed":false}];
+const initCharges = [];
 
 export default initCharges;
 
