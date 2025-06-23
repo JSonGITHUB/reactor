@@ -1,0 +1,123 @@
+<medicalRecords>
+  <patient>
+    <id>001</id>
+    <name>John Doe</name>
+    <dob>1980-05-15</dob>
+    <gender>Male</gender>
+    <diagnosis>Hypertension</diagnosis>
+    <medications>
+      <medication>Aspirin</medication>
+      <medication>Losartan</medication>
+      <medication>Lisinopril</medication>
+      <medication>Metoprolol</medication>
+      <medication>Hydrochlorothiazide</medication>
+    </medications>
+  </patient>
+  <patient>
+    <id>002</id>
+    <name>Jane Smith</name>
+    <dob>1975-10-22</dob>
+    <gender>Female</gender>
+    <diagnosis>Diabetes</diagnosis>
+    <medications>
+      <medication>Insulin</medication>
+      <medication>Metformin</medication>
+      <medication>glipizide</medication>
+      <medication>sitagliptin</medication>
+    </medications>
+  </patient>
+  <!-- Additional patient records can be added here -->
+  <patient>
+    <id>003</id>
+    <name>Ralph Maurice</name>
+    <dob>1965-11-10</dob>
+    <gender>Male</gender>
+    <diagnosis>Hyperlipidemia (High Cholesterol)</diagnosis>
+    <medications>
+      <medication>atorvastatin</medication>
+      <medication>fenofibrate</medication>
+      <medication>ezetimibe</medication>
+    </medications>
+  </patient>
+  <patient>
+    <id>004</id>
+    <name>Gloria Yale</name>
+    <dob>1970-05-27</dob>
+    <gender>Female</gender>
+    <diagnosis>Gastroesophageal Reflux Disease (GERD)</diagnosis>
+    <medications>
+      <medication>omeprazole</medication>
+      <medication>ranitidine</medication>
+      <medication>antacids</medication>
+    </medications>
+  </patient>
+  <patient>
+    <id>005</id>
+    <name>Jolene Duane</name>
+    <dob>1980-02-02</dob>
+    <gender>Female</gender>
+    <diagnosis>Major Depressive Disorder</diagnosis>
+    <medications>
+      <medication>fluoxetine</medication>
+      <medication>venlafaxine</medication>
+    </medications>
+  </patient>
+  <patient>
+    <id>006</id>
+    <name>Grace Conner</name>
+    <dob>1975-09-10</dob>
+    <gender>Female</gender>
+    <diagnosis>Osteoarthritis</diagnosis>
+    <medications>
+      <medication>ibuprofen</medication>
+      <medication>acetaminophen</medication>
+      <medication>corticosteroid</medication>
+    </medications>
+  </patient>
+  <patient>
+    <id>007</id>
+    <name>Clarissa Nola</name>
+    <dob>1990-01-30</dob>
+    <gender>Female</gender>
+    <diagnosis>Asthma</diagnosis>
+    <medications>
+      <medication>fluticasone</medication>
+      <medication>salmeterol</medication>
+      <medication>montelukast</medication>
+    </medications>
+  </patient>
+  <patient>
+    <id>008</id>
+    <name>Donny Zaiden</name>
+    <dob>1992-06-20</dob>
+    <gender>Male</gender>
+    <diagnosis>Hypothyroidism</diagnosis>
+    <medications>
+      <medication>methimazole</medication>
+    </medications>
+  </patient>
+  <patient>
+    <id>009</id>
+    <name>Kelvin Zeb</name>
+    <dob>1962-07-12</dob>
+    <gender>Male</gender>
+    <diagnosis>Chronic Obstructive Pulmonary Disease</diagnosis>
+    <medications>
+      <medication>albuterol</medication>
+      <medication>fluticasone</medication>
+      <medication>tiotropium</medication>
+    </medications>
+  </patient>
+   <patient>
+    <id>010</id>
+    <name>Kelan Ora</name>
+    <dob>1952-08-15</dob>
+    <gender>Male</gender>
+    <diagnosis>Coronary Artery Disease</diagnosis>
+    <medications>
+      <medication>aspirin</medication>
+      <medication>metoprolol</medication>
+      <medication>atorvastatin</medication>
+    </medications>
+  </patient>
+</medicalRecords>
