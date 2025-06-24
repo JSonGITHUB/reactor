@@ -1,11 +1,16 @@
 import React from 'react';
 
-const DropDown = ({ options, value, onChange }) => {
+const DropDown = ({ 
+  options, 
+  value, 
+  onChange, 
+  classes
+}) => {
   return (
-    <select value={value} onChange={onChange} className='color-dark p-10 r-5 m-5'>
+    <select value={value} onChange={onChange} className={`${classes}`}>
       {options.map((option, index) => (
-        <option key={index} value={option}>
-          {option}
+        <option key={index} value={(!option.value)?option:option.value}>
+          {(!option.label)?option:option.label}
         </option>
       ))}
     </select>

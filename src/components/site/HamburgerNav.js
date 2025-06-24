@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import Link from '../Link.js';
+import LinkButton from '../LinkButton.js';
 import getKey from '../utils/KeyGenerator.js';
 
 const HamburgerNav = ({ navItems }) => {
     
     const [menuOpen, setMenuOpen] = useState(false);
-    const portraitButton = (label) => <Link  label={label} href={label} className="noUnderline" key={getKey("link")}>
+    const portraitButton = (label) => <LinkButton  label={label} href={label} className="noUnderline" key={getKey("link")}>
             <div key={getKey(label)} className="button greet p-15 color-yellow r-5 bg-dkGreen mr-20 ml-20 mt-1">
                 {label}
             </div>
-        </Link>;
+        </LinkButton>;
     const portraitNav = (item) => <div key={getKey("nav")}>{portraitButton(item)}</div>;
     const getMenuItems = () => {
         const menuItems = navItems.map((item) => portraitNav(item));

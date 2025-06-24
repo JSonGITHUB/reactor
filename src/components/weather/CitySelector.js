@@ -59,9 +59,9 @@ const CitySelector = () => {
                                             <div className='color-yellow bold mb-10'>wind: </div>
                                             <div className='r-5 p-10 bg-dkGreen'>
                                                 <div className="r-5 m-5 pt-5 pb-5 bg-white">
-                                                    {getDirectionIcon(getDirection(wind.deg))}
+                                                    {getDirectionIcon(getDirection(wind.deg, 'wind'), 'wind')}
                                                 </div>
-                                                {getDirection(wind.deg)}
+                                                {getDirection(wind.deg, 'wind')}
                                                 {windDirection()}
                                                 {windSpeed()}
                                             </div>
@@ -135,8 +135,15 @@ const CitySelector = () => {
     return (
         <React.Fragment>
             <h1 className='navBranding color-yellow'>Search your city</h1>
-            <input onKeyDown={onKeyDown} value={city} placeholder='Enter city'
-                    onChange={(event) => setCity(event.target.value)} className='greet p-20 r-10 w-200 brdr-green'/>
+            <input 
+                id='city'
+                name='city'
+                onKeyDown={onKeyDown} 
+                value={city} 
+                placeholder='Enter city'
+                onChange={(event) => setCity(event.target.value)} 
+                className='greet p-20 r-10 w-200 brdr-green'
+            />
             <button onClick={onSearch} className='ml-5 greet p-20 r-10 w-200 bg-green brdr-green'>
                 Check Weather
             </button>

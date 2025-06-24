@@ -1,37 +1,50 @@
 import React, { useState } from 'react';
-import FormNotes from './components/forms/FormEssay.js';
-import Reservation from './components/forms/FormReservation.js';
-import SignUpDialog from './components/utils/SignUpDialog.js';
-import debounce from './components/utils/Debouncer.js';
-import Footer from './components/site/Footer.js';
-import Header from './components/site/HeaderNoRouter.js';
-import Home from './components/Home.js';
-import Calculator from './components/Calculator.js';
-import BowlBuilder from './components/BowlBuilder.js';
-import LogDirectory from './components/waves/LogDirectoryNoRouter.js';
-import SurfLog from './components/waves/LoggerFunctional.js';
-import WaveFinder from './components/waves/WaveFinder.js';
-import Buoys from './components/waves/SurfReports.js';                            
-import SlideShow from './components/SlideShow.js';
-import PhotoBlog from './components/blog/PhotoBlog.js';
-import PhotoSequence from './components/utils/PhotoSequence.js';
-import Reducer from './components/Reducer.js';
-import Adder from './components/hooks/Adder.js';
-import Counter from './components/hooks/Counter.js';
-import Todos from './components/hooks/Todos.js';   
+import FormNotes from './components/forms/FormEssay';
+import Reservation from './components/forms/FormReservation';
+import SignUpDialog from './components/utils/SignUpDialog';
+import debounce from './components/utils/Debouncer';
+import Footer from './components/site/Footer';
+import Header from './components/site/HeaderNoRouter';
+import Home from './components/Home';
+import Calculator from './components/Calculator';
+import BowlBuilder from './components/BowlBuilder';
+import Sessions from './components/waves/LogDirectoryNoRouter';
+import Session from './components/waves/Session';
+import Waves from './components/waves/Waves';
+import Product from './components/shop/Product';
+import EyeExercises from './components/eye/EyeExercises';
+import PDFReport from './components/eye/PDFReport';
+import SunTracker from './components/waves/SunTracker';
+import StepTimer from './components/utils/StepTimer';
+import StepManager from './components/StepManager';
+import Garden from './components/garden/Garden';
+import Snippets from './components/utils/Snippets';
+import TideChart from './components/waves/tide/TideChart';
+import Buoys from './components/waves/SurfReports';                            
+import SlideShow from './components/SlideShow';
+import PhotoSequence from './components/utils/PhotoSequence';
+import Reducer from './components/Reducer';
+import Adder from './components/hooks/Adder';
+import Counter from './components/hooks/Counter';
+import Todos from './components/hooks/Todos';   
 import './assets/css/App.css';
-import Photos from './components/utils/Photos.js';
-import Videos from './components/utils/Videos.js';
-import WikiSearch from './components/utils/WikiSearch.js';
-import DualVideoPlayer from './components/utils/DualVideoPlayer.js';
-import ExchangeRates from './components/utils/ExchangeRates.js';
-import ExchangeConverter from './components/utils/ExchangeConverter.js';
-import ExpenseTracker from './components/utils/ExpenseTracker.js';
-import TaskTracker from './components/utils/TaskTracker.js';
-import VideoPlayer from './components/utils/VideoPlayer.js';
-import Translator from './components/utils/Translator.js';
-import Accordion from './components/utils/Accordion.js';
-import Route from './components/utils/Route.js';
+import Photos from './components/utils/Photos';
+import Videos from './components/utils/Videos';
+import Wiki from './components/wiki/Wiki';
+import Video from './components/utils/Video';
+import ExchangeRates from './components/utils/ExchangeRates';
+import Admin from './components/utils/Admin';
+import Currency from './components/utils/Currency';
+import Expenses from './components/utils/Expenses';
+import Converter from './components/utils/Converter';
+import Tracker from './components/tracker/Tracker';
+import TrainingLog from './components/tracker/TrainingLog';
+import VideoPlayer from './components/utils/VideoPlayer';
+import Translator from './components/utils/Translator';
+import Accordion from './components/utils/Accordion';
+import Route from './components/utils/Route';
+import initializeData from './components/utils/InitializeData';
+import SunTracker from './components/waves/SunTracker';
 
 export default ({ props }) => {
 
@@ -74,7 +87,7 @@ export default ({ props }) => {
     const startIndex = () => window.location.search.indexOf('logId=')+6;
     const endIndex = () => window.location.search.length;
     const getLogId = () => window.location.search.substring(startIndex(), endIndex());
-    const logId = (logIdExists) ? getLogId() : localStorage.getItem('logId');
+    const logId = (logIdExists) ? getLogId() : initializeData('logId', null);
 
     return (
         <div>
@@ -82,7 +95,7 @@ export default ({ props }) => {
                 <Header company={company} menu='false' width={width} isMotionOn={isMotionOn}/>
                 <div className='fadeIn'>
                     <Route path='/'>
-                        <WaveFinder
+                        <Waves
                             tide='medium' 
                             isSwell1='false' 
                             isSwell2='false' 
@@ -100,16 +113,23 @@ export default ({ props }) => {
                             distance='10' 
                         />
                     </Route>
+                    <Route path='/Snippets'>
+                        <Snippets />
+                    </Route>
                     <Route path='/Home'><Home /></Route>
                     <Route path='/Accordion'><Accordion items={items} /></Route>
                     <Route path='/BowlBuilder'><BowlBuilder /></Route>
-                    <Route path='/Converter'><Calculator /></Route>
+                    {/*<Route path='/Convert'><Calculator /></Route>*/}
                     <Route path='/Notes'><FormNotes /></Route>
                     <Route path='/Reservation'><Reservation /></Route>
                     <Route path='/GuestList'><SignUpDialog /></Route>
-                    <Route path='/SurfLog'><SurfLog logId={logId} /></Route>
-                    <Route path='/WaveFinder'>
-                        <WaveFinder 
+                    <Route path='/Session'><Session logId={logId} /></Route>
+                    <Route path='/SunTracker'><SunTracker /></Route>
+                    <Route path='/EyeExercises'><EyeExercises /></Route>
+                    <Route path='/PDFReport'><PDFReport /></Route>
+                    <Route path='/Product'><Product /></Route>
+                    <Route path='/Waves'>
+                        <Waves 
                             {...props} 
                             tide='medium' 
                             isSwell1='false' 
@@ -128,10 +148,18 @@ export default ({ props }) => {
                             distance='10'
                         />
                     </Route>
+                    <Route path='/StepTimer'>
+                        <StepTimer />
+                    </Route>
+                    <Route path='/StepManager'>
+                        <StepManager />
+                    </Route>
+                    <Route path='/Garden'>
+                        <Garden />
+                    </Route>
                     <Route path='/Buoys'><Buoys /></Route>
-                    <Route path='/LogDirectory'><LogDirectory /></Route>
+                    <Route path='/Sessions'><Sessions /></Route>
                     <Route path='/Swell'><SlideShow /></Route>
-                    <Route path='/PhotoBlog'><PhotoBlog/></Route>
                     <Route path='/PhotoSequence'><PhotoSequence /></Route>
                     <Route path='/Adder'>
                         <Adder 
@@ -143,13 +171,18 @@ export default ({ props }) => {
                     <Route path='/Counter'><Counter /></Route>
                     <Route path='/Photos'><Photos /></Route>
                     <Route path='/Videos'><Videos /></Route>
-                    <Route path='/WikiSearch'><WikiSearch /></Route>
-                    <Route path='/DualVideoPlayer'><DualVideoPlayer /></Route>
+                    <Route path='/Wiki'><Wiki /></Route>
+                    <Route path='/Video'><Video /></Route>
                     <Route path='/ExchangeRates'><ExchangeRates /></Route>
-                    <Route path='/ExchangeConverter'><ExchangeConverter /></Route>
-                    <Route path='/ExpenseTracker'><ExpenseTracker /></Route>
-                    <Route path='/TaskTracker'><TaskTracker /></Route>
-                    <Route path='/Translator'><Translator /></Route>
+                    <Route path='/Currency'><Currency /></Route>
+                    <Route path='/Expenses'><Expenses /></Route>
+                    <Route path='/Converter'><Converter /></Route>
+                    <Route path='/Tracker'><Tracker /></Route>
+                    <Route path='/TideChart'><TideChart /></Route>
+                    <Route path='/TrainingLog'><TrainingLog /></Route>
+                    <Route path='/Admin'><Admin /></Route>
+                    {/*<Route path='/Sheets'><Checklist /></Route>*/}
+                    <Route path='/Translate'><Translator /></Route>
                     <Route path='/Todos'><Todos /></Route>
                     <Route path='/Reducer' ><Reducer /></Route>
                 </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Toggle from '../utils/Toggle';
-import LoginControl from '../utils/LoginControl';
+//import LoginControl from '../utils/LoginControl';
 import CopyrightText from '../functional/CopyrightText';
 import js from '../../assets/images/js.png';
 import Loader from './Loader';
@@ -10,7 +10,7 @@ import ScrollListener from './ScrollListener'
 
 const Footer = ({ isSignedIn, isMotionOn, setMotion, setSignIn, setCountry }) => {
     
-    const getPath = () => window.location.pathname.toLocaleLowerCase();
+    //const getPath = () => window.location.pathname.toLocaleLowerCase();
    
     const [signedIn, setSignedIn] = useState(false);
     const [display, setDisplay] = useState(false);
@@ -46,7 +46,7 @@ const Footer = ({ isSignedIn, isMotionOn, setMotion, setSignIn, setCountry }) =>
         console.log(`onScrollToBottom => ${status}`)
         setDisplay(status);
     }
-    
+    /*
     const isPageHome = () => {
         console.log(`isPageHome => path: ${getPath()}`)
         const homePage = (getPath().includes('home') || getPath() === '/reactor' || getPath() === '/reactor/')
@@ -54,7 +54,6 @@ const Footer = ({ isSignedIn, isMotionOn, setMotion, setSignIn, setCountry }) =>
         : false;
         return homePage
     }
-    /*
     const checkScroll = () => {
         
         const scrollTop = window.scrollY || document.documentElement.scrollTop;

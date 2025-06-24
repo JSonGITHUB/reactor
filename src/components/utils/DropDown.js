@@ -1,5 +1,12 @@
-    import React, { useState, useEffect, useRef } from 'react';
-const DropDown = ({ label, options, selected, onSelectionChange}) => {
+import React, { useState, useEffect, useRef } from 'react';
+
+const DropDown = ({ 
+    label, 
+    options, 
+    selected, 
+    onSelectionChange, 
+    classes 
+}) => {
     const [open, setOpen] = useState(false);
     const toggleOpenStatus = () => setOpen(!open);
     const ref = useRef();
@@ -24,7 +31,7 @@ const DropDown = ({ label, options, selected, onSelectionChange}) => {
         return (
             <div 
                 key={option.value} 
-                className={`button r-5 p-10 bg-dark white`}
+                className={`button r-5 p-10 bg-dark white ${classes}`}
                 onClick={() => onSelectionChange(option)}
             >
                 {option.label}
@@ -33,14 +40,14 @@ const DropDown = ({ label, options, selected, onSelectionChange}) => {
     })
     return (
 
-        <div ref={ref} >
+        <div ref={ref} className={classes}>
             <div 
                 onClick={() => toggleOpenStatus()}
-                className={`ui selection dropdown ${open ? 'visible active' : ''}`}
+                className={`ui selection dropdown ${open ? 'visible active' : ''} ${classes}`}
             >
                 <i className="dropdown icon"></i>
-                <span>{selected.label}</span>
-                <div className={`menu ${open ? 'visible transition' : ''}`}>
+                <span className={classes}>{selected.label}</span>
+                <div className={`menu ${open ? 'visible transition' : ''} ${classes}`}>
                     {list}
                 </div>
             </div>

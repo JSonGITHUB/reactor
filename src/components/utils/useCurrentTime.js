@@ -11,13 +11,10 @@ const getDaysInMonth = () => {
 const getNextDay = (currentDate) => {
     currentDate = Number(currentDate)+1;
     if (currentDate >= getDaysInMonth()) {
-        //console.log(`getNextDay =>\nnextDay: 01\nDaysInMont: ${getDaysInMonth()}`);
         return '01'
     }
     currentDate = (currentDate<10) ? `0${currentDate}` : currentDate;
-    //console.log(`getNextDay =>\nnextDay: ${currentDate}\nDaysInMont: ${getDaysInMonth()}`);
     return currentDate;
-    //((currentTime.getMonth()+1 === 2) &&)
 }
 const getNextMonth = (currentMonth) => {
     // eslint-disable-next-line
@@ -26,50 +23,63 @@ const getNextMonth = (currentMonth) => {
         currentMonth = currentMonth + 1;
     }
     const month = ((currentMonth)<10) ? `0${(currentMonth)}` : currentMonth;
-    
     return month
-    //((currentTime.getMonth()+1 === 2) &&)
 }
 
 const useCurrentTime = () => {
+    const getCurrentTime = new Date();
 
-    let getCurrentTime = new Date();
+    // Extract year, month, date, hours, and minutes
     const year = getCurrentTime.getFullYear();
-    const currentMonth = getCurrentTime.getMonth()+1;
-    const month = ((currentMonth)<10) ? `0${(currentMonth)}` : currentMonth;
-    const monthLong = months[currentMonth-1];
-    const monthNextLong = months[currentMonth];
+    const currentMonth = getCurrentTime.getMonth() + 1;
+    const month = currentMonth < 10 ? `0${currentMonth}` : currentMonth;
+    const monthLong = months[currentMonth - 1];
+    const monthNextLong = months[(currentMonth % 12)]; // Handles December to January transition
     const currentDate = getCurrentTime.getDate();
-    const date = (currentDate<10) ? `0${currentDate}` : currentDate;
+    const date = currentDate < 10 ? `0${currentDate}` : currentDate;
     const currentHour = getCurrentTime.getHours();
-    const hours = (currentHour<10) ? `0${(currentHour<0) ? 0 : currentHour}` : currentHour;
-    const startHour = ((currentHour-7)<10) ? `0${((currentHour-7)<0)?0:(currentHour-7)}` : (currentHour-7);
+    const hours = currentHour < 10 ? `0${currentHour}` : currentHour;
     const currentMinutes = getCurrentTime.getMinutes();
-    const minutes = (currentMinutes<10) ? `0${currentMinutes}` : currentMinutes;
-    //const getEndTime = `${year}${month}${date}%20${hours}:${minutes}`;
-    const getEndTime = `${year}${getNextMonth(currentMonth)}${getNextDay(currentDate)}%20${hours}:${minutes}`;
-    const getStartTime = `${year}${month}${date}%20${startHour}:00`;
-    getCurrentTime = `${year}${month}${date}%20${hours}:${minutes}`;
-    //console.log(`useCurrentTime - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
-    // eslint-disable-next-line
+    const minutes = currentMinutes < 10 ? `0${currentMinutes}` : currentMinutes;
+
+    // Calculate startTime by subtracting 7 hours
+    const startTimeObj = new Date(getCurrentTime.getTime());
+    startTimeObj.setHours(startTimeObj.getHours() - 7);
+    const startHour = startTimeObj.getHours();
+    const startDate = startTimeObj.getDate();
+    const startMonth = startTimeObj.getMonth() + 1;
+    const formattedStartHour = startHour < 10 ? `0${startHour}` : startHour;
+    const formattedStartDate = startDate < 10 ? `0${startDate}` : startDate;
+    const formattedStartMonth = startMonth < 10 ? `0${startMonth}` : startMonth;
+
+    const getStartTime = `${year}${formattedStartMonth}${formattedStartDate}%20${formattedStartHour}:00`;
+
+    // Calculate endTime by adding 1 day to the current date
+    const endTimeObj = new Date(getCurrentTime.getTime());
+    endTimeObj.setDate(endTimeObj.getDate() + 1); // Adding 1 day to the current date for endTime
+    const endYear = endTimeObj.getFullYear();
+    const endMonth = endTimeObj.getMonth() + 1;
+    const endDate = endTimeObj.getDate();
+    //console.log(`useCurrentTime => endDate: ${endDate}`);
+    const endHour = endTimeObj.getHours();
+    const formattedEndMonth = endMonth < 10 ? `0${endMonth}` : endMonth;
+    const formattedEndDate = endDate < 10 ? `0${endDate}` : endDate;
+    const formattedEndHour = endHour < 10 ? `0${endHour}` : endHour;
+
+    const getEndTime = `${endYear}${formattedEndMonth}${formattedEndDate}%20${formattedEndHour}:${minutes}`;
+
+    // Tide start and end time calculation
+    const getTideStartTime = `${year}${month}${date}%2004:00`;
+    const getTideEndTime = `${year}${month}${date}%2021:00`;
+
+    // Set up state
     const [startTime, setStartTime] = useState(getStartTime);
-    // eslint-disable-next-line
+    const [tideStartTime, setTideStartTime] = useState(getTideStartTime);
     const [endTime, setEndTime] = useState(getEndTime);
+    const [tideEndTime, setTideEndTime] = useState(getTideEndTime);
     const currentTime = new Date();
-/*
-    https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?
-    product=predictions&
-    application=NOS.COOPS.TAC.WL&
-    begin_date=20210330%2003:00&
-      end_date=20210330%2010:33&
-    datum=MLLW&
-    station=9410230&
-    time_zone=lst_ldt&
-    units=english&
-    interval=hilo&
-    format=json
-*/   
-    const time = {   
+
+    const time = {
         hours,
         minutes,
         date,
@@ -79,11 +89,12 @@ const useCurrentTime = () => {
         year,
         currentTime,
         startTime,
-        endTime
-    }
+        endTime,
+        tideStartTime,
+        tideEndTime
+    };
 
-    return [ time ]; 
-            
-
+    return [time];
 }
+
 export default useCurrentTime;

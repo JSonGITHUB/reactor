@@ -1,222 +1,213 @@
 import React, { useState, useEffect } from 'react';
-import Loader from '../site/Loader.js';
-//import tide from '../../assets/images/tide.png'
-import arrowDown from '../../assets/images/ArrowDown.png';
-import arrowUp from '../../assets/images/ArrowUp.png';
-//import config from '../../apis/config';
+import Loader from '../site/Loader';
+import tide from '../../assets/images/tide.png';
+import getKey from '../utils/KeyGenerator';
+import icons from '../site/icons';
+import useOceanData from './useOceanData';
+import CollapseToggleButton from '../utils/CollapseToggleButton';
+import validate from '../utils/validate';
+import initializeData from '../utils/InitializeData';
 
-const Tide = ({ tideNow, data, time, setTide, display, isMotionOn }) => {
+const Tide = ({
+    tideNow,
+    data,
+    time,
+    setTide,
+    display,
+    isMotionOn
+}) => {
 
+    const startTime = time[0].startTime;
+    const endTime = time[0].endTime;
+    const tideNowLink = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${startTime}&end_date=${endTime}&station=9410660&product=water_level&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
+    console.log(`TIDE => tideNowLink: ${tideNowLink}`)
+    const [retry, setRetry] = useState('');
+    const localTideNow = useOceanData('tide', tideNowLink, '', setRetry);
+    const getLocalData = (localItem) => initializeData(localItem, null);
+    const collapseStateInit = (localItem) => getLocalData(localItem) ? getLocalData(localItem) === 'true' : true;
+    const [tideCollapse, setTideCollapse] = useState(collapseStateInit('tideCollapse'));
+    
+    const heightInit = () => getLocalData('height') ? getLocalData('height') : '';
+    const getClosestValue = () => {
+        const data = tideNow.data;
+        const currentTime = new Date();
+        let closest = null;
+        let smallestDifference = Infinity;
+        let lastHeight = 0;
+        let direction = '';
+
+        data.forEach((item) => {
+            const itemTime = new Date(item.t.replace(" ", "T"));
+            const timeDifference = Math.abs(currentTime - itemTime);
+            
+            if (Number(item.v) > lastHeight) {
+                direction = 'up';
+            } else {
+                direction = 'down';
+            }
+            if (timeDifference < smallestDifference) {
+                closest = item;
+                smallestDifference = timeDifference;
+            }
+            lastHeight = Number(item.v);
+        });
+        return closest ? [Number(closest.v), direction] : [0, direction];
+    };
+    const getCurrentTide = (getClosestValue()[0] > 4) ? 'high' : (getClosestValue()[0] < 2) ? 'low' : 'medium';
+   
+    const tideHeader = () => {
+        if (retry !== '') {
+            return <div>
+                TIDE: Error fetching data retry attempt {retry}
+            </div>
+        }
+        return <div>
+            TIDE {Number(heightInit()).toFixed(1)}<span className='size12'>ft</span> {getCurrentTide}
+        </div>
+    }
+
+    useEffect(() => {
+        localStorage.setItem('tideCollapse', tideCollapse);
+    }, [tideCollapse]);
+
+    const initTide = {
+        t: '2024-04-04 13:18',
+        v: '-0.743',
+        type: 'L'
+    }
+    const evaluteTide = (tide) => tide ?? initTide;
     const getTideHour = (tide) => {
-        const originalHour = Number(tide.t.split(" ")[1].split(":")[0]);
+        const newTide = evaluteTide(tide);
+        const originalHour = Number(newTide.t.split(' ')[1].split(':')[0]);
         const greaterThan12 = (originalHour > 12) ? true : false;
         const lessThan1 = (originalHour < 1) ? true : false;
         const hour = (greaterThan12) ? (originalHour - 12) : (lessThan1) ? 12 : originalHour;
-        console.log(`getTideHour => hour: ${hour}`);
         return hour;
     }
     const getTideMinutes = (tide) => {
-        const originalMinutes = Number(tide.t.split(" ")[1].split(":")[1]);
+        const newTide = evaluteTide(tide);
+        const originalMinutes = Number(newTide.t.split(' ')[1].split(':')[1]);
         const lessThan10 = (originalMinutes < 10) ? true : false;
         const minutes = (lessThan10) ? `0${originalMinutes}` : originalMinutes;
-        console.log(`getTideMinutes => minutes: ${minutes}`);
         return minutes;
     }
     const getTideTime = (tide) => {
         const originalTime = `${getTideHour(tide)}:${getTideMinutes(tide)}`;
-        console.log(`getTideTime => time: ${originalTime}`);
         return originalTime;
     }
     const getTideHeight = (tide) => {
-        const originalTide = Number(tide.v);
-        console.log(`getTideHeight => tide: ${originalTide.toFixed(1)}`);
+        const newTide = evaluteTide(tide);
+        const originalTide = Number(newTide.v);
         const displayTide = `${originalTide.toFixed(1)}'`
         return displayTide;
     }
-    const getTideType = (tide) => {
-        const originalType = tide.type;
-        const type = (originalType == 'H') ? 'High' : 'Low';
-        console.log(`getTideType => type: ${type}`);
-        return type;
-    }
     const getTide = (tide) => {
-        const originalTide = tide.type;
-        const type = (originalTide == 'H') ? 'HIGH' : 'LOW';
-        console.log(`getTide => tide: ${type}`);
-        return type;
+        const newTide = evaluteTide(tide);
+        const newType = (newTide.type === 'H') ? 'HIGH' : 'LOW';
+        return newType;
     }
-    let localTide = Number(JSON.parse(localStorage.getItem("tideData")).data[JSON.parse(localStorage.getItem("tideData")).data.length - 1].v).toFixed(1);
-    let localTideTime = Number(JSON.parse(localStorage.getItem("tideData")).data[JSON.parse(localStorage.getItem("tideData")).data.length - 1].t);
-
-    console.log('Tide => tideNow: ', tideNow);
-    console.log('Tide => tideNOW!!!: ', localTide);
-    console.log('Tide => data: ', data);
-    console.log('Tide => display: ', display);
-    console.log('Tide => time: ', time[0].year);
-
-    //const KEY = 'Client-ID '+config.unsplashAPI_KEY;
-    //const api = config.tideAPI_BASE_URL;
-    //const uriMLL = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${startTime}&end_date=${endTime}&station=9410230&product=water_level&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
 
     const [status, setStatus] = useState({
         tide: '',
-        tideDirection: localStorage.getItem('tideDirection') || "?",
+        tideDirection: initializeData('tideDirection', '?'),
         height: null,
         updated: false
     });
 
-    const getCurrentWaterLevel = () => {
 
-        if (tideNow.data !== undefined) {
+    /*
+    useEffect(() => {
 
-            const waterLevel = Number(tideNow.data[tideNow.data.length - 1].v).toFixed(1);
-            const waterLevelTime = Number(tideNow.data[tideNow.data.length - 1].t).toFixed(1);
-            localStorage.setItem('height', waterLevel);
+        const uriMLL = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=NOS.COOPS.TAC.WL&begin_date=${startTime}&end_date=${endTime}&datum=MLLW&station=9410230&time_zone=lst_ldt&units=english&interval=hilo&format=json`;
+        setData(useOceanData('tides', uriMLL));
 
-            return [waterLevel, waterLevelTime];
-        }
-
-        localStorage.setItem('height', localTide);
-        localStorage.setItem('heightTime', localTideTime);
-
-        return [localTide, localTideTime];
-    }
-
-    const getCurrentTide = (getCurrentWaterLevel()[0] > 4) ? "high" : (getCurrentWaterLevel()[0] < 2) ? "low" : "medium";
-    const getCurrentTideTime = getCurrentWaterLevel()[1];
-
+    }, []);
+    */
     useEffect(() => {
 
         let mounted = true;
+        let waterLevel = initializeData('height', null);
+        let waterLevelTime = initializeData('heightTime', null);
 
-        if ((tideNow.data !== undefined) && mounted === true) {
-            const height = localStorage.getItem('height');
-            setTide(getCurrentTide, height);
+        if ((validate(tideNow[0].data) !== null) && mounted === true) {
+            waterLevel = Number(tideNow[0].data[tideNow[0].data.length - 1].v).toFixed(1);
+            waterLevelTime = Number(tideNow[0].data[tideNow[0].data.length - 1].t).toFixed(1);
+       } else if (validate(localTideNow[0].data) !== null) {
+            waterLevel = Number(localTideNow[0].data[localTideNow[0].data.length - 1].v).toFixed(1);
+            waterLevelTime = Number(localTideNow[0].data[localTideNow[0].data.length - 1].t).toFixed(1);
         }
+
+        localStorage.setItem('height', waterLevel);
+        localStorage.setItem('heightTime', waterLevelTime)
+        setTide(getCurrentTide, waterLevel);
 
         return () => mounted = false;
 
-    }, [tideNow.data, getCurrentTide, setTide]);
+    }, [tideNow[0].data, getCurrentTide, setTide]);
+
+    const defaultTides = { 
+        "data": { 
+            "predictions": [
+                { 
+                    "t": "2024-07-01 11:40", 
+                    "v": "1.960", 
+                    "type": "L" 
+                }, 
+                { 
+                    "t": "2024-07-01 18:23", 
+                    "v": "6.064", 
+                    "type": "H" 
+                }, 
+                { 
+                    "t": "2024-07-02 01:53", 
+                    "v": "-0.341", 
+                    "type": "L" 
+                }, 
+                { 
+                    "t": "2024-07-02 08:22", 
+                    "v": "3.338", 
+                    "type": "H" 
+                }, 
+                { 
+                    "t": "2024-07-02 12:34", 
+                    "v": "2.232", 
+                    "type": "L" 
+                }
+            ] 
+        }, 
+        "timestamp": 1719874078612 
+    }
 
     useEffect(() => {
 
         let mounted = true;
-        const predictions = data[0].predictions;
+        let predictions = [];
+        console.log(`useEffect => 1 data[0]: ${JSON.stringify(data[0], null, 2)}`);
+        console.log(`useEffect => 1a Object.keys(data[0]).length: ${Object.keys(data[0]).length}`);
+        if (Object.keys(data[0]).length === 0) {
+            predictions = initializeData('tides', defaultTides)[0].predictions;
+        } else {
+            predictions = data[0].predictions;
+        }
 
-        if ((predictions !== undefined && status.updated !== true) && mounted) {
+        if ((validate(predictions !== null) && status.updated !== true) && mounted) {
 
-            localStorage.setItem('tides', JSON.stringify(data));
-            //console.log(`Tide - getDirection => data: ${JSON.stringify(data, null, 2)}`)
-            //const hours = predictions.map((tide) => getTideHour(tide));
-            //console.log(`predictions => hours: ${JSON.stringify(hours)}`);
-            //const minutes = predictions.map((tide) => getTideMinutes(tide));
-            //console.log(`predictions => minutes: ${JSON.stringify(minutes)}`);
-            //const times = predictions.map((tide) => getTideTime(tide));
-            //console.log(`predictions => times: ${JSON.stringify(times)}`);
-            //const heights = predictions.map((tide) => getTideHeight(tide));
-            //console.log(`predictions => heights: ${JSON.stringify(heights)}`);
-            //const types = predictions.map((tide) => getTideType(tide));
-            //console.log(`predictions => types: ${JSON.stringify(types)}`);
-            //console.log('tide heights: ', heights);
-            //const tides = predictions.map((tide) => getTide(tide));
-            //console.log(`predictions => tides: ${JSON.stringify(tides)}`);
-            /*
-            const checkTide = (hour) => {
-
-                if (hour >= time[0].hours) {
-                    if (hour === time[0].hours) {
-                        if (minutes > time[0].minutes) {
-                            return true;
-                        }
-                    } else if (hour > time[0].hours) {
-                        return true;
-                    }
-                };
-                return false;
+            if (Object.keys(data[0]).length > 0) {
+                localStorage.setItem('tides', JSON.stringify(data));
             }
-
-            const nextTideIndex = hours.findIndex(checkTide);
-            
-            const nextIndexExtra = () => ((hours[nextTideIndex-1] === time[0].hours) && (minutes[nextTideIndex-1] > time[0].minutes)) ? 1 : 0;
-            const getNextIndex = () => nextTideIndex + nextIndexExtra();
-            const pastLastTide = Number(time[0].hours-hours[getNextIndex()-1]);
-            const untilNextTide = Number(hours[getNextIndex()]-time[0].hours);
-
-            // eslint-disable-next-line
-            const untilNextTideMinutes = Number(minutes[getNextIndex()]-time[0].minutes);
-            const lessThanHour = (untilNextTide === 0) ? true : false;
-            
-            const untilTide = () => {
-
-                const pastTime = (untilNextTideMinutes < 0) ? (untilNextTideMinutes+60) : untilNextTideMinutes;
-                const time = (lessThanHour) ? (String(pastTime) + 'min') : ((untilNextTideMinutes < 0) ? (untilNextTide-1) : untilNextTide) + 'hr ' + String(pastTime) + 'min';
-                const timeDisplay = time;
-
-                return timeDisplay;
-
-            }
-            
-            // eslint-disable-next-line
-            const closerTideIndex = (pastLastTide >= untilNextTide) ? getNextIndex() : (getNextIndex()-1);
-            
-            const nextTide = tides[getNextIndex()];
-            const nextHeight = heights[getNextIndex()];
-            const nextType = types[getNextIndex()];
-
-            const lastHeight = heights[getNextIndex()-1];
-            const lastHour = hours[getNextIndex()-1];
-            const lastMinute = minutes[getNextIndex()-1];
-            const lastType = types[getNextIndex()-1];
-
-            const laterHeight = heights[getNextIndex()+1];
-            const laterHour = hours[getNextIndex()+1];
-            const laterMinute = minutes[getNextIndex()+1];
-            const laterType = types[getNextIndex()+1];
-
-            const getNextHour = Number(times[(getNextIndex() === -1) ? (times.length-1) : getNextIndex()].split(':')[0]);
-            const nextHour = (getNextHour>12) ? (getNextHour-12) : (getNextHour<1)?'12':getNextHour;
-            const nextMinutes = (times[(getNextIndex() === -1) ? 1 : getNextIndex()].split(':')[1] < 10) ? `0${times[(getNextIndex() === -1) ? (times.length-1) : getNextIndex()].split(':')[1]}` : times[(getNextIndex() === -1) ? (times.length-1) : getNextIndex()].split(':')[1];
-            const nextTime = `${nextHour}:${nextMinutes}`;
-
-            // eslint-disable-next-line
-            const lastTide = tides[getNextIndex()-1];
-            */
-            const convertTide = (tide) => {
-                const convertedTide = (tide === 'H') ? 'High' : 'Low';
-                return convertedTide;
-            };
 
             setStatus(prevState => ({
-
                 ...prevState,
                 tide: getCurrentTide,
-                //tideDirection: (nextTide === 'L') ? "DOWN" : "UP",
-                //previousTide: lastHeight,
-                //previousHour: (lastHour>12)?(lastHour-12):(laterHour<1)?'12':laterHour,
-                //previousMinute: (lastMinute<10)?(`0${lastMinute}`):lastMinute,
-                //previousType: (lastType == 'L')?'LOW':'HIGH',
-                //laterTide: laterHeight,
-                //laterHour: (laterHour>12)?(laterHour-12):(laterHour<1)?'12':laterHour,
-                //laterMinute: (laterMinute<10)?(`0${laterMinute}`):laterMinute, 
-                //laterType: (laterType == 'L')?'LOW':'HIGH',        
-                //nextTide: nextHeight,
-                //nextPhase: convertTide(nextTide),
-                //nextTime: nextTime,
-                //nextType: (nextType == 'L')?'LOW':'HIGH',
-                //untilNextTide: untilTide(),
-                //nextTideIndex: getNextIndex(),
                 predictions: predictions,
                 updated: true
-
             }))
 
         }
-
         return () => mounted = false;
-
     }, [data, getCurrentTide, status.updated, time]);
 
-    const previousTide = () => (localStorage.getItem('tide')) ? Number(localStorage.getItem('tide')) : 0;
+    const previousTide = () => initializeData('tide', 0);
 
     // eslint-disable-next-line
     const notEqual = () => (Number(previousTide()) !== Number(status.height)) ? true : false;
@@ -228,8 +219,8 @@ const Tide = ({ tideNow, data, time, setTide, display, isMotionOn }) => {
 
         localStorage.setItem('tideDirection', 'DOWN')
 
-        return <div className='flex2Column bg-white r-10 ht-55 mt--15 w-50 pt-15 pl-10 pr-10 pb-10'>
-            <img className='arrows mt-5 mb--2' src={arrowDown} alt='tide direction down' />
+        return <div className='containerDetail m-auto bg-white ht-65 mt--15 pt-23 size40'>
+            {icons.downTriangle}
         </div>
     }
 
@@ -237,23 +228,50 @@ const Tide = ({ tideNow, data, time, setTide, display, isMotionOn }) => {
 
         localStorage.setItem('tideDirection', 'UP')
 
-        return <div className='flex2Column bg-white r-10 ht-55 mt--15 w-50 pt-15 pl-10 pr-10 pb-10'>
-            <img className='arrows mt-5 mb--2' src={arrowUp} alt='tide direction up' />
+        return <div className='containerDetail m-auto bg-white ht-65 mt--15 pt-23 size40'>
+            {icons.upTriangle}
         </div>
 
     }
 
-    const getTideDirection = () => (status.tideDirection === "DOWN") ? getDownArrow() : getUpArrow();
+    const getTideDirection = () => (status.tideDirection === 'DOWN') ? getDownArrow() : getUpArrow();
 
     // eslint-disable-next-line
     const setLocalTide = () => localStorage.setItem('tide', status.tide);
     const setLocalTideDirection = () => localStorage.setItem('tideDirection', status.tideDirection);
 
+    const getNextLowTideIndex = () => {
+        const predictions = status.predictions;
+        const currentTime = new Date();
+
+        let closestIndex = -1;
+        let closestTimeDiff = Infinity;
+
+        for (let i = 0; i < predictions.length; i++) {
+            const predictionTime = new Date(predictions[i].t);
+            if (predictionTime > currentTime && predictions[i].type === 'L') {
+                const timeDiff = predictionTime - currentTime;
+                if (timeDiff < closestTimeDiff) {
+                    closestIndex = i;
+                    closestTimeDiff = timeDiff;
+                }
+            }
+        }
+
+        return closestIndex;
+    };
+
     const findClosestDate = () => {
 
-        const datesArray = status.predictions.map((tide) => tide.t)
+        let datesArray = (status.predictions) ? status.predictions.map((tide) => tide.t) : [];
         if (!Array.isArray(datesArray) || datesArray.length === 0) {
-            return null; // Return null for an empty or non-array input
+            //return null; // Return null for an empty or non-array input
+            if (Object.keys(data[0]).length === 0) {
+                const predictions = initializeData('tides', defaultTides)[0].predictions;
+                datesArray = predictions.map((tide) => tide.t)
+            } else {
+                datesArray = data[0].predictions.map((tide) => tide.t)
+            }
         }
 
         const now = new Date();
@@ -263,7 +281,6 @@ const Tide = ({ tideNow, data, time, setTide, display, isMotionOn }) => {
 
         datesArray.forEach(date => {
 
-            
             const currentDate = new Date(date);
             const timeDifference = Math.abs(currentDate - now);
 
@@ -281,25 +298,27 @@ const Tide = ({ tideNow, data, time, setTide, display, isMotionOn }) => {
     }
 
     // eslint-disable-next-line
-    const fixHours = () => (time[0].hours > 12) ? Number(time[0].hours - 12) : time[0].hours;
     const narrowDisplay = <React.Fragment></React.Fragment>;
 
     const tideDisplay = () => {
-
-        console.log(`tideDisplay => ${JSON.stringify(status, null, 2)}`);
-
         if (status.updated) {
-
-            const tideTable = status.predictions.map((tide) => <div className='flexContainer'>
-                <div className={`flex3ColumnRight p-10 r-10-lft ${(findClosestDate()[1] === tide.t) ? 'bg-green' : 'bg-tinted'} mb-1`}>
+            let predictions = [];
+            if (Object.keys(data[0]).length === 0) {
+                predictions = initializeData('tides', defaultTides)[0].predictions;
+            } else {
+                predictions = data[0].predictions;
+            }
+            //const tideTable = status.predictions.map((tide) => <div key={getKey('tide')} className='flexContainer'>
+            const tideTable = predictions.map((tide) => <div key={getKey('tide')} className='flexContainer'>
+                <div className={`flex3ColumnRight p-10 r-10-lft ${(findClosestDate()[1] === tide.t) ? 'bg-green' : (tide.type === 'L') ? 'bg-neogreen' : 'bg-tinted'} mb-1`}>
                     <div className='pr-10-percent'>
                         {getTideHeight(tide)}
                     </div>
                 </div>
-                <div className={`flex3Column p-10 ${(findClosestDate()[1] === tide.t) ? 'bg-green' : 'bg-tinted'} mb-1`}>
+                <div className={`flex3Column p-10 ${(findClosestDate()[1] === tide.t) ? 'bg-green' : (tide.type === 'L') ? 'bg-neogreen' : 'bg-tinted'} mb-1`}>
                     <div>{getTide(tide)}</div>
                 </div>
-                <div className={`flex3ColumnRight p-10 r-10-rt ${(findClosestDate()[1] === tide.t) ? 'bg-green' : 'bg-tinted'} mb-1`}>
+                <div className={`flex3ColumnRight p-10 r-10-rt ${(findClosestDate()[1] === tide.t) ? 'bg-green' : (tide.type === 'L') ? 'bg-neogreen' : 'bg-tinted'} mb-1`}>
                     <div className='pr-50-percent'>
                         <div>{getTideTime(tide)}</div>
                     </div>
@@ -311,64 +330,28 @@ const Tide = ({ tideNow, data, time, setTide, display, isMotionOn }) => {
         return
     }
 
-
-    const wideDisplay = <div className='flexContainer mt-20 p-10 r-10 bg-tinted'>
-        <div className='flex3Column contentRight'>
-            <div className='p-10 r-10-lft bg-tinted mb-1'>
-                {`${(status.previousTide) ? status.previousTide.toFixed(1) : ''}'`}
-            </div>
-            <div className='p-10 r-10-lft bg-tinted mb-1'>
-                {(status.nextTide) ? status.nextTide.toFixed(1) : ''}'
-            </div>
-            <div className='p-10 r-10-lft bg-tinted'>
-                {`${(status.laterTide) ? status.laterTide.toFixed(1) : ''}'`}
-            </div>
-        </div>
-        <div className='flex3Column'>
-            <div className='p-10 bg-tinted mb-1'>
-                {status.previousType}
-            </div>
-            <div className='p-10 bg-tinted mb-1'>
-                {status.nextType}
-            </div>
-            <div className='p-10 bg-tinted'>
-                {status.laterType}
-            </div>
-        </div>
-        <div className='flex3Column contentRight'>
-            <div className='p-10 r-10-rt bg-tinted mb-1'><span className='mr-20'>{status.previousHour}:{status.previousMinute}</span></div>
-            <div className='p-10 r-10-rt bg-tinted mb-1'><span className='mr-20'>{status.nextTime}</span></div>
-            <div className='p-10 r-10-rt bg-tinted'><span className='mr-20'>{status.laterHour}:{status.laterMinute}</span></div>
-        </div>
-    </div>
-
     const starDisplay = <React.Fragment></React.Fragment>
 
     const getTideDetails = () => {
 
         return <div className='bold'>
             <div className='p-10'>
-                {(getCurrentWaterLevel()[0] < 2) ? 'LOW' : 'HIGH'}
+                {getCurrentTide.toLocaleUpperCase()}
             </div>
             <div className='p-10'>
-                <span>{getCurrentWaterLevel()[0]}</span> ft.
+                <span>{getClosestValue()[0]}</span> ft.
             </div>
         </div>
 
     }
 
     const getHeight = () => {
-
-        const height = getCurrentWaterLevel()[0];
+        const height = getClosestValue()[0];
         localStorage.setItem('height', height);
-        const level = String(status.tide).toUpperCase();
-        const levelDisplay = (display=='star' && level=='MEDIUM')?'MID':level;
-
-        return <div className='pt-5'>
-            <div className='bold pt-5 pb-10 mt--2'>{levelDisplay}</div>
-            {(display=='star')?null:<div className='bold color-white'>{height} ft</div>}
+        return <div className=''>
+            <div className='bold pb-10 mt--10'>{/*levelDisplay*/}{getCurrentTide}</div>
+            <div className='bold color-white'>{height} ft</div>
         </div>
-
     }
 
     // eslint-disable-next-line
@@ -377,79 +360,80 @@ const Tide = ({ tideNow, data, time, setTide, display, isMotionOn }) => {
     </React.Fragment>
 
     const tideClasses = () => {
-
         if (display === 'star') {
             return ''
         } else {
             return 'white'
         }
-
     }
 
     const getTideDisplay = () => {
 
-        const datesArray = (status.predictions) ? status.predictions.map((tide) => tide.t) : [];
-
+        let datesArray = (status.predictions) ? status.predictions.map((tide) => tide.t) : [];
+        let predictions = [];
         if (!Array.isArray(datesArray) || datesArray.length === 0) {
-            return null; // Return null for an empty or non-array input
+            //return null; // Return null for an empty or non-array input
+            if (Object.keys(data[0]).length === 0) {
+                predictions = initializeData('tides', defaultTides)[0].predictions;
+                datesArray = predictions.map((tide) => tide.t)
+            } else {
+                predictions = data[0].predictions;
+                datesArray = predictions.map((tide) => tide.t)
+            }
         }
 
-        const nextTideIndex = findClosestDate()[0]+1;
-
+        const nextTideIndex = findClosestDate()[0] + 1;
         const now = new Date();
-        const tide = (status.predictions) ? status.predictions[nextTideIndex] : 'OOPS!';
-
+        const tide = (predictions) ? predictions[nextTideIndex] : 'OOPS!';
         const date = datesArray[nextTideIndex];
         const currentDate = new Date(date);
         const timeDifference = Math.abs(currentDate - now);
-        const nextTide = (status.predictions) ? getTide(tide) : 'OOPS!';
-        const nextTideTime = (status.predictions) ? getTideTime(tide) : 'OOPS!';
-        const nextTideHeight = (status.predictions) ? getTideHeight(tide) : 'OOPS!';
-
-        function millisecondsToTime(ms) {
+        const nextTide = (predictions) ? getTide(tide) : 'OOPS!';
+        const nextTideTime = (predictions) ? getTideTime(tide) : 'OOPS!';
+        const nextTideHeight = (predictions) ? getTideHeight(tide) : 'OOPS!';
+        const millisecondsToTime = (ms) => {
             const seconds = Math.floor((ms / 1000) % 60);
             const minutes = Math.floor((ms / (1000 * 60)) % 60);
             const hours = Math.floor(ms / (1000 * 60 * 60));
-        
             return { hours, minutes, seconds };
         }
-        
-        const { hours, minutes, seconds } = millisecondsToTime(timeDifference);
-        const untilNextTide = (status.predictions) ? `${hours} hours and ${minutes} minutes` : 'OOPS!';
+        const { hours, minutes } = millisecondsToTime(timeDifference);
+        const untilNextTide = (predictions) ? `${hours} hours and ${minutes} minutes` : 'OOPS!';
 
         return <div className={tideClasses()}>
-                    {(display === 'star') 
-                    ? <div>
-                            <div className='pb-10 pt-25 mt--94'>{getTideDirection()}</div>
-                            <div className='pt-10'>{getHeight()}</div>
-                        </div>
-                    : <div className='p-10'>
-                            {(status.nextTideIndex === -1) ? getHeight() : getTideDetails()}
-                        </div>
-                    }
-                    {(display === 'star')
-                        ? <div></div>
-                        : <div>
-                                <div className=''>{getTideDirection()}</div>
-                                <div className='mt-10 p-10'>
-                                    {nextTideHeight} {nextTide} tide at {nextTideTime}
-                                </div>
-                                <div className='p-10'>
-                                    in {untilNextTide}
-                                </div>
-                            </div>
-                    }
-                    
-                    {(display === 'narrow')
-                        ? narrowDisplay
-                        : (display === 'star')
-                            ? starDisplay
-                            : <div className='mt-10 p-10 r-10 bg-tinted'>
-                                {tideDisplay()}
-                            </div>
-                    }
+            {(display === 'star')
+                ? <div>
+                    <div className='pb-10 pt-25 mt--94'>{getTideDirection()}</div>
+                    <div className='pt-10'>{getHeight()}</div>
+                </div>
+                : (display !== 'narrow')
+                    ? <div className='containerDetail mb-10'>
+                        {(status.nextTideIndex === -1) ? getHeight() : getTideDetails()}
+                    </div>
+                    : <div></div>
+            }
+            {(display === 'star' || display === 'narrow')
+                ? <div></div>
+                : <div>
+                    <div className=''>{getTideDirection()}</div>
+                    <div className='mt-10 p-10'>
+                        {nextTideHeight} {nextTide} tide at {nextTideTime}
+                    </div>
+                    <div className='p-10'>
+                        in {untilNextTide}
+                    </div>
+                </div>
+            }
+            {(display === 'narrow')
+                ? narrowDisplay
+                : (display === 'star')
+                    ? starDisplay
+                    : <div className='mt-10 p-10 r-10 bg-tinted'>
+                        {tideDisplay()}
+                    </div>
+            }
 
-                </div>;
+        </div>;
     }
 
     const percent = 'twentyfivePercent mt--70 mb--70';
@@ -461,76 +445,99 @@ const Tide = ({ tideNow, data, time, setTide, display, isMotionOn }) => {
 
     setLocalTideDirection();
 
-    return getTideDisplay()
+    return <div>
+        {
+            (display === 'wide')
+                ? <div className='containerBox bold color-yellow bg-lite p-20'>
+                    <CollapseToggleButton
+                        //title={`TIDE ${icons.moon}`}
+                        //title={`TIDE ${Number(heightInit()).toFixed(1)}ft ${getCurrentTide}`}
+                        title={''}
+                        component={tideHeader()}
+                        isCollapsed={tideCollapse}
+                        setCollapse={setTideCollapse}
+                        align='left'
+                        icon={tide}
+                    />
+                </div>
+                : null
+        }
+        {
+            (tideCollapse)
+                ? null
+                : getTideDisplay()
+        }
+    </div>
+
 }
 
 export default Tide;
 
 /*   sample url data
 {
-    "metadata": {
-        "id":"8454000",
-        "name":"Providence",
-        "lat":"41.8071",
-        "lon":"-71.4012"
+    'metadata': {
+        'id':'8454000',
+        'name':'Providence',
+        'lat':'41.8071',
+        'lon':'-71.4012'
     }, 
-    "data": [
+    'data': [
         {
-            "t":"2013-01-01 10:00", 
-            "v":"0.072", 
-            "s":"0.003", 
-            "f":"0,0,0,0", 
-            "q":"v"
+            't':'2013-01-01 10:00', 
+            'v':'0.072', 
+            's':'0.003', 
+            'f':'0,0,0,0', 
+            'q':'v'
         },
         {
-            "t":"2013-01-01 10:06", 
-            "v":"0.095", 
-            "s":"0.003", 
-            "f":"0,0,0,0", 
-            "q":"v"
+            't':'2013-01-01 10:06', 
+            'v':'0.095', 
+            's':'0.003', 
+            'f':'0,0,0,0', 
+            'q':'v'
         },
         {
-            "t":"2013-01-01 10:12", 
-            "v":"0.115", 
-            "s":"0.003", 
-            "f":"0,0,0,0", 
-            "q":"v"
+            't':'2013-01-01 10:12', 
+            'v':'0.115', 
+            's':'0.003', 
+            'f':'0,0,0,0', 
+            'q':'v'
         },
         {
-            "t":"2013-01-01 10:18", 
-            "v":"0.138", 
-            "s":"0.004", 
-            "f":"0,0,0,0", 
-            "q":"v"
+            't':'2013-01-01 10:18', 
+            'v':'0.138', 
+            's':'0.004', 
+            'f':'0,0,0,0', 
+            'q':'v'
         },
         {
-            "t":"2013-01-01 10:24", 
-            "v":"0.167", 
-            "s":"0.004", 
-            "f":"0,0,0,0", 
-            "q":"v"
+            't':'2013-01-01 10:24', 
+            'v':'0.167', 
+            's':'0.004', 
+            'f':'0,0,0,0', 
+            'q':'v'
         }
     ]
 }
 */
 
 /* Sample temp data
-metadata":{
-    "id":"8454000",
-    "name":"Providence",
-    "lat":"41.8071",
-    "lon":"-71.4012"
+metadata':{
+    'id':'8454000',
+    'name':'Providence',
+    'lat':'41.8071',
+    'lon':'-71.4012'
 }, 
-"data": [
+'data': [
     {
-        "t":"2013-08-08 15:00", 
-        "v":"72.5", 
-        "f":"0,0,0"
+        't':'2013-08-08 15:00', 
+        'v':'72.5', 
+        'f':'0,0,0'
     },
     {
-        "t":"2013-08-08 15:06", 
-        "v":"72.5", 
-        "f":"0,0,0"
+        't':'2013-08-08 15:06', 
+        'v':'72.5', 
+        'f':'0,0,0'
     }
 ]
 }
@@ -558,19 +565,19 @@ application=web_services&
 format=json
 
 {
-    "metadata":{
-        "id":"9410230",
-        "name":"La Jolla",
-        "lat":"32.8669",
-        "lon":"-117.2571"
+    'metadata':{
+        'id':'9410230',
+        'name':'La Jolla',
+        'lat':'32.8669',
+        'lon':'-117.2571'
     }, 
-    "data": [
+    'data': [
         {
-            "t":"2020-05-20 18:24", 
-            "v":"2.494", 
-            "s":"0.459", 
-            "f":"0,0,0,0", 
-            "q":"p"
+            't':'2020-05-20 18:24', 
+            'v':'2.494', 
+            's':'0.459', 
+            'f':'0,0,0,0', 
+            'q':'p'
         }
     ]
 }

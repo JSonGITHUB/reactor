@@ -33,6 +33,7 @@ class CountrySelector extends React.Component {
         const { initials } = country;
         return (
             <i 
+                title='set country'
                 key={getKey("country")} 
                 className={this.countryClasses(initials)} 
                 onClick={() => this.props.setCountry(initials)}

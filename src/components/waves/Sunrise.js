@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Loader from '../utils/Loader.js';
-import useOceanData from './useOceanData.js';
-import useCurrentTime from './useCurrentTime.js';
+import useOceanData from './useOceanData';
+import validate from '../utils/validate';
 
 const Sunrise = ({isMotionOn}) => {
     
@@ -11,21 +11,40 @@ const Sunrise = ({isMotionOn}) => {
     const sunrise4uri = 'https://api.sunrise-sunset.org/json?lat=36.7201600&lng=-4.4203400&formatted=0';
     
     const [sunrise, setSunrise] = useState(null);
-    const [data, getData] = useOceanData('sunrise', sunrise1uri);
-    
+    const [retry, setRetry] = useState('');    
+    const [data, setData] = useState(null);
+
+    const sunriseData = useOceanData('sunrise', sunrise1uri, '', setRetry)
+
     useEffect(() => {
-        if (data !== undefined) {
+        if (sunriseData.results.sunrise) {
+            setData(sunriseData);
+        } else {
+            const localSunrise = initializeData('sunrise', null);
+            setData(localSunrise);
+        }
+    },[sunriseData]);
+
+    useEffect(() => {
+        //if (data !== undefined && data !== null) {
+        if (validate(data) !== null) {
+            localStorage.setItem('sunrise', JSON.stringify(data));
             console.log(`sunrise => ${JSON.stringify(data,null,2)}`)
             const time = data.results.sunrise;
             const timeArray = time.split(':');
             const displayTime = `${timeArray[0]}:${timeArray[1]}`
             setSunrise(displayTime);
         }
-    },[data.results.sunrise]);
+    },[data]);
 
-    const getCurrentSunrise = () => <div className="r-10 m-5 p-10 bg-veryLite white">
-                                {sunrise}<span className='copyright bold'>PM</span>
-                            </div>;
+    const getCurrentSunrise = () => {
+        if (retry !=='') {
+            return <span className='bold'>Error fetching data retry attempt {retry}</span>
+        }
+        return <div className="r-10 m-5 p-10 bg-veryLite white">
+                {sunrise}<span className='copyright bold'>PM</span>
+            </div>;
+    }
     const percent = 'twentyfivePercent mt--70 mb--70';
     // eslint-disable-next-line
     const loading = () => <div className={percent}>

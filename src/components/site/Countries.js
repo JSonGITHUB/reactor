@@ -18,6 +18,12 @@ const countries = [
         greeting: 'Hola!'
     },
     { 
+        country: 'Dominican', 
+        initials: 'DR', 
+        language: 'spanish',
+        greeting: 'Hola!'
+    },
+    { 
         country: 'Costa Rica', 
         initials: 'cr', 
         language: 'spanish',

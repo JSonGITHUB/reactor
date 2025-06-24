@@ -13,15 +13,16 @@ const  Reservation = () => {
         setName(value);
     }
     return (
-        <div className="App-content flexContainer width-100-percent fadeIn">
-            <div className="flex3Column" />
-            <div className="flex3Column" >
-            <form className="neumorphism p-20">
+        <div className='App-content pb-400 sizeMobile flexContainer width-100-percent fadeIn'>
+            <div className='flex3Column' />
+            <div className='flex3Column' >
+            <form className='neumorphism p-20'>
                 <label>
                     Is going:<br/>
                     <input
-                        name="isGoing"
-                        type="checkbox"
+                        id='isGoing'
+                        name='isGoing'
+                        type='checkbox'
                         checked={isGoing}
                         onChange={handleInputChange}
                     />
@@ -30,15 +31,17 @@ const  Reservation = () => {
                 <br />
                 <label>
                     Number of guests:<br/>
-                    <input className="mt-10 greet p-10 r-10 brdr-green"
-                        name="numberOfGuests"
-                        type="number"
+                    <input className='mt-10 greet p-10 r-10 brdr-green'
+                        id='numberOfGuests'
+                        name='numberOfGuests'
+                        type='number'
                         value={numberOfGuests}
-                        onChange={handleInputChange}/>
+                        onChange={handleInputChange}
+                    />
                 </label>
             </form>                    
             </div>
-            <div className="flex3Column" />
+            <div className='flex3Column' />
         </div>
     );
 }

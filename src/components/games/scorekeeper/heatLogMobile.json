@@ -1,0 +1,1627 @@
+[
+    {
+        "date": "Sept 6 2024",
+        "time": "3:23:48 PM",
+        "length": "30",
+        "scores": [
+            {
+                "name": "Caity Simmers",
+                "surfScore": "17.66",
+                "surfScores": [
+                    6.33,
+                    8.83,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 1
+            },
+            {
+                "name": "Caroline Marks",
+                "surfScore": "7.17",
+                "surfScores": [
+                    7.17,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "Italo Ferreira",
+                "surfScore": 0,
+                "surfScores": [
+                    1,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 5
+            },
+            {
+                "name": "John Florence",
+                "surfScore": 0,
+                "surfScores": [
+                    1,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 1
+            },
+            {
+                "name": "Griffin Colapinto",
+                "surfScore": 0,
+                "surfScores": [
+                    1,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "john",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "titus",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 2
+            },
+            {
+                "name": "cp",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 6
+            },
+            {
+                "name": "You",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            },
+            {
+                "name": "Me",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            },
+            {
+                "name": "gina",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            }
+        ],
+        "heatHighestScore": 8.83,
+        "highScoreIndex": [
+            0
+        ]
+    },
+    {
+        "date": "Sept 6 2024",
+        "time": "3:10:55 PM",
+        "length": "30",
+        "scores": [
+            {
+                "name": "Italo Ferreira",
+                "surfScore": "11.67",
+                "surfScores": [
+                    8.17,
+                    1,
+                    3.5,
+                    8.13,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 5
+            },
+            {
+                "name": "John Florence",
+                "surfScore": "10.20",
+                "surfScores": [
+                    9.7,
+                    0.5,
+                    8.43,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 1
+            },
+            {
+                "name": "Caity Simmers",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 1
+            },
+            {
+                "name": "Caroline Marks",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "Griffin Colapinto",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "john",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "titus",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 2
+            },
+            {
+                "name": "cp",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 6
+            },
+            {
+                "name": "You",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            },
+            {
+                "name": "Me",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            },
+            {
+                "name": "gina",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            }
+        ],
+        "heatHighestScore": 9.7,
+        "highScoreIndex": [
+            1
+        ]
+    },
+    {
+        "date": "Sept 6 2024",
+        "time": "2:54:18 PM",
+        "length": "30",
+        "scores": [
+            {
+                "name": "Italo Ferreira",
+                "surfScore": "11.67",
+                "surfScores": [
+                    8.17,
+                    1,
+                    3.5,
+                    8.13,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 5
+            },
+            {
+                "name": "John Florence",
+                "surfScore": "10.20",
+                "surfScores": [
+                    9.7,
+                    0.5,
+                    8.43,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 1
+            },
+            {
+                "name": "Caity Simmers",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 1
+            },
+            {
+                "name": "Caroline Marks",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "Griffin Colapinto",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "john",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "titus",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 2
+            },
+            {
+                "name": "cp",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 6
+            },
+            {
+                "name": "You",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            },
+            {
+                "name": "Me",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            },
+            {
+                "name": "gina",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            }
+        ],
+        "heatHighestScore": 9.7,
+        "highScoreIndex": [
+            1
+        ]
+    },
+    {
+        "date": "Sept 6 2024",
+        "time": "2:44:10 PM",
+        "length": "30",
+        "scores": [
+            {
+                "name": "Italo Ferreira",
+                "surfScore": "11.67",
+                "surfScores": [
+                    8.17,
+                    1,
+                    3.5,
+                    8.13,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 5
+            },
+            {
+                "name": "John Florence",
+                "surfScore": "10.20",
+                "surfScores": [
+                    9.7,
+                    0.5,
+                    8.43,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 1
+            },
+            {
+                "name": "Caity Simmers",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 1
+            },
+            {
+                "name": "Caroline Marks",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "Griffin Colapinto",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "john",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "titus",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 2
+            },
+            {
+                "name": "cp",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 6
+            },
+            {
+                "name": "You",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            },
+            {
+                "name": "Me",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            },
+            {
+                "name": "gina",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            }
+        ],
+        "heatHighestScore": 9.7,
+        "highScoreIndex": [
+            1
+        ]
+    },
+    {
+        "date": "Sept 6 2024",
+        "time": "1:09:15 PM",
+        "length": "0.5",
+        "scores": [
+            {
+                "name": "Caity Simmers",
+                "surfScore": "18.40",
+                "surfScores": [
+                    9.17,
+                    9.2,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 1
+            },
+            {
+                "name": "Caroline Marks",
+                "surfScore": "16.00",
+                "surfScores": [
+                    6.17,
+                    8,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "John Florence",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 1
+            },
+            {
+                "name": "Italo Ferreira",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 5
+            },
+            {
+                "name": "Griffin Colapinto",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "john",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "titus",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 2
+            },
+            {
+                "name": "cp",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 6
+            },
+            {
+                "name": "You",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            },
+            {
+                "name": "Me",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            },
+            {
+                "name": "gina",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            }
+        ],
+        "heatHighestScore": 9.2,
+        "highScoreIndex": [
+            0
+        ]
+    },
+    {
+        "date": "Sept 6 2024",
+        "time": "1:09:15 PM",
+        "length": "0.5",
+        "scores": [
+            {
+                "name": "John Florence",
+                "surfScore": "16.66",
+                "surfScores": [
+                    7.17,
+                    8.33,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 1
+            },
+            {
+                "name": "Italo Ferreira",
+                "surfScore": "12.67",
+                "surfScores": [
+                    4.67,
+                    7.33,
+                    8,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 5
+            },
+            {
+                "name": "Caroline Marks",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "Caity Simmers",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 1
+            },
+            {
+                "name": "Griffin Colapinto",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "john",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "titus",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 2
+            },
+            {
+                "name": "cp",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 6
+            },
+            {
+                "name": "You",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            },
+            {
+                "name": "Me",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            },
+            {
+                "name": "gina",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            }
+        ],
+        "heatHighestScore": 8.33,
+        "highScoreIndex": [
+            0
+        ]
+    },
+    {
+        "date": "Sept 6 2024",
+        "time": "11:47:51 AM",
+        "length": "0.5",
+        "scores": [
+            {
+                "name": "Caroline Marks",
+                "surfScore": "17.10",
+                "surfScores": [
+                    7.5,
+                    5.27,
+                    7.83,
+                    9.6,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "Caity Simmers",
+                "surfScore": "15.00",
+                "surfScores": [
+                    8.5,
+                    4.83,
+                    6.5,
+                    8.37,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 1
+            },
+            {
+                "name": "Italo Ferreira",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 5
+            },
+            {
+                "name": "Griffin Colapinto",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "john",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "titus",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 2
+            },
+            {
+                "name": "cp",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 6
+            },
+            {
+                "name": "You",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            },
+            {
+                "name": "Me",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            },
+            {
+                "name": "gina",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            },
+            {
+                "name": "John Florence",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 1
+            }
+        ],
+        "heatHighestScore": 9.6,
+        "highScoreIndex": [
+            0
+        ]
+    },
+    {
+        "date": "Sept 6 2024",
+        "time": "11:47:51 AM",
+        "length": "0.5",
+        "scores": [
+            {
+                "name": "Italo Ferreira",
+                "surfScore": "13.50",
+                "surfScores": [
+                    5.67,
+                    7.6,
+                    5.77,
+                    5.9,
+                    6.87,
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 5
+            },
+            {
+                "name": "Griffin Colapinto",
+                "surfScore": "13.20",
+                "surfScores": [
+                    5.17,
+                    3,
+                    7.33,
+                    5.87,
+                    7,
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "john",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "titus",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 2
+            },
+            {
+                "name": "cp",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 6
+            },
+            {
+                "name": "You",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            },
+            {
+                "name": "Me",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            },
+            {
+                "name": "gina",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            },
+            {
+                "name": "John Florence",
+                "surfScore": 0,
+                "surfScores": [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 0
+            }
+        ],
+        "heatHighestScore": 7.6,
+        "highScoreIndex": [
+            0
+        ]
+    },
+    {
+        "date": "Feb 27 2024",
+        "time": "7:22:11 AM",
+        "length": 0.5,
+        "scores": [
+            {
+                "name": "Titus",
+                "surfScore": "20.00",
+                "surfScores": [
+                    10,
+                    7,
+                    10,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 3
+            },
+            {
+                "name": "Kaden",
+                "surfScore": "15.00",
+                "surfScores": [
+                    8,
+                    7,
+                    7,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 1
+            },
+            {
+                "name": "Kyan",
+                "surfScore": "15.00",
+                "surfScores": [
+                    8,
+                    7,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 4
+            },
+            {
+                "name": "Tommy",
+                "surfScore": "9.00",
+                "surfScores": [
+                    4,
+                    9,
+                    "P 🚫",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "surfJerseyColor": 5
+            }
+        ]
+    }
+]

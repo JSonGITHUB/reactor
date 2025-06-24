@@ -17,19 +17,25 @@ class SignUpDialog extends React.Component {
     render() {
         const { title, message, login } = this.state;
         return (
-            <div className="App-content flexContainer width-100-percent fadeIn">
-                <div className="flex3Column" />
-                <div className="flex3Column" >
+            <div className='App-content pb-400 sizeMobile flexContainer width-100-percent fadeIn'>
+                <div className='flex3Column' />
+                <div className='flex3Column' >
                     <Dialog title={title}
                             message={message}>
-                        <input value={login} placeholder="Enter here..."
-                                onChange={this.handleChange} className="greet p-20 r-10 w-200 brdr-green"/>
-                        <button onClick={this.handleSignUp} className="ml-5 greet p-20 r-10 w-200 bg-green brdr-green">
+                        <input
+                            id='login' 
+                            name='login'
+                            value={login} 
+                            placeholder='Enter here...'
+                            onChange={this.handleChange} 
+                            className='greet p-20 r-10 w-200 brdr-green'
+                        />
+                        <button onClick={this.handleSignUp} className='ml-5 greet p-20 r-10 w-200 bg-green brdr-green'>
                             Sign Me Up!
                         </button>
                     </Dialog>              
                 </div>
-                <div className="flex3Column" />
+                <div className='flex3Column' />
             </div>
         );
     }

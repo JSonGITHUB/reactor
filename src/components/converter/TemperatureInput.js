@@ -36,15 +36,17 @@ const TemperatureInput = ({ scale, value, onValueChange, onUnitChange }) => {
         onUnitChange(selected);
         setUnit(selected);
     }
+    /*
     const fBoil = (scale==='f' && value >= 212) ? true : false;
     const cBoil = (scale==='c' && value >= 100) ? true : false;
     const boiling = (fBoil||cBoil) ? true : false;
     const tempColor = (boiling) ?  'brdr-red' : 'brdr-blue'; 
+    */
     const classes = 'greet m-20 p-20 r-10 w-100 bg-darker color-soft bold size20 flex2Column';
 
     return (
 
-        <div className="flexContainer bg-veryLite r-10 m-5 centeredContent size20 p-10">
+        <div className='flexContainer bg-veryLite r-10 m-5 centeredContent size20 p-10'>
             <div className='ml-20'>
               <Selector
                     groupTitle='Input'
@@ -56,7 +58,14 @@ const TemperatureInput = ({ scale, value, onValueChange, onUnitChange }) => {
                 />  
             </div>
             
-            <input value={value} onChange={handleChange} className={classes} placeholder="Enter here..." />
+            <input 
+                id='temp'
+                name='temp'
+                value={value} 
+                onChange={handleChange} 
+                className={classes} 
+                placeholder='Enter here...' 
+            />
         </div>
     );
 }
