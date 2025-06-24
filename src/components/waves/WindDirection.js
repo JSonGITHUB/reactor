@@ -7,8 +7,15 @@ import S from '../../assets/images/windS.png';
 import SW from '../../assets/images/windSW.png';
 import W from '../../assets/images/windW.png';
 import NW from '../../assets/images/windNW.png';
+import icons from '../site/icons';
+import initializeData from '../utils/InitializeData';
 
-const WindDirection = ({columns, setWind}) => {
+const WindDirection = ({
+    columns, 
+    setWind,
+    height,
+    collapse
+}) => {
     
     const [status, setStatus] = useState({
         columns: columns,
@@ -20,7 +27,6 @@ const WindDirection = ({columns, setWind}) => {
     });
             
     const getWindData = () => {
-        console.log(`getWind ->`);
         let data;
         const returnJSON = (response) => response.json();
         const returnRejection = (response) => Promise.reject({status: response.status, data});
@@ -33,23 +39,20 @@ const WindDirection = ({columns, setWind}) => {
         const date = (currentDate<10) ? `0${currentDate}` : currentDate;
         const currentHour = getCurrentTime.getHours();
         const hours = (currentHour<10) ? `0${currentHour}` : currentHour;
-        const startHour = ((currentHour-1)<10) ? `0${(currentHour-1)}` : (currentHour-1);
         const currentMinutes = getCurrentTime.getMinutes();
         const minutes = (currentMinutes<10) ? `0${currentMinutes}` : currentMinutes;
-        const getEndTime = `${year}${month}${date}%20${hours}:${minutes}`;
-        const getStartTime = `${year}${month}${date}%20${startHour}:00`;
         getCurrentTime = `${year}${month}${date}%20${hours}:${minutes}`;
-        console.log(`Wind   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
-        const uriWind = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getStartTime}&end_date=${getEndTime}&station=9410230&product=wind&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
-        const uriWindTest = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=20200520%2020:00&end_date=20200520%2020:00&station=9410230&product=wind&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
+        //console.log(`Wind   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
+        //const uriWind = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getStartTime}&end_date=${getEndTime}&station=9410230&product=wind&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
+        //const uriWindTest = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=20200520%2020:00&end_date=20200520%2020:00&station=9410230&product=wind&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
         const tri = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=latest&station=9410230&product=wind&time_zone=lst&units=english&format=json'
         const uri = tri;
-        const proxyurl = "https://cors-anywhere.herokuapp.com/";
+        const proxyurl = 'https://cors-anywhere.herokuapp.com/';
         //const waterTempuri = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime}&end_date=${getCurrentTime}&station=9410230&product=water_temperature&datum=mllw&units=english&time_zone=gmt&application=web_services&format=json`;
-        fetch(proxyurl + uri)
+        //fetch(proxyurl + uri)
+        fetch(uri)
             .then(response => validate(response))
             .then(data => {
-                console.log(`WindDirection => direction: ${JSON.stringify(data.data[data.data.length - 1],null,2)}`)
                 setWind(data.data[data.data.length - 1].dr, data.data[data.data.length - 1].d, data.data[data.data.length - 1].s, data.data[data.data.length - 1].g)
                 setStatus(prevState => ({
                     ...prevState,
@@ -65,20 +68,20 @@ const WindDirection = ({columns, setWind}) => {
     }
     /*
     {
-        "metadata":{
-            "id":"9410230",
-            "name":"La Jolla",
-            "lat":"32.8669",
-            "lon":"-117.2571"
+        'metadata':{
+            'id':'9410230',
+            'name':'La Jolla',
+            'lat':'32.8669',
+            'lon':'-117.2571'
         }, 
-        "data": [
+        'data': [
             {
-                "t":"2020-05-20 20:00", 
-                "s":"5.25", 
-                "d":"313.00",
-                 "dr":"NW", 
-                 "g":"7.39", 
-                 "f":"0,0"
+                't':'2020-05-20 20:00', 
+                's':'5.25', 
+                'd':'313.00',
+                 'dr':'NW', 
+                 'g':'7.39', 
+                 'f':'0,0'
             }
         ]
     }
@@ -104,30 +107,78 @@ const WindDirection = ({columns, setWind}) => {
     */
     const getWindIcon = () => {
         const windDirection = status.direction;
-        const classes = "shaka r-20 p-2 bg-white";
-        if (windDirection === "N") {
+        const classes = 'shaka r-20 p-2 bg-white h50w50 mb-15';
+        if (windDirection === 'N') {
             return <img src={N} className={classes} alt={windDirection} />;
-        } else if ((windDirection === "NE") || (windDirection === "NNE") || (windDirection === "ENE")) {
+        } else if ((windDirection === 'NE') || (windDirection === 'NNE') || (windDirection === 'ENE')) {
             return <img src={NE} className={classes} alt={windDirection} />;
-        } else if (windDirection === "E") {
+        } else if (windDirection === 'E') {
             return <img src={E} className={classes} alt={windDirection} />;
-        } else if ((windDirection === "SE") || (windDirection === "SSE") || (windDirection === "ESE")) {
+        } else if ((windDirection === 'SE') || (windDirection === 'SSE') || (windDirection === 'ESE')) {
             return <img src={SE} className={classes} alt={windDirection} />;
-        } else if (windDirection === "S") {
+        } else if (windDirection === 'S') {
             return <img src={S} className={classes} alt={windDirection} />;
-        } else if ((windDirection === "SW") || (windDirection === "SSW") || (windDirection === "WSW")) {
+        } else if ((windDirection === 'SW') || (windDirection === 'SSW') || (windDirection === 'WSW')) {
             return <img src={SW} className={classes} alt={windDirection} />;
-        } else if (windDirection === "W") {
+        } else if (windDirection === 'W') {
             return <img src={W} className={classes} alt={windDirection} />;
-        } else if ((windDirection === "NW") || (windDirection === "NNW") || (windDirection === "WNW")) {
+        } else if ((windDirection === 'NW') || (windDirection === 'NNW') || (windDirection === 'WNW')) {
             return <img src={NW} className={classes} alt={windDirection} />;
         }
     }
-    return <div className="r-10 p-10 white">
-        <div>{getWindIcon()}</div>
-        <div className='mb-10'>{`${status.direction} ${Number(status.angle).toFixed(0)}°`}</div>
-        <div>{`${Number(status.speed).toFixed(0)}-${Number(status.gusts).toFixed(0)}`} <span className="">knots</span></div>
-    </div>
+
+    const displayWindSpeed = (speed, gusts) => {
+        if (speed === gusts) {
+            return speed;
+        }
+        return `${speed}-${gusts}`
+    }
+
+    const knots = () => {
+
+        const getKnots = (knots) => Number(knots).toFixed(0);
+
+        const speed = getKnots(status.speed);
+        const gusts = getKnots(status.gusts);
+
+        return displayWindSpeed(speed, gusts);
+
+    }
+    const mph = () => {
+
+        const getMPH = (knots) => Number(knots / .868976).toFixed(0);
+
+        const speed = getMPH(status.speed);
+        const gusts = getMPH(status.gusts);
+
+        localStorage.setItem('windSpeed', `${speed}mph`);
+
+        return displayWindSpeed(speed, gusts);
+
+    }
+
+    const display = () => {
+        
+        const waterTemp = initializeData('waterTemp', '80');
+        const airTemp = initializeData('airTemp', '90');
+
+        if (collapse) {
+            return <div>
+                    {icons.wind} {status.direction} {Number(status.gusts).toFixed(0)}mph {icons.water}{waterTemp}°F {icons.temperature} {airTemp}°F
+                </div>
+        }
+        return <div className='r-10 p-10 white'>
+                <div>{getWindIcon()}</div>
+                <div className='mb-10'>{`${status.direction} ${Number(status.angle).toFixed(0)}°`}</div>
+                {/*<div>{knots()} <span className=''>knots</span></div>*/}
+                <div>{mph()} <span className=''>mph</span></div>
+            </div>
+    }
+    return <div>
+            {
+                display()
+            }
+        </div>
 }
 
 export default WindDirection;

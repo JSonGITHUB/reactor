@@ -1,43 +1,62 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import Selector from '../../forms/FunctionalSelector.js';
-import WindDirection from '../WindDirection.js';
+//import WindDirection from '../WindDirection.js';
 import directions from '../Directions.js';
-import thumbsUp from '../../../assets/images/ThumbsUp.png';
-import thumbsDown from '../../../assets/images/ThumbsDown.png';
+//import thumbsUp from '../../../assets/images/ThumbsUp.png';
+//import thumbsDown from '../../../assets/images/ThumbsDown.png';
+import icons from '../../site/icons.js';
+import { OceanContext } from '../../context/OceanContext';
 
-const WindSelector = ({windDirection, pause, setWind, isWind, setStatus, handleWindCheck}) => {
+const WindSelector = ({
+    //status, 
+    windDirection, 
+    /* 
+    pause, 
+    setWind, 
+    isWind,  
+    setStatus,
+    handleWindCheck
+    */ 
+}) => {
+
+    const {
+        status,
+        setStatus,
+        handleWindCheck
+    } = useContext(OceanContext);
+
     //console.log(`WindSelector => isWind: ${isWind}`);
     
-    const [filterByWind, setFilterByWind] = useState(isWind);
-    const backgroundColorClass = (localStorage.getItem('isWind') === 'true') ? 'bg-veryLite fadeInFaded' : 'bg-tinted fadeOutFaded';
-    const windClass = () => `${backgroundColorClass} flex2Column contentCenter r-10 m-5 p-15`;
+    //const [filterByWind, setFilterByWind] = useState(isWind);
+    const backgroundColorClass = (status.isWind === true) ? 'bg-veryLite fadeInFaded' : 'bg-tinted fadeOutFaded';
+    const windClass = () => `${backgroundColorClass} containerBox flex2Column contentCenter`;
     const handleWindSelection = (groupTitle, label, selected) => {
         setStatus(selected)
     }
 
     return (
-        <div className={windClass()} onMouseDown={pause}>
+        <div className={windClass()}>
             {/*console.log(`windSelector => windDirection: ${status.windDirection}`)*/}
-            <div className='p-10 r-10 bg-tinted'>
-                <div className='p-10 mb-15 r-10 bg-tinted'>
-                    Wind
+                <div className='containerBox'>
+                    <div className='containerBox bg-lite'>
+                        Wind {icons.wind}
+                    </div>
+                    <div className='mt-10 mr-10 mb-5'>
+                        <Selector
+                            groupTitle='Wind' 
+                            selected={windDirection} 
+                            label='Direction'
+                            items={directions}
+                            onChange={handleWindSelection}
+                            fontSize='20'
+                            padding='5px'
+                            width='93%'
+                        />
+                    </div>
                 </div>
-                <div className='mt-5 size20 p-10'>
-                    <Selector
-                        groupTitle="Wind" 
-                        selected={windDirection} 
-                        label="Direction"
-                        items={directions}
-                        onChange={handleWindSelection}
-                        fontSize='20'
-                        padding='5px'
-                        width='93%'
-                    />
+                <div className='containerBoxDetail button size40 p-20' onClick={handleWindCheck} >
+                    {(status.isWind === true) ? icons.good : icons.bad }
                 </div>
-            </div>
-            <div className="button mt-15" onClick={handleWindCheck}>
-                {(localStorage.getItem('isWind') === 'true') ? <img src={thumbsUp} alt='wind' className='p-10 r-20' /> : <img src={thumbsDown} alt='wind' className='p-10 r-20' /> }
-            </div>
         </div>
     );
 }

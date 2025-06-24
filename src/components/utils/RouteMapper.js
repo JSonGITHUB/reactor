@@ -15,7 +15,7 @@ const showCounter = () => {
 }
 const showTranslator = () => {
     const pathname = window.location.pathname;
-    if (pathname === '/Translator') { return <Translator /> }
+    if (pathname === '/Translate') { return <Translator /> }
 }
 
 export default () => {

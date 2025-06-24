@@ -6,7 +6,7 @@ const logTemplateData = {
         Year: 2020
     },
     Location: {
-        Break: "Notch"
+        Break: "Seaside"
     },
     Surf: {
         Height: "head high",

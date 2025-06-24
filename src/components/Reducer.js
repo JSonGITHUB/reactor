@@ -94,6 +94,7 @@ const App = () => {
                 <label>
                     <div className='white b p-10'>
                         <input
+                        id={`${taskInterface(todo)}`}
                         type="checkbox"
                         checked={todo.complete}
                         onChange={() => handleChange(todo)}
@@ -104,8 +105,13 @@ const App = () => {
             </li>
         ))}
         </ul>
-        <div className="button bg-dkGreen r-5 color-neogreen b p-10 m-10" 
-        onClick={() => addTask()}>Add</div>
+        <div 
+          title='add'
+          className="button bg-dkGreen r-5 color-neogreen b p-10 m-10" 
+          onClick={() => addTask()}
+        >
+          Add
+        </div>
     </React.Fragment>
   );
 };

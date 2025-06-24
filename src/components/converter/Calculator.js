@@ -1,9 +1,9 @@
 //stateful component
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TemperatureInput from './TemperatureInput';
 import BoilingVerdict, {tryConvert, toCelsius, toFahrenheit} from './BoilingVerdict';
 // eslint-disable-next-line
-import LiquidVerdict, {toGallons, toLiters} from './LiquidVerdict';
+import { toGallons, toLiters } from './LiquidVerdict';
 
 // eslint-disable-next-line
 import templateData from '../waves/TemplateData';
@@ -32,12 +32,37 @@ const Calculator = () => {
         console.log(`handleUnit2Change => unit2: ${unit}`)
         setUnit2(unit);
     }
-    const celsius = () => (unit1 === 'Fahrenheit') ? tryConvert(value1, toCelsius) : value1;
+    const celsius = () => {
+        
+        const display = (unit1 === 'Fahrenheit') ? tryConvert(value1, toCelsius) : value1;
+        return display;
+    }
     const fahrenheit = () => (unit2 === 'Celsius') ? tryConvert(value2, toFahrenheit) : value2;
     // eslint-disable-next-line
     const gallons = () => (unit1 === 'Gallons') ? tryConvert(value1, toLiters) : value1;
     // eslint-disable-next-line
     const liters = () => (unit2 === 'Liters') ? tryConvert(value2, toGallons) : value2;
+
+    useEffect(() => {
+        console.log(`unit1 => ${unit1}`);
+        console.log(`unit1: ${unit1} value1: ${value1}`); 
+        console.log(`unit2: ${unit2} value2: ${value2}`);      
+    }, [unit1]);
+    useEffect(() => {
+        console.log(`unit2 => ${unit2}`); 
+        console.log(`unit1: ${unit1} value1: ${value1}`); 
+        console.log(`unit2: ${unit2} value2: ${value2}`);
+    }, [unit2]);
+    useEffect(() => {
+        console.log(`value1 => ${value1}`); 
+        console.log(`unit1: ${unit1} value1: ${value1}`); 
+        console.log(`unit2: ${unit2} value2: ${value2}`);
+    }, [value1]);
+    useEffect(() => {
+        console.log(`value2 => ${value2}`); 
+        console.log(`unit1: ${unit1} value1: ${value1}`); 
+        console.log(`unit2: ${unit2} value2: ${value2}`);
+    }, [value2]);
     
     return (
         <div className="fadeIn mt--14">

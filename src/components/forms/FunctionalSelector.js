@@ -1,42 +1,66 @@
 import React from 'react';
 import getKey from '../utils/KeyGenerator.js';
-//<FunctionalSelector items={["Grapefruit", "Lime", "Coconut", "Mango"]} />
+import validate from '../utils/validate';
 
-function FunctionalSelector(props) {
-    //let action = "";
-    //console.log(`FunctionalSelector => props: ${JSON.stringify(props.onChange,null,2)}`)
-    let { items, label, groupTitle, selected, padding, fontSize, maxWidth, width} = props;
-    //console.log(`FunctionalSelector => \n${groupTitle}\nlabel: ${label}\nselected: ${selected}`)
+const FunctionalSelector = React.memo(({
+    items,
+    label,
+    alignText,
+    groupTitle,
+    selected,
+    padding,
+    fontSize,
+    maxWidth,
+    width,
+    bgColor = null,
+    color = null,
+    onChange
+}) => {
+
+    //console.log(`FunctionalSelector => label: ${label}`);
+    //console.log(`FunctionalSelector => selected: ${selected} `)
+    //console.log(`FunctionalSelector => items: ${JSON.stringify(items, null, 2)}`);
+
+    const tag = (item) => {
+        if (validate(item) !== null) {
+            return <option key={getKey(item)} value={item}>
+                {item}
+            </option>;
+        } else {
+            //console.log(`FunctionalSelector => item: ${JSON.stringify(item, null, 2)}`);
+        }
+
+    }
     const setSelected = (item) => {
         selected = item;
         return tag(item)
     }
-    //const tagSelected = (item) => <option selected key={getKey(item)} value={item.toString()}>{item}</option>;
-    const tag = (item) => <option key={getKey(item)} value={item}>{item}</option>;
+
     const getTag = (item, index) => (Number(item) === Number(selected)) ? setSelected(item) : tag(item);
-    const selectItems = items.map((item, index) => getTag(item,index));
+    const selectItems = () => {
+        //console.log(`FunctionalSelector => items: ${JSON.stringify(items, null, 2)}`);
+        if (validate(items) === null || items.length === 0 || !Array.isArray(items)) {
+            //console.log(`FunctionalSelector => empty: ${JSON.stringify(items, null, 2)} validate: ${validate(items)} length: ${items.length} typeOf: ${typeof items}`);
+            return ['empty'];
+        }
+        return items.map((item, index) => getTag(item, index));
+    };
     const handleChange = (event) => {
         selected = event.target.value;
-        //this.setState({value: e.target.value});
-        props.onChange(groupTitle, label, selected);
+        //console.log(`FunctionalSelector => selected: ${selected}`)
+        onChange(groupTitle, label, selected);
     }
-    const getStyle = {
-        padding: padding || 0,
-        fontSize: Number(fontSize),
-        color: 'yellow',
-        maxWidth: maxWidth,
-        width: width
-    };
+    const getAlignment = () => {
+        const contentAlign = (alignText === 'center') ? 'contentCenter' : (alignText === 'right') ? 'contentRight' : 'contentLeft';
+        return contentAlign;
+    }
     return (
-        
-        <label>    
-            <div>
-                <select className='r-10 p-10 bg-darker color-soft width-auto pt-5 pb-5 button' style={getStyle} value={(selected)||''} onChange={handleChange}>
-                    {selectItems}
-                </select>
-            </div>
+        <label id={label} key={getKey('selectorContainer')}>
+            <select id={`${label}Selector`} className={`containerBox ${getAlignment()} button width-100-percent ${color || 'color-soft'} ${bgColor || 'bg-tintedMediumDark'}`} value={(selected) || ''} onChange={handleChange}>
+                {selectItems()}
+            </select>
         </label>
     );
-}
+})
 
 export default FunctionalSelector;

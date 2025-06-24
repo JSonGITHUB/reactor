@@ -10,6 +10,7 @@ const SongList = (props) => {
         return props.songs.map(song => {
             return (
                 <div 
+                    title={song.title}
                     key={getKey(song.title)} 
                     className={buttonClasses} 
                     onClick={() => props.selectSong(song)}

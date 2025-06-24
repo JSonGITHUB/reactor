@@ -8,7 +8,7 @@ const createLog = (item, status) => {
     const posts = new PostDirectory();
     console.log(`createLog =>\nstatus: ${JSON.stringify(status, null, 2)}`);
     localStorage.setItem('spot', item.name);
-    const goToLog = () => window.location.pathname = `/reactor/SurfLog`;
+    const goToLog = () => window.location.pathname = `/reactor/Session`;
     const generateNewLogId = () => {
         const date = new Date()
         const st = date.toDateString().replace(/ /g,'');

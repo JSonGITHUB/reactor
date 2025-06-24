@@ -1,51 +1,51 @@
 const templateData = {
     Day: {
-        Date: "2020-01-17T08:00:00.000Z",
-        Day: 17,
-        Month: 1,
-        Year: 2020
+        Date: '',
+        Day: '',
+        Month: '',
+        Year: ''
     },
     Location: {
-        Break: "Notch"
+        Break: ''
     },
     Surf: {
-        Height: "head high",
-        Report: "4ft",
-        Shape: "close-outs"
+        Height: '',
+        Report: '',
+        Shape: ''
     },
     Swell1: {
-        Height: "4ft",
-        Direction: "NW",
-        Angle: "280",
-        Interval: "18 seconds",
+        Height: '',
+        Direction: '',
+        Angle: '',
+        Interval: ''
     },
     Swell2: {
-        Height: "1ft",
-        Direction: "NW",
-        Angle: "270",
-        Interval: "8 seconds",
+        Height: '',
+        Direction: '',
+        Angle: '',
+        Interval: ''
     },
     Swell3: {
-        Height: "1ft",
-        Direction: "NW",
-        Angle: "180",
-        Interval: "6 seconds",
+        Height: '',
+        Direction: '',
+        Angle: '',
+        Interval: ''
     },
     Tide: {
-        Phase: "High => Low",
-        Height: "2ft"
+        Phase: '',
+        Height: ''
     },
     Wind: {
-        Direction: "NW",
-        Orientation: "Offshore",
-        MPH: "5mph",
-        Surface: "Glassy"
+        Direction: '',
+        Orientation: '',
+        MPH: '',
+        Surface: ''
     },
     Conditions: {
-        Conditions: "Firing"
+        Conditions: ''
     },
     Comments: {
-        "notes": "Biggest crowd but plenty of sick ones..."
+        'notes': ''
     }
 };
 export default templateData
