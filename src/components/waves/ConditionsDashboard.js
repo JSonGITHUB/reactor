@@ -17,7 +17,7 @@ import getDirection from './getDirection';
 import { setSwell1 } from './WaveActions';
 //import BuoyReadingsChart from './BuoyReadingsChart';
 //import MarineDataChart from './MarineDataChart';
-import MarineChart from './MarineChart';
+//import MarineChart from './MarineChart';
 
 const ConditionsDashboard = ({
     tideDisplay,
@@ -138,7 +138,7 @@ const {
         <div className=''>
             {/*<BuoyReadingsChart lat={localStorage.getItem('latitude')} long={localStorage.getItem('longitude')} />*/}
             {/*<MarineDataChart />*/}
-            <MarineChart />
+            {/*<MarineChart />*/}
 
             <div className='containerBox bold color-yellow bg-lite p-20'>
                 <CollapseToggleButton

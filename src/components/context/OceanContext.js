@@ -40,40 +40,7 @@ const OceanParent = ({
     const [swell, setSwell] = useState(null);
     const [dataInit, setDataInit] = useState(false);
 
-    const [status, setStatusData] = useState({
-        module: 'Waves',
-        pause: true,
-        date: new Date(),
-        //edit: false,
-        tide: getDefault('tide'),
-        stars: getDefault('stars'),
-        waterTemp: '66.2',
-        swell1Height: '2.0',
-        swell1Interval: '17 seconds',
-        swell1Direction: getSwell1Direction(),
-        swell2Height: '2.0',
-        swell2Interval: '9 seconds',
-        swell2Direction: getSwell2Direction(),
-        swell1Angle: directionObject[getSwell1Direction()],
-        swell2Angle: directionObject[getSwell2Direction()],
-        //swell1Direction: getDefault('swell1Direction'),
-        //swell2Direction: getDefault('swell2Direction'),
-        //swell1Angle: getDefault('swell1Angle'),
-        //swell2Angle: getDefault('swell2Angle'),
-        //swell1Height: getDefault('swell1Height'),
-        //swell2Height: getDefault('swell2Height'),
-        //swell1Interval: getDefault('swell1Interval'),
-        //swell2Interval: getDefault('swell2Interval'),
-        windDirection: getDefault('windDirection'),
-        distance: getDistance(),
-        isSwell1: (initializeData('isSwell1', null) === true) ? true : false,
-        isSwell2: (initializeData('isSwell2', null) === true) ? true : false,
-        isTide: (initializeData('isTide', null) === true) ? true : false,
-        isWind: (initializeData('isWind', null) === true) ? true : false,
-        //locations: getLocalLocations(),
-        matches: [],
-        init: false
-    });
+    const [status, setStatusData] = useState();
 
     const handleSwell1LiveSelection = () => {
 
@@ -91,7 +58,7 @@ const OceanParent = ({
             swell1Direction: swell1Angle,
             swell1Angle: roundToNearestFive(swellData.swell_wave_direction),
             swell1Height: Number(swellData.swell_wave_height).toFixed(0),
-            swell1Interval: `${Number(swellData.swell_wave_period).toFixed(0)} seconds`,
+            swell1Interval: `${Number(swellData.swell_wave_period).toFixed(0)}`,
             swellData
         }));
 
@@ -112,7 +79,7 @@ const OceanParent = ({
             swell2Direction: swell2Angle,
             swell2Angle: roundToNearestFive(directionObject[swell2Angle]),
             swell2Height: Number(swellData.wave_height).toFixed(0),
-            swell2Interval: `${Number(swellData.wave_period).toFixed(0)} seconds`,
+            swell2Interval: `${Number(swellData.wave_period).toFixed(0)}`,
             swellData
         }));
 
@@ -137,11 +104,11 @@ const OceanParent = ({
             newValue.swell1Direction = swell1Angle;
             newValue.swell1Angle = roundToNearestFive(swellData.swell_wave_direction);
             newValue.swell1Height = Number(swellData.swell_wave_height).toFixed(0);
-            newValue.swell1Interval = `${Number(swellData.swell_wave_period).toFixed(0)} seconds`;
+            newValue.swell1Interval = `${Number(swellData.swell_wave_period).toFixed(0)}`;
             newValue.swell2Direction = swell2Angle;
             newValue.swell2Angle = roundToNearestFive(swellData.wave_direction);
             newValue.swell2Height = Number(swellData.wave_height).toFixed(0);
-            newValue.swell2Interval = `${Number(swellData.wave_period).toFixed(0)} seconds`;
+            newValue.swell2Interval = `${Number(swellData.wave_period).toFixed(0)}`;
             newValue.swellData = swellData;
             //////////////////////////////////////////////////////////////
             setStatusData(newValue);
@@ -149,8 +116,42 @@ const OceanParent = ({
     };
 
     useEffect(() => {
-        //console.log(`OceanContext => status: ${JSON.stringify(status, null, 2)}`);
-    }, [status]);
+        
+        setStatusData({
+            module: 'Waves',
+            pause: true,
+            date: new Date(),
+            //edit: false,
+            tide: getDefault('tide'),
+            stars: getDefault('stars'),
+            waterTemp: '66.2',
+            swell1Height: initializeData('swell1Height', '2.0'),
+            swell1Interval: initializeData('swell1Interval', 17),
+            swell1Direction: getSwell1Direction(),
+            swell2Height: initializeData('swell2Height', '2.0'),
+            swell2Interval: initializeData('swell2Interval', 9),
+            swell2Direction: getSwell2Direction(),
+            swell1Angle: directionObject[getSwell1Direction()],
+            swell2Angle: directionObject[getSwell2Direction()],
+            //swell1Direction: getDefault('swell1Direction'),
+            //swell2Direction: getDefault('swell2Direction'),
+            //swell1Angle: getDefault('swell1Angle'),
+            //swell2Angle: getDefault('swell2Angle'),
+            //swell1Height: getDefault('swell1Height'),
+            //swell2Height: getDefault('swell2Height'),
+            //swell1Interval: getDefault('swell1Interval'),
+            //swell2Interval: getDefault('swell2Interval'),
+            windDirection: getDefault('windDirection'),
+            distance: getDistance(),
+            isSwell1: (initializeData('isSwell1', null) === true) ? true : false,
+            isSwell2: (initializeData('isSwell2', null) === true) ? true : false,
+            isTide: (initializeData('isTide', null) === true) ? true : false,
+            isWind: (initializeData('isWind', null) === true) ? true : false,
+            //locations: getLocalLocations(),
+            matches: [],
+            init: false
+        })
+    }, []);
 
     useEffect(() => {
         const templateData = {
@@ -324,7 +325,7 @@ const OceanParent = ({
         setStatus(prevState => ({
             ...prevState,
             pause: true,
-            swell1Height: selected
+            swell1Height: selected.replace('ft', '')
         }));
     }
     const handleSwell2Height = (groupTitle, label, selected) => {
@@ -332,7 +333,7 @@ const OceanParent = ({
         setStatus(prevState => ({
             ...prevState,
             pause: true,
-            swell2Height: selected
+            swell2Height: selected.replace('ft', '')
         }));
     }
     const handleSwell1Interval = (groupTitle, label, selected) => {

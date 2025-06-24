@@ -64,28 +64,28 @@ const SwellSelector = ({
 
     const getSwellIcon = (id) => {
         if (id === '1') {
-            return <img src={swell1} className='shaka r-20 p-2' alt="swell1" />
+            return <img src={swell1} className='shaka r-20 p-2' alt='swell1' />
         } else {
-            return <img src={swell2} className='shaka r-20 p-2' alt="swell2" />;
+            return <img src={swell2} className='shaka r-20 p-2' alt='swell2' />;
         }
     }
     const classes = 'h50w50 r-10 p-5 bg-white';
     const getDirectionIcon = () => {
-        if (swellDirection === "N") {
+        if (swellDirection === 'N') {
             return <img src={N} className={classes} alt={swellDirection} />;
-        } else if ((swellDirection === "NE") || (swellDirection === "NNE") || (swellDirection === "ENE")) {
+        } else if ((swellDirection === 'NE') || (swellDirection === 'NNE') || (swellDirection === 'ENE')) {
             return <img src={NE} className={classes} alt={swellDirection} />;
-        } else if (swellDirection === "E") {
+        } else if (swellDirection === 'E') {
             return <img src={E} className={classes} alt={swellDirection} />;
-        } else if ((swellDirection === "SE") || (swellDirection === "SSE") || (swellDirection === "ESE")) {
+        } else if ((swellDirection === 'SE') || (swellDirection === 'SSE') || (swellDirection === 'ESE')) {
             return <img src={SE} className={classes} alt={swellDirection} />;
-        } else if (swellDirection === "S") {
+        } else if (swellDirection === 'S') {
             return <img src={S} className={classes} alt={swellDirection} />;
-        } else if ((swellDirection === "SW") || (swellDirection === "SSW") || (swellDirection === "WSW")) {
+        } else if ((swellDirection === 'SW') || (swellDirection === 'SSW') || (swellDirection === 'WSW')) {
             return <img src={SW} className={classes} alt={swellDirection} />;
-        } else if (swellDirection === "W") {
+        } else if (swellDirection === 'W') {
             return <img src={W} className={classes} alt={swellDirection} />;
-        } else if ((swellDirection === "NW") || (swellDirection === "NNW") || (swellDirection === "WNW")) {
+        } else if ((swellDirection === 'NW') || (swellDirection === 'NNW') || (swellDirection === 'WNW')) {
             return <img src={NW} className={classes} alt={swellDirection} />;
         }
     }
@@ -94,7 +94,7 @@ const SwellSelector = ({
             <div className='containerBox'>
                 <div className='containerBox bg-lite'>
                     {getSwellIcon(id)}
-                    <div className="ml-5">Swell{id}</div>
+                    <div className='ml-5'>Swell{id}</div>
                 </div>
                 <div className='p-10'>{getDirectionIcon()}</div>  
             </div>
@@ -107,7 +107,7 @@ const SwellSelector = ({
                         groupTitle={`Swell${id}`}
                         selected={(id === '1') ? status.swell1Direction : status.swell2Direction} 
                         //getState(`swell1`)
-                        label="Direction" 
+                        label='Direction' 
                         items={directions}
                         onChange={(id === '1') ? handleSwell1Selection : handleSwell2Selection}
                         fontSize='20'
@@ -121,7 +121,7 @@ const SwellSelector = ({
                 <Selector
                     groupTitle={`SwellAngle${id}`}
                     selected={(id === '1') ? roundToNearestFive(status.swell1Angle) : roundToNearestFive(status.swell2Angle)} 
-                    label="Angle" 
+                    label='Angle' 
                     items={angles}
                     onChange={(id === '1') ? handleSwell1Angle : handleSwell2Angle}
                     fontSize='20'
@@ -133,8 +133,8 @@ const SwellSelector = ({
                 <div className='containerBox color-yellow bg-lite'>height</div>
                 <Selector
                     groupTitle={`SwellHeight${id}`}
-                    selected={(id === '1') ? `${Number(status.swell1Height)}ft` : `${Number(status.swell2Height)}ft`} 
-                    label="Height" 
+                    selected={(id === '1') ? `${Number(localStorage.getItem(`swell1Height`).replace('ft', '')).toFixed(0)}ft` : `${Number(localStorage.getItem('swell2Height').replace('ft', '')).toFixed(0)}ft`} 
+                    label='Height' 
                     items={waveHeights}
                     onChange={(id === '1') ? handleSwell1Height : handleSwell2Height}
                     fontSize='20'
@@ -147,8 +147,16 @@ const SwellSelector = ({
                 <div className='containerBox color-yellow bg-lite'>interval</div>
                 <Selector
                     groupTitle={`SwellInterval${id}`}
-                    selected={(id === '1') ? status.swell1Interval : status.swell2Interval} 
-                    label="interval" 
+                    selected={
+                      (id === '1')
+                        ? (status.swell1Interval && !status.swell1Interval.toString().includes('seconds')
+                            ? `${status.swell1Interval} seconds`
+                            : status.swell1Interval)
+                        : (status.swell2Interval && !status.swell2Interval.toString().includes('seconds')
+                            ? `${status.swell2Interval} seconds`
+                            : status.swell2Interval)
+                    }
+                    label='interval' 
                     items={intervals}
                     onChange={(id === '1') ? handleSwell1Interval : handleSwell2Interval}
                     fontSize='20'
@@ -157,7 +165,7 @@ const SwellSelector = ({
                 />
             </div>
             
-            <div className="containerBoxDetail button size40 p-20" onClick={() => toggleSelected()}>
+            <div className='containerBoxDetail button size40 p-20' onClick={() => toggleSelected()}>
                 {/*<img src={(selected) ? thumbsUp : thumbsDown} alt={`swell${id}`} className='p-10 r-20' />*/}
                 {((selected) === true) ? icons.good : icons.bad }
             </div>
