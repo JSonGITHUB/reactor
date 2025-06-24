@@ -78,9 +78,9 @@ const getMatchIcon = ({
                     alt={kind}
                 />
                 <span className='size15'>
-                    {Number(localStorage.getItem('swell1Height')).toFixed(0)}ft
-                    {localStorage.getItem('swell1Direction')}
-                    /{Number(localStorage.getItem('swell1Interval')).toFixed(0)}
+                    {(localStorage.getItem('swell1Height')) ? `${Number(localStorage.getItem('swell1Height').replace('ft','')).toFixed(0)}ft` : `${Number(status.swell1Height).toFixed(0)}ft`}
+                    {(localStorage.getItem('swell1Direction')) ? localStorage.getItem('swell1Direction') : status.swell1Direction}
+                    /{(localStorage.getItem('swell1Interval')) ? `${Number(localStorage.getItem('swell1Interval').replace(' seconds', '')).toFixed(0)}s` : `${Number(status.swell1Interval.replace(' seconds', '')).toFixed(0)}s`}
                 </span>
             </div>
         }
@@ -100,9 +100,9 @@ const getMatchIcon = ({
                         alt={kind} 
                     />
                     <div className='size15'>
-                        {Number(localStorage.getItem('swell2Height')).toFixed(0)}ft
+                    {Number(localStorage.getItem('swell2Height').replace('ft','')).toFixed(0)}ft
                         {localStorage.getItem('swell2Direction')}
-                        /{Number(localStorage.getItem('swell2Interval')).toFixed(0)}
+                    /{`${Number(localStorage.getItem('swell2Interval').replace(' seconds', '')).toFixed(0)}s`}
                     </div>
                 </div>
         }
