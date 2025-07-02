@@ -214,6 +214,8 @@ const icons = {
     earth2: '🌍',
     earth3: '🌏',
     garden: '🌿',
+    fishfinder: '🐟',
+    debtcollector: '💰',
     flex: '💪🏽',
     shaka: '🤙🏽',
     numberOne: '☝🏽',

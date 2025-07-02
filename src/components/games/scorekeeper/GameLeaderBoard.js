@@ -16,13 +16,13 @@ const GameLeaderboard = () => {
     useEffect(() => {
         const add = 'add Game/Sport';
         const gamesDir = initializeData('games', games);
-        if (!gamesDir.includes(add)) {
-            const newGamesDir = ['add Game / Sport', ...gamesDir];
+        //if (!gamesDir.includes(add)) {
+            //const newGamesDir = ['add Game / Sport', ...gamesDir];
             //gamesDir.unshift('add Game/Sport');
-            setAllGames(newGamesDir);
-        } else {
+            //setAllGames(newGamesDir);
+        //} else {
             setAllGames(gamesDir);
-        }
+        //}
     }, []);
     useEffect(() => {
        //console.log(`GameLeaderBoard => gold: ${JSON.stringify(gold, null, 2)}`); 

@@ -12,12 +12,14 @@ import Sessions from './components/waves/LogDirectoryNoRouter';
 import Session from './components/waves/Session';
 import Waves from './components/waves/Waves';
 import Product from './components/shop/Product';
-import EyeExercises from './components/eye/EyeExercises';
-import PDFReport from './components/eye/PDFReport';
+//import EyeExercises from './components/eye/EyeExercises';
+//import PDFReport from './components/eye/PDFReport';
 import SunTracker from './components/waves/SunTracker';
 import StepTimer from './components/utils/StepTimer';
 import StepManager from './components/StepManager';
 import Garden from './components/garden/Garden';
+import FishFinder from './components/fishing/FishFinder';
+import DebtCollector from './components/finance/DebtCollector';
 import Snippets from './components/utils/Snippets';
 import TideChart from './components/waves/tide/TideChart';
 import Buoys from './components/waves/SurfReports';                            
@@ -125,8 +127,10 @@ export default ({ props }) => {
                     <Route path='/GuestList'><SignUpDialog /></Route>
                     <Route path='/Session'><Session logId={logId} /></Route>
                     <Route path='/SunTracker'><SunTracker /></Route>
+                    {/*
                     <Route path='/EyeExercises'><EyeExercises /></Route>
                     <Route path='/PDFReport'><PDFReport /></Route>
+                    */}
                     <Route path='/Product'><Product /></Route>
                     <Route path='/Waves'>
                         <Waves 
@@ -156,6 +160,12 @@ export default ({ props }) => {
                     </Route>
                     <Route path='/Garden'>
                         <Garden />
+                    </Route>
+                    <Route path='/FishFinder'>
+                        <FishFinder />
+                    </Route>
+                    <Route path='/DebtCollector'>
+                        <DebtCollector />
                     </Route>
                     <Route path='/Buoys'><Buoys /></Route>
                     <Route path='/Sessions'><Sessions /></Route>

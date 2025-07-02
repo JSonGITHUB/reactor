@@ -206,27 +206,24 @@ const LoungeBeatPlayer = () => {
     };
 
     return (
-        <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-            <h2>🎶 Deeper Lounge Beat (with Bass + Reverb)</h2>
+        <div className='containerBox'>
+            <div className='containerBox'>🎶 Lounge Beat</div>
             <div>
-                <button onClick={togglePlay} style={{ fontSize: '1.5rem', padding: '1rem 2rem' }}>
+                <button onClick={togglePlay} className='containerBox button bg-green width-100-percent'>
                     {isPlaying ? 'Stop' : 'Start'}
                 </button>
             </div>
-            <div style={{ marginTop: '2rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem' }}>Tempo: {tempo} BPM</label>
+            <div className='containerBox bg-lite'>
+                <label>Tempo: {tempo} BPM</label>
                 <input
                     type='range'
                     min='60'
                     max='140'
                     value={tempo}
                     onChange={(e) => setTempo(Number(e.target.value))}
-                    style={{ width: '300px' }}
+                    className='width-100-percent'
                 />
             </div>
-            <p style={{ marginTop: '1rem' }}>
-                {isPlaying ? 'Lounge beats flowing...' : 'Ready to chill?'}
-            </p>
         </div>
     );
 };

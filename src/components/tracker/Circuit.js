@@ -100,7 +100,7 @@ const Circuit = ({
         }
     }
 
-    return <div key={`circuit${circuitIndex}`} className='containerBox lowerBorder contentLeft'>
+    return <div key={`circuit${circuitIndex}`} className='lowerBorder contentLeft'>
         <div className='containerBox bg-lite'>
             <div className='flexContainer'>
                 <div className='flex1Auto contentLeft'>

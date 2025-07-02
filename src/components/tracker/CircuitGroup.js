@@ -112,7 +112,7 @@ const CircuitGroup = () => {
         (circuitGroup)
         ? <div key={getKey(`circuit${groupIndex}`)} ref={targetElementRef}>
             <div className=''>
-                <div className='containerBox flexContainer bg-lite'>
+                <div className='flexContainer'>
                     <div className='flex1Auto'>
                         {
                             (isEditedCircuitGroupTitle())

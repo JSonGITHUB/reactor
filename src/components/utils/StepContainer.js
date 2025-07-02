@@ -261,7 +261,7 @@ const StepContainer = React.memo(( {
     if (validate(step)) {
         return (
             <div key={index} className={`containerDetail`}>
-                <div key={index} className={`${(currentStepIndex === index) ? 'incompletedSelector r-20' : ''} p-10 m-5`}>
+                <div key={index} className={`${(currentStepIndex === index) ? 'incompletedSelector r-20' : ''} m-5`}>
                     <div key={index} className='containerBox contentLeft'>
                         <div className='containerBox color-yellow bold' onClick={() => editStep(index)}>
                             {index + 1}. {step.step}
@@ -279,7 +279,7 @@ const StepContainer = React.memo(( {
                             {(currentStepIndex === index) ? formatTime(currentTimer) : formatTime(step.timer)}
                         </div>
                     </div>
-                    <div className='containerDetail p-15 m-10'>
+                    <div className=''>
                         <input
                             id={`step${index}Note`}
                             name={`step${index}Note`}
@@ -291,6 +291,7 @@ const StepContainer = React.memo(( {
                             onMouseLeave={handleMouseLeave}
                             onTouchStart={handleTouchStart}
                             onTouchEnd={handleTouchEnd}
+                            className='containerBox'
                         />
                     </div>
                     <div className='flexContainer mr-10 p-10'>
