@@ -57,6 +57,7 @@ const PlayerScores = () => {
     } = useContext(WavesContext);
 
     const locations = initializeData('spots', []);
+    const [gameSelections, setGameSelections] = useState();
 
     //console.log(`PlayerScores => playersInGame: ${JSON.stringify(playersInGame(), null, 2)}`);
 
@@ -173,13 +174,13 @@ const PlayerScores = () => {
         setParDialog(true);
     }
     useEffect(() => {
-        const add = 'add Game/Sport';
+        //const add = 'add Game/Sport';
         const gamesDir = initializeData('games', games);
-        if (!gamesDir.includes(add)) {
-            const newGamesDir = ['add Game/Sport', ...gamesDir];
+        //if (!gamesDir.includes(add)) {
+            //const newGamesDir = ['add Game/Sport', ...gamesDir];
             //gamesDir.unshift('add Game/Sport');
-            setAllGames(newGamesDir);
-        }
+            //setAllGames(newGamesDir);
+        //}
         setAllGames(gamesDir);
     }, []);
     useEffect(() => {
@@ -210,6 +211,10 @@ const PlayerScores = () => {
         setPlayers(newPlayers);
         setLogCollapse(true);
         setStandingsCollapse(true);
+        console.log(`PlayerScores => allGames: ${JSON.stringify(allGames, null, 2)}`);
+        const newGameSelections = allGames.push('add game/sport');
+        console.log(`PlayerScores => newGameSelections: ${JSON.stringify(newGameSelections, null, 2)}`);
+        setGameSelections(allGames);
     }, [allGames]);
     const setGameInProgress = (playerIndex) => {
         if (playerIndex > 0) {
@@ -1370,7 +1375,7 @@ const PlayerScores = () => {
                     <Selector
                         groupTitle='game'
                         label='game selector'
-                        items={allGames}
+                        items={gameSelections}
                         selected={game}
                         onChange={selectGame}
                         fontSize='25'

@@ -12,12 +12,14 @@ import Sessions from './components/waves/Sessions';
 import Session from './components/waves/Session';
 import Waves from './components/waves/Waves';
 import Product from './components/shop/Product';
-import EyeExercises from './components/eye/EyeExercises';
-import PDFReport from './components/eye/PDFReport';
+//import EyeExercises from './components/eye/EyeExercises';
+//import PDFReport from './components/eye/PDFReport';
 import SunTracker from './components/waves/SunTracker';
 import StepTimer from './components/utils/StepTimer';
 import StepManager from './components/StepManager';
 import Garden from './components/garden/Garden';
+import FishFinder from './components/fishing/FishFinder';
+import DebtCollector from './components/finance/DebtCollector';
 import Snippets from './components/utils/Snippets';
 import TideChart from './components/waves/tide/TideChart';
 import Buoys from './components/waves/SurfReports';
@@ -158,7 +160,7 @@ const App = () => {
 
     return (
         //AppComponent();<ScrollToTop loc={window.location} />
-        <div className='containerBox'>
+        <div className=''>
             {/*
                 <h1 className='text-xl font-bold'>Welcome, {role}!</h1>
                 <button
@@ -214,6 +216,7 @@ const App = () => {
                                     </div>
                                 )}
                             />
+                            {/*
                             <Route
                                 path='/PDFReport'
                                 render={(props) => (
@@ -226,6 +229,7 @@ const App = () => {
                                     <EyeExercises />
                                 )}
                             />
+                            */}
                             <Route
                                 path='/SunTracker'
                                 render={(props) => (
@@ -248,6 +252,18 @@ const App = () => {
                                 path='/Garden'
                                 render={(props) => (
                                     <Garden />
+                                )}
+                            />
+                            <Route
+                                path='/FishFinder'
+                                render={(props) => (
+                                    <FishFinder />
+                                )}
+                            />
+                            <Route
+                                    path='/DebtCollector'
+                                render={(props) => (
+                                    <DebtCollector />
                                 )}
                             />
                             <Route

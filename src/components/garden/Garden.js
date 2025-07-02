@@ -161,8 +161,12 @@ const Garden = () => {
         type='checkbox'
         onChange={() => { fertilized[index] = !fertilized[index] }}
     />
+    const truncateString = (str) => {
+        return str.length > 20 ? str.slice(0, 20) + '...' : str;
+    }
+      
     return (
-        <div className={`containerBox`}>
+        <div className={``}>
             <div className={`containerBox color-yellow bold bg-lite`}>
                 <CollapseToggleButton
                     title='Fertilizers'
@@ -255,7 +259,7 @@ const Garden = () => {
                             >
                                 <option value=''>🪴 Fertilizer</option>
                                 {fertilizers && (fertilizers.map(fertilizer => (
-                                    <option key={fertilizer} value={fertilizer}>🪴 {fertilizer}</option>
+                                    <option key={fertilizer} value={fertilizer}>🪴 {truncateString(fertilizer)}</option>
                                 )))}
                             </select>
                             <button

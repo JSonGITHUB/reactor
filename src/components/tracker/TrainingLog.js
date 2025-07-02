@@ -524,14 +524,14 @@ const TrainingLog = () => {
                         </div>
                         <div className='containerBox p-20'>
                             <div className='flexContainer'>
-                                <div className='containerBox flex2Column button bg-green' onClick={() => resetZero()}>
+                                <div className='containerBox flex2Column button bg-green centerVertical' onClick={() => resetZero()}>
                                     ZERO OUT
                                 </div>
                                 <div className='containerBox flex2Column button bg-green' onClick={() => reset()}>
                                     RESET TRAINING LOG
                                 </div>
                             </div>
-                            <div className='containerBox p-10 button bg-green' onClick={() => setGoals()}>
+                            <div className='containerBox button bg-green' onClick={() => setGoals()}>
                                 SET GOALS TO MATCH LOG
                             </div>
                         </div>

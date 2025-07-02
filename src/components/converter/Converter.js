@@ -526,12 +526,20 @@ const Converter = () => {
   }, [unit1]);
 
   useEffect(() => {
+    /* 
     if (value2) {
       if (unit1 === 'Direction' || unit2 === 'Direction') {
         setValue1(conversionFactors[unit2](parseFloat(value2), unit1));
       } else {
         console.log(`unit1: ${unit1} unit2: ${unit2} value2: ${value2}`)
         setValue1(conversionFactors[unit2](parseFloat(value2), unit1).toFixed(2));
+      }
+  */  
+    if (value1) {
+      if (unit1 === 'Direction' || unit2 === 'Direction') {
+        setValue2(conversionFactors[unit1](parseFloat(value1), unit2));
+      } else {
+        setValue2(conversionFactors[unit1](parseFloat(value1), unit2).toFixed(2));
       }
     }
   }, [unit2]);

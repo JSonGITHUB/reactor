@@ -53,10 +53,8 @@ const Location = ({
           {location.longitude}, {location.latitude}
         </p>
       ) : (
-        <p>
-          {/*Obtaining GPS coordinates...*/}
+          /*Obtaining GPS coordinates...*/
           <GPSStatus />
-        </p>
       )}
     </div>
   );

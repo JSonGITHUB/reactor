@@ -84,6 +84,7 @@ const Tracker = () => {
             if (!recipeGroup.isCollapsed) {
                 recipeGroup.recipes.forEach((recipe) => {
                     if (!recipe.isCollapsed && recipe.ingredients && recipe.ingredients.length > 0) {
+                        console.log(`getIngredient => recipe: ${JSON.stringify(recipe, null, 2)}`);
                         recipe.ingredients.forEach((ingredient) => {
                             newIngredients.push(ingredient);
                         });
@@ -746,7 +747,7 @@ const Tracker = () => {
         window.location.reload();
     }
 
-    return <div className='mt--30 containerDetail bg-lite'>
+    return <div className='mt--30'>
         <div className='pt-5'>
             <div className='flexContainer containerBox'>
                 <div className='flex2Column containerBox p-15 columnRightAlign width-50-percent size25 r-5 bold color-soft'>

@@ -1,20 +1,19 @@
-import React, { useState, useEffect, useContext } from 'react';
-import WaterTemp from './WaterTemp';
-import AirTemp from './AirTemp';
-import WindDirection from './WindDirection';
-import SunTracker from './SunTracker';
-import CollapseToggleButton from '../utils/CollapseToggleButton';
-import BuoysDisplay from './BouysDisplay';
+import { useContext, useEffect, useState } from 'react';
+import ConditionsContext from '../context/ConditionsContext';
+import { OceanContext } from '../context/OceanContext';
 import icons from '../site/icons';
-import SwellDisplay from './SwellDisplay';
+import CollapseToggleButton from '../utils/CollapseToggleButton';
 import initializeData from '../utils/InitializeData';
 import useCurrentTime from '../utils/useCurrentTime';
-import { OceanContext } from '../context/OceanContext';
-import ConditionsSelectors from './ConditionsSelectors';
-import ConditionsContext from '../context/ConditionsContext';
+import AirTemp from './AirTemp';
+import BuoysDisplay from './BouysDisplay';
 import { buoysTemplateData } from './buoysTemplateData';
+import ConditionsSelectors from './ConditionsSelectors';
 import getDirection from './getDirection';
-import { setSwell1 } from './WaveActions';
+import SunTracker from './SunTracker';
+import SwellDisplay from './SwellDisplay';
+import WaterTemp from './WaterTemp';
+import WindDirection from './WindDirection';
 //import BuoyReadingsChart from './BuoyReadingsChart';
 //import MarineDataChart from './MarineDataChart';
 //import MarineChart from './MarineChart';
@@ -70,6 +69,7 @@ const {
     }, [buoyCollapse]);
     useEffect(() => {
         const localBuoyData = initializeData('buoyData', buoysTemplateData);
+        /*         
         fetch(localBouyReadings())
             .then(res => res.ok ? res.json() : Promise.reject())
             .then(data => {
@@ -79,7 +79,8 @@ const {
             })
             .catch(() => {
                 setBouyData(localBuoyData);
-            });
+            }); 
+        */
     }, []);
     useEffect(() => {
         const swells = buoyData.data
@@ -100,6 +101,7 @@ const {
     }, [buoyData]);
     useEffect(() => {
         const localBuoyData = initializeData('buoyData', buoysTemplateData);
+        /* 
         fetch(localBouyReadings())
             .then(res => res.ok ? res.json() : Promise.reject())
             .then(data => {
@@ -109,7 +111,8 @@ const {
             })
             .catch(() => {
                 setBouyData(localBuoyData);
-            });
+            }); 
+        */
             console.log(`ConditionsDashboard => range: ${range}`);
     }, [range]);
 
