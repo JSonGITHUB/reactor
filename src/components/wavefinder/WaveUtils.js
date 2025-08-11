@@ -207,7 +207,7 @@ const WaveUtils = ({
             </div>
             <div className='containerBox'>
                 <div className='containerBox color-yellow button' onClick={() => addASwell(index)}>
-                    SWELL {icons.plus}
+                    SWELL <span className='text-outline-light'>{icons.plus}</span>
                 </div>
                 {locations[index].swell.map((s, swellIndex) => <div className='containerBox flexContainer button'>
                     <div 
@@ -229,7 +229,7 @@ const WaveUtils = ({
             </div>
             <div className='containerBox'>
                 <div className='containerBox color-yellow button' onClick={() => addAWind(index)}>
-                    WIND {icons.plus}
+                    WIND <span className='text-outline-light'>{icons.plus}</span>
                 </div>
                 {locations[index].wind.map((w,windIndex) => <div className='containerBox flexContainer button'>
                         <div
@@ -251,7 +251,7 @@ const WaveUtils = ({
             </div>
             <div className='containerBox'>
                 <div className='containerBox color-yellow button' onClick={() => addATide(index)}>
-                    TIDE {icons.plus}
+                    TIDE <span className='text-outline-light'>{icons.plus}</span>
                 </div>
                 {locations[index].tide.map((t,tideIndex) => <div className='containerBox flexContainer button'>
                     <div
@@ -352,9 +352,7 @@ const WaveUtils = ({
             </div>
         </div>
     </div>
-
-
-    //console.log(`status.module: ${item.module}`);
+    //console.log(`status.module: ${item.module} edit: ${edit} status: ${JSON.stringify(validate(status), null, 2)}`);
     return ((edit) ? (validate(status) !== null && item.module === 'Waves') ? menu : itemContainer : null)
 
 }

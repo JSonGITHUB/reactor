@@ -15,26 +15,27 @@ const categories = [
 const units = {
   Celsius: ['Fahrenheit'],
   Fahrenheit: ['Celsius'],
-  Gallons: ['Liters', 'Cups', 'Milliliters', 'Ounces'],
-  Liters: ['Gallons', 'Cups', 'Milliliters', 'Ounces'],
-  Milliliters: ['Gallons', 'Cups', 'Ounces', 'Liters', 'Tablespoons', 'Teaspoons'],
+  Gallons: ['Liters', 'Cups', 'Milliliters', 'Ounces', 'Quarts'],
+  Quarts: ['Gallons', 'Liters', 'Cups', 'Milliliters', 'Ounces'],
+  Liters: ['Gallons', 'Quarts', 'Cups', 'Milliliters', 'Ounces'],
+  Milliliters: ['Gallons', 'Quarts', 'Cups', 'Ounces', 'Liters', 'Tablespoons', 'Teaspoons'],
   Pesos: ['Dollars'],
   Dollars: ['Pesos'],
-  Miles: ['Kilometers', 'Yards', 'Feet'],
-  Kilometers: ['Miles', 'MPH', 'Knots'],
+  Miles: ['Kilometers', 'Yards', 'Feet', 'Centimeters'],
+  Kilometers: ['Miles', 'MPH', 'Knots', 'Centimeters'],
   Millimeters: ['Centimeters', 'Yards', 'Feet', 'Inches', 'Meters'],
-  Inches: ['Centimeters','Yards', 'Feet', 'Millimeters'],
-  Centimeters: ['Inches', 'Millimeters'],
+  Inches: ['Centimeters', 'Yards', 'Feet', 'Millimeters'],
+  Centimeters: ['Inches', 'Millimeters', 'Meters', 'Feet', 'Yards'],
+  Meters: ['Centimeters', 'Millimeters', 'Yards', 'Feet', 'Inches', 'Miles'],
   Pounds: ['Kilograms', 'Grams', 'Ounces'],
   Kilograms: ['Pounds', 'Grams', 'Ounces'],
-  Ounces: ['Grams', 'Cups', 'Tablespoons', 'Teaspoons', 'Pounds', 'Kilograms', 'Liters', 'Milliliters', 'Gallons'],
-  Grams: ['Ounces', 'Cups', 'Tablespoons', 'Teaspoons', 'Kilograms', 'Pounds', 'Liters', 'Milliliters', 'Gallons'],
-  Cups: ['Ounces', 'Tablespoons', 'Teaspoons', 'Grams', 'Liters', 'Milliliters', 'Gallons'],
+  Ounces: ['Grams', 'Cups', 'Tablespoons', 'Teaspoons', 'Pounds', 'Kilograms', 'Liters', 'Milliliters', 'Gallons', 'Quarts'],
+  Grams: ['Ounces', 'Cups', 'Tablespoons', 'Teaspoons', 'Kilograms', 'Pounds', 'Liters', 'Milliliters', 'Gallons', 'Quarts'],
+  Cups: ['Ounces', 'Tablespoons', 'Teaspoons', 'Grams', 'Liters', 'Milliliters', 'Gallons', 'Quarts'],
   Tablespoons: ['Ounces', 'Teaspoons', 'Grams', 'Cups', 'Liters', 'Milliliters'],
   Teaspoons: ['Ounces', 'Tablespoons', 'Grams', 'Cups', 'Liters', 'Milliliters'],
-  Yards: ['Meters','Yards', 'Feet', 'Inches', 'Miles', 'Millimeters'],
-  Feet: ['Meters', 'Yards', 'Inches', 'Miles', 'Millimeters'],
-  Meters: ['Yards','Feet', 'Inches', 'Miles', 'Millimeters'],
+  Yards: ['Meters', 'Yards', 'Feet', 'Inches', 'Miles', 'Millimeters', 'Centimeters'],
+  Feet: ['Meters', 'Yards', 'Inches', 'Miles', 'Millimeters', 'Centimeters'],
   MPH: ['Knots', 'Kilometers'],
   Knots: ['MPH', 'Kilometers'],
   Degrees: ['Direction'],
@@ -118,10 +119,63 @@ const directionToDegrees = (direction) => {
 };
 */
 const conversionFactors = {
+  Quarts: (value, toUnit) => {
+    switch (toUnit) {
+      case 'Gallons':
+        return value / 4;
+      case 'Liters':
+        return value * 0.946353;
+      case 'Cups':
+        return value * 4;
+      case 'Milliliters':
+        return value * 946.353;
+      case 'Ounces':
+        return value * 32;
+      default:
+        return value;
+    }
+  },
+  Centimeters: (value, toUnit) => {
+    switch (toUnit) {
+      case 'Inches':
+        return value / 2.54;
+      case 'Millimeters':
+        return value * 10;
+      case 'Meters':
+        return value / 100;
+      case 'Feet':
+        return value / 30.48;
+      case 'Yards':
+        return value / 91.44;
+      default:
+        return value;
+    }
+  },
+  // Update Meters for Centimeters
+  Meters: (value, toUnit) => {
+    switch (toUnit) {
+      case 'Centimeters':
+        return value * 100;
+      case 'Millimeters':
+        return value * 1000;
+      case 'Yards':
+        return value / 0.9144;
+      case 'Feet':
+        return value * 3.28084;
+      case 'Inches':
+        return value * 39.3701;
+      case 'Miles':
+        return value / 1609.34;
+      default:
+        return value;
+    }
+  },
   Celsius: (value) => (value * 9 / 5) + 32,
   Fahrenheit: (value) => (value - 32) * 5 / 9,
   Gallons: (value, toUnit) => {
     switch (toUnit) {
+      case 'Quarts':
+        return value * 4;
       case 'Liters':
         return value * 3.78541;
       case 'Cups':
@@ -195,16 +249,6 @@ const conversionFactors = {
     }
   },
 
-  Centimeters: (value, toUnit) => {
-    switch (toUnit) {
-      case 'Millimeters':
-          return value / 0.1;
-      case 'Inches':
-        return value / 2.54
-      default:
-        return value;
-    }
-  },
   Pounds: (value, toUnit) => {
     switch (toUnit) {
       case 'Kilograms':
@@ -380,23 +424,6 @@ const conversionFactors = {
         return value * .00328084;
       case 'Yards':
         return value * .001093613333333;
-      default:
-        return value;
-    }
-  },
-  
-  Meters: (value, toUnit) => {
-    switch (toUnit) {
-      case 'Millimeters':
-        return value / .001;
-      case 'Yards':
-        return value / 0.3048;
-      case 'Feet':
-        return value / 0.1016;
-      case 'Inches':
-        return value * 39.3701;
-      case 'Miles':
-        return value / 1609.34;
       default:
         return value;
     }

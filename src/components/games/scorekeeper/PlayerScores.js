@@ -174,14 +174,15 @@ const PlayerScores = () => {
         setParDialog(true);
     }
     useEffect(() => {
-        //const add = 'add Game/Sport';
+        const add = 'add Game/Sport';
         const gamesDir = initializeData('games', games);
-        //if (!gamesDir.includes(add)) {
-            //const newGamesDir = ['add Game/Sport', ...gamesDir];
+        if (!gamesDir.includes(add)) {
+            const newGamesDir = ['add Game/Sport', ...gamesDir];
             //gamesDir.unshift('add Game/Sport');
-            //setAllGames(newGamesDir);
-        //}
-        setAllGames(gamesDir);
+            setAllGames(newGamesDir);
+        } else {
+            setAllGames(gamesDir);
+        }
     }, []);
     useEffect(() => {
         localStorage.setItem('games', JSON.stringify(allGames));
@@ -207,14 +208,10 @@ const PlayerScores = () => {
                 player.golfGIR = initGolfStats;
             }
         });
-        
         setPlayers(newPlayers);
         setLogCollapse(true);
         setStandingsCollapse(true);
         console.log(`PlayerScores => allGames: ${JSON.stringify(allGames, null, 2)}`);
-        const newGameSelections = allGames.push('add game/sport');
-        console.log(`PlayerScores => newGameSelections: ${JSON.stringify(newGameSelections, null, 2)}`);
-        setGameSelections(allGames);
     }, [allGames]);
     const setGameInProgress = (playerIndex) => {
         if (playerIndex > 0) {
@@ -1375,7 +1372,7 @@ const PlayerScores = () => {
                     <Selector
                         groupTitle='game'
                         label='game selector'
-                        items={gameSelections}
+                        items={allGames}
                         selected={game}
                         onChange={selectGame}
                         fontSize='25'

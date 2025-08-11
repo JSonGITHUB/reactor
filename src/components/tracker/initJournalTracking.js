@@ -1,5 +1,4 @@
-const initJournalTracking = [];
-/* [
+const initJournalTracking = [
     {
         "title": "Pismo 2024",
         "journal": [
@@ -26,7 +25,7 @@ const initJournalTracking = [];
         ],
         "isCollapsed": false
       }
-  ]; */
+  ]; 
   export default initJournalTracking;
   
   /*

@@ -405,6 +405,7 @@ const TrainingLog = () => {
                                         goalData={goalData}
                                         colors={colors}
                                         category='training'
+                                        categories={categories}
                                     />
                                     : null
                             }
@@ -525,14 +526,14 @@ const TrainingLog = () => {
                         <div className='containerBox p-20'>
                             <div className='flexContainer'>
                                 <div className='containerBox flex2Column button bg-green centerVertical' onClick={() => resetZero()}>
-                                    ZERO OUT
+                                    Clear
                                 </div>
                                 <div className='containerBox flex2Column button bg-green' onClick={() => reset()}>
-                                    RESET TRAINING LOG
+                                    Default
                                 </div>
                             </div>
                             <div className='containerBox button bg-green' onClick={() => setGoals()}>
-                                SET GOALS TO MATCH LOG
+                                Set Goals To Match Log
                             </div>
                         </div>
                     </div>
@@ -559,6 +560,7 @@ const TrainingLog = () => {
                                             goalData={goalData}
                                             colors={colors}
                                             category='goals'
+                                            categories={categories}
                                         />
                                         : null
                                 }
@@ -640,12 +642,12 @@ const TrainingLog = () => {
                                         checked={activeTimers}
                                         onChange={() => toggleActiveTimer()}
                                     />
-                                    USE ACTIVE TIMERS
+                                    Use Active Timers
                                 </div>
                             </div>
                             <div className='mt-10 flex2Column'>
                                 <div className='containerDetail p-10 button bg-lite m-5 p-20' onClick={() => resetGoals()}>
-                                    RESET GOALS
+                                    Rest Goals
                                 </div>
                             </div>
                         </div>

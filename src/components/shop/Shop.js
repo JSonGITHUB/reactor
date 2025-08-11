@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import '../../assets/css/shop.css';
 import IngredientParent from '../context/IngredientContext';
 import List from './List';

@@ -17,16 +17,21 @@ const TrackJournal = ({
     const [sort, setSort] = useState(initialSort);
 
     useEffect(() => {
-        if ((journals === null) && (initializeData('journalSort', null) === null)) {
+        if ((journals === null || journals === undefined || journals === 'undefined') && (initializeData('journalSort', null) === null)) {
             setJournals(initJournalTracking);
+        } else {
+            if (journals !== null && journals !== undefined && journals !== 'undefined') {
+                console.log(`TrackJournal => useEffect => journals: ${JSON.stringify(journals, null, 2)}`);
+                localStorage.setItem('journalTracking', JSON.stringify(journals));
+            }
         }
-        localStorage.setItem('journalTracking', JSON.stringify(journals));
     }, [journals]);
 
     useEffect(() => {
-        const storedJournals = (journals !== null) 
+        const storedJournals = (journals !== null && journals !== undefined) 
                                 ? journals 
                                 : initializeData('journalTracking', initJournalTracking)
+        console.log(`TrackJournal => useEffect => storedJournals: ${JSON.stringify(storedJournals, null, 2)}`);
         setJournals(storedJournals);
     }, []);
 
@@ -66,7 +71,6 @@ const TrackJournal = ({
             setJournals(newJournals);
         }
     }
-
     return (
         <div key={getKey('journalGroupContainer')}>
             <div className='containerBox'>
@@ -78,40 +82,46 @@ const TrackJournal = ({
                 />
             </div>
             {
-                (sort)
-                ? journals.slice().reverse().map((journalGroup, journalGroupIndex, array) => (
-                    (journalGroup.display && journalGroup.display === true)
-                    ?<div key={getKey('journalGroups')}>
-                        <JournalGroup
-                            journals={journals}
-                            setJournals={setJournals}
-                            journalGroup={journalGroup}
-                            journalGroupIndex={(array.length - 1 - journalGroupIndex)}
-                            deleteGroup={deleteGroup}
-                            addJournal={addJournal}
-                            targetElementRef={targetElementRef}
-                            scrollToBottom={scrollToBottom}
-                            sort={sort}
-                        />
+                (sort && journals)
+                ? <div className='containerBox'>
+                    {
+                        journals.slice().reverse().map((journal,j) => <div key={getKey(j)} className='containerBox'>{journal.title}</div>)
+                    }
+                    {
+                        journals.slice().reverse().map((journalGroup, journalGroupIndex, array) => <div key={getKey('journalGroups')} className='containerBox'>
+                                <JournalGroup
+                                    journals={journals}
+                                    setJournals={setJournals}
+                                    journalGroup={journalGroup}
+                                    journalGroupIndex={(array.length - 1 - journalGroupIndex)}
+                                    deleteGroup={deleteGroup}
+                                    addJournal={addJournal}
+                                    targetElementRef={targetElementRef}
+                                    scrollToBottom={scrollToBottom}
+                                    sort={sort}
+                                />
+                            </div>
+                        )
+                    }
                     </div>
+                : (journals)
+                    ? journals.map((journalGroup, journalGroupIndex) => (
+                        (journalGroup.display && journalGroup.display === true)
+                            ? <div key={getKey('journalGroups')} className='containerBox'>
+                                <JournalGroup
+                                    journals={journals}
+                                    setJournals={setJournals}
+                                    journalGroup={journalGroup}
+                                    journalGroupIndex={journalGroupIndex}
+                                    deleteGroup={deleteGroup}
+                                    addJournal={addJournal}
+                                    targetElementRef={targetElementRef}
+                                    scrollToBottom={scrollToBottom}
+                                />
+                            </div>
+                            : null
+                    ))
                     : null
-                ))
-                : journals.map((journalGroup, journalGroupIndex) => (
-                    (journalGroup.display && journalGroup.display === true)
-                    ? <div key={getKey('journalGroups')}>
-                        <JournalGroup
-                            journals={journals}
-                            setJournals={setJournals}
-                            journalGroup={journalGroup}
-                            journalGroupIndex={journalGroupIndex}
-                            deleteGroup={deleteGroup}
-                            addJournal={addJournal}
-                            targetElementRef={targetElementRef}
-                            scrollToBottom={scrollToBottom}
-                        />
-                    </div>
-                    : null
-                ))
             }
         </div>
     )

@@ -137,6 +137,142 @@ const Recipe = ({
             setRecipes(newRecipes);
         }
     }
+    const parseRecipeDescription = (input, currentRecipe = {}) => {
+        if (!input || typeof input !== 'string') {
+            return {
+                dish: currentRecipe.dish || '',
+                description: currentRecipe.description || '',
+                ingredients: currentRecipe.ingredients || [],
+                instructions: currentRecipe.instructions || '',
+                nutrition: currentRecipe.nutrition || ''
+            };
+        }
+
+        const lines = input.split('\n').map(line => line.trim());
+        let dish = undefined;
+        let description = '';
+        let ingredients = [];
+        let instructions = '';
+        let nutrition = '';
+
+        let section = '';
+        let buffer = [];
+        let foundSection = false;
+
+        const flushBuffer = () => {
+            if (section === 'Ingredients') {
+                ingredients = buffer
+                    .map(line => {
+                        const parts = line.trim().split(/\s+/); // split by whitespace
+                        if (parts.length >= 3) {
+                            const [quantity, unit, ...rest] = parts;
+                            const name = rest.join(' ');
+                            // Skip if any part is literally 'undefined'
+                            if (
+                                quantity.toLowerCase() === 'undefined' ||
+                                unit.toLowerCase() === 'undefined' ||
+                                name.toLowerCase() === 'undefined'
+                            ) {
+                                return null;
+                            }
+                            return [quantity, unit, name];
+                        }
+
+                        // Optional: also skip single-word lines like just 'undefined'
+                        if (line.toLowerCase() === 'undefined') return null;
+
+                        return null; // skip malformed entries
+                    })
+                    .filter(Boolean); // remove nulls
+            } else if (section === 'Cooking Instructions') {
+                description = buffer
+                    .join('\n')
+                    .replace(/None required\./gi, '')
+                    .replace(/\n{2,}/g, '\n')
+                    .trim();
+            } else if (section === 'Serving Instructions') {
+                instructions = buffer
+                    .filter(Boolean)
+                    .map(line => ({
+                        step: line,
+                        ingredients: [] // or extract matched ingredients here if needed
+                    }));
+
+                const servingText = buffer
+                    .join('\n')
+                    .replace(/None required\./gi, '')
+                    .replace(/\n{2,}/g, '\n')
+                    .trim();
+
+                // Append serving instructions text to description
+                if (servingText) {
+                    description += (description ? '\n\n' : '') + servingText;
+                }
+            } else if (section === 'Nutritional Value') {
+                nutrition = buffer.join('\n').trim();
+            }
+            buffer = [];
+        };
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+
+            // Match headers
+            const isDishHeader = /^Dish:?(.*)$/i.exec(line);
+            const isIngredientsHeader = /^Ingredients:?$/i.test(line);
+            const isCookingHeader = /^Cooking Instructions:?$/i.test(line);
+            const isServingHeader = /^Serving Instructions:?$/i.test(line);
+            const isNutritionHeader = /^Nutritional Value:?$/i.test(line);
+
+            if (isDishHeader) {
+                flushBuffer();
+                section = 'Dish';
+                foundSection = true;
+
+                const inlineDish = isDishHeader[1].trim();
+                if (inlineDish) {
+                    dish = inlineDish;
+                } else if (i + 1 < lines.length && lines[i + 1].trim()) {
+                    dish = lines[i + 1].trim();
+                    i++; // Skip the next line since it was used for the dish
+                }
+                continue;
+            }
+
+            if (isIngredientsHeader || isCookingHeader || isServingHeader || isNutritionHeader) {
+                flushBuffer();
+                if (isIngredientsHeader) section = 'Ingredients';
+                if (isCookingHeader) section = 'Cooking Instructions';
+                if (isServingHeader) section = 'Serving Instructions';
+                if (isNutritionHeader) section = 'Nutritional Value';
+                foundSection = true;
+                continue;
+            }
+
+            buffer.push(line);
+        }
+
+        flushBuffer();
+
+        // If no known sections found, assign all to description
+        if (!foundSection) {
+            return {
+                dish: currentRecipe.dish || '',
+                description: input.trim(),
+                ingredients: currentRecipe.ingredients || [],
+                instructions: currentRecipe.instructions || '',
+                nutrition: currentRecipe.nutrition || ''
+            };
+        }
+
+        return {
+            dish: dish === undefined ? currentRecipe.dish : (dish || currentRecipe.dish || ''),
+            description: description || currentRecipe.description || '',
+            ingredients: ingredients.length > 0 ? ingredients : currentRecipe.ingredients || [],
+            instructions: instructions || currentRecipe.instructions || '',
+            nutrition: nutrition || currentRecipe.nutrition || ''
+        };
+    };
     const toggleEditRecipe = () => {
         const toggleRecipe = (editRecipe)
             ? false
@@ -146,8 +282,15 @@ const Recipe = ({
         setEditedRecipe((toggleRecipe) ? recipe.description : '');
         if (!toggleRecipe && wasRecipeEdited) {
             const newRecipes = [...recipes];
-            const selectedNewRecipe = newRecipes[recipeGroupIndex].recipes[recipeIndex];
-            selectedNewRecipe.description = (wasRecipeEdited) ? editedRecipe : selectedNewRecipe.description;
+            const updatedRecipe = wasRecipeEdited
+                ? parseRecipeDescription(editedRecipe, newRecipes[recipeGroupIndex].recipes[recipeIndex])
+                : newRecipes[recipeGroupIndex].recipes[recipeIndex];
+            const updatedGroupRecipes = [...newRecipes[recipeGroupIndex].recipes];
+            updatedGroupRecipes[recipeIndex] = updatedRecipe;
+            newRecipes[recipeGroupIndex] = {
+                ...newRecipes[recipeGroupIndex],
+                recipes: updatedGroupRecipes
+            };
             setRecipes(newRecipes);
         }
     }
@@ -348,7 +491,7 @@ const Recipe = ({
     const recipeHeader = (category, toggleFunction, isEdit) => {
 
         return <div className='containerBox flexContainer bg-lite centerVertical '>
-            <div className='flex2Column containerBox color-yellow bg-tinted p-20'>
+            <div className='flex2Column containerDetail color-yellow bg-tinted pt-10 pb-10 mr-5'>
                 <CollapseToggleButton
                     title={category}
                     isCollapsed={(category.toLowerCase().includes('ingredient')) ? collapseIngredients : collapseInstructions}
@@ -706,7 +849,11 @@ const Recipe = ({
         {
             (collapsed)
                 ? null
-                : <div>
+                : <div className=''>
+                    <div className='containerDeatil pl-10 color-orange size12'>
+                        Use the following headers for easy parsing:
+                        Ingredients:, Cooking Instructions:, Serving Instructions:, Nutritional Value:
+                    </div>
                     <EditableTextField
                         title='Recipe:'
                         data={recipe.description}

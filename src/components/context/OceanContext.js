@@ -115,6 +115,8 @@ const OceanParent = ({
         }
     };
 
+    
+
     useEffect(() => {
         
         setStatusData({
@@ -152,7 +154,9 @@ const OceanParent = ({
             init: false
         })
     }, []);
-
+    useEffect(() => {
+        
+    }, [status]);
     useEffect(() => {
         const templateData = {
             time: 1719878400,

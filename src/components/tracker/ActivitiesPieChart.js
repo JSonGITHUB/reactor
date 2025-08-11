@@ -1,18 +1,24 @@
 import React, { useCallback, useState } from 'react';
 import { PieChart, Pie, Cell, Tooltip } from 'recharts';
+import icons from '../site/icons';
 
 const ActivitiesPieChart = ({
     trainingData,
     goalData,
     colors,
-    category
+    category,
+    categories
 }) => {
+
+    console.log(`ActivitiesPieChart => trainingData: ${JSON.stringify(trainingData, null, 2)}`);
+    console.log(`ActivitiesPieChart => goalData: ${JSON.stringify(goalData, null, 2)}`);
 
     const convertToDataFormat = (data) => {
         //console.log(`convertToDataFormat => ${JSON.stringify(data, null, 2)}`)
         return data.map(item => ({
             name: item.skill,
-            value: Number(item.percentage)
+            value: Number(item.percentage),
+            icon: item.icon
         }));
     };
 
@@ -23,7 +29,7 @@ const ActivitiesPieChart = ({
         const y = cy + (radius*2.5) * Math.sin(-midAngle * RADIAN);
 
         return (
-            <text x={x} y={y}  textAnchor={x > cx ? 'start' : 'end'} fill={colors[index % colors.length]} dominantBaseline="central">
+            <text x={x} y={y}  textAnchor={x > cx ? 'start' : 'end'} fill={colors[index]} dominantBaseline='central'>
                 {`${(percent * 100).toFixed(0)}%`}
             </text>
         );
@@ -42,7 +48,7 @@ const ActivitiesPieChart = ({
             dataKey='value'
         >
             {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                <Cell key={`cell-${index}`} fill={colors[index]} />
             ))}
         </Pie>
         <Tooltip />
@@ -51,14 +57,14 @@ const ActivitiesPieChart = ({
         color: 'blue',
         backgroundColor: '#00FF00',
     };
-    const customizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
+    const customizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, name}) => {
         const radius = (innerRadius/2)+10;
         const x = cx + (radius*2.5) * Math.cos(-midAngle * RADIAN);
         const y = cy + (radius*2.5) * Math.sin(-midAngle * RADIAN);
-
+        const categoryIndex = categories.findIndex(cat => cat === name);
         return (
-            <text x={x} y={y} textAnchor={x > cx ? 'start' : 'end'} fill={colors[index % colors.length]} dominantBaseline="central">
-                {`${(percent * 100).toFixed(0)}%`}
+            <text x={x} y={y} textAnchor={x > cx ? 'start' : 'end'} fill={colors[index]} dominantBaseline='central'>
+                {`${icons[categories[categoryIndex]] || ''} ${(percent * 100).toFixed(0)}%`}
             </text>
         );
     };
@@ -73,7 +79,7 @@ const ActivitiesPieChart = ({
             fill='#8884d8'
         >
             {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                <Cell key={`cell-${index}`} fill={colors[index]} />
             ))}
         </Pie>
         <Pie
@@ -87,9 +93,11 @@ const ActivitiesPieChart = ({
             fill='#8884d8'
             dataKey='value'
         >
-            {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
-            ))}
+            {data.map((entry, index) => {
+                return (
+                    <Cell key={`cell-${index}`} fill={colors[index]} />
+                )
+            })}
         </Pie>
         <Tooltip />
     </PieChart>

@@ -216,7 +216,7 @@ const Tracker = () => {
     useEffect(() => {
         if (recipes !== undefined) {
             const ingredients = getIngredients();
-            if (validate(ingredients) !== null && (ingredients === undefined)) {
+            if ((validate(ingredients) !== null) && (ingredients !== undefined)) {
                 localStorage.setItem('ingredients', JSON.stringify(ingredients));
             }
         }
@@ -252,7 +252,9 @@ const Tracker = () => {
     }, []);
 
     useEffect(() => {
-        localStorage.setItem('projects', JSON.stringify(projects));
+        if (projects !== undefined || projects !== '') {
+            localStorage.setItem('projects', JSON.stringify(projects));
+        }
     }, [projects]);
 
     useEffect(() => {
@@ -309,38 +311,48 @@ const Tracker = () => {
     }, [isCollapsed]);
 
     useEffect(() => {
-        localStorage.setItem('waveTracking', JSON.stringify(waves));
+        if (waves !== undefined || waves !== '') {
+            localStorage.setItem('waveTracking', JSON.stringify(waves));
+        }
     }, [waves]);
 
     useEffect(() => {
         //console.log(`Tracker => links: ${JSON.stringify(links, null, 2)}`);
-        localStorage.setItem('linkTracking', JSON.stringify(links));
+        if (links !== undefined || links !== '') {
+            localStorage.setItem('linkTracking', JSON.stringify(links));
+        }
     }, [links]);
 
     useEffect(() => {
-        console.log(`Tracker => tasks: ${JSON.stringify(tasks, null, 2)}`);
-        localStorage.setItem('taskTracking', JSON.stringify(tasks));
+        if (tasks !== undefined || tasks !== '') {
+            console.log(`Tracker => tasks: ${JSON.stringify(tasks, null, 2)}`);
+            localStorage.setItem('taskTracking', JSON.stringify(tasks));
+        }
     }, [tasks]);
 
     useEffect(() => {
-        console.log(`charges: ${JSON.stringify(charges, null, 2)}`);
-        localStorage.setItem('chargeTracking', JSON.stringify(charges));
+        if (charges !== undefined || charges !== '') {
+            console.log(`charges: ${JSON.stringify(charges, null, 2)}`);
+            localStorage.setItem('chargeTracking', JSON.stringify(charges));
+        }
     }, [charges]);
 
     useEffect(() => {
-        localStorage.setItem('eventTracking', JSON.stringify(events));
+        if (events !== undefined || events !== '') {
+            localStorage.setItem('eventTracking', JSON.stringify(events));
+        }
     }, [events]);
 
     useEffect(() => {
-        localStorage.setItem('noteTracking', JSON.stringify(notes));
+        if (notes !== undefined || notes !== '') {
+            localStorage.setItem('noteTracking', JSON.stringify(notes));
+        }
     }, [notes]);
 
     useEffect(() => {
-        localStorage.setItem('journalTracking', JSON.stringify(journals));
-    }, [journals]);
-
-    useEffect(() => {
-        localStorage.setItem('tracking', tracking);
+        if (tracking !== undefined || tracking !== '') {
+            localStorage.setItem('tracking', tracking);
+        }
     }, [tracking]);
 
     useEffect(() => {
@@ -519,13 +531,15 @@ const Tracker = () => {
                 const inGratefulFor = (journal) => journal.gratefulFor.toLowerCase().includes(searchTerm);
                 const filteredJournals = [...journals];
                 filteredJournals.map((journalGroup) => {
-                    journalGroup.display = false;
-                    journalGroup.journals.map((journal) => {
-                        if (inJournalGroupTitle(journalGroup) || inJournalDescription(journal) || inJournal(journal) || inFeelings(journal) || inTodaysGoals(journal) || inFutureGoals(journal) || inGratefulFor(journal) || searchTerm === '' || searchTerm === ' ' || searchTerm === null) {
-                            journal.display = true;
-                            journalGroup.display = true;
-                        }
-                    });
+                    if (journalGroup.journals && journalGroup?.journals.length>0) {
+                        journalGroup.display = false;
+                        journalGroup.journals.map((journal) => {
+                            if (inJournalGroupTitle(journalGroup) || inJournalDescription(journal) || inJournal(journal) || inFeelings(journal) || inTodaysGoals(journal) || inFutureGoals(journal) || inGratefulFor(journal) || searchTerm === '' || searchTerm === ' ' || searchTerm === null) {
+                                journal.display = true;
+                                journalGroup.display = true;
+                            }
+                        });
+                    }
                 });
                 setJournals(filteredJournals);
             }
@@ -548,6 +562,7 @@ const Tracker = () => {
             createdDate: currentDate(),
             startTime: currentTime(),
             tasks: [],
+            journals: [],
             totalTime: 0,
             isCollapsed: false
         };
@@ -783,7 +798,7 @@ const Tracker = () => {
                 : <React.Fragment></React.Fragment>
             }
         </div>
-        <div className='containerBox'>
+        <div className=''>
             {
                 (tracking === 'journals')
                 ? <div>
@@ -799,34 +814,38 @@ const Tracker = () => {
                         (!currentGoalsCollapse)
                         ? <div className='containerBox'>
                             {
-                                journals.map((journalGroup, journalGroupIndex) => (
-                                    journalGroup.journals.map((journal, journalIndex) => (
-                                        journal.todaysGoals.map((currentGoal, currentGoalIndex) => (
-                                            (!currentGoal[1])
-                                                ? <div className='containerBox flexContainer centerVertical' key={getKey(`currentGoal${currentGoal}`)}>
-                                                    <div className='flex2Column contentLeft'>
-                                                        {currentGoal[0]}
-                                                    </div>
-                                                    <div className='flexColumn contentRight'>
-                                                        <div
-                                                            title='toggle checkbox'
-                                                            className='containerBox bg-lite p-20 button'
-                                                            onClick={() => toggleCheckbox('todaysGoals', journalGroupIndex, journalIndex, currentGoalIndex)}
-                                                        >
-                                                            <input
-                                                                id='completed'
-                                                                name='completed'
-                                                                className='regular-checkbox'
-                                                                checked={currentGoal[1]}
-                                                                type='checkbox'
-                                                            />
+                                (journals && journals.length > 0)
+                                ? journals.map((journalGroup, journalGroupIndex) => (
+                                    (journalGroup.journals && journalGroup.journals.length > 0)
+                                        ? journalGroup.journals.map((journal, journalIndex) => (
+                                            journal.todaysGoals.map((currentGoal, currentGoalIndex) => (
+                                                (!currentGoal[1])
+                                                    ? <div className='containerBox flexContainer centerVertical' key={getKey(`currentGoal${currentGoal}`)}>
+                                                        <div className='flex2Column contentLeft'>
+                                                            {currentGoal[0]}
+                                                        </div>
+                                                        <div className='flexColumn contentRight'>
+                                                            <div
+                                                                title='toggle checkbox'
+                                                                className='containerBox bg-lite p-20 button'
+                                                                onClick={() => toggleCheckbox('todaysGoals', journalGroupIndex, journalIndex, currentGoalIndex)}
+                                                            >
+                                                                <input
+                                                                    id='completed'
+                                                                    name='completed'
+                                                                    className='regular-checkbox'
+                                                                    checked={currentGoal[1]}
+                                                                    type='checkbox'
+                                                                />
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                : null
+                                                    : null
+                                            ))
                                         ))
+                                        : null
                                     ))
-                                ))
+                                : null
                             }
                         </div>
                         : null
@@ -843,8 +862,10 @@ const Tracker = () => {
                         (!futureGoalsCollapse)
                         ? <div className='containerBox'>
                             {
-                                journals.map((journalGroup, journalGroupIndex) => (
-                                    journalGroup.journals.map((journal, journalIndex) => (
+                                (journals && journals.length > 0)
+                                ? journals.map((journalGroup, journalGroupIndex) => (
+                                    (journalGroup.journals && journalGroup.journals.length > 0)
+                                    ? journalGroup.journals.map((journal, journalIndex) => (
                                         journal.futureGoals.map((futureGoal, futureGoalIndex) => (
                                             (!futureGoal[1])
                                             ? <div className='containerBox flexContainer centerVertical' key={getKey(`futureGoal${futureGoal}`)}>
@@ -868,7 +889,9 @@ const Tracker = () => {
                                             : null
                                         ))
                                     ))
+                                    : null
                                 ))
+                                : null
                             }
                         </div>
                         : null
@@ -885,8 +908,10 @@ const Tracker = () => {
                         (!completedGoalsCollapse)
                         ? <div className='containerBox'>
                             {
-                                journals.map((journalGroup, journalGroupIndex) => (
-                                    journalGroup.journals.map((journal, journalIndex) => (
+                                (journals && journals.length > 0)
+                                ? journals.map((journalGroup, journalGroupIndex) => (
+                                    (journalGroup.journals && journalGroup.journals.length > 0)
+                                    ? journalGroup.journals.map((journal, journalIndex) => (
                                         journal.todaysGoals.map((todaysGoal, todaysGoalIndex) => (
                                             (todaysGoal[1])
                                             ? <div className='containerBox flexContainer centerVertical' key={getKey(`todaysGoal${todaysGoal}`)}>
@@ -910,7 +935,9 @@ const Tracker = () => {
                                             : null
                                         ))
                                     ))
+                                    : null
                                 ))
+                                : null
                             }
                             {
                                 journals.map((journalGroup, journalGroupIndex) => {

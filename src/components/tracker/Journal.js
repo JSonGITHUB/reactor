@@ -46,7 +46,7 @@ const Journal = ({
     }
     useEffect(() => {
         const newJournals = [...journals];
-        const selectedNewJournal = newJournals[journalGroupIndex].journals[journalIndex] ?? templateJournal;
+        const selectedNewJournal = newJournals[journalGroupIndex].journal[journalIndex] ?? templateJournal;
         console.log(`selectedNewJournal: ${JSON.stringify(selectedNewJournal,null, 2)}`)
         let dataUpdated = false;
         //if (selectedNewJournal?.feelings === undefined || selectedNewJournal?.feelings === null) {
@@ -94,14 +94,16 @@ const Journal = ({
 
     useEffect(() => {
         const newJournals = [...journals];
-        const selectedNewJournal = newJournals[journalGroupIndex].journals[journalIndex] ?? templateJournal;
+        const selectedNewJournal = newJournals[journalGroupIndex].journal[journalIndex] ?? templateJournal;
         console.log(`Journal => collapsed: ${collapsed}`)
         console.log(`Journal => selectedNewJournal: ${JSON.stringify(selectedNewJournal,null,2)}`);
         console.log(`Journal => selectedNewJournal.isCollapsed: ${selectedNewJournal.isCollapsed}`);
         selectedNewJournal.isCollapsed = collapsed;
         const stringifiedData = JSON.stringify(newJournals);
-        //console.log(`Journal => stringifiedData: ${stringifiedData}`);
-        localStorage.setItem('journalTracking', stringifiedData);
+        console.log(`Journal => stringifiedData: ${stringifiedData}`);
+        if (stringifiedData !== 'undefined' && stringifiedData !== undefined) {
+            localStorage.setItem('journalTracking', stringifiedData);
+        }
     }, [collapsed]);
 
     const toggleEditTitle = () => {
@@ -113,7 +115,7 @@ const Journal = ({
         setEditedJournalTitle((toggleTitle) ? journal.title : '');
         if (!toggleTitle && wasJournalTitleEdited) {
             const newJournals = [...journals];
-            const selectedNewJournal = newJournals[journalGroupIndex].journals[journalIndex];
+            const selectedNewJournal = newJournals[journalGroupIndex].journal[journalIndex];
             selectedNewJournal.description = (wasJournalTitleEdited) ? editedJournalTitle : selectedNewJournal.description;
             setJournals(newJournals);
         }
@@ -127,7 +129,7 @@ const Journal = ({
         setEditedJournal((toggleJournal) ? journal.journal : '');
         if (!toggleJournal && wasJournalEdited) {
             const newJournals = [...journals];
-            const selectedNewJournal = newJournals[journalGroupIndex].journals[journalIndex];
+            const selectedNewJournal = newJournals[journalGroupIndex].journal[journalIndex];
             selectedNewJournal.journal = (wasJournalEdited) ? editedJournal : selectedNewJournal.journal;   
             setJournals(newJournals);
         }
@@ -141,7 +143,7 @@ const Journal = ({
         setEditedFeelings((toggleFeelings) ? journal.feelings : '');
         if (!toggleFeelings && wasFeelingsEdited) {
             const newJournals = [...journals];
-            const selectedNewJournal = newJournals[journalGroupIndex].journals[journalIndex];
+            const selectedNewJournal = newJournals[journalGroupIndex].journal[journalIndex];
             selectedNewJournal.feelings = (wasFeelingsEdited) ? editedFeelings : selectedNewJournal.feelings;   
             setJournals(newJournals);
         }
@@ -155,7 +157,7 @@ const Journal = ({
         setEditedTodaysGoals((toggleTodaysGoals) ? journal.todaysGoals : '');
         if (!toggleTodaysGoals && wasTodaysGoalsEdited) {
             const newJournals = [...journals];
-            const selectedNewJournal = newJournals[journalGroupIndex].journals[journalIndex];
+            const selectedNewJournal = newJournals[journalGroupIndex].journal[journalIndex];
             selectedNewJournal.todaysGoals = (wasTodaysGoalsEdited) ? editedTodaysGoals : selectedNewJournal.todaysGoals;   
             setJournals(newJournals);
         }
@@ -169,7 +171,7 @@ const Journal = ({
         setEditedFutureGoals((toggleFutureGoals) ? journal.futureGoals : '');
         if (!toggleFutureGoals && wasFutureGoalsEdited) {
             const newJournals = [...journals];
-            const selectedNewJournal = newJournals[journalGroupIndex].journals[journalIndex];
+            const selectedNewJournal = newJournals[journalGroupIndex].journal[journalIndex];
             selectedNewJournal.futureGoals = (wasFutureGoalsEdited) ? editedFutureGoals : selectedNewJournal.futureGoals;   
             setJournals(newJournals);
         }
@@ -183,7 +185,8 @@ const Journal = ({
         setEditedGratefulFor((toggleGratefulFor) ? journal.gratefulFor : '');
         if (!toggleGratefulFor && wasGratefulForEdited) {
             const newJournals = [...journals];
-            const selectedNewJournal = newJournals[journalGroupIndex].journals[journalIndex];
+            const selectedNewJournal = newJournals[journalGroupIndex].journal[journalIndex];
+            console.log(`Journal => toggleEditGratefulFor => journalGroupIndex: ${journalGroupIndex} newJournals[${journalGroupIndex}]: ${JSON.stringify(newJournals[journalGroupIndex], null, 2)}`)
             selectedNewJournal.gratefulFor = (wasGratefulForEdited) ? editedGratefulFor : selectedNewJournal.gratefulFor;   
             setJournals(newJournals);
         }
@@ -211,7 +214,7 @@ const Journal = ({
 
     const addGoal = (title) => {
         const newJournals = [...journals];
-        const selectedNewJournal = newJournals[journalGroupIndex].journals[journalIndex];
+        const selectedNewJournal = newJournals[journalGroupIndex].journal[journalIndex];
         const newGoal = prompt(`Add a ${title.toLowerCase().replace('goals','goal')}:`, '');
         if (newGoal != null) {
             if (title.toLowerCase().includes('today')) {
@@ -225,7 +228,8 @@ const Journal = ({
     }
     const toggleCheckbox = (category, index) => {
         const newJournals = [...journals];
-        const selectedNewJournal = newJournals[journalGroupIndex].journals[journalIndex];
+        const selectedNewJournal = newJournals[journalGroupIndex].journal[journalIndex];
+        //console.log(`Journal => toggleCheckbox => newJournals[${journalGroupIndex}]: ${newJournals[journalGroupIndex].journal[journalIndex].journal}`);
         if (category === 'todaysGoals') {
             const todayGoalComplete = (selectedNewJournal.todaysGoals[index][1]) ? false : true;
             selectedNewJournal.todaysGoals[index][1] = todayGoalComplete;
@@ -238,25 +242,21 @@ const Journal = ({
     }
     const editGoal = (category, index) => {
         const newJournals = [...journals];
-        const selectedNewJournal = newJournals[journalGroupIndex].journals[journalIndex];
+        const selectedNewJournal = newJournals[journalGroupIndex].journal[journalIndex];
         if (category === 'todaysGoals') {
-            /*
-                const editTodayGoal = prompt(`Edit goal #${index+1}:`, selectedNewJournal.todaysGoals[index][0]);
-                if (editTodayGoal != null) {
-                    selectedNewJournal.todaysGoals[index][0] = editTodayGoal;
-                    setJournals(newJournals);
-                }
-            */
-            setSelectedGoal(selectedNewJournal.todaysGoals[index][0]);
+            const editTodayGoal = prompt(`Edit goal #${index+1}:`, selectedNewJournal.todaysGoals[index][0]);
+            if (editTodayGoal != null) {
+                selectedNewJournal.todaysGoals[index][0] = editTodayGoal;
+                setJournals(newJournals);
+            }
+            setSelectedGoal(selectedNewJournal.todaysGoals[index]);
         } else if (category === 'futureGoals') {
-            /*
-                const editFutureGoal = prompt(`Edit goal #${index+1}:`, selectedNewJournal.futureGoals[index][0]);
-                if (editFutureGoal != null) {
-                    selectedNewJournal.futureGoals[index][0] = editFutureGoal;
-                    setJournals(newJournals);
-                }
-            */
-           setSelectedGoal(selectedNewJournal.futureGoals[index][0]);
+            const editFutureGoal = prompt(`Edit goal #${index+1}:`, selectedNewJournal.futureGoals[index][0]);
+            if (editFutureGoal != null) {
+                selectedNewJournal.futureGoals[index][0] = editFutureGoal;
+                setJournals(newJournals);
+            }
+           setSelectedGoal(selectedNewJournal.futureGoals[index]);
         }
         setEditCategory(category);
         setEditIndex(index);
@@ -265,13 +265,13 @@ const Journal = ({
 
     const submitGoal = (updatedGoal) => {
         const newJournals = [...journals];
-        const selectedNewJournal = newJournals[journalGroupIndex].journals[journalIndex];
-        
+        const selectedNewJournal = newJournals[journalGroupIndex].journal[journalIndex];
         if (updatedGoal != null) {
+            console.log(`Journal => submitGoal => updatedGoal: ${updatedGoal} futureGoals[editIndex]: ${selectedNewJournal.futureGoals[editIndex]}`);
             if (editCategory === 'todaysGoals') {
-                selectedNewJournal.todaysGoals[editIndex][0] = updatedGoal;
+                selectedNewJournal.todaysGoals[editIndex] = String(updatedGoal);
             } else if (editCategory === 'futureGoals') {
-                selectedNewJournal.futureGoals[editIndex][0] = updatedGoal;
+                selectedNewJournal.futureGoals[editIndex] = String(updatedGoal);
             }
             setJournals(newJournals);
         }
@@ -290,7 +290,7 @@ const Journal = ({
             }
         };
         const newJournals = [...journals];
-        removeItemByIndex(newJournals[journalGroupIndex].journals[journalIndex][editCategory]);
+        removeItemByIndex(newJournals[journalGroupIndex].journal[journalIndex][editCategory]);
         setJournals(newJournals);
         setEditCategory(null);
         setEditIndex(null);
@@ -300,7 +300,7 @@ const Journal = ({
 
     const journalHeader = (title, toggleFunction, isEdit) => {
 
-        return <div className='flexContainer containerBox bg-lite centerVertical '>
+        return <div className='flexContainer containerBox bg-lite centerVertical'>
                     <div className='containerBox p-20 flex2Column color-yellow'>
                         {title}
                     </div>
@@ -330,7 +330,7 @@ const Journal = ({
                             >
                                 {
                                     (isEdit)
-                                    ? <div className='r-10 p-10 bg-lite color-neogreen button bold'>save</div>
+                                    ? <div className='r-10 p-10 bg-lite color-neogreen button bold bg-blue'>save</div>
                                     : <div className='r-10 p-10 bg-lite button'>{icons.edit}</div>
                                 }
                             </div>
@@ -384,7 +384,7 @@ const Journal = ({
                                                     title={goal[0]}
                                                     onClick={() => editGoal(category, index)}
                                                 >
-                                                    {index+1}. {goal[0]}
+                                                    {index+1}. {goal}
                                                 </div>
                                             </div>
                                             {/*

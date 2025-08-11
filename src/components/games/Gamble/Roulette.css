@@ -1,0 +1,167 @@
+/* Roulette.css */
+
+.result-display {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-top: 1rem;
+}
+
+.result-number {
+    margin-left: 0.5rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 5px;
+    color: white;
+}
+
+.result-number.red {
+    background-color: #d22;
+}
+
+.result-number.black {
+    background-color: #000;
+}
+
+.result-number.green {
+    background-color: #2e8b57;
+}
+
+.roulette-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: sans-serif;
+    text-align: center;
+}
+
+.board {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.zero-slot {
+    flex: 0 0 60px;
+}
+
+.slot {
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-align: center;
+    color: white;
+    border-radius: 4px;
+    border: 2px solid #111;
+    cursor: pointer;
+    transition: transform 0.1s ease-in-out;
+}
+
+.slot:hover {
+    transform: scale(1.05);
+}
+
+.selected {
+    box-shadow: 0 0 10px 3px yellow;
+    outline: 3px solid yellow;
+}
+
+.green {
+    background-color: #2e8b57;
+}
+
+.red {
+    background-color: #c00;
+}
+
+.black {
+    background-color: #111;
+}
+
+.main-grid {
+    display: flex;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.color-bets {
+    margin: 1.5rem 0;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.color-bet {
+    padding: 0.7rem 1.5rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    min-width: 120px;
+}
+
+.color-bet.red {
+    background-color: #d22;
+}
+
+.color-bet.black {
+    background-color: #000;
+}
+
+.color-bet.selected {
+    box-shadow: 0 0 10px 3px yellow;
+    outline: 3px solid yellow;
+}
+
+.controls {
+    margin-top: 2rem;
+    font-size: 1.1rem;
+}
+
+.controls input {
+    width: 80px;
+    padding: 0.2rem;
+    margin-left: 0.5rem;
+    text-align: center;
+}
+
+button {
+    margin-left: 1rem;
+    padding: 0.5rem 1.2rem;
+    font-size: 1rem;
+    background-color: #2d89ef;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:disabled {
+    background-color: #999;
+    cursor: not-allowed;
+}
+
+.status {
+    margin-top: 1.5rem;
+    font-size: 1.2rem;
+}
+
+.status .green {
+    color: #2e8b57;
+}
+
+.status .red {
+    color: #c00;
+}
+
+.status .black {
+    color: #000;
+}

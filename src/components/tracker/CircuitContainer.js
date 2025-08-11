@@ -77,7 +77,17 @@ const CircuitContainer = ({
         {
             (active && goal.link.includes('youtu'))
                 ? (goal.link.includes('youtu'))
-                    ? <iframe title='videoPlayer' width={dimensions.width} height={dimensions.height} frameBorder='0' className='r-5' allowFullScreen='' src={`${videoSource}&autoplay=1`}></iframe>
+                    ? <iframe 
+                        title='videoPlayer' 
+                        width={dimensions.width} 
+                        height={dimensions.height} 
+                        frameBorder='0' 
+                        className='r-5' 
+                        allowFullScreen
+                        allow='autoplay; encrypted-media'
+                        src={`${videoSource}&autoplay=1&mute=1&playsinline=1`}
+                    >
+                    </iframe>
                     : <div className='mt-20'>
                         <img className='width-100-percent button' src={goal.link} alt={goal.title} />
                     </div>
@@ -148,8 +158,7 @@ const CircuitContainer = ({
             </div>
         )
     }
-    const videoSource = `https://www.youtube.com/embed/${getVideoID()}?autoplay=1`;
-    
+    const videoSource = `https://www.youtube.com/embed/${getVideoID()}?autoplay=1&mute=1&playsinline=1`;
     return getCircuitDetails(index, goal);
     
 }

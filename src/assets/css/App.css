@@ -87,6 +87,9 @@
 .height-100-percent {
   height: 100%;
 }
+.height-50-percent {
+  height: 50%;
+}
 .ht-0 {
   height: 0px;
 }
@@ -180,6 +183,10 @@
 
 .ht-200 {
   height: 200px;
+}
+
+.ht-250 {
+  height: 250px;
 }
 
 .rt-0 {
@@ -1005,6 +1012,9 @@
 .width-50-percent {
   width: 50%;
 }
+.width-75-percent {
+  width: 75%;
+}
 
 .width-80-percent {
   width: 80%;
@@ -1020,6 +1030,10 @@ select {
 
 .width-auto {
   width: auto;
+  display: inline-block;
+  width: auto;
+  white-space: nowrap;
+  /* Prevents text from wrapping to the next line */ 
 }
 .width-100 {
   width: 100px;
@@ -1275,6 +1289,18 @@ select {
 
 .size50 {
   font-size: 50px;
+}
+.size60 {
+  font-size: 60px;
+}
+.size70 {
+  font-size: 70px;
+}
+.size80 {
+  font-size: 80px;
+}
+.size90 {
+  font-size: 90px;
 }
 .size100 {
   font-size: 100px;
@@ -2863,6 +2889,21 @@ input.error {
   bottom: -500px;
   position: fixed;
   animation: bottomCollapse 1s ease;
+}
+.b-300 {
+  bottom: 300px;
+}
+.b-200 {
+  bottom: 200px;
+}
+.b-180 {
+  bottom: 180px;
+}
+.b-100 {
+  bottom: 100px;
+}
+.b-30 {
+  bottom: 30px;
 }
 
 .t-50 {

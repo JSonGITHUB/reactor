@@ -1,0 +1,54 @@
+const MicroNavItems = [
+    {'Home','home'},
+    {'Tracker','tracker'},
+    {'BusinessTax','businesstax'},
+    {'TrainingLog','traininglog'},
+    {'Scores','scores'},
+    {'Scheduler','scheduler'},
+    {'Waves','waves'},
+    {'Buoys','buoys'},
+    //'Swell',}
+    {'TideChart','tidechart'},
+    {'Sessions','sessions'},
+    //'Session',}
+    {'Shop',}
+    {'Dose',}
+    {'Fuel',}
+    {'Expenses',}
+    {'Converter',}
+    {'Currency',}
+    {'DebtCollector',}
+    {'BusinessTax',}
+    {'Todos',}
+    {'Notes',}
+    {'Garden',}
+    {'FishFinder',}
+    {'SoundBoard',}
+    {'Product',
+    //'Sheets',
+    //'Fireworks',
+    //'EyeExercises',
+    //'PDFReport',
+    //'Video',}
+    {'Translate',
+    //'BowlBuilder',
+    //'Convert',
+    //'Reservation',
+    //'GuestList',}
+    {'Wiki',}
+    {'Photos',}
+    {'Videos',}
+    {'TicTacToe',}
+    {'WheelOfFortune',}
+    {'BlackJack',}
+    {'Roulette',
+    //'PhotoSequence',
+    //'Search',
+
+    //'ExchangeRates',
+    //'StepTimer',
+    //'StepManager',}
+    {'Snippets',}
+    {'Admin'
+];
+export default MicroNavItems

@@ -578,7 +578,7 @@ const ScoreCardGolf = ({
             </div>
             <div className='size10 color-medium mb--10'>
                 <div className='scrollSnapTop'>
-                    <Location currentPositionExists={currentPositionExists} returnCoordinates={updateCurrentLocation} />
+                    <Location currentPositionExists={currentPositionExists} returnCoordinates={updateCurrentLocation} icon='true' />
                 </div>
             </div>
         </div>

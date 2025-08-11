@@ -11,6 +11,7 @@ import BowlBuilder from './components/BowlBuilder';
 import Sessions from './components/waves/LogDirectoryNoRouter';
 import Session from './components/waves/Session';
 import Waves from './components/waves/Waves';
+import WindDirection from './components/waves/WindDirection';
 import Product from './components/shop/Product';
 //import EyeExercises from './components/eye/EyeExercises';
 //import PDFReport from './components/eye/PDFReport';
@@ -40,7 +41,21 @@ import Currency from './components/utils/Currency';
 import Expenses from './components/utils/Expenses';
 import Converter from './components/utils/Converter';
 import Tracker from './components/tracker/Tracker';
+import Notes from './components/tracker/Notes';
+import Tasks from './components/tracker/Tasks';
+import Sets from './components/tracker/Sets';
+import Events from './components/tracker/Events';
+import Charges from './components/tracker/Charges';
+import Cook from './components/tracker/Cook';
+import Train from './components/tracker/Train';
+import Journals from './components/tracker/Journals';
+import BusinessTax from './components/tracker/BusinessTax';
+import Scheduler from './components/tracker/Scheduler';
+import BlackJack from './components/tracker/BlackJack';
+import WheelOfFortune from './components/tracker/WheelOfFortune';
+import Roulette from './components/tracker/Roulette';
 import TrainingLog from './components/tracker/TrainingLog';
+import Dose from './components/tracker/Dose';
 import VideoPlayer from './components/utils/VideoPlayer';
 import Translator from './components/utils/Translator';
 import Accordion from './components/utils/Accordion';
@@ -115,6 +130,15 @@ export default ({ props }) => {
                             distance='10' 
                         />
                     </Route>
+                    <Route path='/Wind'>
+                        <WindDirection />
+                    </Route>
+                    <Route path='/Water'>
+                        <WindDirection />
+                    </Route>
+                    <Route path='/Air'>
+                        <WindDirection />
+                    </Route>
                     <Route path='/Snippets'>
                         <Snippets />
                     </Route>
@@ -122,7 +146,7 @@ export default ({ props }) => {
                     <Route path='/Accordion'><Accordion items={items} /></Route>
                     <Route path='/BowlBuilder'><BowlBuilder /></Route>
                     {/*<Route path='/Convert'><Calculator /></Route>*/}
-                    <Route path='/Notes'><FormNotes /></Route>
+                    <Route path='/Note'><FormNotes /></Route>
                     <Route path='/Reservation'><Reservation /></Route>
                     <Route path='/GuestList'><SignUpDialog /></Route>
                     <Route path='/Session'><Session logId={logId} /></Route>
@@ -188,6 +212,21 @@ export default ({ props }) => {
                     <Route path='/Expenses'><Expenses /></Route>
                     <Route path='/Converter'><Converter /></Route>
                     <Route path='/Tracker'><Tracker /></Route>
+                    <Route path='/Notes'><Notes /></Route>
+                    <Route path='/Tasks'><Tasks /></Route>
+                    <Route path='/Sets'><Sets /></Route>
+                    <Route path='/Charges'><Charges /></Route>
+                    <Route path='/Events'><Events /></Route>
+                    <Route path='/Links'><Links /></Route>
+                    <Route path='/Circuit'><Train /></Route>
+                    <Route path='/Journals'><Journals /></Route>
+                    <Route path='/Cook'><Cook /></Route>
+                    <Route path='/BusinessTax'><BusinessTax /></Route>
+                    <Route path='/Dose'><Dose /></Route>
+                    <Route path='/Scheduler'><Scheduler /></Route>
+                    <Route path='/BlackJack'><BlackJack /></Route>
+                    <Route path='/WheelOfFortune'><WheelOfFortune /></Route>
+                    <Route path='/Roulette'><Roulette /></Route>
                     <Route path='/TideChart'><TideChart /></Route>
                     <Route path='/TrainingLog'><TrainingLog /></Route>
                     <Route path='/Admin'><Admin /></Route>

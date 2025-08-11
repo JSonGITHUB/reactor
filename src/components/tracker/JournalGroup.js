@@ -40,8 +40,10 @@ const JournalGroup = ({
         const selectedJournalGroup = newJournals[journalGroupIndex];
         selectedJournalGroup.isCollapsed = collapsed;
         const stringifiedData = JSON.stringify(newJournals);
-        //console.log(`Journal => stringifiedData: ${stringifiedData}`);
-        localStorage.setItem('journalTracking', stringifiedData);
+        console.log(`Journal => stringifiedData: ${stringifiedData}`);
+        if (stringifiedData !== 'undefined' && stringifiedData !== undefined) {
+            localStorage.setItem('journalTracking', stringifiedData);
+        }
     }, [collapsed]);
     
     const toggleEdit = () => {
@@ -136,15 +138,31 @@ const JournalGroup = ({
                     <div>
                         {
                             (collapsed) 
-                            ? null 
+                            ? <div className=''>{
+                                (Array.isArray(journalGroup.journal))
+                                ? <div className='containerBox'>
+                                        {
+                                    journalGroup.journal.map((log, journalIndex) => <div key={getKey(`journalContainer${journalIndex}`)}>
+                                        <Journal
+                                            journals={journals}
+                                            setJournals={setJournals}
+                                            journalGroupIndex={journalGroupIndex}
+                                            journalIndex={journalIndex}
+                                            journal={log}
+                                        />
+                                    </div>)
+                                        }
+                                    </div>
+                                : <div className='containerBox'>No Journals</div>
+                                }</div>
                             : (sort)
-                                ? journalGroup.journals.slice().reverse().map((journal, journalIndex, array) => (
+                                ? journalGroup.journal.slice().reverse().map((journal, journalIndex, array) => (
                                         <div key={getKey(`journalContainer${journalIndex}`)}>
                                             <Journal
                                                 journals={journals}
                                                 setJournals={setJournals}
                                                 journalGroupIndex={journalGroupIndex} 
-                                                journalIndex={(array.length - 1 - journalIndex)}
+                                                journalIndex={journalIndex}
                                                 journal={journal}
                                             />
                                         </div>

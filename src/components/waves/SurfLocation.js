@@ -33,6 +33,7 @@ const SurfLocation = ({
         setEdit,
         updateLocations
     } = useContext(WavesContext);
+
     const [status, setStatus] = useState({
         module: 'SurfLocation',
         logged: false,
@@ -370,7 +371,7 @@ const SurfLocation = ({
     const logLocationButton = (item) => {
         return <React.Fragment>
             {
-                (initializeData('edit', 'false') === 'true')
+                (initializeData('edit', 'false'))
                 ? <div className='mb--10'>
                     <WaveUtils
                         item={item}

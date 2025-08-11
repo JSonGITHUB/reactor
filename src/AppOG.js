@@ -37,6 +37,8 @@ import Currency from './components/converter/Currency';
 import Expenses from './components/expense/Expenses';
 import Converter from './components/converter/Converter';
 import Tracker from './components/tracker/Tracker';
+import Notes from './components/tracker/Notes';
+import Links from './components/tracker/Links';
 import TrainingLog from './components/tracker/TrainingLog';
 //import Checklist from './components/utils/SheetsChecklist';
 //import VideoPlayer from './components/utils/VideoPlayer';
@@ -174,7 +176,7 @@ class App extends React.Component {
                 {/*<Route path='/BowlBuilder' component={BowlBuilder} />*/}
                 {/*<Route path='/BowlBuilder' render={(props) => <BowlBuilder {...props} width={width} height={height} />}/>*/}
                 {/*<Route path='/Convert' component={Calculator} />*/}
-                <Route path='/Notes' component={FormNotes} />
+                <Route path='/Note' component={FormNotes} />
                 {/*<Route path='/Reservation' component={Reservation} />*/}
                 {/*<Route path='/GuestList' component={SignUpDialog} />*/}
                 {/*<Route path='/Session' component={Session} />*/}
@@ -248,6 +250,8 @@ class App extends React.Component {
                 <Route path='/Expenses' render={(props) => <Expenses />} />
                 <Route path='/Converter' render={(props) => <Converter />} />
                 <Route path='/Tracker' render={(props) => <Tracker />} />
+                <Route path='/Notes' render={(props) => <Notes />} />
+                <Route path='/Links' render={(props) => <Links />} />
                 <Route path='/TideChart' render={(props) => <TideChart />} />
                 <Route path='/TrainingLog' render={(props) => <TrainingLog />} />
                 <Route path='/Admin' render={(props) => <Admin />} />

@@ -3,10 +3,13 @@ import GPSStatus from './GPS_Status';
 
 const Location = ({ 
   currentPositionExists, 
-  returnCoordinates 
+  returnCoordinates,
+  icon 
 }) => {
+
   const [location, setLocation] = useState({ latitude: null, longitude: null });
-  
+  const [activeIcon, setActiveIcon] = useState(icon);
+  const toggleGPS = () => setActiveIcon(!activeIcon);
   useEffect(() => {
     let isMounted = true; // Track if component is mounted
     
@@ -47,11 +50,13 @@ const Location = ({
   }, [returnCoordinates]);
 
   return (
-    <div className='containerBox'>
+    <div className='containerBox p-20'>
       {location.latitude && location.longitude ? (
-        <p>
-          {location.longitude}, {location.latitude}
-        </p>
+        (!activeIcon)
+          ? <div title='gps signal' onClick={toggleGPS} className='containerDetail size15 color-yellow button'>
+            <div className=''>{location.longitude},</div> <div className=''>{location.latitude}</div>
+          </div>
+        : <div title='gps signal' onClick={toggleGPS} className='size40 button'>🛰️</div>
       ) : (
           /*Obtaining GPS coordinates...*/
           <GPSStatus />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import getKey from '../utils/KeyGenerator.js';
 import initializeData from '../utils/InitializeData';
 import Selector from '../forms/FunctionalSelector';

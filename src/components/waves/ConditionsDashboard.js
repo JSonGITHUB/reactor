@@ -68,8 +68,7 @@ const {
         localStorage.setItem('buoyCollapse', buoyCollapse);
     }, [buoyCollapse]);
     useEffect(() => {
-        const localBuoyData = initializeData('buoyData', buoysTemplateData);
-        /*         
+        const localBuoyData = initializeData('buoyData', buoysTemplateData);     
         fetch(localBouyReadings())
             .then(res => res.ok ? res.json() : Promise.reject())
             .then(data => {
@@ -79,8 +78,7 @@ const {
             })
             .catch(() => {
                 setBouyData(localBuoyData);
-            }); 
-        */
+            });
     }, []);
     useEffect(() => {
         const swells = buoyData.data
@@ -101,7 +99,7 @@ const {
     }, [buoyData]);
     useEffect(() => {
         const localBuoyData = initializeData('buoyData', buoysTemplateData);
-        /* 
+        
         fetch(localBouyReadings())
             .then(res => res.ok ? res.json() : Promise.reject())
             .then(data => {
@@ -112,7 +110,6 @@ const {
             .catch(() => {
                 setBouyData(localBuoyData);
             }); 
-        */
             console.log(`ConditionsDashboard => range: ${range}`);
     }, [range]);
 
@@ -142,60 +139,65 @@ const {
             {/*<BuoyReadingsChart lat={localStorage.getItem('latitude')} long={localStorage.getItem('longitude')} />*/}
             {/*<MarineDataChart />*/}
             {/*<MarineChart />*/}
-
-            <div className='containerBox bold color-yellow bg-lite p-20'>
-                <CollapseToggleButton
-                    title={`🌊 ${buoyData.data[0].latestData.height}ft ${getDirection(buoyData.data[0].latestData.direction)} ${buoyData.data[0].latestData.direction}° ${buoyData.data[0].latestData.peakPeriod}s`}
-                    isCollapsed={localBuoyCollapse}
-                    setCollapse={setLocalBuoyCollapse}
-                    align='left'
-                />
-            </div>
             {
-                (localBuoyCollapse) 
-                ? null 
-                : <div className='scrollHeight250'>
+                /*
+                <div className='containerBox bold color-yellow bg-lite p-20'>
+                    <CollapseToggleButton
+                        title={`🌊 ${buoyData.data[0].latestData.height}ft ${getDirection(buoyData.data[0].latestData.direction)} ${buoyData.data[0].latestData.direction}° ${buoyData.data[0].latestData.peakPeriod}s`}
+                        isCollapsed={localBuoyCollapse}
+                        setCollapse={setLocalBuoyCollapse}
+                        align='left'
+                    />
+                </div>
                 {
-                    buoyData.data
-                    .slice() // copy array to avoid mutating state
-                    .sort((a, b) => {
-                        if (b.latestData.peakPeriod !== a.latestData.peakPeriod) {
-                            return b.latestData.peakPeriod - a.latestData.peakPeriod;
-                        }
-                        return b.latestData.height - a.latestData.height;
-                    })
-                    .slice(0, 5).map((buoy, index) => (
-                        <div key={index} className='containerBox contentLeft'>
-                            <div className='containerDetail bold color-yellow bg-lite pb-10 pt-10'> 
-                                🌊  {buoy.name}
+                    (localBuoyCollapse) 
+                    ? null 
+                    : <div className='scrollHeight250'>
+                    {
+                        buoyData.data
+                        .slice() // copy array to avoid mutating state
+                        .sort((a, b) => {
+                            if (b.latestData.peakPeriod !== a.latestData.peakPeriod) {
+                                return b.latestData.peakPeriod - a.latestData.peakPeriod;
+                            }
+                            return b.latestData.height - a.latestData.height;
+                        })
+                        .slice(0, 5).map((buoy, index) => (
+                            <div key={index} className='containerBox contentLeft'>
+                                <div className='containerDetail bold color-yellow bg-lite pb-10 pt-10'> 
+                                    🌊  {buoy.name}
+                                </div>
+                                <div className='flexContainer'>
+                                    <div className='containerDetail flex4Column'>
+                                        {buoy.latestData.height}ft
+                                    </div>
+                                    <div className='containerDetail flex4Column contentCenter'>
+                                        {getDirection(buoy.latestData.direction)}
+                                    </div>
+                                    <div title='set swell' onClick={() => handleSwell1Selection(null, null, getDirection(buoy.latestData.direction))} className='containerDetail flex4Column button'>
+                                        {buoy.latestData.direction}°
+                                    </div>
+                                    <div className='containerDetail flex4Column'>
+                                        {buoy.latestData.peakPeriod}s
+                                    </div>
+                                </div>
                             </div>
-                            <div className='flexContainer'>
-                                <div className='containerDetail flex4Column'>
-                                    {buoy.latestData.height}ft
-                                </div>
-                                <div className='containerDetail flex4Column contentCenter'>
-                                    {getDirection(buoy.latestData.direction)}
-                                </div>
-                                <div title='set swell' onClick={() => handleSwell1Selection(null, null, getDirection(buoy.latestData.direction))} className='containerDetail flex4Column button'>
-                                    {buoy.latestData.direction}°
-                                </div>
-                                <div className='containerDetail flex4Column'>
-                                    {buoy.latestData.peakPeriod}s
-                                </div>
-                            </div>
+                        ))
+                    }
+                    <div className='containerBox flexContainer'>
+                        <div className='containerDetail flex3Column bg-yellow button p-20 mr-10' onClick={() => setRange(range + .05)}>
+                            {icons.plus}
                         </div>
-                    ))
-                }
-                <div className='containerBox flexContainer'>
-                    <div className='containerDetail flex2Column bg-yellow button p-20 mr-10' onClick={() => setRange(range + .05)}>
-                        {icons.plus}
-                    </div>
-                            <div className='containerDetail flex2Column bg-yellow button p-20' onClick={() => setRange((range - .05) < .05 ? .05 : (range - .05))}>
-                        {icons.minus}
+                        <div className='containerDetail flex3Column bg-yellow button p-20 mr-10' onClick={() => setRange(range + .05)}>
+                            ⛴️range {range} miles
+                        </div>
+                        <div className='containerDetail flex3Column bg-yellow button p-20' onClick={() => setRange((range - .05) < .05 ? .05 : (range - .05))}>
+                            {icons.minus}
+                        </div>
                     </div>
                 </div>
-            </div>
-    }
+                */
+            }
             {(conditionsCollapse) ? null : swellDisplay()}
             {tideDisplay('wide')}
             <div className='containerBox bold color-yellow bg-lite p-20'>

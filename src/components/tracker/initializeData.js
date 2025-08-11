@@ -5,11 +5,14 @@ const initializeData = (category, initData) => {
         return str.includes(char);
     };
     if (!savedData) {
+        console.log(`initializeData => 1 - ${category} => savedData: ${savedData}`);
         return initData;
     } else if (containsCharacter(savedData, '[') || containsCharacter(savedData, '{')) {
+        console.log(`initializeData => 2 - ${category} => savedData: ${savedData}`);
         return JSON.parse(savedData);
     } else {
-        return initData;
+        console.log(`initializeData => 3 - ${category} => savedData: ${savedData}`);
+        return savedData;
     }
 }
 export default initializeData

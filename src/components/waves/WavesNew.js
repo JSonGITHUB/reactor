@@ -449,7 +449,7 @@ const WavesNew = () => {
                     {
                         (conditionsCollapse)
                         ? <div>
-                            <Location currentPositionExists={currentPositionExists} returnCoordinates={updateCurrentLocation} />
+                            <Location currentPositionExists={currentPositionExists} returnCoordinates={updateCurrentLocation} icon='true' />
                             <div className='color-soft'>
                                 <ConditionsDashboard
                                     tideDisplay={tideDisplay}
@@ -473,19 +473,13 @@ const WavesNew = () => {
                             {
                                 (gpsCollapse)
                                 ? null
-                                : <Location currentPositionExists={currentPositionExists} returnCoordinates={updateCurrentLocation} />
+                                : <Location currentPositionExists={currentPositionExists} returnCoordinates={updateCurrentLocation} icon='true'/>
                             }
                             <div className='color-soft'>
                                 <ConditionsDashboard
                                     tideDisplay={tideDisplay}
                                 />
                             </div>
-
-                            <ConditionsContext.Provider value={status}>
-                                <ConditionsSelectors
-                                    tideDisplay={tideDisplay}
-                                />
-                            </ConditionsContext.Provider>
                             <div className=''>
                                 <div className='containerBox color-yellow bg-lite p-20'>
                                     <CollapseToggleButton

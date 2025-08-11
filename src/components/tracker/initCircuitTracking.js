@@ -985,6 +985,12 @@ const initCircuitTracking = [
             complete: false
           },
           {
+            title: "Side Crunches Right",
+            link: "https://www.youtube.com/watch?v=w0OWFjfI3zM",
+            type: "timer",
+            complete: false
+          },
+          {
             title: "Dynamic Chest",
             link: "https://www.youtube.com/watch?v=kLmWN3Qsj0A",
             type: "timer",
@@ -1033,7 +1039,13 @@ const initCircuitTracking = [
             complete: false
           },
           {
-            title: "Lying Twist Stretch",
+            title: "Lying Twist Stretch Left",
+            link: "https://www.youtube.com/watch?v=ZI-j_POtzlU",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Lying Twist Stretch Right",
             link: "https://www.youtube.com/watch?v=ZI-j_POtzlU",
             type: "timer",
             complete: false
@@ -1153,7 +1165,13 @@ const initCircuitTracking = [
             complete: false
           },
           {
-            title: "Lying Swing Legs",
+            title: "Lying Swing Legs Left",
+            link: "https://www.youtube.com/watch?v=hIoFHFyZJnE",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Lying Swing Legs Right",
             link: "https://www.youtube.com/watch?v=hIoFHFyZJnE",
             type: "timer",
             complete: false
@@ -1171,7 +1189,13 @@ const initCircuitTracking = [
             complete: false
           },
           {
-            title: "V-Ups",
+            title: "V-Ups Left",
+            link: "https://www.youtube.com/watch?v=iFaZ095MMGg",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "V-Ups Right",
             link: "https://www.youtube.com/watch?v=iFaZ095MMGg",
             type: "timer",
             complete: false
@@ -3445,7 +3469,7 @@ const initCircuitTracking = [
             complete: false
           },
           {
-            title: "Single Leg Left Deadlift",
+            title: "Single Leg Right Deadlift",
             link: "https://www.youtube.com/watch?v=_UB6Tp8fzEQ",
             type: "timer",
             complete: false

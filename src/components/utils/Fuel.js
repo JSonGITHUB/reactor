@@ -86,6 +86,7 @@ const Fuel = () => {
     ];
 
     useEffect(() => {
+        console.log(`Fuel => trips: ${JSON.stringify(trips, null, 2)}`);
         localStorage.setItem('TripFuelTracker', JSON.stringify(trips));
         setDistance(initializeData('distance', null));
     }, [trips]);
@@ -101,6 +102,23 @@ const Fuel = () => {
     useEffect(() => {
         localStorage.setItem('oilChange', oilChange);
     }, [oilChange]);
+    useEffect(() => {
+        let newTrips = localStorage.getItem('TripFuelTracker');
+        if (typeof newTrips === 'string' && newTrips.length > 1) {
+            // Remove surrounding quotes if present
+            if (newTrips[0] === '"' && newTrips[newTrips.length - 1] === '"') {
+                newTrips = newTrips.substring(1, newTrips.length - 1);
+            }
+            try {
+                newTrips = JSON.parse(newTrips);
+            } catch {
+                newTrips = [];
+            }
+        }
+        setTrips(newTrips);
+        console.log(`Fuel => newTrips: ${JSON.stringify(newTrips, null, 2)}`);
+        // ...use newTrips as needed...
+    }, []);
     /*
     const clearRecord = () => {
         setTrips([]);
@@ -276,7 +294,8 @@ const Fuel = () => {
             usdPerGallon: newUsdPerGallon,
             totalUSD: newTotalUSD
         }
-        const newTrips = [...trips, newTrip]
+        const newTrips = [...trips, newTrip];
+        console.log(`Fuel => calculateAndRecord => newTrips: ${JSON.stringify(newTrips, null, 2)}`);
         setTrips(newTrips);
 
     };
@@ -462,28 +481,29 @@ const Fuel = () => {
         }
         return <div className='flexContainer scrollSnapBottom r-10 bg-dkGreen'>
             <div className='flex4Column containerDetail m-1'>
-                <div className='containerDetail bold color-yellow'>distance</div>
+                <div className='containerDetail bold color-yellow size30'>🛣️</div>
                 <div className='bold color-lite'>{getTotalMiles(index)}</div>
             </div>
             <div className='flex4Column containerDetail m-1'>
-                <div className='containerDetail bold color-yellow'>time</div>
+                <div className='containerDetail bold color-yellow size30'>⏱️</div>
                 <div className='bold color-lite'>{getTotalHours(index)}</div>
             </div>
             <div className='flex4Column containerDetail m-1'>
-                <div className='containerDetail bold color-yellow'>stops</div>
+                <div className='containerDetail bold color-yellow size30'>🛑</div>
                 <div className='bold color-lite'>{getTotalStops(index)}</div>
             </div>
             <div className='flex4Column containerDetail m-1'>
-                <div className='containerDetail bold color-yellow'>gallons</div>
+                <div className='containerDetail bold color-yellow size30'>⛽️</div>
                 <div className='bold color-lite'>{getTotalGallons(index)}</div>
             </div>
             <div className='flex4Column containerDetail m-1'>
-                <div className='containerDetail bold color-yellow'>USD</div>
+                <div className='containerDetail bold color-yellow size30'>💸</div>
                 <div className='bold color-lite'>${getTotalUSD(index)}</div>
             </div>
         </div>
     }
     const getTripTime = (trip) => {
+        console.log(`Fuel => getTripTime => trip: ${JSON.stringify(trip, null, 2)}`);
         const time = trip.time.split(', ')[1];
         const hours = time.split(':')[0];
         const minutes = time.split(':')[1];
@@ -608,13 +628,15 @@ const Fuel = () => {
 
     const displayLog = () => {
         const sortedTrips = [...trips].reverse();
+        console.log(`Fuel => displayLog => sortedTrips: ${JSON.stringify(sortedTrips, null, 2)}`);
         return <div>
             <div className='height--350 r-10 m-5 mt-20'>
                 {
                     sortedTrips.map((trip, index) => {
                         const originalIndex = trips.length - 1 - index;
-                        return <div className='containerBox bg-lite width--30' key={getKey(`trip${originalIndex}`)}>
-                            <div className='containerDetail color-soft scrollSnap mb-5 bg-veryLite'>
+                        return <div className='mr-20' key={getKey(`trip${originalIndex}`)}>
+                            {getDailyTotalsDisplay(originalIndex)}
+                            <div className='containerDetail color-soft scrollSnap mb-5 bg-veryLite'>  
                                 <div className='containerBox flexContainer'>
                                     <div className='bold size25 color-yellow flex1Auto contentLeftCenter' onClick={() => editLocation(originalIndex, trip.location)}>
                                         {originalIndex+1}. {trip.location}
@@ -623,13 +645,18 @@ const Fuel = () => {
                                         X
                                     </div>
                                 </div>
-                                <div className='containerDetail mr-5 ml-5'>
+                                <div className='contentLeft bold size20 p-5 ml-10 mb-5' onClick={() => editDate(originalIndex)}>
+                                    {`${trip.time.split(', ')[0].split('/')[0]}/${trip.time.split(', ')[0].split('/')[1]}`} - {`${(trip && trip !== "'") ? getTripTime(trip) : null}`}
+                                </div>
+                                <div className='containerDetail mr-5 ml-10'>
+                                    
                                     <div className='p-5 flexContainer'>
                                         <span>
                                             <div
-                                                className='button p-5 bg-green mr-10 r-5 color-lite'
+                                                title='map'
+                                                className='button p-5 mr-10 r-5 color-lite size30'
                                                 onClick={() => window.location = `https://www.google.com/maps?q=${trip.latitude},${trip.longitude}`}>
-                                                Map
+                                                🌎
                                             </div>
                                         </span>
                                         <span className='color-yellow p-5' onClick={() => editLatitude(originalIndex, trip.latitude)}>{trip.latitude}, </span><span className='color-yellow p-5' onClick={() => editLongitude(originalIndex, trip.longitude)}>{trip.longitude}</span>
@@ -637,35 +664,31 @@ const Fuel = () => {
                                 </div>
                                 <div className=''>
                                     <div className='flexContainer m-5'>
-                                        <div className='flex4Column containerDetail'>
-                                            <div className='containerDetail color-lite bold' onClick={() => editTime(originalIndex)}>{`${getTripTime(trip)}`}</div>
-                                            <div className='bold size20 p-5' onClick={() => editDate(originalIndex)}>{`${trip.time.split(', ')[0].split('/')[0]}/${trip.time.split(', ')[0].split('/')[1]}`}</div>
-                                        </div>
-                                        <div className='flex4Column ml-5 containerDetail'>
-                                            <div className='containerDetail color-lite bold'>Gallons</div>
+                                        <div className='fle3Column ml-5 containerDetail'>
+                                            <div className='containerDetail color-lite bold size30'>⛽️</div>
                                             <div className='bold size20 p-5' onClick={() => editGallons(originalIndex, trip.gallons)}>{trip.gallons}</div>
                                         </div>
-                                        <div className='flex4Column ml-5 containerDetail'>
-                                            <div className='containerDetail color-lite bold'>$/Gallons</div>
+                                        <div className='flex3Column ml-5 containerDetail'>
+                                            <div className='containerDetail color-lite bold size30'>💸 / ⛽️</div>
                                             <div className='bold size20 p-5' onClick={() => editUSDGallons(originalIndex, trip.usdPerGallon)}>${trip.usdPerGallon}</div>
                                         </div>
-                                        <div className='flex4Column ml-5 containerDetail'>
-                                            <div className='containerDetail color-lite bold'>USD</div>
+                                        <div className='flex3Column ml-5 containerDetail'>
+                                            <div className='containerDetail color-lite bold size30'>💸</div>
                                             <div className='bold size20 p-5' onClick={() => editTotalUSD(originalIndex, trip.totalUSD)}>${trip.totalUSD}</div>
                                         </div>
                                     </div>
                                     <div className='flexContainer m-5'>
-                                        <div className='containerDetail flex3Column' onClick={() => editOdometer(originalIndex, trip.odometer)}>
-                                            <div className='containerDetail color-lite bold'>odometer</div>
+                                        <div className='containerDetail flex3Column ml-5' onClick={() => editOdometer(originalIndex, trip.odometer)}>
+                                            <div className='containerDetail color-lite bold size30'>🚙</div>
                                             <div className='bold size20 p-5'>{trip.odometer}</div>
                                         </div>
                                         <div className='containerDetail flex3Column ml-5 mr-5'>
-                                            <div className='containerDetail color-lite bold'>tank</div>
+                                            <div className='containerDetail color-lite bold size30'>⛽️</div>
                                             <div className='bold size20 p-5' onClick={() => editGuageStart(originalIndex, trip.guageStart)}>{trip.guageStart}% to <span onClick={() => editGuageEnd(originalIndex, trip.guageEnd)}>{trip.guageEnd}</span>%</div>
                                         </div>
                                         <div className='containerDetail flex3Column' onClick={() => editDistance(originalIndex, trip.distance)}>
-                                            <div className='containerDetail color-lite bold'>
-                                                distance
+                                            <div className='containerDetail color-lite bold size30'>
+                                                🛣️
                                             </div>
                                             <div className='bold size20 p-5'>
                                                 {trip.distance} miles
@@ -674,7 +697,6 @@ const Fuel = () => {
                                     </div>
                                 </div>
                             </div>
-                            {getDailyTotalsDisplay(originalIndex)}
                         </div>
                     })
                 }
