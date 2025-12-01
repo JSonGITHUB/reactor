@@ -1,0 +1,680 @@
+[
+    {
+        "name": "Beans (bush)",
+        "icon": "🫛",
+        "months": [
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August"
+        ],
+        "harvest": "50-60 days",
+        "companions": [
+            "Carrots",
+            "Cucumber",
+            "Corn"
+        ],
+        "soil": "Well-drained, sandy loam",
+        "watering": "1-1.5 inches per week",
+        "fertilizer": "Compost tea or fish emulsion",
+        "pests": "Watch for aphids and bean beetles; use neem oil.",
+        "sun_exposure": "Full sun",
+        "care": "Do not prune—bush beans are determinate and compact by nature. Harvest frequently to encourage continued pod production. Avoid overwatering; soggy soil leads to root rot."
+    },
+    {
+        "name": "Beans (pole)",
+        "icon": "🫛",
+        "months": [
+            "April",
+            "May",
+            "June",
+            "July",
+            "August"
+        ],
+        "harvest": "60-70 days",
+        "companions": [
+            "Corn",
+            "Radish",
+            "Marigold"
+        ],
+        "soil": "Loamy, well-drained",
+        "watering": "1-1.5 inches per week",
+        "fertilizer": "Organic mulch and compost",
+        "pests": "Protect against spider mites with insecticidal soap.",
+        "sun_exposure": "Full sun",
+        "care": "Provide a strong trellis or pole support early. Minimal pruning; remove only damaged or diseased leaves. Pinch the growing tip once vines reach the top of their support to encourage pod set."
+    },
+    {
+        "name": "Broccoli",
+        "icon": "🥦",
+        "months": [
+            "February",
+            "March",
+            "April",
+            "August",
+            "September"
+        ],
+        "harvest": "70-85 days",
+        "companions": [
+            "Lettuce",
+            "Spinach",
+            "Onions"
+        ],
+        "soil": "Rich, well-drained loam",
+        "watering": "1-2 inches per week",
+        "fertilizer": "High nitrogen fertilizer",
+        "pests": "Keep an eye out for cabbage worms and flea beetles.",
+        "sun_exposure": "Full sun",
+        "care": "Remove yellowing lower leaves to improve airflow. After cutting the central head, allow side shoots to grow for extended harvest. Avoid trimming too aggressively; leaves fuel head growth."
+    },
+    {
+        "name": "Brussel Sprouts",
+        "icon": "🌱",
+        "months": [
+            "June",
+            "July",
+            "August"
+        ],
+        "harvest": "90-100 days",
+        "companions": [
+            "Beets",
+            "Carrots",
+            "Celery"
+        ],
+        "soil": "Firm, well-drained soil",
+        "watering": "1-1.5 inches per week",
+        "fertilizer": "Balanced 10-10-10 fertilizer",
+        "pests": "Aphids and caterpillars; use row covers.",
+        "sun_exposure": "Full sun",
+        "care": "As sprouts begin forming, remove lower leaves below maturing sprouts. Pinch out the growing tip (top of the plant) about 3–4 weeks before final harvest to encourage sprout uniformity."
+    },
+    {
+        "name": "Cabbage",
+        "icon": "🥬",
+        "months": [
+            "March",
+            "April",
+            "May",
+            "August",
+            "September"
+        ],
+        "harvest": "80-100 days",
+        "companions": [
+            "Dill",
+            "Celery",
+            "Potatoes"
+        ],
+        "soil": "Moist, well-drained loam",
+        "watering": "1-1.5 inches per week",
+        "fertilizer": "Rich compost or aged manure",
+        "pests": "Cabbage loopers and aphids; use neem oil.",
+        "sun_exposure": "Full sun",
+        "care": "Outer leaves should stay intact for photosynthesis until harvest. Remove only diseased or pest-damaged leaves. Mulch heavily to regulate moisture and deter pests."
+    },
+    {
+        "name": "Cauliflower",
+        "icon": "🥦",
+        "months": [
+            "March",
+            "April",
+            "May",
+            "August",
+            "September"
+        ],
+        "harvest": "75-85 days",
+        "companions": [
+            "Beans",
+            "Celery",
+            "Spinach"
+        ],
+        "soil": "Rich, well-drained soil",
+        "watering": "1.5 inches per week",
+        "fertilizer": "High nitrogen compost or fish emulsion",
+        "pests": "Cabbage worms and slugs.",
+        "sun_exposure": "Full sun",
+        "care": "When the head begins forming, blanch by tying outer leaves over the developing curd to protect from sun/yellowing. Remove only damaged leaves."
+    },
+    {
+        "name": "Celery",
+        "icon": "🌱",
+        "months": [
+            "April",
+            "May",
+            "June",
+            "July"
+        ],
+        "harvest": "85-120 days",
+        "companions": [
+            "Beans",
+            "Cabbage",
+            "Leeks"
+        ],
+        "soil": "Moist, rich in organic matter",
+        "watering": "2 inches per week",
+        "fertilizer": "High nitrogen fertilizer",
+        "pests": "Aphids and slugs.",
+        "sun_exposure": "Full sun",
+        "care": "Keep soil consistently moist—shallow roots dry quickly. Trim damaged outer stalks to channel energy into inner growth. For blanching (tender stalks), wrap plants with paper or mound soil around stems."
+    },
+    {
+        "name": "Chives",
+        "icon": "🌱",
+        "months": [
+            "March",
+            "April",
+            "May",
+            "June"
+        ],
+        "harvest": "30-60 days",
+        "companions": [
+            "Carrots",
+            "Tomatoes",
+            "Lettuce"
+        ],
+        "soil": "Well-drained, sandy loam",
+        "watering": "1 inch per week",
+        "fertilizer": "Light compost feeding",
+        "pests": "Generally pest-free.",
+        "sun_exposure": "Full sun",
+        "care": "Harvest by cutting outer leaves about 1 inch above soil. Regular harvesting keeps growth vigorous. Remove flower stalks unless you want seeds, as flowering reduces leaf quality."
+    },
+    {
+        "name": "Cucumber",
+        "icon": "🥒",
+        "months": [
+            "April",
+            "May",
+            "June"
+        ],
+        "harvest": "50-70 days",
+        "companions": [
+            "Corn",
+            "Radish",
+            "Beans"
+        ],
+        "soil": "Loose, sandy loam",
+        "watering": "1-2 inches per week",
+        "fertilizer": "Balanced liquid fertilizer",
+        "pests": "Cucumber beetles and aphids.",
+        "sun_exposure": "Full sun",
+        "care": "Train vertically on trellis to improve airflow and fruit shape. Pinch off side shoots if growing in limited space (otherwise let them run). Regularly remove yellow or diseased leaves."
+    },
+    {
+        "name": "Eggplant",
+        "icon": "🍆🌱",
+        "months": [
+            "April",
+            "May",
+            "June"
+        ],
+        "harvest": "70-90 days",
+        "companions": [
+            "Basil",
+            "Beans",
+            "Peppers"
+        ],
+        "soil": "Loamy, well-drained soil",
+        "watering": "1-1.5 inches per week",
+        "fertilizer": "Rich compost and phosphorus",
+        "pests": "Flea beetles and spider mites.",
+        "sun_exposure": "Full sun",
+        "care": "Stake or cage plants to prevent branch breakage from heavy fruits. Pinch off first flowers to encourage stronger vegetative growth. Prune suckers (lower shoots) and excess leaves for better airflow."
+    },
+    {
+        "name": "Lettuce",
+        "icon": "🥬",
+        "months": [
+            "February",
+            "March",
+            "April",
+            "September",
+            "October"
+        ],
+        "harvest": "40-60 days",
+        "companions": [
+            "Carrots",
+            "Radish",
+            "Chives"
+        ],
+        "soil": "Moist, well-drained soil",
+        "watering": "1-2 inches per week",
+        "fertilizer": "Compost and balanced nitrogen",
+        "pests": "Slugs and aphids.",
+        "sun_exposure": "Partial shade",
+        "care": "Harvest outer leaves regularly (“cut-and-come-again” method). Avoid pruning inner growing tip or the plant will stop producing. Provide shade in hot weather to prevent bolting."
+    },
+    {
+        "name": "Parsley",
+        "icon": "🌱",
+        "months": [
+            "March",
+            "April",
+            "May",
+            "June"
+        ],
+        "harvest": "60-90 days",
+        "companions": [
+            "Tomatoes",
+            "Carrots",
+            "Onions"
+        ],
+        "soil": "Moist, rich soil",
+        "watering": "1 inch per week",
+        "fertilizer": "Light compost feeding",
+        "pests": "Generally pest-free.",
+        "sun_exposure": "Full sun",
+        "care": "Harvest by cutting outer stems at the base; do not just snip leaves. Regular cutting encourages bushier growth. Remove flower stalks if they appear (parsley bolts in year 2)."
+    },
+    {
+        "name": "Peas",
+        "icon": "🫛",
+        "months": [
+            "February",
+            "March",
+            "April"
+        ],
+        "harvest": "50-70 days",
+        "companions": [
+            "Carrots",
+            "Radish",
+            "Turnip"
+        ],
+        "soil": "Well-drained, loamy soil",
+        "watering": "1-1.5 inches per week",
+        "fertilizer": "Low nitrogen fertilizer",
+        "pests": "Aphids and weevils.",
+        "sun_exposure": "Full sun",
+        "care": "Provide netting/trellis support. Minimal pruning; only remove yellow/diseased leaves. Frequent harvesting encourages more pods."
+    },
+    {
+        "name": "Peppers",
+        "icon": "🫑",
+        "months": [
+            "April",
+            "May",
+            "June"
+        ],
+        "harvest": "60-90 days",
+        "companions": [
+            "Basil",
+            "Tomatoes",
+            "Carrots"
+        ],
+        "soil": "Well-drained, loamy soil",
+        "watering": "1 inch per week",
+        "fertilizer": "Balanced 10-10-10 or compost",
+        "pests": "Aphids and spider mites.",
+        "sun_exposure": "Full sun",
+        "care": "Pinch out the first flower buds (the 'crown buds') to encourage branching. Prune lower leaves/branches up to the first flower cluster for airflow. Stake or cage for support as fruits weigh down branches."
+    },
+    {
+        "name": "Spinach",
+        "icon": "🌱",
+        "months": [
+            "February",
+            "March",
+            "April",
+            "September",
+            "October"
+        ],
+        "harvest": "40-50 days",
+        "companions": [
+            "Lettuce",
+            "Strawberries",
+            "Peas"
+        ],
+        "pests": "Leaf miners and aphids.",
+        "soil": "Moist, well-drained, high in organic matter",
+        "watering": "Consistently moist soil",
+        "fertilizer": "Compost or fish emulsion",
+        "sun_exposure": "Partial shade",
+        "care": "Harvest outer leaves regularly. Do not cut central growing point to prolong production. Provide partial shade in hot weather to prevent bolting."
+    },
+    {
+        "name": "Squash (summer)",
+        "icon": "🥒",
+        "months": [
+            "May",
+            "June",
+            "July"
+        ],
+        "harvest": "50-60 days",
+        "companions": [
+            "Corn",
+            "Radish",
+            "Beans"
+        ],
+        "soil": "Sandy, well-drained soil",
+        "watering": "1-1.5 inches per week",
+        "fertilizer": "Compost tea",
+        "pests": "Squash vine borers and aphids.",
+        "sun_exposure": "Full sun",
+        "care": "Train vines outward for space efficiency. Remove older, large leaves near the base for airflow/disease prevention. Harvest fruits small and often to keep plants productive."
+    },
+    {
+        "name": "Squash (winter)",
+        "icon": "🥒",
+        "months": [
+            "June",
+            "July"
+        ],
+        "harvest": "80-110 days",
+        "companions": [
+            "Corn",
+            "Radish",
+            "Marigold"
+        ],
+        "soil": "Well-drained, rich soil",
+        "watering": "1.5 inches per week",
+        "fertilizer": "Compost and potassium-rich fertilizer",
+        "pests": "Squash bugs and aphids.",
+        "sun_exposure": "Full sun",
+        "care": "Prune lightly to manage space but keep plenty of foliage for fruit ripening. Pinch growing tips after 3–4 fruits set (on smaller varieties) to channel energy into maturing fruit. Keep vines off damp soil with mulch to prevent rot."
+    },
+    {
+        "name": "Tomatoes",
+        "icon": "🍅",
+        "months": [
+            "March",
+            "April",
+            "May",
+            "June"
+        ],
+        "harvest": "60-80 days",
+        "companions": [
+            "Basil",
+            "Marigold",
+            "Carrots"
+        ],
+        "soil": "Loamy, well-drained",
+        "watering": "1-2 inches per week",
+        "fertilizer": "Balanced 10-10-10 or compost",
+        "pests": "Tomato hornworms and aphids.",
+        "sun_exposure": "Full sun",
+        "care": "Indeterminate varieties: remove suckers from leaf axils (“armpits”), prune lower leaves below first flower cluster. Stake or cage for support. Determinate varieties: minimal pruning; just remove diseased/yellow leaves. Mulch and water deeply to reduce blossom-end rot."
+    },
+    {
+        "name": "Beets",
+        "icon": "🌱",
+        "months": [
+            "February",
+            "March",
+            "September",
+            "October"
+        ],
+        "harvest": "50-70 days",
+        "companions": [
+            "Lettuce",
+            "Onions",
+            "Cabbage"
+        ],
+        "soil": "Loose, sandy loam",
+        "watering": "1 inch per week",
+        "fertilizer": "Bone meal or well-rotted compost",
+        "pests": "Protect from leaf miners and aphids.",
+        "sun_exposure": "Full sun",
+        "care": "Do not prune leaves unless harvesting for food (they’re edible!). Thin seedlings early to avoid crowding. Harvest greens sparingly so bulbs still develop."
+    },
+    {
+        "name": "Avocado",
+        "icon": "🥑",
+        "months": [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December"
+        ],
+        "harvest": "3-4 years for trees to mature",
+        "companions": [
+            "Bananas",
+            "Comfrey",
+            "Basil"
+        ],
+        "soil": "Well-drained, rich loam",
+        "watering": "Deep watering every 2 weeks",
+        "fertilizer": "Fish emulsion and compost",
+        "pests": "Monitor for root rot and lace bugs.",
+        "sun_exposure": "Full sun",
+        "care": "Pinch young plants to encourage branching. Prune selectively to maintain open structure and airflow. Remove suckers from the base."
+    },
+    {
+        "name": "Mint",
+        "icon": "🌱",
+        "months": [
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August"
+        ],
+        "harvest": "Continuous",
+        "companions": [
+            "Cabbage",
+            "Tomatoes",
+            "Carrots"
+        ],
+        "soil": "Moist, well-drained",
+        "watering": "1-2 inches per week",
+        "fertilizer": "Compost tea or balanced organic fertilizer",
+        "pests": "Watch for spider mites and aphids.",
+        "sun_exposure": "Full sun",
+        "care": "Harvest frequently by pinching stems. Trim flower stalks immediately to keep leaves tender. Grows aggressively—best kept in containers."
+    },
+    {
+        "name": "Cilantro",
+        "icon": "🌱",
+        "months": [
+            "February",
+            "March",
+            "April",
+            "September",
+            "October"
+        ],
+        "harvest": "30-45 days",
+        "companions": [
+            "Spinach",
+            "Lettuce",
+            "Tomatoes"
+        ],
+        "soil": "Light, well-drained",
+        "watering": "1 inch per week",
+        "fertilizer": "Fish emulsion or compost tea",
+        "pests": "Monitor for aphids and whiteflies.",
+        "sun_exposure": "Partial shade",
+        "care": "Harvest outer leaves regularly, cut stems close to soil. Pinch off flower stalks to delay bolting. Sow successively every 2–3 weeks for continuous harvest."
+    },
+    {
+        "name": "Basil",
+        "icon": "🌿",
+        "months": [
+            "April",
+            "May",
+            "June",
+            "July",
+            "August"
+        ],
+        "harvest": "30-60 days",
+        "companions": [
+            "Tomato",
+            "Peppers",
+            "Oregano"
+        ],
+        "soil": "Well-draining, rich in organic matter",
+        "watering": "Keep soil consistently moist",
+        "fertilizer": "Fish emulsion or compost",
+        "pests": "Watch for aphids and whiteflies; use insecticidal soap.",
+        "sun_exposure": "Full sun",
+        "care": "Pinch growing tips above a pair of leaves to encourage bushy growth. Remove flower buds as soon as they form to prolong leaf production. Harvest stems, not just single leaves, for stronger regrowth."
+    },
+    {
+        "name": "Carrot",
+        "icon": "🥕",
+        "months": [
+            "February",
+            "March",
+            "April",
+            "August",
+            "September"
+        ],
+        "harvest": "70-80 days",
+        "companions": [
+            "Beans",
+            "Lettuce",
+            "Tomatoes"
+        ],
+        "soil": "Loose, sandy, well-draining",
+        "watering": "1 inch per week",
+        "fertilizer": "Low nitrogen, high phosphorus",
+        "pests": "Watch for carrot flies; use row covers.",
+        "sun_exposure": "Full sun",
+        "care": "Do not prune foliage; it fuels root growth. Thin seedlings early to proper spacing. Harvest greens sparingly (they’re edible but stunt root growth if overcut)."
+    },
+    {
+        "name": "Bell Pepper",
+        "icon": "🫑",
+        "months": [
+            "March",
+            "April",
+            "May",
+            "June",
+            "July"
+        ],
+        "harvest": "60-90 days",
+        "companions": [
+            "Basil",
+            "Carrots",
+            "Onions"
+        ],
+        "soil": "Well-drained, loamy soil",
+        "watering": "1-2 inches per week",
+        "fertilizer": "Compost or fish emulsion",
+        "pests": "Watch for aphids and cutworms; use neem oil.",
+        "sun_exposure": "Full sun",
+        "care": "Pinch first flowers to encourage branching. Prune lower leaves for airflow. Stake plants for heavy fruit loads."
+    },
+    {
+        "name": "Zucchini",
+        "icon": "🥒",
+        "months": [
+            "April",
+            "May",
+            "June",
+            "July"
+        ],
+        "harvest": "45-60 days",
+        "companions": [
+            "Beans",
+            "Corn",
+            "Radish"
+        ],
+        "soil": "Well-drained, fertile soil",
+        "watering": "1-1.5 inches per week",
+        "fertilizer": "Compost tea or balanced fertilizer",
+        "pests": "Watch for squash bugs; use neem oil.",
+        "sun_exposure": "Full sun",
+        "care": "Train vines outward for space efficiency. Remove older, large leaves near the base for airflow/disease prevention. Harvest fruits small and often to keep plants productive."
+    },
+    {
+        "name": "Radish",
+        "icon": "🌿",
+        "months": [
+            "February",
+            "March",
+            "April",
+            "August",
+            "September"
+        ],
+        "harvest": "25-40 days",
+        "companions": [
+            "Carrots",
+            "Lettuce",
+            "Beans"
+        ],
+        "soil": "Loose, well-drained soil",
+        "watering": "1 inch per week",
+        "fertilizer": "Compost or balanced fertilizer",
+        "pests": "Watch for flea beetles; use row covers.",
+        "sun_exposure": "Full sun",
+        "care": "No pruning needed; grows quickly. Thin seedlings to prevent crowding. Harvest promptly—leaving too long leads to woody roots."
+    },
+    {
+        "name": "Kale",
+        "icon": "🥬",
+        "months": [
+            "February",
+            "March",
+            "April",
+            "August",
+            "September"
+        ],
+        "harvest": "50-65 days",
+        "companions": [
+            "Lettuce",
+            "Beets",
+            "Celery"
+        ],
+        "soil": "Moist, well-drained, high in organic matter",
+        "watering": "Consistently moist soil",
+        "fertilizer": "Compost or nitrogen-rich fertilizer",
+        "pests": "Watch for cabbage worms; use neem oil or row covers.",
+        "sun_exposure": "Partial shade",
+        "care": "Harvest bottom leaves first, working upward. Remove yellow/damaged leaves promptly. Pinch central growing tip only if you want to limit height."
+    },
+    {
+        "name": "Green Bean",
+        "icon": "🫛",
+        "months": [
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August"
+        ],
+        "harvest": "50-60 days",
+        "companions": [
+            "Carrots",
+            "Cucumber",
+            "Corn"
+        ],
+        "soil": "Well-drained, sandy loam",
+        "watering": "1-1.5 inches per week",
+        "fertilizer": "Compost tea or fish emulsion",
+        "pests": "Watch for aphids and bean beetles; use neem oil.",
+        "sun_exposure": "Full sun",
+        "care": "Provide a strong trellis or pole support early. Minimal pruning; remove only damaged or diseased leaves. Pinch the growing tip once vines reach the top of their support to encourage pod set. Do not prune—bush beans are determinate and compact by nature. Harvest frequently to encourage continued pod production. Avoid overwatering; soggy soil leads to root rot."
+    },
+    {
+        "name": "Strawberry",
+        "icon": "🍓",
+        "months": [
+            "March",
+            "April",
+            "May",
+            "June"
+        ],
+        "harvest": "90-120 days",
+        "companions": [
+            "Lettuce",
+            "Spinach",
+            "Basil"
+        ],
+        "soil": "Rich, well-draining, slightly acidic",
+        "watering": "1-2 inches per week",
+        "fertilizer": "Compost or fish emulsion",
+        "pests": "Watch for slugs and aphids; use diatomaceous earth.",
+        "sun_exposure": "Full sun",
+        "care": "Remove runners (long trailing stems) if you want more fruit yield; allow some if you want propagation. Cut off old/diseased leaves after fruiting season. Mulch around plants to keep berries off soil and deter rot."
+    }
+]

@@ -1,0 +1,228 @@
+.tradeview-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.tradeview-sidebar {
+    width: 300px;
+    min-width: 220px;
+    padding: 20px;
+}
+
+.tradeview-main {
+    flex: 1;
+    padding: 20px;
+}
+
+.tradeview-search {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.tradeview-stock-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.tradeview-stock-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.tradeview-stock-item.selected {
+    border: yellow 1px solid;
+    border-radius: 10px;
+}
+.tradeview-stock-item:hover {
+    border: orange 1px solid;
+    border-radius: 10px;
+}
+
+.favorite-btn {
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.favorite-btn.active {
+    color: #f5b400;
+}
+
+.tradeview-favorites {
+    margin-top: 10px;
+}
+
+.tradeview-favorite-item {
+    cursor: pointer;
+    padding: 2px 0;
+}
+
+.tradeview-news {
+    margin-bottom: 20px;
+}
+
+.tradeview-news-source {
+    margin-left: 10px;
+    color: #888;
+    font-size: 12px;
+}
+
+.tradeview-widgets {
+    margin-top: 10px;
+}
+
+.tradeview-vitals-row {
+    display: flex;
+    gap: 10px;
+}
+
+@media (max-width: 900px) {
+    .tradeview-container {
+        flex-direction: column;
+    }
+
+    .tradeview-sidebar {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .tradeview-main {
+        padding: 10px;
+    }
+}
+.news-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 10px 0;
+    border-radius: 6px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.news-menu-item {
+    cursor: pointer;
+    padding: 10px 12px;
+    border-bottom: 1px solid #222;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.news-menu-item.selected,
+.news-menu-item:hover {
+    background: #2e3241;
+}
+
+.news-title {
+    font-weight: 500;
+    color: #eee;
+}
+
+.news-source {
+    color: #f5b400;
+    font-size: 0.95em;
+}
+
+.news-detail {
+    background: #23262f;
+    border-radius: 8px;
+    margin-top: 10px;
+    color: #eee;
+}
+
+.news-detail-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.news-detail-source {
+    color: #f5b400;
+    font-size: 1em;
+}
+
+.news-detail-date {
+    color: #aaa;
+    font-size: 0.95em;
+}
+
+.news-detail-description {
+    margin: 10px 0;
+}
+
+.news-detail-link {
+    display: inline-block;
+    margin-top: 10px;
+    color: #f5b400;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.news-detail-image {
+    margin: 10px 0;
+    box-shadow: 0 2px 8px #0003;
+}
+.news-category-menu {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.news-category-btn {
+    background: #23262f;
+    color: #eee;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.news-category-btn.selected,
+.news-category-btn:hover {
+    background: #f5b400;
+    color: #23262f;
+}
+
+.news-search-input {
+    background: #181a20;
+    color: #eee;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 1rem;
+}
+.tradingview-widget-container {
+    width: 100%;
+    min-width: 300px;
+    height: 400px;
+    /* or any fixed height you want */
+    box-sizing: border-box;
+}
+
+.tradingview-widget-container__widget {
+    width: 100% !important;
+    height: 100% !important;
+}
+.tradingview-widget-container {
+    width: 100% !important;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+.tradingview-widget-container iframe {
+    width: 100% !important;
+    display: block;
+    border: none;
+}

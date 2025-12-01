@@ -1,0 +1,236 @@
+/* Budget.css */
+
+.budget-manager {
+    display: flex;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+}
+
+/* Sidebar */
+.budget-sidebar {
+    width: 220px;
+    background-color: #2d3e50;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.budget-sidebar h3 {
+    margin: 10px 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.budget-list {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
+
+.budget-list div {
+    padding: 8px;
+    margin-bottom: 4px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.budget-list div:hover {
+    background-color: #3e556d;
+}
+
+.budget-list div.active {
+    background-color: #1a2a3f;
+    font-weight: bold;
+}
+
+/* Add Budget Button */
+.add-budget-button {
+    padding: 8px;
+    background-color: #1abc9c;
+    color: #fff;
+    text-align: center;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.add-budget-button:hover {
+    background-color: #16a085;
+}
+
+/* Tabs */
+.budget-tabs {
+    display: flex;
+    background-color: #ecf0f1;
+    padding: 5px;
+    overflow-x: auto;
+    border-bottom: 1px solid #ccc;
+}
+
+.budget-tabs div {
+    padding: 6px 12px;
+    margin-right: 4px;
+    cursor: pointer;
+    background-color: #bdc3c7;
+    border-radius: 4px 4px 0 0;
+}
+
+.budget-tabs div.active {
+    background-color: #3498db;
+    color: #fff;
+    font-weight: bold;
+}
+
+.close-tab {
+    margin-left: 6px;
+    color: #e74c3c;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Budget Container */
+.budget-container {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Budget Header */
+.budget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.budget-header h2 {
+    font-size: 20px;
+    margin: 0;
+}
+
+/* Category Row */
+.category-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.category-row input {
+    flex: 1;
+    padding: 6px;
+    margin-right: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.category-row button {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #3498db;
+    color: #fff;
+}
+
+.category-row button:hover {
+    background-color: #2980b9;
+}
+
+/* Add Category Button */
+.add-category {
+    margin-top: 10px;
+    padding: 6px 10px;
+    background-color: #1abc9c;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    align-self: flex-start;
+}
+
+.add-category:hover {
+    background-color: #16a085;
+}
+
+/* Comparison View */
+.comparison-view {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.comparison-budget {
+    flex: 1 1 300px;
+    background-color: #ecf0f1;
+    margin: 10px;
+    padding: 12px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.comparison-budget h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.comparison-budget .category-row {
+    margin-bottom: 6px;
+}
+.budget-total {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.budget-total.under {
+    color: #27ae60;
+    /* green */
+}
+
+.budget-total.over {
+    color: #e74c3c;
+    /* red */
+}
+
+.budget-total.neutral {
+    color: #7f8c8d;
+    /* gray */
+}
+
+/* Color-coded totals */
+.budget-totals.total-green { background: #e6ffe6; color: #228B22; border-radius: 8px; padding: 10px; }
+.budget-totals.total-red { background: #ffe6e6; color: #b22222; border-radius: 8px; padding: 10px; }
+.budget-totals.total-gray { background: #f0f0f0; color: #555; border-radius: 8px; padding: 10px; }
+
+/* Responsive sidebar and stacking */
+@media (max-width: 700px) {
+    .budget-manager.sidebar-collapsed {
+        flex-direction: column;
+    }
+    .sidebar.collapsed {
+        /*display: none;*/
+    }
+    .budget-main {
+        width: 100%;
+        height: calc(100% - 300px);
+    }
+    .budget-main .flexContainer>.flexColumn,
+    .budget-main .flexContainer>.width-100-percent {
+        align-self: flex-start;
+    }
+
+    /* Optional: ensure budget-content is also top-aligned if using flex */
+    .budget-content.stacked,
+    .budget-content {
+        align-items: flex-start !important;
+    }
+    .budget-content.stacked {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .expand-sidebar {
+        display: block;
+        margin: 10px auto;
+    }
+}

@@ -1,0 +1,199 @@
+import React, { useState, useEffect } from 'react';
+import Sounds from '../sound/Sounds.js';
+import validate from '../utils/validate.js';
+
+const TimerDisplay = (timedItem, index) => {
+
+    const initTimedItem = {
+        description: 'New Timed Item',
+        setTodoCurrentTime: () => alert('setTodoCurrentTime!'),
+        elapsedTime: 0,
+        activated: false,
+        type: 'track',/*timer*/ 
+        completed: false,
+        time: 0,
+        currentTime: 0,
+    }
+    const [clock, setClock] = useState('00:00:00');
+    const [timerWorker, setTimerWorker] = useState(null);
+    //const [startTime, setStartTime] = useState(null);
+    const [localTimedItems, setLocalTimedItems] = useState(initializeData('localTimedItems', [initTimedItem]));
+    const [localTimedItem, setLocalTimedItem] = useState(timedItem);
+
+    const formatTime = (timeInSeconds) => {
+        const hours = Math.floor(timeInSeconds / 3600);
+        const minutes = Math.floor((timeInSeconds % 3600) / 60);
+        const seconds = timeInSeconds % 60;
+        const formattedHours = hours.toString().padStart(2, '0');
+        const formattedMinutes = minutes.toString().padStart(2, '0');
+        const formattedSeconds = seconds.toString().padStart(2, '0');
+        return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+    };
+
+    useEffect(() => {
+        const newTime = localTimedItem.elapsedTime;
+        const newTimedItems = [...localTimedItems];
+        newTimedItems[index] = localTimedItem;
+        //timedItem.setTodos(newTodos);
+        setLocalTimedItems(newTimedItems);
+        setClock(formatTime(newTime));
+        if (localTimedItem.activated) {
+            startTimer();
+        } else {
+            stopTimer();
+        }
+    }, [localTimedItem]);
+
+    useEffect(() => {
+        if (timerWorker !== null) {
+            timerWorker.onmessage = (event) => {
+               // setClock(formatTime(event.data));
+                
+                const currentElapsedTime = () => {
+                    let time = 0;
+                    const elapsedTime = localTimedItem.elapsedTime;
+                    if (localTimedItem.type === 'track') {
+                        time = Number(elapsedTime)+Number(event.data);
+                    } else {
+                        time = Number(elapsedTime)-Number(event.data);
+                    }
+                    return time;
+                }
+                const newTime = currentElapsedTime()
+                const NewLocalTimedItem = localTimedItem;
+                NewLocalTimedItem.elapsedTime = newTime;
+                if (NewLocalTimedItem.type === 'timer' && newTime === 0 && NewLocalTimedItem.activated) {
+                    //Sounds.siren();
+                    //toggleTimer();
+                    //alert(`Times up index: ${index} ${timedItem.description} `);
+                    NewLocalTimedItem.completed = true;
+                    NewLocalTimedItem.activated = false;
+                }
+                console.log(`timedItem - ${index}: ${timedItem.description} elapsed time: ${newTime}`);
+                console.log(`timedItem - ${index}: ${timedItem.description} completed: ${NewLocalTimedItem.completed}`);
+                console.log(`timedItem - ${index}: ${timedItem.description} activated: ${NewLocalTimedItem.activated}`);
+                setLocalTimedItem(NewLocalTimedItem);
+            }
+        }
+    }, [timerWorker]);
+
+    useEffect(() => {
+        //.log(`TimerComponent => timedItem: ${JSON.stringify(timedItem,null,2)}`)
+        //if (timedItem.currentTime && timedItem.currentTime !== undefined) {
+        if (validate(timedItem.currentTime) !== null) {
+            const currentTime = timedItem.currentTime;
+            console.log(`timedItem.currentTime: ${currentTime}`)
+            setLocalTimedItem(timedItem);
+        }
+    }, []);
+    
+    const startTimer = () => {
+        //if (typeof (Worker) !== 'undefined') {
+        if (validate(Worker) !== null) {
+            if (timerWorker === null) {
+                const worker = new Worker("timerWorker.js");
+                setTimerWorker(worker);
+                const elapsedTime = localTimedItem.elapsedTime;
+                //setStartTime(Date.now() - elapsedTime);
+                console.log(`startTimer => elapsedTime: ${elapsedTime}`);
+            }
+        } else {
+            // Web workers are not supported by your browser
+            setClock("Web Workers not supported...");
+        }
+        return () => {
+            timerWorker.terminate();
+        };
+    }
+    const stopTimer = () => {
+        if (timerWorker != null) {
+            timerWorker.terminate();
+            //setStartTime(Date.now() - elapsedTime);
+            const elapsedTime = localTimedItem.elapsedTime;
+            timedItem.setTodoCurrentTime(index, elapsedTime)
+            console.log(`stopTimer => elapsedTime: ${elapsedTime}`);
+            setTimerWorker(null);
+        }
+    }
+    /*
+    const getClock = (id) => {
+        if (timedItem.currentTime !== undefined) {
+            const todoTime = timedItem.currentTime;
+            return <div className='containerBox bold p-30'>
+                <span className='size40'>
+                    {formatTime(todoTime)}
+                </span>
+            </div>
+        } else {
+            return 'XXX'
+        }
+
+    }
+    */
+    const toggleTimer = () => {
+        const elapsedTime = localTimedItem.elapsedTime;
+        console.log(`toggleTimer => timer: ${localTimedItem.type} localTimedItem.activated: ${localTimedItem.activated}  time: ${localTimedItem.time} localTimedItem.completed: ${localTimedItem.completed} currentTime: ${localTimedItem.currentTime} elapsedTime: ${elapsedTime} - ${(localTimedItem.activated) ? 'stop' : 'start'}}`);
+        Sounds.boop(0, 1);
+        const NewLocalTimedItem = localTimedItem;
+        NewLocalTimedItem.activated = !localTimedItem.activated;
+        setLocalTimedItem(NewLocalTimedItem);
+    }
+
+    return <div>
+                <div className='containerBox flexContainer bg-lite centeredContent'>
+                    <div className='flex2Column flexContainer size30 color-lite'>
+                        <div className='flex3Column containerBox'>
+                            <div className='containerBox flexContainer'>
+                                clock: {clock}
+                            </div>
+                            <div className='containerBox flexContainer'>
+                                localTimedItem.elapsedTime: {localTimedItem.elapsedTime}
+                            </div>
+                        </div>
+                        {/*
+                        <div className='flex3Column containerBox'>
+                            <div className='containerBox flexContainer'>
+                                timedItem.time: {timedItem.time}
+                            </div>
+                            <div className='containerBox flexContainer'>
+                                timedItem.currentTime: {timedItem.currentTime}
+                            </div>
+                            <div className='containerBox flexContainer'>
+                                timedItem.activated: {timedItem.activated}
+                            </div>
+                            <div className='containerBox flexContainer'>
+                                timedItem.completed: {timedItem.completed}
+                            </div>
+                        </div>
+                        <div className='flex3Column containerBox'>
+                            <div className='containerBox flexContainer'>
+                                localTimedItem.time: {localTimedItem.time}
+                            </div>
+                            <div className='containerBox flexContainer'>
+                                localTimedItem.currentTime: {localTimedItem.currentTime}
+                            </div>
+                            <div className='containerBox flexContainer'>
+                                localTimedItem.activated: {localTimedItem.activated}
+                            </div>
+                            <div className='containerBox flexContainer'>
+                                localTimedItem.completed: {localTimedItem.completed}
+                            </div>
+                        </div>
+                        */}
+                    </div>
+                    <div className='flex2Column p-10 m-10 r-10'>
+                        <button 
+                            title={(localTimedItem.activated) ? 'STOP' : (localTimedItem.completed) ? 'RESET' : 'START'}
+                            id={`toggleTimer${timedItem.description}`} 
+                            name={`toggleTimer${timedItem.description}`} 
+                            className={`width-100-percent r-10 p-15 greet bold ${(localTimedItem.activated) ? 'bg-dkRed color-red' : 'bg-dkGreen color-neogreen'}`} 
+                            onClick={() => toggleTimer()
+                        }>
+                            {(localTimedItem.activated) ? 'STOP' : (localTimedItem.completed) ? 'RESET' : 'START'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+};
+
+export default TimerDisplay;

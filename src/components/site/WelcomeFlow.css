@@ -1,0 +1,304 @@
+/* WelcomeFlow.css */
+
+/* Root container */
+.wf-root {
+    min-height: 100vh;
+    font-family: "Segoe UI", Roboto, system-ui, -apple-system, "Helvetica Neue", Arial;
+    color: #111;
+    background: linear-gradient(180deg, #f7fbff 0%, #eef6ff 100%);
+    /* light base */
+    position: relative;
+    overflow: hidden;
+}
+
+/* Overlay that fades to brand color */
+.wf-overlay {
+    position: fixed;
+    inset: 0;
+    background: transparent;
+    pointer-events: none;
+    transition: background-color 0.9s ease, opacity 0.9s ease;
+    z-index: 20;
+}
+
+.wf-overlay.active {
+    background: linear-gradient(180deg, rgba(16, 66, 127, 0.95), rgba(20, 120, 180, 0.95));
+    opacity: 0.98;
+}
+
+/* Full-screen welcome / quote screens */
+.wf-screen {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 2rem;
+    z-index: 10;
+}
+
+/* Card for the welcome content */
+.wf-card {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 14px;
+    padding: 2.2rem;
+    box-shadow: 0 12px 30px rgba(12, 35, 63, 0.12);
+    width: min(720px, 92%);
+}
+
+/* Heading with inline input for first name */
+.wf-heading {
+    font-size: 2.2rem;
+    margin: 0 0 0.25rem 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 700;
+    color: #0b2160;
+    flex-wrap: wrap;
+}
+
+.wf-input {
+    font-size: 2.0rem;
+    font-weight: 700;
+    border: none;
+    background: transparent;
+    border-bottom: 3px solid rgba(11, 33, 96, 0.14);
+    padding: 0.12rem 0.25rem;
+    width: 12ch;
+    text-align: left;
+    outline: none;
+    color: #0b2160;
+}
+
+/* placeholder subtle */
+.wf-input::placeholder {
+    color: rgba(11, 33, 96, 0.35);
+    font-weight: 600;
+}
+
+/* subtext */
+.wf-sub {
+    margin: 0.6rem 0 1.2rem 0;
+    color: #254a84;
+    font-size: 1.05rem;
+}
+
+/* primary button */
+.wf-button {
+    background: linear-gradient(90deg, #0077ff, #00b3ff);
+    color: white;
+    border: none;
+    padding: 0.9rem 1.6rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(0, 112, 255, 0.18);
+    transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.wf-button:active {
+    transform: translateY(1px);
+}
+
+.wf-button:focus {
+    outline: 3px solid rgba(0, 123, 255, 0.18);
+}
+
+/* Quote screen */
+.wf-quote {
+    color: #06325a;
+}
+
+.wf-quote-box {
+    display: flex;
+    gap: 1.2rem;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 1.4rem 1.8rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(6, 50, 90, 0.08);
+    transform-origin: center;
+    animation: wf-quote-fade 3.6s ease-in-out forwards;
+}
+
+@keyframes wf-quote-fade {
+    0% {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    10% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    70% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+}
+
+.wf-quote-icon svg {
+    width: 42px;
+    height: 42px;
+    color: #ffb347;
+}
+
+.wf-quote-text {
+    font-size: 1.2rem;
+    font-style: italic;
+    margin: 0;
+    color: #0b2e4a;
+}
+
+.wf-quote-author {
+    font-size: 0.95rem;
+    margin-top: 0.35rem;
+    color: #315b7f;
+}
+
+/* Dashboard reveal wrapper */
+.wf-dashboard-wrap {
+    position: relative;
+    min-height: 100vh;
+    transform: translateY(12vh);
+    opacity: 0;
+    transition: transform 700ms cubic-bezier(.2, .9, .2, 1), opacity 700ms ease;
+    z-index: 5;
+}
+
+.wf-dashboard-wrap.visible {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* Dashboard header */
+.wf-dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.6rem 3rem;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.6));
+    border-bottom: 1px solid rgba(12, 34, 63, 0.06);
+}
+
+.wf-dashboard-header h2 {
+    margin: 0;
+    color: #042a57;
+}
+
+/* Dashboard layout */
+.wf-dashboard {
+    padding: 2rem 3rem;
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 1.8rem;
+    align-items: start;
+}
+
+/* micro progress animation */
+.wf-micro-progress {
+    margin-bottom: 1rem;
+}
+
+.wf-progress-bar {
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 999px;
+    height: 8px;
+    width: 160px;
+    overflow: hidden;
+}
+
+.wf-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #00b3ff, #0077ff);
+    animation: wf-progress 1.6s ease forwards;
+}
+
+@keyframes wf-progress {
+    0% {
+        width: 0;
+    }
+
+    100% {
+        width: 68%;
+    }
+}
+
+/* tip bubble */
+.wf-tip-bubble {
+    background: linear-gradient(180deg, #fff, #fbfdff);
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+    box-shadow: 0 8px 18px rgba(11, 33, 96, 0.06);
+    max-width: 420px;
+    margin-bottom: 1rem;
+}
+
+.wf-tip-actions {
+    margin-top: 0.6rem;
+    display: flex;
+    gap: 0.6rem;
+}
+
+.wf-small {
+    background: transparent;
+    border: 1px solid rgba(11, 33, 96, 0.08);
+    padding: 0.4rem 0.6rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* tasks */
+.wf-tasks {
+    background: white;
+    padding: 1.2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(12, 35, 63, 0.04);
+}
+
+.wf-tasks h3 {
+    margin-top: 0;
+    color: #06325a;
+}
+
+.wf-task {
+    list-style: none;
+    margin: 0.6rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.wf-task.done .wf-task-text {
+    text-decoration: line-through;
+    color: rgba(6, 50, 90, 0.4);
+}
+
+/* welcome text area */
+.wf-welcome-text {
+    margin-top: 1.2rem;
+    padding: 0.9rem;
+    background: linear-gradient(90deg, #f5fbff, #ffffff);
+    border-radius: 8px;
+}
+
+/* small responsive tweaks */
+@media (max-width: 900px) {
+    .wf-dashboard {
+        grid-template-columns: 1fr;
+        padding: 1.2rem;
+    }
+
+    .wf-card {
+        padding: 1.4rem;
+    }
+}

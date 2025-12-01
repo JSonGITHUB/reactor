@@ -1,0 +1,110 @@
+.wheel-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    text-align: center;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.puzzle-board {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.tile {
+    width: 40px;
+    height: 50px;
+    border: 2px solid #333;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.spin-button {
+    padding: 10px 20px;
+    font-size: 18px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    background-color: #ffcc00;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.spin-button:hover:not(:disabled) {
+    background-color: #e6b800;
+}
+
+.letter-grid {
+    display: grid;
+    grid-template-columns: repeat(13, 1fr);
+    gap: 10px;
+    margin: 1.5rem 0;
+    justify-items: center;
+}
+
+.letter-grid button {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.consonant {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.vowel {
+    background-color: #007BFF;
+    color: white;
+}
+
+.letter-grid button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.status {
+    margin-top: 1.5rem;
+    font-size: 1.1rem;
+}
+
+.status p {
+    margin: 0.5rem 0;
+}
+
+@media (max-width: 600px) {
+    .letter-grid {
+        grid-template-columns: repeat(7, 1fr);
+    }
+
+    .tile {
+        width: 35px;
+        height: 45px;
+        font-size: 20px;
+    }
+}
+.main-grid {
+    display: flex;
+}
