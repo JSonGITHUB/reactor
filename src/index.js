@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import ReactDOM from 'react-dom';
 //import './assets/css/index.css';
 //import App from './AppNoRouter';
 import { Provider } from 'react-redux';
@@ -18,15 +18,15 @@ const store = createStore(
     composeEnhancers(applyMiddleware(thunk)
 ));
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
+ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
       <Router>
         <App />
       </Router>
     </Provider>
-  </React.StrictMode>
+  </React.StrictMode>,
+  document.getElementById('root')
 );
 
 // If you want your app to work offline and load faster, you can change
