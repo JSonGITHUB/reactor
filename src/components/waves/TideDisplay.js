@@ -101,7 +101,6 @@ const TideDisplay = ({
     const heightInit = () => getLocalData('height') ? getLocalData('height') : '';
     const tideHeader = () => <div>Tide {Number(heightInit()).toFixed(1)}<span className='size12'>ft</span> {getCurrentTide()}</div>
 
-
     useEffect(() => {
         localStorage.setItem('tideCollapse', tideCollapse);
     }, [tideCollapse]);
@@ -124,7 +123,7 @@ const TideDisplay = ({
             }
         }
 
-    }, [tideNow]);
+    }, [tideNow]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         const fetchData = async () => {
@@ -154,7 +153,7 @@ const TideDisplay = ({
             }
         };
         fetchData();
-    }, []);
+    }, [tideNowLink]);
 
     const handleOverride = async () => {
         setLoading(true);
@@ -192,75 +191,6 @@ const TideDisplay = ({
     if (!tideNow) {
         return <div>No data available.</div>;
     }
-    const defaultTides = {
-        "data": {
-            "predictions": [
-                {
-                    "t": "2024-07-01 11:40",
-                    "v": "1.960",
-                    "type": "L"
-                },
-                {
-                    "t": "2024-07-01 18:23",
-                    "v": "6.064",
-                    "type": "H"
-                },
-                {
-                    "t": "2024-07-02 01:53",
-                    "v": "-0.341",
-                    "type": "L"
-                },
-                {
-                    "t": "2024-07-02 08:22",
-                    "v": "3.338",
-                    "type": "H"
-                },
-                {
-                    "t": "2024-07-02 12:34",
-                    "v": "2.232",
-                    "type": "L"
-                }
-            ]
-        },
-        "timestamp": 1719874078612
-    }
-
-    const findClosestDate = () => {
-        const data = tides;
-        let datesArray = (data.predictions) ? data.predictions.map((tide) => tide.t) : [];
-        if (!Array.isArray(datesArray) || datesArray.length === 0) {
-            //return null; // Return null for an empty or non-array input
-            if (Object.keys(tides).length === 0) {
-                const predictions = initializeData('tides', defaultTides)[0].predictions;
-                datesArray = predictions.map((tide) => tide.t)
-            } else {
-                console.log(`useEffect => 3 tides: ${JSON.stringify(tides, null, 2)}`);
-                datesArray = tides.predictions.map((tide) => tide.t)
-            }
-        }
-        const now = new Date();
-        let closestDate = datesArray[0];
-        let index = 0;
-        let closestIndex = 0;
-
-        datesArray.forEach(date => {
-
-            const currentDate = new Date(date);
-            const timeDifference = Math.abs(currentDate - now);
-
-            // If the current date is closer than the assumed closest date, update closestDate
-            if (timeDifference < Math.abs(new Date(closestDate) - now)) {
-                closestDate = date;
-                closestIndex = index;
-            }
-            index++
-
-        });
-
-        return [closestIndex, closestDate];
-
-    }
-
     const getTideDisplay = () => {
 
         const getNextLowTideIndex = () => {
@@ -286,13 +216,9 @@ const TideDisplay = ({
 
         const predictions = tides.predictions;
         const datesArray = predictions.map((tide) => tide.t);
-        const nextTideIndex = findClosestDate()[0];
         const now = new Date();
-        const date = datesArray[nextTideIndex];
         const low = datesArray[getNextLowTideIndex()];
-        const currentDate = new Date(date);
         const currentLow = new Date(low);
-        const timeDifference = Math.abs(currentDate - now);
         const timeDifferenceLow = Math.abs(currentLow - now);
         const millisecondsToTime = (ms) => {
             const seconds = Math.floor((ms / 1000) % 60);
@@ -300,8 +226,6 @@ const TideDisplay = ({
             const hours = Math.floor(ms / (1000 * 60 * 60));
             return { hours, minutes, seconds };
         }
-        const { hours, minutes } = millisecondsToTime(timeDifference);
-        const untilNextTide = (predictions) ? `${hours} hours and ${minutes} minutes` : 'OOPS!';
         const untilNextLow = (predictions) ? `${millisecondsToTime(timeDifferenceLow)['hours']} hours and ${millisecondsToTime(timeDifferenceLow)['minutes']} minutes` : 'OOPS!';
 
         const getHeight = () => {
@@ -330,9 +254,9 @@ const TideDisplay = ({
             const nextLowTideIndex = getNextLowTideIndex();
 
             return (
-                <div>
+                <div className='mt-10 mb-35 ml--5 mr--5'>
                     {nextLowTideIndex !== -1 ? (
-                        <div className='containerBox color-oceanblue p-20 mt-10'>
+                        <div className='containerBox color-oceanblue p-20'>
                             Next <b>LOW</b> tide in {untilNextLow}
                         </div>
                     ) : (
@@ -376,7 +300,7 @@ const TideDisplay = ({
                     ? <div></div>
                     : (tideCollapse)
                         ? null
-                        : <div>
+                        : <div className='mt--5'>
                             {/*
                             <div>{getTideDirection()}</div>
                             */}
@@ -384,7 +308,7 @@ const TideDisplay = ({
                                 <div>
                                 <div className='containerBox color-neogreen contentLeft'>
                                     <div>
-                                        Next tide <b>{nextTide}</b> {nextTideHeight} in {untilNextTide} at {nextTideTime}
+                                        Next tide <b>{nextTide}</b> {nextTideHeight} in {nextTideCountdown} at {nextTideTime}
                                     </div>
                                 </div>
                             </div>

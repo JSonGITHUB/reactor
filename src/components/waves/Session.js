@@ -37,8 +37,6 @@ const Session = ({logId, location}) => {
     const getSpot = () => initializeData('spot', null);
 
     useEffect(() => {
-        // eslint-disable-next-line
-        const { state } = location;
         const logId = initializeData('logId', null);
         console.log(`Session => useEffect => logId: ${logId}`)
 
@@ -48,7 +46,7 @@ const Session = ({logId, location}) => {
             setStatus(prevState => ({
                 ...prevState,
                 //log: templateData,
-                log: ((lastPost===0)||(lastPost===null))?initLog():lastPost,
+                log: ((lastPost===0)||(lastPost===null)) ? templateData : lastPost,
                 logID:generateNewLogId(),
                 items: interfaceData,
                 isLoaded: true
@@ -64,7 +62,7 @@ const Session = ({logId, location}) => {
                 isLoaded: true
             }));
         }
-    }, []);
+    }, [getLastPost, location]);
 
     useEffect(() => {
        console.log(`Session => useEffect => status.log: ${JSON.stringify(status.log,null,2)}`)

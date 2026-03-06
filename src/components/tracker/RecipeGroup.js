@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import icons from '../site/icons';
 import Recipe from './Recipe';
-import getKey from '../utils/KeyGenerator';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
 import validate from '../utils/validate';
 
@@ -37,20 +36,33 @@ const RecipeGroup = ({
         if (dataUpdated) {
             setRecipes(newRecipes);
         }
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
-        const newRecipes = [...recipes];
-        if (newRecipes[recipeGroupIndex]) {
-            newRecipes[recipeGroupIndex] = {
-                ...newRecipes[recipeGroupIndex],
+        setCollapsed(recipeGroup.isCollapsed ?? recipeGroup.collapsed ?? true);
+    }, [recipeGroup.isCollapsed, recipeGroup.collapsed]);
+
+    useEffect(() => {
+        setRecipes((previousRecipes) => {
+            if (!Array.isArray(previousRecipes) || !previousRecipes[recipeGroupIndex]) {
+                return previousRecipes;
+            }
+
+            const currentGroup = previousRecipes[recipeGroupIndex];
+            if (currentGroup.isCollapsed === collapsed && currentGroup.collapsed === collapsed) {
+                return previousRecipes;
+            }
+
+            const updatedRecipes = [...previousRecipes];
+            updatedRecipes[recipeGroupIndex] = {
+                ...currentGroup,
                 isCollapsed: collapsed,
                 collapsed: collapsed
             };
-            //setRecipes(newRecipes);
-            localStorage.setItem('recipeTracking', JSON.stringify(newRecipes));
-        }
-    }, [collapsed]);
+            localStorage.setItem('recipeTracking', JSON.stringify(updatedRecipes));
+            return updatedRecipes;
+        });
+    }, [collapsed, recipeGroupIndex, setRecipes]);
     
     const toggleEdit = () => {
         const toggle = (edit)
@@ -71,6 +83,7 @@ const RecipeGroup = ({
         const newRecipes = [...recipes];
         const selectedNewRecipeGroup = newRecipes[recipeGroupIndex];
         selectedNewRecipeGroup.isCollapsed = collapse;
+        selectedNewRecipeGroup.collapsed = collapse;
         setRecipes(newRecipes);
         setCollapsed(collapse);
         setCollapseAll(false);
@@ -100,8 +113,9 @@ const RecipeGroup = ({
             setRecipes(newRecipes);
         }
     }
+    const recipeGroupTitle = (recipeGroup.category) ? `${recipeGroup.category} (${recipeGroup.recipes.length})` : 'New Category';
     
-    return <div key={getKey(`recipe${recipeGroupIndex}`)} className='' ref={targetElementRef}>
+    return <div className=''>
             <div className=''>
                 <div className='flexContainer'>
                     <div className='bold size25 color-yellow flex1Auto contentLeft'>
@@ -115,10 +129,10 @@ const RecipeGroup = ({
                             >
                                 {editedRecipeGroupTitle}
                             </textarea>
-                            : <div className='containerBox bg-lite centerVertical'>
+                            : <div className='containerDetail m-5 bg-lite centerVertical'>
                                 <div className='containerDetail color-yellow bg-tinted p-20'>
                                     <CollapseToggleButton
-                                        title={recipeGroup.category}
+                                        title={recipeGroupTitle}
                                         isCollapsed={collapsed}
                                         setCollapse={setCollapsed}
                                         align='left'
@@ -132,11 +146,11 @@ const RecipeGroup = ({
                 {
                     (collapsed) 
                     ? null 
-                    : <div className='containerBox'>
-                        <div className='flexContainer contentRight'>
+                    : <div className=''>
+                        <div className='containerDetail mr-5 ml-5 mt--5 mb--5 flexContainer'>
                             <div
                                 title='add recipe'
-                                className='containerBox flex4Column button bg-lite centeredContent'
+                                className='containerDetail flex3Column button bg-lite centeredContent'
                                 onClick={() => addToGroup(recipeGroupIndex, targetElementRef)}
                             >
                                 <div className='flexContainer'>
@@ -150,17 +164,17 @@ const RecipeGroup = ({
                             </div>
                             <div
                                 title={(isEditedRecipeGroupTitle())?'save category':'edit category'}
-                                className={`containerBox flex4Column button bg-lite centeredContent ${(isEditedRecipeGroupTitle()) ? '' : ' bg-lite'}`}
+                                className={`containerDetail mr-5 ml-5 p-25 flex3Column button bg-lite centeredContent ${(isEditedRecipeGroupTitle()) ? '' : ' bg-lite'}`}
                             >
                                 {
                                     (isEditedRecipeGroupTitle())
-                                    ? <div title='save' className='p-5 color-lite bold' onClick={() => toggleEdit(recipeGroupIndex)}>save</div>
-                                    : <div title='edit' className='p-5' onClick={() => toggleEdit(recipeGroupIndex)}>{icons.edit}</div>
+                                    ? <div title='save' className='size25 color-lite bold' onClick={() => toggleEdit(recipeGroupIndex)}>save</div>
+                                    : <div title='edit' className='size25' onClick={() => toggleEdit(recipeGroupIndex)}>{icons.edit}</div>
                                 }
                             </div>
                             <div 
                                 title='delete category'
-                                className='containerBox flex4Column button bg-lite centeredContent p-15' 
+                                className='containerDetail flex3Column button bg-lite centeredContent p-20 size25 ' 
                                 onClick={() => deleteGroup(recipeGroupIndex)}
                             >
                                 {icons.delete}
@@ -170,22 +184,23 @@ const RecipeGroup = ({
                             {
                                 (collapsed)
                                 ? null
-                                : recipeGroup.recipes.map((recipe, recipeIndex) => {
-                                    //console.log(`RecipeGroup => recipe: ${JSON.stringify(recipe, null, 2)}`);
-                                    if (recipe?.display === true || recipe?.display === 'true') {
-                                        return <div key={getKey(`recipeContainer${recipeIndex}`)}>
-                                            <Recipe
-                                                recipes={recipes}
-                                                setRecipes={setRecipes}
-                                                recipeGroupIndex={recipeGroupIndex}
-                                                recipeIndex={recipeIndex}
-                                                recipe={recipe}
-                                                setCollapseAll={setCollapseAll}
-                                            />
-                                        </div>
-                                    }
-                                    return null;
-                                })
+                                : (recipeGroup.recipes && recipeGroup.recipes.length > 0)
+                                    ? recipeGroup.recipes.map((recipe, recipeIndex) => {
+                                        if (recipe?.display === true || recipe?.display === 'true') {
+                                            return <div key={`${recipe?.dish || 'recipe'}-${recipeIndex}`} ref={(el) => (recipeIndex === 0 ? targetElementRef : null)}>
+                                                <Recipe
+                                                    recipes={recipes}
+                                                    setRecipes={setRecipes}
+                                                    recipeGroupIndex={recipeGroupIndex}
+                                                    recipeIndex={recipeIndex}
+                                                    recipe={recipe}
+                                                    setCollapseAll={setCollapseAll}
+                                                />
+                                            </div>
+                                        }
+                                        return null;
+                                    })
+                                    : null
                             }
                         </div>
                     </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import GardenItem from './GardenItem';
 import gardenData from './gardenData.json';
 import feedingPlans from './feedingPlans';
@@ -16,15 +16,13 @@ const monthsList = [
 const Garden = () => {
 
     const [crops, setCrops] = useState();
-    const [expandedIndex, setExpandedIndex] = useState(null);
     const [search, setSearch] = useState(localStorage.getItem('search') || '');
     const [selectedMonth, setSelectedMonth] = useState(localStorage.getItem('selectedMonth') || '');
     const [selectedSoil, setSelectedSoil] = useState(localStorage.getItem('selectedSoil') || '');
     const [selectedFertilizer, setSelectedFertilizer] = useState(localStorage.getItem('selectedFertilizer') || '');
-    const [selectedSun, setSelectedSun] = useState(localStorage.getItem('selectedSun') || null);
     const [sortOrder, setSortOrder] = useState(localStorage.getItem('sortOrder') || 'asc');
-    const [darkMode, setDarkMode] = useState(localStorage.getItem('darkMode') === 'true');
-    const [modalData, setModalData] = useState(null);
+    const [darkMode] = useState(localStorage.getItem('darkMode') === 'true');
+    const [, setModalData] = useState(null);
     const [soils, setSoils] = useState();
     const [suns, setSuns] = useState();
     const [sun, setSun] = useState(initializeData('sun', null));
@@ -33,8 +31,6 @@ const Garden = () => {
     const [fertilizerCollapse, setFertilizerCollapse] = useState(true);
     const [feedingCollapse, setFeedingCollapse] = useState(true);
     const [planted, setPlanted] = useState(initializeData('planted', false));
-    const [currentFertilizers, setCurrentFertilizers] = useState();
-    const fertilized = [];
 
     useEffect(() => {
         localStorage.setItem('planted', planted);
@@ -42,14 +38,6 @@ const Garden = () => {
     useEffect(() => {
         localStorage.setItem('sun', sun);
     }, [sun]);
-    useEffect(() => {
-        fertilized.length = 0;
-        if (currentFertilizers) {
-            currentFertilizers.forEach((fertilizer) => {
-                fertilized.push(false);
-            });
-        }
-    }, [currentFertilizers]);
     // Save user settings to local storage
     useEffect(() => {
         localStorage.setItem('search', search);
@@ -107,7 +95,6 @@ const Garden = () => {
                 return Array.from(fertilizersSet); // Convert Set to array
             };
             setFertilizers(extractFertilizers(crops));
-            setCurrentFertilizers(extractFertilizers(filteredVegetables));
 
             /* crops.forEach((crop) => {
                 if (crop.planted) alert(`${crop.name} planted!`)
@@ -130,9 +117,11 @@ const Garden = () => {
         setSun(sunValue === 'null' ? null : sunValue);
     }, []);
     const plantingStatus = ['true', 'false', 'null'];
-    const filteredVegetables = (!crops)
-        ? null
-        : crops.filter(item => {
+    const filteredVegetables = useMemo(() => {
+        if (!crops) {
+            return null;
+        }
+        return crops.filter(item => {
             //console.log(`Garden => filteredVegetables => item: ${JSON.stringify(item, null, 2)} crops: ${JSON.stringify(crops, null, 2)}`);
             const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase());
             //console.log(`Garden => ${item.name} matchesSearch: ${matchesSearch}`)
@@ -143,7 +132,6 @@ const Garden = () => {
             //console.log(`Garden => ${item.name} matchesSoil: ${matchesSoil} - '${selectedSoil.toLowerCase()}'`)
             const matchesPlanted = (planted === null || planted === 'null' || String(item.planted) === String(planted)) ? true : false;
             //console.log(`Garden => ${item.name} planted: ${planted} ?? item: ${item.planted} matchesPlanted: ${matchesPlanted}`)
-            const fertilizerArray = item.fertilizer.toLowerCase().split(', ');
             //const matchingSun = (selectedSun) ? 'Full sun' : 'Partial shade';
             const matchesSun = (!sun || sun === item.sun_exposure) ? true : false;
             //console.log(`Garden => ${item.name} sun: ${sun} ?? item: ${item.sun_exposure} matchesPlanted: ${matchesSun}`)
@@ -153,6 +141,28 @@ const Garden = () => {
             return matchesSun && matchesSearch && matchesMonth && matchesPlanted && (matchesSoil || selectedSoil === '') && (matchesFertilizer || selectedFertilizer === '');
         })
             .sort((a, b) => sortOrder === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
+    }, [crops, planted, search, selectedFertilizer, selectedMonth, selectedSoil, sortOrder, sun]);
+
+    const currentFertilizers = useMemo(() => {
+        if (!filteredVegetables) {
+            return null;
+        }
+        const extractFertilizers = (data) => {
+            const fertilizersSet = new Set();
+            data.forEach((plant) => {
+                if (plant.fertilizer) {
+                    const ingredients = plant.fertilizer
+                        .split(/ and | or /)
+                        .map((entry) => entry.trim());
+                    ingredients.forEach((ingredient) => fertilizersSet.add(ingredient.toLocaleLowerCase().replace(' fertilizer', '')));
+                }
+            });
+            return Array.from(fertilizersSet);
+        };
+        return extractFertilizers(filteredVegetables);
+    }, [filteredVegetables]);
+
+    const fertilized = currentFertilizers ? currentFertilizers.map(() => false) : [];
 
     const getFertilizerCheckBox = (fertilizer, index) => <input
         id={`${fertilizer}`}

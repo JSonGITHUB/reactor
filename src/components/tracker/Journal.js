@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import icons from '../site/icons';
-import getKey from '../utils/KeyGenerator';
 import EditableTextField from '../utils/EditableTextField';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
 import validate from '../utils/validate';
@@ -45,6 +44,24 @@ const Journal = ({
         isCollapsed: false
     };
 
+    const normalizeGoals = (value) => {
+        if (!Array.isArray(value)) return [];
+        return value
+            .map(item => {
+                if (Array.isArray(item)) {
+                    return { goal: item[0] ?? '', completed: Boolean(item[1]) };
+                }
+                if (typeof item === 'string') {
+                    return { goal: item, completed: false };
+                }
+                if (item && typeof item === 'object') {
+                    return { goal: item.goal ?? '', completed: Boolean(item.completed) };
+                }
+                return null;
+            })
+            .filter(Boolean);
+    };
+
     // Ensure journal fields are initialized
     useEffect(() => {
         const newJournals = [...journals];
@@ -71,36 +88,36 @@ const Journal = ({
         if (validate(selectedNewJournal.todaysGoals) === null) {
             selectedNewJournal.todaysGoals = [];
             dataUpdated = true;
-        } else if (typeof selectedNewJournal.todaysGoals === 'string') {
-            selectedNewJournal.todaysGoals = [selectedNewJournal.todaysGoals];
-            dataUpdated = true;
+        } else {
+            const normalized = normalizeGoals(selectedNewJournal.todaysGoals);
+            if (JSON.stringify(normalized) !== JSON.stringify(selectedNewJournal.todaysGoals)) {
+                selectedNewJournal.todaysGoals = normalized;
+                dataUpdated = true;
+            }
         }
         if (validate(selectedNewJournal.futureGoals) === null) {
             selectedNewJournal.futureGoals = [];
             dataUpdated = true;
-        } else if (typeof selectedNewJournal.futureGoals === 'string') {
-            selectedNewJournal.futureGoals = [selectedNewJournal.futureGoals];
-            dataUpdated = true;
+        } else {
+            const normalized = normalizeGoals(selectedNewJournal.futureGoals);
+            if (JSON.stringify(normalized) !== JSON.stringify(selectedNewJournal.futureGoals)) {
+                selectedNewJournal.futureGoals = normalized;
+                dataUpdated = true;
+            }
         }
         if (validate(selectedNewJournal.gratefulFor) === null) {
             selectedNewJournal.gratefulFor = '';
             dataUpdated = true;
         }
         if (dataUpdated) setJournals(newJournals);
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (journals !== undefined && journals.length > 0) {
-            //console.log(`Journal => useEffect => journals[${journalIndex}].isCollapsed: ${journals[journalIndex].isCollapsed}`);
-            //console.log(`Journal => useEffect => journals[${journalIndex}].isCollapsed: ${journals[journalIndex].isCollapsed}`);
-            console.log(`Journal => useEffect => journals[${journalGroupIndex}].isCollapsed: ${JSON.stringify(journals[journalGroupIndex].isCollapsed, null, 2)}`);
             localStorage.setItem('journalTracking', JSON.stringify(journals));
         }
     }, [journals]);
     useEffect(() => {
         if (editedFeelings !== undefined && editedFeelings.length > 0) {
-            //console.log(`Journal => useEffect => journals[${journalIndex}].isCollapsed: ${journals[journalIndex].isCollapsed}`);
-            //console.log(`Journal => useEffect => journals[${journalIndex}].isCollapsed: ${journals[journalIndex].isCollapsed}`);
-            console.log(`Journal => useEffect => editedFeelings: ${editedFeelings}`);
         }
     }, [editedFeelings]);
 
@@ -112,29 +129,27 @@ const Journal = ({
         selectedNewJournal.isCollapsed = !isCollapsed;
         localStorage.setItem('journalTracking', JSON.stringify(newJournals));
         //setJournals(newJournals);
-    }, [isCollapsed]);
+    }, [isCollapsed]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Toggle edit helpers
     //toggleEdit = (editFeelings, setEditFeelings, editedFeelings, setEditedFeelings, journal.feelings, 'feelings')
     const toggleEdit = (editState, setEditState, value, setValue, field, updateField) => {
         const toggled = (editState === undefined) ? true : !editState;
-        console.log(`Journal => toggleEdit => toggled: ${toggled}`);
-        console.log(`Journal => toggleEdit => editState: ${editState}`);
-        console.log(`Journal => toggleEdit => setEditState: ${setEditState}`);
-        console.log(`Journal => toggleEdit => value: ${value}`);
-        console.log(`Journal => toggleEdit => setValue: ${setValue}`);
-        console.log(`Journal => toggleEdit => field: ${field}`);
-        console.log(`Journal => toggleEdit => updateField: ${updateField}`);
         setEditState(toggled);
         setValue(toggled ? value : '');
         if (!toggled && value !== field) {
-            console.log(`Journal => toggleEdit => field: ${JSON.stringify(field, null, 2)} editFeelings: ${editFeelings} editedFeelings: ${editedFeelings} value: ${value}`);
-            console.log(`Journal => toggleEdit => field: ${JSON.stringify(field, null, 2)} editJournal: ${editJournal} editedJournal: ${editedJournal} value: ${value}`);
 
             const newJournals = [...journals];
-            const selectedNewJournal = newJournals[journalGroupIndex].journal[(journals.length - journalIndex)];
+            if (!newJournals[journalGroupIndex] || !Array.isArray(newJournals[journalGroupIndex].journal)) {
+                console.warn('toggleEdit: journal group or journal list missing');
+                return;
+            }
+            const selectedNewJournal = newJournals[journalGroupIndex].journal[journalIndex];
+            if (!selectedNewJournal) {
+                console.warn('toggleEdit: selected journal missing');
+                return;
+            }
             selectedNewJournal[updateField] = value;
-            console.log(`Journal => toggleEdit => selectedNewJournal[${updateField}]: ${JSON.stringify(selectedNewJournal[updateField], null, 2)}`);
             setJournals(newJournals);
         }
     };
@@ -146,7 +161,7 @@ const Journal = ({
         const newGoal = prompt(`Add a ${title.toLowerCase().replace('goals','goal')}:`, '');
         if (newGoal) {
             const goalArray = title.toLowerCase().includes('today') ? 'todaysGoals' : 'futureGoals';
-            selectedNewJournal[goalArray].push([newGoal, false]);
+            selectedNewJournal[goalArray].push({ goal: newGoal, completed: false });
             setJournals(newJournals);
         }
     };
@@ -167,7 +182,6 @@ const Journal = ({
         newJournals[journalGroupIndex].journal[journalIndex] = {...selectedNewJournal};
         //newJournals[journalGroupIndex].isCollapsed = false;
         //newJournals[journalGroupIndex].isCollapsed = false;
-        console.log(`Journal => toggleCheckbox => newJournals[${journalGroupIndex}].isCollapsed: ${newJournals[journalGroupIndex].isCollapsed}`);
         setJournals(newJournals);
     };
 
@@ -222,8 +236,8 @@ const Journal = ({
 
     // UI helpers
     const journalHeader = (title, toggleFunction, isEdit) => (
-        <div className='flexContainer containerBox bg-lite centerVertical'>
-            <div className='containerBox p-20 flex2Column color-yellow'>{title}</div>
+        <div className='flexContainer containerDetail bg-lite centerVertical'>
+            <div className='containerDetail p-20 flex2Column color-yellow'>{title}</div>
             <div className='flexContainer contentRight'>
                 {title.toLowerCase().includes('goal') ? (
                     <div
@@ -253,67 +267,78 @@ const Journal = ({
         </div>
     );
 
-    const journalField = (isEdit, setEdited, edited, data, toggleEdit, category) => (
-        <div key={getKey(category)}>
-            <div className='color-soft button'>
-                {
-                    isEdit 
-                    ? <textarea
+    const journalField = (isEdit, setEdited, edited, data, toggleEdit, category) => {
+        const renderJournalContent = () => {
+            if (isEdit) {
+                return (
+                    <textarea
                         className='inputField size20 r-10 height-200 p-20'
                         onChange={e => setEdited(e.target.value)}
                         value={edited !== null ? edited : ifUndefinedArray(data)}
                         placeholder={edited}
                     />
-                    : typeof data === 'string' 
-                        ? <div onClick={toggleEdit}>
-                            {ifUndefinedArray(data).split('\n').map((line, index) => (
-                                <React.Fragment key={getKey(`data${index}`)}>
-                                    {line}
-                                    <br />
-                                </React.Fragment>
-                            ))}
-                        </div>
-                        :  data.map((goal, index) => (
-                            <div key={getKey(`goal${index}`)} className={`containerBox flexContainer centerVertical ${(goal.completed) ?'bg-lite':'bg-lite'}`}>
-                                <div className='flexColumn contentRight'>
-                                    <div
-                                        key={getKey(`goalToggle${index}`)}
-                                        title='toggle checkbox'
-                                        className='containerBox bg-lite p-20 button'
-                                        onClick={() => {toggleCheckbox(category, index)}}
-                                    >
-                                        <input
-                                            id='completed'
-                                            name='completed'
-                                            className='regular-checkbox button'
-                                            //checked={goal.completed}
-                                            checked={journals[journalGroupIndex].journal[journalIndex][category][index].completed}
-                                            type='checkbox'
-                                            //onChange={() => console.log(`goal: ${JSON.stringify(goal, null, 2)}`)}
-                                            readOnly
-                                        />
-                                    </div>
-                                </div>
-                                <div className='containerBox flex2Column p-20'>
-                                    <div
-                                        title={goal && goal.goal ? String(goal.goal) : ''}
-                                        onClick={() => {
-                                            // Defensive: Only call editGoal if goal exists
-                                            if (goal) editGoal(category, index);
-                                        }}
-                                    >
-                                        {goal && goal.goal
-                                        ? `${index + 1}. ${journals[journalGroupIndex].journal[journalIndex][category][index].goal}`
-                                        : `${index + 1}. (empty goal)`
-                                        }
-                                    </div>
-                                </div>
+                );
+            }
+            if (typeof data === 'string') {
+                return (
+                    <div onClick={toggleEdit}>
+                        {ifUndefinedArray(data).split('\n').map((line, index) => (
+                            <React.Fragment key={`journal-data-${journalGroupIndex}-${journalIndex}-${category}-${index}`}>
+                                {line}
+                                <br />
+                            </React.Fragment>
+                        ))}
+                    </div>
+                );
+            }
+            if (Array.isArray(data)) {
+                return data.map((goal, index) => (
+                    <div key={`journal-goal-${journalGroupIndex}-${journalIndex}-${category}-${index}-${String(goal?.goal || 'goal')}`} className={`containerDetail flexContainer centerVertical ${(goal.completed) ?'bg-lite':'bg-lite'}`}>
+                        <div className='flexColumn contentRight'>
+                            <div
+                                key={`journal-goal-toggle-${journalGroupIndex}-${journalIndex}-${category}-${index}`}
+                                title='toggle checkbox'
+                                className='containerDetail bg-lite p-20 button'
+                                onClick={() => {toggleCheckbox(category, index)}}
+                            >
+                                <input
+                                    name='completed'
+                                    className='regular-checkbox button'
+                                    //checked={goal.completed}
+                                    checked={journals[journalGroupIndex].journal[journalIndex][category][index].completed}
+                                    type='checkbox'
+                                    readOnly
+                                />
                             </div>
-                        )
-                )}
+                        </div>
+                        <div className='containerDetail flex2Column p-20'>
+                            <div
+                                title={goal && goal.goal ? String(goal.goal) : ''}
+                                onClick={() => {
+                                    // Defensive: Only call editGoal if goal exists
+                                    if (goal) editGoal(category, index);
+                                }}
+                            >
+                                {goal && goal.goal
+                                ? `${index + 1}. ${journals[journalGroupIndex].journal[journalIndex][category][index].goal}`
+                                : `${index + 1}. (empty goal)`
+                                }
+                            </div>
+                        </div>
+                    </div>
+                ));
+            }
+            return null;
+        };
+
+        return (
+            <div key={`journal-category-${journalGroupIndex}-${journalIndex}-${category}`}>
+                <div className='color-soft button'>
+                    {renderJournalContent()}
+                </div>
             </div>
-        </div>
-    );
+        );
+    };
 
     const closeDialog = () => {
         setGoalDialog(false);
@@ -355,7 +380,7 @@ const Journal = ({
                                 value={editedJournalTitle !== null ? editedJournalTitle : journal.description}
                                 placeholder={journal.description}
                             />
-                            : <div className='containerBox bg-lite centerVertical p-20 bold'>
+                            : <div className='containerDetail bg-lite centerVertical p-10 bold'>
                                 <CollapseToggleButton
                                     title={journal.description}
                                     isCollapsed={isCollapsed}
@@ -377,7 +402,7 @@ const Journal = ({
                     )}
                 </div>
                 {!isCollapsed && (
-                    <div className='m-10 flexContainer contentRight'>
+                    <div className='m-5 flexContainer contentRight'>
                         <div
                             title='delete'
                             className='r-10 p-10 bg-lite button ml-10'
@@ -398,8 +423,8 @@ const Journal = ({
                         setEdited={setEditedJournal}
                         edited={editedJournal}
                     />
-                    <div className='flexContainer containerBox bg-lite centerVertical'>
-                        <div className='containerBox flex2Column color-yellow p-20'>
+                    <div className='flexContainer containerDetail bg-lite centerVertical'>
+                        <div className='containerDetail flex2Column color-yellow p-20'>
                             I am...
                         </div>
                         <div className='r-10 p-10 bg-lite button color-lite centeredContent'>
@@ -420,7 +445,7 @@ const Journal = ({
                             </div>
                         </div>
                     </div>
-                    <div className='containerBox p-20 color-soft button'>
+                    <div className='containerDetail p-20 color-soft button'>
                         {
                             (editFeelings) 
                             ? <textarea
@@ -453,9 +478,9 @@ const Journal = ({
                     {journalField(editTodaysGoals, setEditedTodaysGoals, editedTodaysGoals, journal.todaysGoals, () => toggleEdit(editTodaysGoals, setEditTodaysGoals, editedTodaysGoals, setEditedTodaysGoals, journal.todaysGoals, 'todaysGoals'), 'todaysGoals')}
                     {journalHeader('Goals for the future:', () => toggleEdit(editFutureGoals, setEditFutureGoals, editedFutureGoals, setEditedFutureGoals, journal.futureGoals, 'futureGoals'), editFutureGoals)}
                     {journalField(editFutureGoals, setEditedFutureGoals, editedFutureGoals, journal.futureGoals, () => toggleEdit(editFutureGoals, setEditFutureGoals, editedFutureGoals, setEditedFutureGoals, journal.futureGoals, 'futureGoals'), 'futureGoals')}
-                    <div className='containerBox bg-lite'>
+                    <div className='containerDetail bg-lite'>
                         <div className='flexContainer centerVertical'>
-                            <div className='containerBox p-20 flex2Column color-yellow'>I am grateful for...</div>
+                            <div className='containerDetail p-20 flex2Column color-yellow'>I am grateful for...</div>
                             <div className='flexColumn contentRight'>
                                 <div
                                     title={editGratefulFor ? 'save' : 'edit'}
@@ -470,7 +495,7 @@ const Journal = ({
                             </div>
                         </div>
                     </div>
-                    <div className='containerBox'>
+                    <div className='containerDetail'>
                         <div className='color-soft button'>
                             {editGratefulFor ? (
                                 <textarea

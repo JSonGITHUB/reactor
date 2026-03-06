@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import getKey from '../utils/KeyGenerator';
 import initTask from './initTask';
 import icons from '../site/icons';
 import getTotalTime from '../utils/getTotalTime';
@@ -7,6 +6,7 @@ import Task from './Task';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
 import initSession from './initSession';
 import { currentTime, currentDate } from '../utils/CurrentCalendar';
+import Group from './Group';
 
 const TaskGroup = ({
 
@@ -21,7 +21,6 @@ const TaskGroup = ({
 }) => {
 
     const [collapsed, setCollapsed] = useState(taskGroup.isCollapsed);
-    //console.log(`TaskGroup => tasks: ${JSON.stringify(tasks, null, 2)}`)
 
     useEffect(() => {
         const newTasks = [...tasks];
@@ -33,11 +32,9 @@ const TaskGroup = ({
         } else {
             localStorage.setItem('taskTracking', dataToString);
         }
-    }, [collapsed]);
+    }, [collapsed, index, tasks, tracking]);
     
     useEffect(() => {
-        //console.log(`TaskGroup => tasks: ${JSON.stringify(tasks, null, 2)}`)
-        //console.log(`TaskGroup => taskGroup: ${JSON.stringify(taskGroup, null, 2)}`)
     }, []);
 
     const addTask = (index) => {
@@ -50,22 +47,19 @@ const TaskGroup = ({
             const updatedTasks = [...tasks];
             updatedTasks[index].tasks.unshift(task);
             updatedTasks[index].isCollapsed = false;
-            updatedTasks.map((project, projectIndex) => {
-                return {
-                    ...project,
-                    totalTime: getProjectTotalTime(project)
-                };
-            })
+            updatedTasks.forEach((project) => {
+                project.totalTime = getProjectTotalTime(project);
+            });
             setTasks(updatedTasks);
         }
     };
-    return <div key={getKey(`${taskGroup.description}${index}`)} className='m-5'>
+    return <div key={`task-group-${index}-${String(taskGroup?.description || 'group')}`} className='m-5'>
                 <div className='containerDetail bg-lite'>
                     <div className='centerVertical'>
                         <div className='containerDetail color-yellow bg-tinted size25'>
                             <CollapseToggleButton
                                 title={`${taskGroup.description}`}
-                                description={`${getTotalTime(taskGroup.totalTime)}`}
+                                description={`${String(taskGroup.createdDate).split(', ')[0]}`}
                                 isCollapsed={collapsed}
                                 setCollapse={setCollapsed}
                                 align='left'
@@ -73,11 +67,13 @@ const TaskGroup = ({
                         </div>
                     </div>
                     {
-                        (collapsed)
+                        (!collapsed)
                         ? null
-                        : <div className='flexContainer'>
+                        : <div className='flexContainer mb-5'>
                             <div className='containerDetail flex2Column color-lite contentLeft pl-20 pt-10 mt-5 mr-5'>
-                                <div className=''>{String(taskGroup.createdDate).split(', ')[0]}</div>
+                                <div className=''>
+                                    {getTotalTime(taskGroup.totalTime)}
+                                </div>
                             </div>
                             <div className='flex2Column'>
                                 <div className='flexContainer'>
@@ -102,14 +98,20 @@ const TaskGroup = ({
                     <div>
                     {
                         (collapsed)
-                        ? null
+                        ? <Group 
+                            tasks={taskGroup.tasks}
+                            setTasks={setTasks}
+                            taskGroup={taskGroup}
+                            index={index}
+                            tracking={tracking}
+                          />
                         : <div className=''>
                             {taskGroup.tasks.map((task, taskIndex) => (
                             (!task.display || (task.display && task.display === true))
-                                ? <div key={getKey(`Task${taskIndex}`)} className='containerDetail lowerBorder mt-5 size20 bg-lite'>
+                                ? <div key={`task-${index}-${taskIndex}-${String(task?.description || 'task')}`} className='containerDetail lowerBorder mt-5 size20 bg-lite'>
                                     <Task
-                                        projects={tasks}
-                                        setProjects={setTasks}
+                                        tasks={tasks}
+                                        setTasks={setTasks}
                                         taskIndex={taskIndex}
                                         task={task}
                                         projectIndex={index}

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import getKey from '../utils/KeyGenerator';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
 import Selector from '../forms/FunctionalSelector';
-import initializeData from '../utils/InitializeData';
 
 const DebtCollector = () => {
 
@@ -138,15 +137,6 @@ const DebtCollector = () => {
             )
         );
     };
-    const addDuesNote = (id, note) => {
-        setDues(
-            dues.map((due) =>
-                due.id === id
-                    ? { ...due, note: [...due.note, note] }
-                    : due
-            )
-        );
-    };
     const editNote = (id, index, note) => {
         console.log(`DebtCollector => editNote => note: ${note}`);
         setDebts(
@@ -159,21 +149,6 @@ const DebtCollector = () => {
                             : debt.note.map((n, i) => (i === index ? note : n))
                     }
                     : debt
-            )
-        );
-    };
-    const editDuesNote = (id, index, note) => {
-        console.log(`DebtCollector => editDuesNote => note: ${note}`);
-        setDues(
-            dues.map((due) =>
-                due.id === id
-                    ? {
-                        ...due,
-                        note: note === ''
-                            ? due.note.filter((_, i) => i !== index)
-                            : due.note.map((n, i) => (i === index ? note : n))
-                    }
-                    : due
             )
         );
     };

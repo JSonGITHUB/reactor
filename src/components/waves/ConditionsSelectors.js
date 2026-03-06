@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import WindSelector from './wind/WindSelector.js';
 import TideSelector from './tide/TideSelector.js';
 import SwellSelector from './SwellSelector.js';
@@ -12,6 +12,8 @@ const ConditionsSelectors = ({
     tideDisplay
 }) => {
 
+    const distanceInputIdRef = useRef(null);
+
     const {
         status,
         handleStarSelection,
@@ -19,6 +21,10 @@ const ConditionsSelectors = ({
     } = useContext(OceanContext);
 
     const refresh = () => window.location.pathname = '/reactor/Waves';
+    if (distanceInputIdRef.current === null) {
+        distanceInputIdRef.current = `distance-${Math.random().toString(36).slice(2, 10)}`;
+    }
+    const distanceInputId = distanceInputIdRef.current;
     const getLocalData = (localItem) => initializeData(localItem, null);
     const collapseStateInit = (localItem) => getLocalData(localItem) ? getLocalData(localItem) === 'true' : true;
     const [conditionsCollapse, setConditionsCollapse] = useState(collapseStateInit('conditionsCollapse'));
@@ -27,31 +33,31 @@ const ConditionsSelectors = ({
         localStorage.setItem('conditionsCollapse', conditionsCollapse);
     }, [conditionsCollapse]);
 
-    const starSelector = (stars) => <div className='containerBox flex2Column mt-5' >
-        <div className='containerBox bg-lite'>
+    const starSelector = (stars) => <div className='containerDetail m-5 flex2Column size20' >
+        <div className='containerDetail bg-lite color-yellow contentLeft p-10'>
             Match
         </div>
-        <div className='size20 width-auto mr-10'>
+        <div className='width--5 mt--5'>
             <Selector
                 groupTitle='Matches'
                 selected={stars}
                 label='Quality'
                 items={[0, 1, 2, 3, 4, 5]}
                 onChange={handleStarSelection}
-                fontSize='20'
+                fontSize='30'
                 padding='5px'
                 width='93%'
             />
         </div>
     </div>
-    const milesInput = (distance) => <div className='containerBox flex2Column mt-5'>
-        <label>
-            <div className='containerBox bg-lite'>
+    const milesInput = (distance) => <div className='containerDetail m-5 flex2Column size20'>
+        <label htmlFor={distanceInputId}>
+            <div className='containerDetail bg-lite color-yellow contentLeft p-10'>
                 Miles
             </div>
-            <input className='containerBox width--10'
-                id='distance'
-                name='distance'
+            <input className='containerDetail bg-dark p-10 color-lite mb-5 width--5 mt-5'
+                id={distanceInputId}
+                name={distanceInputId}
                 type='number'
                 value={isNaN(Number(distance) || distance === '' || Number(distance) < 1) ? 10 : Number(distance)}
                 onChange={handleDistanceSelection}
@@ -60,7 +66,7 @@ const ConditionsSelectors = ({
     </div>
 
     return <div>
-        <div className='containerDetail mb-5 mt-5 size20 bold color-yellow bg-lite p-20'>
+        <div className='containerDetail mb-5 mt-5 size20 color-yellow bg-lite p-20'>
             <CollapseToggleButton
                 title={`${icons.save} Select Conditions`}
                 isCollapsed={conditionsCollapse}
@@ -71,15 +77,15 @@ const ConditionsSelectors = ({
         {
             (conditionsCollapse)
                 ? <div></div>
-                : <div className='containerBox'>
+                : <div className=''>
                     <div className='flexContainer'>
                         <SwellSelector
-                            id='1'
+                            id={String(1)}
                             swellDirection={status.swell1Direction}
                         >
                         </SwellSelector>
                         <SwellSelector
-                            id='2'
+                            id={String(2)}
                             swellDirection={status.swell2Direction}
                         >
                         </SwellSelector>

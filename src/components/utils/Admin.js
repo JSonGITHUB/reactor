@@ -130,9 +130,11 @@ const Admin = () => {
 
     const handleView = () => {
         const storedData = initializeData(key, null);
-        let allData = [];
         if (key === '*') {
-             allData = localStorage;
+              const allData = Object.fromEntries(Object.entries(localStorage));
+              setMessage(null);
+              setData(JSON.stringify(allData, null, 2));
+              return;
         }
         const startsWithBracket = (str) => String(str).charAt(0) === '[' || String(str).charAt(0) === '{';
         if (storedData) {
@@ -237,7 +239,9 @@ const Admin = () => {
                             onChange={handleKeyChange}
                         >
                             {
-                                localDataItems.map((key) => <option value={key}>{key}</option>)
+                                localDataItems.map((itemKey, index) => (
+                                    <option key={`${itemKey}-${index}`} value={itemKey}>{itemKey}</option>
+                                ))
                             }
                         </select>
                         <div className='flexContainer'>

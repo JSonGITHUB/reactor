@@ -22,24 +22,14 @@ const TimerDisplay = ({
     useEffect(() => {
         if (timerWorker !== null) {
             timerWorker.onmessage = (event) => {
-                const currentElapsedTime = () => {
-                    const elapsedTime = Number(seconds) + Number(event.data);
-                    return elapsedTime;
-                }
-                const newTime = currentElapsedTime();
-                console.log(`message: ${event.data} newTime/seconds: ${newTime}`)
-                setSeconds(newTime);
+                setSeconds((prevSeconds) => {
+                    const newTime = Number(prevSeconds) + Number(event.data);
+                    console.log(`message: ${event.data} newTime/seconds: ${newTime}`);
+                    return newTime;
+                });
             }
         }
     }, [timerWorker]);
-
-    useEffect(() => {
-        if (isActive) {
-        } else {
-            console.log(`seconds: ${seconds}`)
-        }
-        
-    }, [isActive]);
     
     useEffect(() => {
         console.log(`totalTime: ${totalTime}`);
@@ -47,7 +37,7 @@ const TimerDisplay = ({
         const minutes = Number(timeArray[0])*60;
         const seconds = Number(timeArray[1]);
         setSeconds(minutes+seconds)
-    }, []);
+    }, [totalTime]);
 
     const startTimer = () => {
         if (validate(Worker) !== null) {

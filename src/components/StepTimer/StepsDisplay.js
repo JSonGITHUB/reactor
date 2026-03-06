@@ -215,7 +215,7 @@ const StepsDisplay = React.memo(() => {
                 ? null
                 : <div className='containerBox'>
                     <input
-                        id='newStep'
+                        id='steptimer-stepsdisplay-newStep'
                         name='newStep'
                         type='text'
                         placeholder='Description'
@@ -234,7 +234,7 @@ const StepsDisplay = React.memo(() => {
                     />
                 */}
                     <input
-                        id='hours'
+                        id='steptimer-stepsdisplay-hours'
                         name='hours'
                         type='number'
                         placeholder='Hours'
@@ -243,7 +243,7 @@ const StepsDisplay = React.memo(() => {
                         className='containerBox width-100-percent'
                     />
                     <input
-                        id='minutes'
+                        id='steptimer-stepsdisplay-minutes'
                         name='minutes'
                         type='number'
                         placeholder='Minutes'
@@ -252,7 +252,7 @@ const StepsDisplay = React.memo(() => {
                         className='containerBox width-100-percent'
                     />
                     <input
-                        id='seconds'
+                        id='steptimer-stepsdisplay-seconds'
                         name='seconds'
                         type='number'
                         placeholder='Seconds'

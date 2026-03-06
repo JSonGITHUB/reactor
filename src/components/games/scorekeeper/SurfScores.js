@@ -8,15 +8,12 @@ import CountdownTimer from './CountdownTimer';
 import CollapseToggleButton from '../../utils/CollapseToggleButton';
 import { PlayerContext } from '../../context/PlayerContext';
 import ScoreBoard from './ScoreBoard';
-import initializeData from '../../utils/InitializeData';
 import jerseyColors from './JerseyColors';
 
 const SurfScores = ({ 
     heatLength, 
     time,
     setTime,
-    newHeatTimer,
-    setSurfScore, 
     recordHeatScores,
     priorityCollapse, 
     setPriorityCollapse,
@@ -31,18 +28,16 @@ const SurfScores = ({
     
     //const [timerOn, setTimerOn] = useState(false);
     const [timesUp, setTimesUp] = useState(false);
-    const [playerIdScored, setPlayerIdScored] = useState();
-    const [scoreIdScored, setScoreIdScored] = useState();
     const [scoreboardCollapse, setScoreboardCollapse] = useState(true);
 
     const getPriorityColor = (prio) => {
-        return players.map((player) => (player.surfPriority == prio)
+        return players.map((player) => (player.surfPriority === prio)
             ? jerseyColors[player.surfJerseyColor]
             : null
         )
     }
     const getPriorityAthlete = (prio) => {
-        return players.map((player, index) => (player.surfPriority == prio)
+        return players.map((player, index) => (player.surfPriority === prio)
             ? index
             : null
         )
@@ -67,8 +62,8 @@ const SurfScores = ({
     */
 
     useEffect(() => {
-        newHeatTimer();
-    }, [heatLength]);
+        setTime(heatLength * 60);
+    }, [heatLength, setTime]);
     
     const getPlayers = () => {
         let index = 0;
@@ -116,13 +111,6 @@ const SurfScores = ({
                     </div>
                 </div>
         
-    const setNewScore = (playerId, scoreId) => {
-        const newScore = prompt(`Enter ${players[playerId].player || players[playerId].name}'s score for wave ${scoreId + 1}: `, '');
-        //setSurfScore(playerId, scoreId, newScore);
-        setSurfScore(newScore);
-        setPlayerIdScored(playerId);
-        setScoreIdScored(scoreId);
-    }
     const addNewScore = (playerId) => {
         const emptyScore = players[playerId].surfScores.indexOf('');
         const zeroScore = players[playerId].surfScores.indexOf(0);
@@ -132,10 +120,7 @@ const SurfScores = ({
             return
         }
         const scoreId = (zeroScore !== -1 && zeroScore < emptyScore) ? zeroScore : emptyScore;
-        const isPlayerRepeat = (playerIdScored === playerId) ? true : false;
-        const isScoreRepeat = (scoreIdScored === scoreId) ? true : false;
         const score = players[playerId].surfScores[scoreId];
-        //setNewScore(playerId, scoreId);
         getSurfScore(scoreId, playerId, score);
     }
         

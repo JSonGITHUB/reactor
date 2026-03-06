@@ -1,19 +1,19 @@
-import React, { useState, useRef } from 'react';
-import { useLogin } from './components/context/LoginContext';
+import React, { useState } from 'react';
 import FormNotes from './components/forms/FormEssay';
 //import Reservation from './components/forms/FormReservation';
 //import SignUpDialog from './components/utils/SignUpDialog';
 import debounce from './components/utils/Debouncer';
 import TradeView from './components/utils/TradeView';
-import Footer from './components/site/Footer';
 import Header from './components/site/Header';
 import Home from './components/Home';
-import NewTide from './components/waves/NewTide';
+
+import './assets/css/App.css';
 //import BowlBuilder from './components/BowlBuilder';
 import Sessions from './components/waves/Sessions';
 import Session from './components/waves/Session';
 import Waves from './components/waves/Waves';
 import Weather from './components/waves/Weather';
+import Dive from './components/waves/Dive';
 import Location from './components/waves/Location';
 import WindDirection from './components/waves/WindDirection';
 import Product from './components/shop/Product';
@@ -25,6 +25,8 @@ import StepManager from './components/StepManager';
 import Garden from './components/garden/Garden';
 import FishFinder from './components/fishing/FishFinder';
 import DebtCollector from './components/finance/DebtCollector';
+import WorkDay from './components/finance/WorkDay';
+import NaturalRX from './components/functional/NaturalRX';
 import Snippets from './components/utils/Snippets';
 import TideChart from './components/waves/tide/TideChart';
 import Buoys from './components/waves/SurfReports';
@@ -46,11 +48,16 @@ import GallonsCalculator from './components/utils/GallonsCalculator';
 import Admin from './components/utils/Admin';
 //import AIDashboard from './components/utils/AIDashboard';
 import Fuel from './components/utils/Fuel';
+import Parks from './components/Parks/Parks';
+import Moon from './components/utils/Moon';
+import PhotoAssistant from './components/utils/PhotoAssistant';
 import SoundBoard from './components/sound/SoundBoard';
 import TicTacToe from './components/games/tictactoe/TicTacToe';
 //import CrosswordPuzzle from './components/games/words/CrosswordPuzzle';
 import Currency from './components/converter/Currency';
 import Expenses from './components/expense/Expenses';
+import Interest from './components/finance/Interest';
+import Pay from './components/finance/Pay';
 import Budget from './components/expense/Budget';
 import Pricing from './components/expense/Pricing';
 import Converter from './components/converter/Converter';
@@ -59,15 +66,18 @@ import Expense529 from './components/tracker/Expense529';
 import Notes from './components/tracker/Notes';
 import Tasks from './components/tracker/Tasks';
 import Sets from './components/tracker/Sets';
-import Events from './components/tracker/Events';
+//import Events from './components/tracker/Events';
 import Charges from './components/tracker/Charges';
 import Links from './components/tracker/Links';
 import Cook from './components/tracker/Cook';
+import Ingredients from './components/tracker/Ingredients';
 import Train from './components/tracker/Train';
 import Journals from './components/tracker/Journals';
 import BusinessTax from './components/tracker/BusinessTax';
 import Scheduler from './components/tracker/Scheduler';
 import BlackJack from './components/games/Gamble/BlackJack';
+import Poker from './components/games/Poker';
+import Animation from './components/games/Gamble/Animation';
 import Checkers from './components/games/checkers/Checkers.jsx';
 import WheelOfFortune from './components/games/Gamble/WheelOfFortune';
 import Roulette from './components/games/Gamble/Roulette';
@@ -80,13 +90,10 @@ import Translator from './components/translator/Translator';
 import Accordion from './components/utils/Accordion';
 //import Weather from './components/weather/Weather';
 import Scores from './components/games/scorekeeper/Scores';
-import Calculator from './components/converter/Calculator';
 import Shop from './components/shop/Shop';
 import HomeManager from './components/Residential/HomeManager';
 import MusicPlayer from './components/music/Player';
-import history from './components/utils/history';
 import Fireworks from './components/legacy/Fireworks';
-import CountryContext from './components/context/CountryContext';
 import { Provider } from 'react-redux';
 import { store } from './redux/store';
 import { VotingForm } from './components/VotingForm';
@@ -110,20 +117,10 @@ const App = () => {
     const company = 'KFA';
     //let path = initializeData('path', window.location.pathname);
     let path = window.location.pathname;
-    const componentId = path.replace('/', '').toLocaleLowerCase();
-    const currentComponent = componentId;
-    //console.log(`App => componentId: ${componentId}`);
-    const setMotion = () => setState({ isMotionOn: !state.isMotionOn });
     const setSignIn = () => {
         console.log(`sssetSignIn ======> ${!state.isSignedIn}`);
         setState({
             isSignedIn: !state.isSignedIn,
-        });
-    };
-    const setCountry = (countryInitials) => {
-        console.log(`setCountry => ${countryInitials}`);
-        setState({
-            country: countryInitials
         });
     };
     const widthChanged = () => (window.innerWidth !== state.width ? true : false);
@@ -156,16 +153,6 @@ const App = () => {
         },
     ];
 
-    const components = {
-        surflog: <Session />,
-        //guestlist: <SignUpDialog title='Guest List' message='Sign up' />,
-        //reservation: <Reservation />,
-        note: <FormNotes className='mt-40' />,
-        tempconverter: <Calculator />,
-        //bowlbuilder: <BowlBuilder />,
-        home: <Home />,
-    };
-
     window.addEventListener('resize', debounce(setIt, 250));
     path = `/${window.location.pathname.split('/')[2]}`
     localStorage.setItem('path', path)
@@ -188,7 +175,6 @@ const App = () => {
     // eslint-disable-next-line
     const { width, height, isMotionOn, isSignedIn } = state;
     //console.log(`App => state.isSignedIn: ${state.isSignedIn}`);
-    const targetElementRef = useRef(null);
 
     return (
         //AppComponent();<ScrollToTop loc={window.location} />
@@ -212,7 +198,7 @@ const App = () => {
             >
                 <FocusManagerProvider>
                     <Provider store={store}>
-                        <Router basename={base} history={history}>
+                        <Router basename={base}>
 
                             <div className='App'>
                                 <Switch>
@@ -259,6 +245,12 @@ const App = () => {
                                             path='/Weather'
                                             render={(props) => (
                                                 <Weather />
+                                            )}
+                                        />
+                                        <Route
+                                            path='/Dive'
+                                            render={(props) => (
+                                                <Dive coreMetricsOnly={props.location.search.includes('core=true')} />
                                             )}
                                         />
                                         <Route
@@ -350,9 +342,21 @@ const App = () => {
                                             )}
                                         />
                                         <Route
-                                                path='/Collections'
+                                            path='/Collections'
                                             render={(props) => (
                                                 <DebtCollector />
+                                            )}
+                                        />
+                                        <Route
+                                            path='/WorkDay'
+                                            render={(props) => (
+                                                <WorkDay />
+                                            )}
+                                        />
+                                        <Route
+                                            path='/NaturalRX'
+                                            render={(props) => (
+                                                <NaturalRX />
                                             )}
                                         />
                                         <Route
@@ -392,17 +396,24 @@ const App = () => {
                                         <Route path='/Assessments' render={(props) => <Assessments />} />
                                         <Route path='/GallonsCalculator' render={(props) => <GallonsCalculator />} />
                                         <Route path='/Fuel' render={(props) => <Fuel />} />
+                                        <Route path='/Parks' render={(props) => <Parks />} />
+                                        <Route path='/Moon' render={(props) => <Moon standalone={true} />} />
+                                        <Route path='/PhotoAssistant' render={(props) => <PhotoAssistant />} />
                                         <Route path='/Sounds' render={(props) => <SoundBoard />} />
                                         <Route path='/TicTacToe' render={(props) => <TicTacToe />} />
                                         {/*<Route path='/CrosswordPuzzle' render={(props) => <CrosswordPuzzle />} />*/}
                                         <Route path='/Currency' render={(props) => <Currency />} />
                                         <Route path='/Expenses' render={(props) => <Expenses />} />
+                                        <Route path='/Interest' render={(props) => <Interest />} />
+                                        <Route path='/Pay' render={(props) => <Pay />} />
                                         <Route path='/Budget' render={(props) => <Budget />} />
                                         <Route path='/TradeView' render={(props) => <TradeView />} />
                                         <Route path='/Pricing' render={(props) => <Pricing />} />
                                         <Route path='/Converter' render={(props) => <Converter />} />
                                         <Route path='/Scheduler' render={(props) => <Scheduler />} />
                                         <Route path='/BlackJack' render={(props) => <BlackJack />} />
+                                        <Route path='/Poker' render={(props) => <Poker />} />
+                                        <Route path='/Animation' render={(props) => <Animation />} />
                                         <Route path='/Checkers' render={(props) => <Checkers />} />
                                         <Route path='/WheelOfFortune' render={(props) => <WheelOfFortune />} />
                                         <Route path='/Roulette' render={(props) => <Roulette />} />
@@ -411,10 +422,11 @@ const App = () => {
                                         <Route path='/Notes' render={(props) => <Notes />} />
                                         <Route path='/Tasks' render={(props) => <Tasks />} />
                                         <Route path='/Sets' render={(props) => <Sets />} />
-                                        <Route path='/Events' render={(props) => <Events />} />
+                                        {/*<Route path='/Events' render={(props) => <Events />} />*/}
                                         <Route path='/Charges' render={(props) => <Charges />} />
                                         <Route path='/Links' render={(props) => <Links />} />
                                         <Route path='/Cook' render={(props) => <Cook />} />
+                                        <Route path='/Ingredients' render={(props) => <Ingredients />} />
                                         <Route path='/Circuit' render={(props) => <Train />} />
                                         <Route path='/Journals' render={(props) => <Journals />} />
                                         <Route path='/BusinessTax' render={(props) => <BusinessTax />} />
@@ -437,8 +449,7 @@ const App = () => {
                                         <Route path='/Reducer' component={Reducer} />
                                     </Switch>
                                 </div>
-                                {
-                                /* 
+                                {/*
                                     <Switch>
                                         <CountryContext.Provider value={state.country}>
                                             <Footer
@@ -450,8 +461,7 @@ const App = () => {
                                             />
                                         </CountryContext.Provider>
                                     </Switch>
-                                */
-                                }                
+                                */}                
                                 </div>
                         </Router>
                     </Provider>

@@ -23,10 +23,7 @@ const Dominos = ({
     }
     const {
         players,
-        setPlayers,
-        edit,
-        editPlayer,
-        deletePlayer
+        setPlayers
     } = useContext(PlayerContext);
         
 
@@ -98,35 +95,10 @@ const Dominos = ({
         newScore = (newScore < 0) ? 0 : newScore;
         const newPlayers = initializeData('players', initPlayers);
         newPlayers[playerIndex].dominoScore = newScore;
-        if (newPlayers != []) {
+        if (newPlayers.length > 0) {
             setPlayers(newPlayers);
         }
         updateDominos();
-    }
-
-    const editNav = () => {
-        if (edit) {
-            return <div className='subIndex t-0 relative flexContainer color-yellow p-1 bg-dkGreen r-5 bold'>
-                <div className='flex3Column'></div>
-                <div className='flex3Column'>
-                    <div 
-                        title='edit'
-                        className='button color-green description r-5 p-5 m-5 bg-yellow' 
-                        onClick={() => editPlayer(playerIndex)}
-                    >
-                        EDIT
-                    </div>
-                    <div 
-                        title='delete'
-                        className='button color-red description r-5 p-5 m-5 bg-yellow' 
-                        onClick={() => deletePlayer(playerIndex)}
-                    >
-                        DELETE
-                    </div>
-                </div>
-                <div className='flex3Column'></div>
-            </div>
-        }
     }
     
     const stockClasses = 'r-10 m-1 color-yellow bold bg-darker';

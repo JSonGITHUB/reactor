@@ -1,22 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import menu from '../../assets/images/menuYellow.png';
 import fetchTimer from '../utils/FetchTimer';
 import initializeData from '../utils/InitializeData';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
 
+const DEFAULT_RATES = {
+    USD: 1,
+    MXN: 17.16,
+    DOP: 58.95,
+    NIO: 36.55,
+    CRC: 541.23,
+    IDR: 15045.30,
+    AUD: 1.50,
+};
+
 const ExchangeRatesConfig = ({ onExchangeRatesChange }) => {
 
-    const defaultRates = {
-        USD: 1,
-        MXN: 17.16,   // Mexican Peso
-        DOP: 58.95,   // Dominican Peso
-        NIO: 36.55,   // Nicaraguan Cordovas
-        CRC: 541.23,    // Costa Rican Colones
-        IDR: 15045.30,  // Indonesian Rupiah
-        AUD: 1.50,    // Australian Dollar
-    }
-
-    const [exchangeRates, setExchangeRates] = useState(defaultRates);
+    const [exchangeRates, setExchangeRates] = useState(DEFAULT_RATES);
     const [collapse, setCollapse] = useState(true);
 
     useEffect(() => {
@@ -42,11 +41,11 @@ const ExchangeRatesConfig = ({ onExchangeRatesChange }) => {
                 console.log(`data: ${JSON.stringify(data.rates, null, 2)}`);
 
                 setExchangeRates(data.rates);
-                onExchangeRatesChange(exchangeRates)
+                onExchangeRatesChange(data.rates);
             } catch (error) {
                 //console.error('Error fetching exchange rates:', error);
-                setExchangeRates(defaultRates);
-                onExchangeRatesChange(exchangeRates)
+                setExchangeRates(DEFAULT_RATES);
+                onExchangeRatesChange(DEFAULT_RATES);
             }
         };
         const isObjectEmpty = (obj) => Object.keys(obj).length === 0 && obj.constructor === Object;
@@ -56,15 +55,10 @@ const ExchangeRatesConfig = ({ onExchangeRatesChange }) => {
         
         if (!isObjectEmpty(currentExchangeRates) && (currentExchangeRates === savedExchangeRates)) {
             setExchangeRates(currentExchangeRates);
-            onExchangeRatesChange(exchangeRates);
+            onExchangeRatesChange(currentExchangeRates);
         }
 
-    }, []);
-
-    useEffect(() => {
-        localStorage.setItem('exchangeRates', JSON.stringify(exchangeRates));
-        onExchangeRatesChange(exchangeRates);
-    }, [exchangeRates]);
+    }, [onExchangeRatesChange]);
 
     useEffect(() => {
         localStorage.setItem('exchangeRates', JSON.stringify(exchangeRates));
@@ -81,7 +75,6 @@ const ExchangeRatesConfig = ({ onExchangeRatesChange }) => {
             ...prevState,
             [rate]: value
         }));
-        onExchangeRatesChange(exchangeRates);
     }
     const handleRateEnter = (e) => {
         console.log(`handleRateEnter:1 - key: ${e.key}`);

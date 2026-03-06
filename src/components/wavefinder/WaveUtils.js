@@ -12,39 +12,15 @@ const WaveUtils = ({
 }) => {
 
     const {
-        status,
-        setStatus,
-        setTide,
-        setWind,
-        setWindStatus,
-        handleTideCheck,
-        handleTideSelection,
-        handleWindCheck,
-        handleSwellCheck,
-        handleSwell1Selection,
-        handleSwell2Selection,
-        handleSwell1LiveSelection,
-        handleSwell2LiveSelection,
-        handleSwell1Angle,
-        handleSwell2Angle,
-        handleSwell1Height,
-        handleSwell2Height,
-        handleSwell1Interval,
-        handleSwell2Interval,
-        handleStarSelection,
-        handleDistanceSelection,
-        pause
+        status
     } = useContext(OceanContext);
 
     const {
         locations,
         setLocations,
-        currentWave,
-        setCurrentWave,
         handleResetLocations,
         handleEditToggle,
         edit,
-        setEdit,
         updateLocations
     } = useContext(WavesContext);
 
@@ -57,7 +33,6 @@ const WaveUtils = ({
     const deleteWave = (props) => {
         console.log(`deleteWave => locations: ${JSON.stringify(locations, null, 2)}`);
         const waveLocations = [...locations];
-        let index = 0;
 
         const filterOutSelected = () => {
             if (!Array.isArray(waveLocations)) {
@@ -73,47 +48,6 @@ const WaveUtils = ({
         //waveLocations.splice(index-1, 1);
         setLocations(filterOutSelected());
         updateLocations(filterOutSelected());
-    }
-    const editWaveSave = (location, index) => {
-        console.log(`editWaveSave => index: ${index}`)
-        const waveLocations = [...locations];
-        let swells = location.swell;
-        let winds = location.wind;
-        let tides = location.tide;
-        let i = 0;
-        let wave = prompt('wave: ', location.name);
-        let latitude = prompt('lat: ', location.latitude);
-        let longitude = prompt('long: ', location.longitude);
-        const swellCount = prompt('swell count: ', swells.length);
-        for (i = 0; i < swellCount; i++) {
-            swells[i] = prompt('edit swell direction', swells[i]).toLocaleUpperCase();
-        }
-        swells = swells.slice(0, swellCount);
-        const windCount = prompt('wind count: ', winds.length);
-        for (i = 0; i < windCount; i++) {
-            winds[i] = prompt('edit wind direction', winds[i]).toLocaleUpperCase();
-        }
-        winds = winds.slice(0, windCount);
-        const tideCount = prompt('tide count: ', tides.length);
-        for (i = 0; i < tideCount; i++) {
-            tides[i] = prompt('edit tide direction', tides[i]).toLocaleLowerCase();
-        }
-        tides = tides.slice(0, tideCount);
-        const getObj = () => {
-            return {
-                name: wave,
-                latitude: latitude,
-                longitude: longitude,
-                swell: swells,
-                wind: winds,
-                tide: tides
-            }
-        }
-        waveLocations[index] = getObj();
-        console.log(`editWaveSave => wave: ${wave} ${JSON.stringify(waveLocations[index], null, 2)}`)
-        localStorage.setItem('locations', JSON.stringify(waveLocations));
-        setLocations(waveLocations);
-        updateLocations(waveLocations);
     }
     const addASwell = (index) => {
         const newLocations = [...locations];

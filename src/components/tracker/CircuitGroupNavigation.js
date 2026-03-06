@@ -9,9 +9,7 @@ const CircuitGroupNavigation = ({
 }) => {
 
     const {
-        targetElementRef,
-        edit,
-        setEdit
+        targetElementRef
     } = useContext(CircuitContext);
 
     return <div className='containerBox'>

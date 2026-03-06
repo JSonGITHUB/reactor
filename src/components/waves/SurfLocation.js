@@ -21,20 +21,13 @@ const SurfLocation = ({
     const { /*edit, */windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, swell1Interval, swell2Interval, tide, stars } = state;
     // eslint-disable-next-line
     const [collapse, setCollapse] = useState(item.collapse);
-    const [showLabel, setShowLabel] = useState(false);
     const {
         locations,
-        setLocations,
-        currentWave,
-        setCurrentWave,
-        handleResetLocations,
-        handleEditToggle,
         edit,
-        setEdit,
         updateLocations
     } = useContext(WavesContext);
 
-    const [status, setStatus] = useState({
+    const [status] = useState({
         module: 'SurfLocation',
         logged: false,
         edit: edit,
@@ -58,53 +51,11 @@ const SurfLocation = ({
         const newLocations = [...locations];
         const index = newLocations.findIndex(location => location === item);
         newLocations[index].collapse = collapse;
-        //setLocations(newLocations)
         localStorage.setItem('locations', JSON.stringify(newLocations))
-    }, [collapse]);
+    }, [collapse, item, locations]);
 
     const style = {
         height: '50px'
-    }
-    const editWave = (location, index) => {
-        console.log(`editWaveSave => index: ${index}`)
-        const waveLocations = [...locations];
-        let swells = location.swell;
-        let winds = location.wind;
-        let tides = location.tide;
-        let i = 0;
-        let wave = prompt('wave: ', location.name);
-        let latitude = prompt('lat: ', location.latitude);
-        let longitude = prompt('long: ', location.longitude);
-        const swellCount = prompt('swell count: ', swells.length);
-        for (i = 0; i < swellCount; i++) {
-            swells[i] = prompt('edit swell direction', swells[i]).toLocaleUpperCase();
-        }
-        swells = swells.slice(0, swellCount);
-        const windCount = prompt('wind count: ', winds.length);
-        for (i = 0; i < windCount; i++) {
-            winds[i] = prompt('edit wind direction', winds[i]).toLocaleUpperCase();
-        }
-        winds = winds.slice(0, windCount);
-        const tideCount = prompt('tide count: ', tides.length);
-        for (i = 0; i < tideCount; i++) {
-            tides[i] = prompt('edit tide direction', tides[i]).toLocaleLowerCase();
-        }
-        tides = tides.slice(0, tideCount);
-        const getObj = () => {
-            return {
-                name: wave,
-                latitude: latitude,
-                longitude: longitude,
-                swell: swells,
-                wind: winds,
-                tide: tides
-            }
-        }
-        waveLocations[index] = getObj();
-        console.log(`editWaveSave => wave: ${wave} ${JSON.stringify(waveLocations[index], null, 2)}`)
-        localStorage.setItem('locations', JSON.stringify(waveLocations));
-        setLocations(waveLocations);
-        updateLocations(waveLocations);
     }
 
     const getCurrentWind = () => {
@@ -493,14 +444,6 @@ const SurfLocation = ({
                 : getLocationDetails
             }
         </div>
-
-    const transitionClass = `button ease`;
-
-    const handleTransitionEnd = () => {
-        if (!collapse) {
-            setShowLabel(true);
-        }
-    };
 
     return (
         <div 

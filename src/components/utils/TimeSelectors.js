@@ -1,8 +1,6 @@
 import React, { useState, useContext } from 'react';
 import Selector from '../forms/FunctionalSelector';
 import { CircuitContext } from '../context/CircuitContext';
-import initCircuitTracking from '../tracker/initCircuitTracking';
-import initializeData from '../tracker/initializeData';
 
 const TimeSelectors = ({
     circuitGroupIndex,
@@ -11,11 +9,8 @@ const TimeSelectors = ({
 
     const {
         circuits,
-        setCircuits,
         setExcersizeTime,
-        setRestTime,
-        edit,
-        setEdit
+        setRestTime
     } = useContext(CircuitContext);
 
     const totalTime = Number(circuits[circuitGroupIndex].circuits[circuitIndex].time);

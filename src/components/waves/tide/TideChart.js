@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import useCurrentTime from '../../utils/useCurrentTime';
 import TideGraph from './TideGraph';
 import validate from '../../utils/validate';
@@ -6,6 +6,7 @@ import icons from '../../site/icons';
 import moment from 'moment';
 import Spline from 'cubic-spline';
 import getKey from '../../utils/KeyGenerator';
+import Moon from '../../utils/Moon';
 
 const TideChart = () => {
 
@@ -19,8 +20,12 @@ const TideChart = () => {
     const tideStartTime = time[0].tideStartTime;
     const tideEndTime = time[0].tideEndTime;
 
-    const tideNowLink = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${tideStartTime}&end_date=${tideEndTime}&station=9410660&product=water_level&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
-    const significantTides = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=NOS.COOPS.TAC.WL&begin_date=${startTime}&end_date=${endTime}&datum=MLLW&station=9410230&time_zone=lst_ldt&units=english&interval=hilo&format=json`;
+    const tideNowLink = useMemo(() => (
+        `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${tideStartTime}&end_date=${tideEndTime}&station=9410660&product=water_level&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`
+    ), [tideStartTime, tideEndTime]);
+    const significantTides = useMemo(() => (
+        `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=NOS.COOPS.TAC.WL&begin_date=${startTime}&end_date=${endTime}&datum=MLLW&station=9410230&time_zone=lst_ldt&units=english&interval=hilo&format=json`
+    ), [startTime, endTime]);
     
     console.log(`TideChart => time: ${JSON.stringify(time, null, 2)}`);
     console.log(`TideChart => startTime: ${startTime} endTime: ${endTime}`);
@@ -35,7 +40,7 @@ const TideChart = () => {
     // &end_date=20240624%2017:30
     //&station=9410660&product=water_level&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json
 
-    const interpolateTides = (data, intervalMinutes = 1) => {
+    const interpolateTides = useCallback((data, intervalMinutes = 1) => {
         const times = data.map(point => moment(point.t, 'YYYY-MM-DD HH:mm').unix());
         const values = data.map(point => parseFloat(point.v));
 
@@ -60,7 +65,7 @@ const TideChart = () => {
         }
 
         return interpolatedData;
-    }
+    }, []);
     useEffect(() => {
 
         const fetchData = async () => {
@@ -83,7 +88,7 @@ const TideChart = () => {
             }
         };
         fetchData();
-    }, []);
+    }, [significantTides, interpolateTides]);
 
     useEffect(() => {
         localStorage.setItem('currentTide', currentTide[0]);
@@ -95,7 +100,7 @@ const TideChart = () => {
         hours = hours % 12 || 12; // Converts '0' or '12' to '12'
         return `${hours}:${minutes < 10 ? '0' + minutes : minutes} ${period}`;
     }
-    const getClosestValue = (data) => {
+    const getClosestValue = useCallback((data) => {
 
         const currentTime = new Date();
         let closest = null;
@@ -119,7 +124,7 @@ const TideChart = () => {
             lastHeight = Number(item.v);
         });
         return closest ? [Number(closest.v), direction] : [0, direction];
-    };
+    }, []);
 
     useEffect(() => {
         if (validate(tideChart) !== null) {
@@ -141,7 +146,7 @@ const TideChart = () => {
             fetchData();
 
         }
-    }, [tideChart]);
+    }, [tideChart, tideNowLink, getClosestValue]);
     const getNextTideIndex = () => {
         const predictions = tideNow.predictions;
         const currentTime = new Date();
@@ -198,6 +203,7 @@ const TideChart = () => {
                         })
                     }
                     </div>
+                    <Moon standalone={false} />
                     <div className='containerDetail p-10 mt-5'>
                         <a className='button size15' href="https://www.tide-forecast.com/tide/Bahia-de-Ballenas-Baja-California-Sur-Mexico" target="_blank" rel="noopener noreferrer">
                             {icons.buoys} Bahia-de-Ballenas-Baja-California-Sur-Mexico

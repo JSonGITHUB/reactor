@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import directionObject from '../waves/DirectionObject';
-import validate from '../utils/validate';
 import getKey from '../utils/KeyGenerator';
 import icons from '../site/icons';
 
@@ -16,10 +15,10 @@ const units = {
   Kelvin: ['Celsius', 'Fahrenheit'],
   // Currency
   Pesos: ['Dollars', 'Euros', 'Yen', 'Pounds'],
-  Dollars: ['Pesos', 'Euros', 'Yen', 'Pounds'],
-  Euros: ['Dollars', 'Pesos', 'Yen', 'Pounds'],
-  Yen: ['Dollars', 'Euros', 'Pesos', 'Pounds'],
-  Pounds: ['Dollars', 'Euros', 'Pesos', 'Yen'],
+  Dollars: ['Pesos', 'Euros', 'Yen', 'Pounds Sterling'],
+  Euros: ['Dollars', 'Pesos', 'Yen', 'Pounds Sterling'],
+  Yen: ['Dollars', 'Euros', 'Pesos', 'Pounds Sterling'],
+  'Pounds Sterling': ['Dollars', 'Euros', 'Pesos', 'Yen'],
   // Volume
   Gallons: ['Liters', 'Cups', 'Milliliters', 'Ounces', 'Quarts', 'Pints'],
   Quarts: ['Gallons', 'Liters', 'Cups', 'Milliliters', 'Ounces', 'Pints'],
@@ -175,7 +174,6 @@ const unitObjects = {
 };
 
 const directions = Object.keys(directionObject);
-const degrees = Object.values(directionObject);
 
 // --- Conversion Functions ---
 // ...existing code...
@@ -226,7 +224,7 @@ const conversionFactors = {
     if (toUnit === 'Pounds') return value / 196;
     return value;
   },
-  Pounds: (value, toUnit) => {
+  'Pounds Sterling': (value, toUnit) => {
     if (toUnit === 'Dollars') return value / 0.79;
     if (toUnit === 'Euros') return value / 0.85;
     if (toUnit === 'Pesos') return value * 25;
@@ -643,9 +641,13 @@ const Converter = () => {
   const [value1, setValue1] = useState('');
   const [value2, setValue2] = useState('');
 
+  const unit2Options = unitObjects[category]?.[unit1] || [];
+
   // Update units when category changes
   useEffect(() => {
-    const firstUnit = Object.keys(unitObjects[category])[0];
+    const categoryUnits = unitObjects[category] || {};
+    const firstUnit = Object.keys(categoryUnits)[0];
+    if (!firstUnit) return;
     setUnit1(firstUnit);
     setUnit2(units[firstUnit][0]);
     setValue1('');
@@ -746,7 +748,7 @@ const Converter = () => {
         </div>
         <div className='containerDetail flexContainer bg-lite'>
           <select className='containerDetail color-lite size20 flex2Column contentRight m-5' value={unit2} onChange={e => setUnit2(e.target.value)}>
-            {unitObjects[category][unit1].map((unit) => (
+            {unit2Options.map((unit) => (
               <option key={getKey(unit)} value={unit}>{unit}</option>
             ))}
           </select>

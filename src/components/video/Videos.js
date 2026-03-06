@@ -43,6 +43,7 @@ const Videos = () => {
               ✕
             </button>
             <iframe
+              title='Selected YouTube video'
               width='100%'
               height='400'
               src={`https://www.youtube.com/embed/${selectedVideo}`}

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import initializeData from './initializeData';
 import { newDate } from '../utils/Dates';
-import CollapseToggleButton from '../utils/CollapseToggleButton';
 import icons from '../site/icons';
 
 const categories = [
@@ -17,10 +16,10 @@ const categories = [
 
 const BusinessTax = () => {
     const today = () => newDate();
-    const [income, setIncome] = useState();
+    const [income, setIncome] = useState('');
     const [expenses, setExpenses] = useState([]);
     const [entry, setEntry] = useState({ date: today(), category: '', amount: '', notes: '' });
-    const [edit, setEdit] = useState({ date: today(), category: '', amount: '', notes: '' });
+    const [edit] = useState({ date: today(), category: '', amount: '', notes: '' });
     const [activeTab, setActiveTab] = useState('tracker');
     const [editIndex, setEditIndex] = useState();
     const [addCollapse, setAddCollapse] = useState(true);
@@ -28,9 +27,6 @@ const BusinessTax = () => {
     const handleChange = (e) => {
         const { name, id, value } = e.target;
         
-        console.log(`BusinessTax => handleChage => id: ${id}`);
-        console.log(`BusinessTax => handleChage => name: ${name}`);
-        console.log(`BusinessTax => handleChage => name: value: ${ value }`);
 
 
         if (name === 'income') {
@@ -74,19 +70,15 @@ const BusinessTax = () => {
     });
     useEffect(() => {
         const localIncome = initializeData('taxIncome', 0);
-        console.log(`BusinessTax => useEffect => localIncome: ${localIncome}`);
-        setIncome(localIncome);
+        setIncome(localIncome ?? '');
         const localExpenses = initializeData('taxExpenses', []);
         setExpenses(localExpenses);
         const localEditIndex = initializeData('taxEditIndex', null);
         setEditIndex(localEditIndex);
-        console.log(`BusinessTax => useEffect => today: ${JSON.stringify(today(),null,2)}`);
     }, []);
     useEffect(() => {
-        console.log(`BusinessTax => useEffect => entry: ${JSON.stringify(entry, null, 2)}`);
     }, [entry]);
     useEffect(() => {
-        console.log(`BusinessTax => useEffect => edit: ${JSON.stringify(edit, null, 2)}`);
     }, [edit]);
     useEffect(() => {
         localStorage.setItem('taxIncome', income);
@@ -98,10 +90,6 @@ const BusinessTax = () => {
         localStorage.setItem('taxEditIndex', editIndex);
     }, [editIndex]);
 
-    const isEven = (index) => {
-        return index % 2 === 0;
-    }
-    
     return (
         <div className='tax-tracker containerDetail mt--30'>
             <div className='containerDetail color-lite bg-dkGreen m-5 p-22 size30 contentLeft'>
@@ -137,7 +125,7 @@ const BusinessTax = () => {
                         <input
                             className='flex2Column containerDetail button w-100 m-5 p-10 color-lite'
                             name='income'
-                            value={income}
+                            value={income ?? ''}
                             onChange={handleChange}
                             placeholder={income || 0}
                         />
@@ -178,10 +166,10 @@ const BusinessTax = () => {
                                     value={entry.category} 
                                     onChange={handleChange} 
                                     placeholder='Category' 
-                                    list='category-list' 
+                                    list='category-list-add' 
                                 />
                             </div>
-                            <datalist id='category-list'>
+                            <datalist id='category-list-add'>
                                 {categories.map((c) => (
                                     <option key={c} value={c} />
                                 ))}
@@ -258,7 +246,7 @@ const BusinessTax = () => {
                                                         className='containerDetail button flex5Column m-5 p-10 color-lite width-100-percent' 
                                                         id={idx}
                                                         name='edit-date' 
-                                                        value={e.date} 
+                                                        value={e.date ?? ''} 
                                                         onChange={handleChange} 
                                                         placeholder='Date' 
                                                     />
@@ -275,10 +263,10 @@ const BusinessTax = () => {
                                                         className='containerDetail button flex5Column m-5 p-10 color-lite width-100-percent' 
                                                         id={idx}
                                                         name='edit-category' 
-                                                        value={e.category} 
+                                                        value={e.category ?? ''} 
                                                         onChange={handleChange} 
                                                         placeholder='Category' 
-                                                        list='category-list' 
+                                                        list='category-list-edit' 
                                                     />
                                             </div> 
                                         </div>
@@ -293,7 +281,7 @@ const BusinessTax = () => {
                                                     className='containerDetail button flex5Column m-5 p-10 color-lite width-100-percent' 
                                                     id={idx}
                                                     name='edit-amount' 
-                                                    value={Number(e.amount)} 
+                                                    value={e.amount ?? ''} 
                                                     onChange={handleChange} 
                                                     placeholder='Amount' 
                                                     type='number' 
@@ -311,14 +299,14 @@ const BusinessTax = () => {
                                                     className='containerDetail button flex5Column m-5 p-10 color-lite width-100-percent' 
                                                     id={idx}
                                                     name='edit-notes' 
-                                                    value={e.notes} 
+                                                    value={e.notes ?? ''} 
                                                     onChange={handleChange} 
                                                     placeholder='Notes' 
                                                 />
                                             </div>
                                         </div>
                                         <div className='input-row containerBox flexContainer'>
-                                            <datalist id='category-list'>
+                                            <datalist id='category-list-edit'>
                                                 {categories.map((c) => (
                                                     <option key={c} value={c} />
                                                 ))}

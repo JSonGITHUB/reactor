@@ -13,54 +13,17 @@ export default function Todos(props) {
     const [pausedTodos, setPausedTodos] = useState();
     const [edit, setEdit] = useState(false);
     const [add, setAdd] = useState(false);
-    const [timerOn, setTimerOn] = useState(false);
     const [paused, setPaused] = useState(false);
-    const storeIt = () => localStorage.setItem('todos', JSON.stringify(todos));
     const todoInput = () => document.getElementById('todo').value;
     const clearInput = () => document.getElementById('todo').value = '';
     const getNewTodo = (todo) => todo.charAt(0).toUpperCase() + todo.slice(1);
 
     useEffect(() => {
-        storeIt();
+        localStorage.setItem('todos', JSON.stringify(todos));
         console.log('TODOS CHANGED!!!!!!!!!!!!!!!!!!!!')
         //const timerActive = todos.some(obj => obj.activated);
         //setTimerOn(timerActive);
     }, [todos]);
-
-    useEffect(() => {
-        let intervalId;
-        if (timerOn) {
-            intervalId = setInterval(() => {
-                const newTodos = [...todos];
-                newTodos.map((todo) => {
-                    if (todo.activated) {
-                        if (todo.type === 'timer' && todo.currentTime > 0) {
-                            if (todo.currentTime === 0) {
-                                Sounds.siren();
-                            }
-                            return {
-                                ...todo,
-                                activated: (todo.currentTime === 0) ? false : todo.activated,
-                                completed: (todo.completed === 0) ? true : todo.completed,
-                                currentTime: (todo.currentTime === 0) ? todo.time : todo.currentTime - 1,
-                            }
-                        } else if (todo.type === 'track') {
-                            return {
-                                ...todo,
-                                currentTime: todo.currentTime + 1
-                            }
-                        }
-                    }
-                    return {
-                        ...todo
-                    }
-                });
-                setTodos(newTodos);
-                console.log(`tick`)
-            }, 1000);
-        }
-        return () => clearInterval(intervalId);
-    }, [timerOn]);
 
     const addTodo = () => {
         const newTodo = {
@@ -68,6 +31,8 @@ export default function Todos(props) {
             type: 'checkbox',
             time: 0,
             currentTime: 0,
+            counterValue: 0,
+            counterTarget: 0,
             activated: false,
             completed: false
         }
@@ -137,6 +102,65 @@ export default function Todos(props) {
         setAdd(false);
         Sounds.boop(0, 1);
     }
+    const counterTodo = (id) => {
+        console.log(`counter todo: ${todos[id].description}`);
+        const newTodos = [...todos];
+        newTodos[id].type = 'counter';
+        newTodos[id].counterValue = Number(newTodos[id].counterValue || 0);
+        newTodos[id].counterTarget = Number(newTodos[id].counterTarget || 0);
+        newTodos[id].time = 0;
+        newTodos[id].currentTime = 0;
+        setTodos(newTodos);
+        setEdit(false);
+        setAdd(false);
+        Sounds.boop(0, 1);
+    }
+    const setCounterTarget = (id) => {
+        const newTodos = [...todos];
+        const currentTarget = Number(newTodos[id].counterTarget || 0);
+        const updatedTarget = prompt('Enter counter target (0 clears target):', currentTarget);
+
+        if (updatedTarget === null) {
+            return;
+        }
+
+        const parsedTarget = Number(updatedTarget);
+        if (!Number.isFinite(parsedTarget) || parsedTarget < 0) {
+            return;
+        }
+
+        const normalizedTarget = Math.floor(parsedTarget);
+        newTodos[id].counterTarget = normalizedTarget;
+
+        const currentValue = Number(newTodos[id].counterValue || 0);
+        if (normalizedTarget > 0) {
+            newTodos[id].completed = currentValue >= normalizedTarget;
+        }
+
+        setTodos(newTodos);
+        Sounds.boop(0, 1);
+    }
+    const updateCounter = (id, delta) => {
+        const newTodos = [...todos];
+        const currentValue = Number(newTodos[id].counterValue || 0);
+        const nextValue = Math.max(0, currentValue + delta);
+        newTodos[id].counterValue = nextValue;
+
+        const targetValue = Number(newTodos[id].counterTarget || 0);
+        if (targetValue > 0) {
+            newTodos[id].completed = nextValue >= targetValue;
+        }
+
+        setTodos(newTodos);
+        Sounds.boop(0, 1);
+    }
+    const resetCounter = (id) => {
+        const newTodos = [...todos];
+        newTodos[id].counterValue = 0;
+        newTodos[id].completed = false;
+        setTodos(newTodos);
+        Sounds.boop(0, 1);
+    }
     /*
     const makeMenu = () => {
         const makeMenu = (menu) => menu.map(item => <div className='button bg-green r-10 m-5 p-5'>{item}</div>);
@@ -195,7 +219,6 @@ export default function Todos(props) {
             }));
         }
         setTodos(updatedTodos);
-        setTimerOn(paused);
         setPaused(prev => !prev)
     }
     const resetTodos = () => {
@@ -206,6 +229,9 @@ export default function Todos(props) {
             if (todo.type === 'timer') {
                 newTodos[index].currentTime = newTodos[index].time;
                 newTodos[index].elapsedTime = 0;
+            }
+            if (todo.type === 'counter') {
+                newTodos[index].counterValue = 0;
             }
             index++
         });
@@ -246,28 +272,27 @@ export default function Todos(props) {
     return (
         <div className='mt--30'>
             <div className='color-yellow p-5 r-10'>
-                <div className='containerBox'>
+                <div className='containerDetail p-10 size20'>
                     <label className='flexContainer containerInput'>
                         <input 
                             id='todo'
                             name='todo'
-                            className='inputField p-15 bold size25 r-10' 
+                            className='inputField p-15 size25 r-10' 
                             type='text'
                             placeholder='Enter a todo' 
                             onKeyDown={handleKeyDown} 
                         />
-                        {/*<div className='r-10 greet bold bg-green m-5 p-20 flex2Column10Percent contentCenter' onClick={() => addTodo()}>ADD</div>*/}
+                        {/*<div className='r-10 greet bg-green m-5 p-20 flex2Column10Percent contentCenter' onClick={() => addTodo()}>ADD</div>*/}
                     </label>
                 </div>
             </div>
             <div id='list' className='height--360 scroll'>
                 {todos.map((todo, index) => (
-                    <div key={getKey('todo')} className='containerBox bold scrollSnapTop'>
+                    <div key={getKey('todo')} className='containerDetail p-10 size20 scrollSnapTop'>
 
-                        <div className='containerBox p-20 flexContainer color-lite'>
+                        <div className='containerDetail p-10 size20 p-20 flexContainer color-lite'>
                             <div className=''>
                                 <input
-                                    id='completed'
                                     name='completed'
                                     className='regular-checkbox button mr-10'
                                     checked={todo.completed}
@@ -281,7 +306,9 @@ export default function Todos(props) {
                                         ? <div className='size25'>{icons.timer}</div>
                                         : ((todo.type === 'track')
                                             ? <div className='size25'>{icons.track}</div>
-                                            : '')
+                                            : ((todo.type === 'counter')
+                                                ? <div className='size25'>🔢</div>
+                                                : ''))
                                 }
                             </div>
                             <div className='size25 ml-10'>
@@ -290,7 +317,7 @@ export default function Todos(props) {
                         </div>
                         <div>
                             {
-                                ((todo.type === 'timer' || todo.type === 'track') && !edit)
+                                ((todo.type === 'timer' || todo.type === 'track' || todo.type === 'counter') && !edit)
                                     /*? <TimerComponent
                                             todo={todo}
                                             index={index}
@@ -300,7 +327,7 @@ export default function Todos(props) {
                                         />
                                     */
                                     ? <div className='flexContainer'>
-                                        <div className='flex2Column containerBox m-5'>
+                                        <div className='flex2Column containerDetail p-10 size20 m-5'>
                                             {/*
                                                         <TimerComponent
                                                             todo={todo}
@@ -322,24 +349,69 @@ export default function Todos(props) {
                                                             onReset={onReset}
                                                         />
                                                     */}
-                                            <TodoTimer
-                                                todo={todo}
-                                                index={index}
-                                                setTodoCurrentTime={setTodoCurrentTime}
-                                                todos={todos}
-                                                setTodos={setTodos}
-                                                localData='todos'
-                                                time={todo.time}
-                                                toggleCheckbox={toggleCheckbox}
-                                                onReset={onReset}
-                                            />
+                                            {
+                                                (todo.type === 'counter')
+                                                    ? <div className='flexContainer size20'>
+                                                        <div className='containerDetail flex1Column flexContainer size20 bg-lite'>
+                                                            <div
+                                                                title='decrement'
+                                                                className='containerDetail p-20 size20 flex3Column button color-lite bg-dkRed text-outline-light'
+                                                                onClick={() => updateCounter(index, -1)}
+                                                            >
+                                                                {icons.minus}
+                                                            </div>
+                                                            <div className='containerDetail pt-15 flex3Column ml-5 mr-5 size30 bg-lite color-yellow'>
+                                                                <div>{Number(todo.counterValue || 0)}</div>
+                                                                {
+                                                                    Number(todo.counterTarget || 0) > 0
+                                                                        ? <div className='size12 color-lite'>
+                                                                            / {Number(todo.counterTarget || 0)}
+                                                                        </div>
+                                                                        : null
+                                                                }
+                                                            </div>
+                                                            <div
+                                                                title='increment'
+                                                                className='containerDetail p-20 size20 flex3Column button color-yellow bg-dkGreen text-outline-light'
+                                                                onClick={() => updateCounter(index, 1)}
+                                                            >
+                                                                {icons.plus}
+                                                            </div>
+                                                        </div>
+                                                        <div
+                                                            title='reset counter'
+                                                            className='size60 flex5Column button color-lite mt-20 contentRight'
+                                                            onClick={() => resetCounter(index)}
+                                                        >
+                                                            🔄
+                                                        </div>
+                                                        <div
+                                                            title='set counter target'
+                                                            className='size60 flex5Column button color-lite mt-20'
+                                                            onClick={() => setCounterTarget(index)}
+                                                        >
+                                                            🎯
+                                                        </div>
+                                                    </div>
+                                                    : <TodoTimer
+                                                        todo={todo}
+                                                        index={index}
+                                                        setTodoCurrentTime={setTodoCurrentTime}
+                                                        todos={todos}
+                                                        setTodos={setTodos}
+                                                        localData='todos'
+                                                        time={todo.time}
+                                                        toggleCheckbox={toggleCheckbox}
+                                                        onReset={onReset}
+                                                    />
+                                            }
                                         </div>
                                     </div>
                                     : null
                             }
                             {
                                 (edit || ((add === true) && (index === todos.length - 1)))
-                                    ? <div className='flexContainer containerBox'>
+                                    ? <div className='flexContainer containerDetail p-10 size20'>
                                         <div 
                                             title='checkbox' 
                                             id={`setTimert${index}`} 
@@ -367,6 +439,15 @@ export default function Todos(props) {
                                         >
                                             {icons.track} Track
                                         </div>
+                                        <div
+                                            title='Counter'
+                                            id={`counter${index}`}
+                                            name={`counter${todo.description}`}
+                                            className='button flex4Column containerDetail size12 m-1'
+                                            onClick={() => counterTodo(index)}
+                                        >
+                                            🔢 Counter
+                                        </div>
                                         <div 
                                             title={`${icons.edit} Edit`}
                                             id={`edit${index}`} 
@@ -392,11 +473,11 @@ export default function Todos(props) {
                     </div>
                 ))}
             </div>
-            <div className='bt-0 containerBox width--10'>
+            <div className='bt-0 containerDetail p-10 size20 width--10'>
                 {/*makeMenu()*/}
                 <div
                     title={`${(paused) ? 'UNPAUSE' : 'PAUSE ALL CLOCKS'}`}
-                    className='button color-lite r-10 bg-lite m-5 bold flex3Column p-20 size25 columnCenterAlign' 
+                    className='button color-lite r-10 bg-lite m-5 flex3Column p-20 size25 columnCenterAlign' 
                     onClick={() => togglePause()}
                 >
                     {(paused) ? 'UNPAUSE' : 'PAUSE ALL CLOCKS'}
@@ -404,21 +485,21 @@ export default function Todos(props) {
                 <div className='flexContainer'>
                     <div 
                         title='RESET'
-                        className='button color-neogreen r-10 bg-dkGreen m-5 bold flex3Column p-20 size25 columnCenterAlign' 
+                        className='button color-neogreen r-10 bg-dkGreen m-5 flex3Column p-20 size25 columnCenterAlign' 
                         onClick={() => resetTodos()}
                     >
                         RESET
                     </div>
                     <div 
                         title='EDIT'
-                        className='button color-yellow r-10 bg-dkYellow m-5 bold flex3Column p-20 size25 columnCenterAlign' 
+                        className='button color-yellow r-10 bg-dkYellow m-5 flex3Column p-20 size25 columnCenterAlign' 
                         onClick={() => editTodos()}
                     >
                         EDIT
                     </div>
                     <div 
                         title='CLEAR'
-                        className='button color-red r-10 bg-dkRed m-5 bold flex3Column p-20 size25 columnCenterAlign' 
+                        className='button color-red r-10 bg-dkRed m-5 flex3Column p-20 size25 columnCenterAlign' 
                         onClick={() => clear()}
                     >
                         CLEAR

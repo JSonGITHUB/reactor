@@ -1,90 +1,26 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
-import DropDown from '../forms/DropDown';
+import React, { useState, useEffect } from 'react';
 import AddProjectInterface from './AddProjectInterface';
-//import TimerComponent from '../hooks/TimerComponent';
-import TrackTasks from './TrackTasks';
-import TrackEvents from './TrackEvents';
 import TrackCharge from './TrackCharge';
-import TrackWaves from './TrackWaves';
-import TrackNote from './TrackNote';
-import TrackJournal from './TrackJournal';
-import TrackCircuit from './TrackCircuit';
-import TrackRecipe from './TrackRecipe';
-import LinkSaver from './LinkSaver';
-import Sounds from '../sound/Sounds';
 import { currentTime, currentDate } from '../utils/CurrentCalendar';
-import initSession from './initSession';
-import initProjects from './initProjects';
-import initWaves from './initWaves';
-import initTasks from './initTasks';
 import initCharges from './initCharges';
-import initEvents from './initEvents';
-import trackables from './trackables';
-import initLinkTracking from './initLinkTracking';
-import initNoteTracking from './initNoteTracking';
-import initJournalTracking from './initJournalTracking';
-import initCircuitTracking from './initCircuitTracking';
-import initRecipeTracking from './initRecipeTracking';
 import mobileRecipeTracking from './data_mobile';
-import CollapseToggleButton from '../utils/CollapseToggleButton';
-import getKey from '../utils/KeyGenerator';
-import CircuitsParent from '../context/CircuitContext';
 import icons from '../site/icons';
 import initializeData from '../utils/InitializeData';
-import IngredientParent from '../context/IngredientContext';
 import validate from '../utils/validate';
 
 const Charges = () => {
 
-    const [projects, setProjects] = useState(initializeData('projects', initProjects));
-    const [events, setEvents] = useState(initializeData('eventTracking', initEvents));
-    const [waves, setWaves] = useState(initializeData('waveTracking', initWaves));
-    const [links, setLinks] = useState(initializeData('linkTracking', initLinkTracking));
-    const [notes, setNotes] = useState(initializeData('noteTracking', initNoteTracking));
-    const [journals, setJournals] = useState(initializeData('journalTracking', initJournalTracking));
-    const [circuits, setCircuits] = useState();
-    const [tasks, setTasks] = useState(initializeData('taskTracking', initTasks));
     const [charges, setCharges] = useState(initializeData('chargeTracking', initCharges));
-    //const [scroll, setScroll] = useState();
-    const [tracking, setTracking] = useState('charges');
     const [initialized, setInitialized] = useState(false);
-    const [isCollapsed, setIsCollapsed] = useState();
+    const [isCollapsed] = useState();
     const [newProjectDescription, setNewProjectDescription] = useState('');
-    const [activated, setActivated] = useState(true);
-    const [currentGoalsCollapse, setCurrentGoalsCollapse] = useState(true);
-    const [futureGoalsCollapse, setFutureGoalsCollapse] = useState(true);
-    const [completedGoalsCollapse, setCompletedGoalsCollapse] = useState(true);
-    //const [recipes, setRecipes] = useState(initializeData('recipeTracking', initRecipeTracking));
-    const [recipes, setRecipes] = useState(initializeData('recipeTracking', mobileRecipeTracking));
-
-    const targetElementRef = useRef(null);
-
-    const scrollToBottom = () => {
-        //alert(`scrollToBottom`);
-        if (targetElementRef.current) {
-            //targetElementRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-        }
-    };
-
-    const trackingMap = {
-        'projects': [projects, setProjects],
-        'tasks': [tasks, setTasks],
-        'waves': [waves, setWaves],
-        'events': [events, setEvents],
-        'charges': [charges, setCharges],
-        'links': [links, setLinks],
-        'notes': [notes, setNotes],
-        'journals': [journals, setJournals],
-        'circuits': [circuits, setCircuits],
-        'recipes': [recipes, setRecipes],
-    };
+    const [recipes] = useState(initializeData('recipeTracking', mobileRecipeTracking));
     const getIngredients = () => {
         const newIngredients = [];
         recipes.forEach((recipeGroup) => {
             if (!recipeGroup.isCollapsed) {
                 recipeGroup.recipes.forEach((recipe) => {
                     if (!recipe.isCollapsed && recipe.ingredients && recipe.ingredients.length > 0) {
-                        console.log(`getIngredient => recipe: ${JSON.stringify(recipe, null, 2)}`);
                         recipe.ingredients.forEach((ingredient) => {
                             newIngredients.push(ingredient);
                         });
@@ -159,10 +95,8 @@ const Charges = () => {
         }
         const removeExtraStuff = (ingredient) => {
             const cleanIngredient = removeables.reduce((acc, word) => removeIt(acc, word), ingredient);
-            //console.log(`TrackRecipe => removeExtraStuff => cleanIngredient: ${cleanIngredient}`);
             return cleanIngredient;
         }
-        //console.log(`ingredients: ${JSON.stringify(getAllIngredients(), null, 2)}`);
         const ingredientLabel = (ingredient, index) => (ingredient[index] && (ingredient[index] !== '') && (ingredient[index] !== undefined)) ? String(ingredient[index]).toLowerCase() : '';
         //const allIngredients = newIngredients.map(ingredient => (ingredientLabel(ingredient, 2) !== null) ? ingredientLabel(ingredient, 2) : (ingredientLabel(ingredient, 1) !== null) ? ingredientLabel(ingredient, 1) : (ingredientLabel(ingredient, 0) !== null) ? ingredientLabel(ingredient, 0) : 'salt');
         const allIngredients = newIngredients.map(ingredient => `${ingredientLabel(ingredient, 2)} ${ingredientLabel(ingredient, 0)} ${ingredientLabel(ingredient, 1)}`);
@@ -184,9 +118,6 @@ const Charges = () => {
         const removeEmpty = (arr) => {
             return arr.filter(item => item !== '');
         };
-        const removeAnds = (arr) => {
-            return arr.filter(item => item !== 'and');
-        };
         const removeSingularIfPluralExists = (words) => {
             const wordSet = new Set(words);
             return words.filter(word => {
@@ -194,19 +125,16 @@ const Charges = () => {
                 return !(wordSet.has(pluralForm) && !word.endsWith('s'));
             });
         };
-        //console.log(`sterilIngredients: ${JSON.stringify(sterilIngredients, null, 2)}`);
         const pluralPriority = removeSingularIfPluralExists(sterilIngredients);
         const noAnd = removeAndItems(pluralPriority);
         const sortAlphabetically = (arr) => {
             return arr.sort((a, b) => a.localeCompare(b));
         };
         const parenthesisStart = removeParenthesisStart(noAnd);
-        const andsRemoved = removeAnds(pluralPriority);
         const empty = removeEmpty(parenthesisStart)
         const number1 = remove1InBeginning(empty)
         const aStart = removeAInBeginning(number1)
         const sorted = sortAlphabetically(aStart);
-        //console.log(`Charges => ingredients sorted: ${JSON.stringify(sorted, null, 2)}`);
         //setIngredients(sorted);
         //localStorage.setItem('ingredients', JSON.stringify(ingredients));
         //setIngredients(ingredients);
@@ -220,244 +148,45 @@ const Charges = () => {
                 localStorage.setItem('ingredients', JSON.stringify(ingredients));
             }
         }
-    }, [recipes]);
+    }, [recipes]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
-        const storedEvents = initializeData('eventTracking', initEvents)
-        if (storedEvents) {
-            setEvents(storedEvents);
-        } else {
-            setEvents([initSession(currentDate(), currentTime(), currentDate(), currentTime(), 0)]);
-        }
-        //console.log(`local Projects: ${JSON.stringify(localProjects(), null, 2)}`)
-        if (projects === null) setProjects(initProjects);
-        if (tasks === null) setTasks(initTasks);
-        if (waves === null) setWaves(initWaves);
-        if (events === null) setEvents(initEvents);
         if (charges === null) setCharges(initCharges);
-        if (links === null) setLinks(initLinkTracking);
-        if (notes === null) setNotes(initNoteTracking);
-        if (journals === null) setJournals(initJournalTracking);
-        if (circuits === null) setCircuits(initCircuitTracking);
-        //if (recipes === null) setRecipes(initRecipeTracking);
-        if (recipes === null) setRecipes(mobileRecipeTracking);
-        //console.log(`Charges =>  notes: ${JSON.stringify(notes, null, 2)}`)
-        //setTracking('recipes')
-        // alert(`tracking: ${tracking}`)
-        if (tracking === 'recipes') {
-            const timer = setTimeout(() => {
-                setNewProjectDescription('');
-            }, 1000);
-        }
-    }, []);
-
-    useEffect(() => {
-        if (projects !== undefined || projects !== '') {
-            localStorage.setItem('projects', JSON.stringify(projects));
-        }
-    }, [projects]);
+    }, [charges]);
 
     useEffect(() => {
 
         if (initialized) {
-            let updatedTrackingData = [...projects];
-            if (tracking === 'recipes') {
-                updatedTrackingData = [...recipes];
-            } else if (tracking === 'links') {
-                updatedTrackingData = [...links];
-            } else if (tracking === 'notes') {
-                updatedTrackingData = [...notes];
-            } else if (tracking === 'journals') {
-                updatedTrackingData = [...journals];
-            } else if (tracking === 'circuits') {
-                updatedTrackingData = [...circuits];
-            } else if (tracking === 'events') {
-                updatedTrackingData = [...events];
-            } else if (tracking === 'waves') {
-                updatedTrackingData = [...waves];
-            } else if (tracking === 'tasks') {
-                updatedTrackingData = [...tasks];
-            } else if (tracking === 'charges') {
-                updatedTrackingData = [...charges];
-            }
-
-            updatedTrackingData.map((group, groupIndex) => group.isCollapsed = isCollapsed);
-
-            if (tracking === 'recipes') {
-                setRecipes(updatedTrackingData);
-            } else if (tracking === 'links') {
-                setLinks(updatedTrackingData);
-            } else if (tracking === 'notes') {
-                setNotes(updatedTrackingData);
-            } else if (tracking === 'journals') {
-                setJournals(updatedTrackingData);
-            } else if (tracking === 'circuits') {
-                console.log(`updatedTrackingData: circuits => ${JSON.stringify(updatedTrackingData, null, 2)}`);
-                setCircuits(updatedTrackingData);
-            } else if (tracking === 'events') {
-                setEvents(updatedTrackingData);
-            } else if (tracking === 'waves') {
-                setWaves(updatedTrackingData);
-            } else if (tracking === 'tasks') {
-                setTasks(updatedTrackingData);
-            } else if (tracking === 'charges') {
-                setCharges(updatedTrackingData);
-            } else if (tracking === 'projects') {
-                setProjects(updatedTrackingData);
-            }
+            let updatedTrackingData = [...charges];
+            updatedTrackingData.forEach((group) => {
+                group.isCollapsed = isCollapsed;
+            });
+            setCharges(updatedTrackingData);
         } else {
             setInitialized(true);
         }
-    }, [isCollapsed]);
-
-    useEffect(() => {
-        if (waves !== undefined || waves !== '') {
-            localStorage.setItem('waveTracking', JSON.stringify(waves));
-        }
-    }, [waves]);
-
-    useEffect(() => {
-        //console.log(`Charges => links: ${JSON.stringify(links, null, 2)}`);
-        if (links !== undefined || links !== '') {
-            localStorage.setItem('linkTracking', JSON.stringify(links));
-        }
-    }, [links]);
-
-    useEffect(() => {
-        if (tasks !== undefined || tasks !== '') {
-            console.log(`Charges => tasks: ${JSON.stringify(tasks, null, 2)}`);
-            localStorage.setItem('taskTracking', JSON.stringify(tasks));
-        }
-    }, [tasks]);
+    }, [isCollapsed]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (charges !== undefined || charges !== '') {
-            console.log(`charges: ${JSON.stringify(charges, null, 2)}`);
             localStorage.setItem('chargeTracking', JSON.stringify(charges));
         }
     }, [charges]);
 
     useEffect(() => {
-        if (events !== undefined || events !== '') {
-            localStorage.setItem('eventTracking', JSON.stringify(events));
-        }
-    }, [events]);
-
-    useEffect(() => {
-        if (notes !== undefined || notes !== '') {
-            localStorage.setItem('noteTracking', JSON.stringify(notes));
-        }
-    }, [notes]);
-
-    useEffect(() => {
-        if (tracking !== undefined || tracking !== '') {
-            localStorage.setItem('tracking', tracking);
-        }
-    }, [tracking]);
-
-    useEffect(() => {
         if (newProjectDescription !== undefined) {
             const searchTerm = newProjectDescription.toLowerCase() || '';
             localStorage.setItem('WorkOutSearch', searchTerm);
-            if (tracking === 'recipes' && recipes !== undefined) {
-                const inRecipeTitle = (recipe) => recipe.dish.toLowerCase().includes(searchTerm);
-                const inDescription = (recipe) => recipe.description.toLowerCase().includes(searchTerm);
-                const inIngredients = (recipe) => {
-                    if (recipe.ingredients && recipe.ingredients.length > 0) {
-                        return recipe.ingredients.some((ingredient) => {
-                            return ingredient[2] && ingredient[2].toLowerCase().includes(searchTerm);
-                        });
-                    }
-                    return false;
-                };
-                const inInstructions = (recipe) => {
-                    if (recipe.instructions && recipe.instructions.length > 0) {
-                        return recipe.instructions.some((instruction) => {
-                            if (instruction.step && instruction.step.toLowerCase().includes(searchTerm)) {
-                                return true;
-                            }
-                            if (instruction.ingredients && instruction.ingredients.length > 0) {
-                                return instruction.ingredients.some((ingredient) =>
-                                    ingredient[2] && ingredient[2].toLowerCase().includes(searchTerm)
-                                );
-                            }
-                            return false;
-                        });
-                    }
-                    return false;
-                };
-                const category = localStorage.getItem('recipeCategory') || 'all';
-                const filteredRecipes = [...recipes];
-                console.log(`Charges => searchTerm: '${searchTerm}'`);
-                filteredRecipes.map((recipeGroup) => {
-                    recipeGroup.display = false;
-                    recipeGroup.recipes.map((recipe) => {
-                        if ((inInstructions(recipe) || inIngredients(recipe) || inDescription(recipe) || inRecipeTitle(recipe) || searchTerm === '' || searchTerm === ' ' || searchTerm === null) && (category === 'all' || recipeGroup.category === category)) {
-                            recipe.display = true;
-                            recipeGroup.display = true;
-                        } else {
-                            recipe.display = false;
-                        }
-                    });
-                });
-                setRecipes(filteredRecipes);
-            } else if (tracking === 'tasks' && tasks !== undefined) {
-                const inTaskGoupDescription = (taskGroup) => {
-                    const result = taskGroup.description.toLowerCase().includes(searchTerm);
-                    console.log(`Charges => inTaskGoupDescription => task.description: ${taskGroup.description} searchTerm: ${searchTerm} result: ${result}`);
-                    return result;
-                }
-                const inTaskDescription = (task) => {
-                    const result = task.description.toLowerCase().includes(searchTerm);
-                    console.log(`Charges => inTaskDescription => task.description: ${task.description} searchTerm: ${searchTerm} result: ${result}`);
-                    return result;
-                }
-                const inTaskSessionDescription = (task) => {
-                    if (task.sessions && task.sessions.length > 0) {
-                        return task.sessions.some(
-                            (session) =>
-                                session.description &&
-                                session.description.toLowerCase().includes(searchTerm)
-                        );
-                    }
-                    return false;
-                };
-                const category = localStorage.getItem('tasksCategory') || 'all';
-                const filteredTasks = [...tasks];
-
-                filteredTasks.map((taskGroup) => {
-                    taskGroup.display = inTaskGoupDescription(taskGroup);
-                    taskGroup.tasks.map((task) => {
-                        if ((inTaskGoupDescription(taskGroup) || inTaskDescription(task) || inTaskSessionDescription(task) || searchTerm === '' || searchTerm === ' ' || searchTerm === null) && (category === 'all' || taskGroup.category === category)) {
-                            task.display = true;
-                            taskGroup.display = true;
-                            console.log(`Charges => category: ${category} searchTerm: '${searchTerm}' true`);
-                            console.log(`Charges taskGroup: ${JSON.stringify(taskGroup, null, 2)}`);
-                        }
-                    });
-                });
-                setTasks(filteredTasks);
-            } else if (tracking === 'waves' && waves !== undefined) {
-                const inWaveDescription = (wave) => wave.description.toLowerCase().includes(searchTerm);
-                const filteredWaves = [...waves];
-                filteredWaves.map((wave) => {
-                    wave.display = false;
-                    if (inWaveDescription(wave) || searchTerm === '' || searchTerm === ' ' || searchTerm === null) {
-                        wave.display = true;
-                    }
-                });
-                setWaves(filteredWaves);
-            } else if (tracking === 'charges' && charges !== undefined) {
+            if (charges !== undefined) {
                 const inChargeGoupDescription = (chargeGroup) => String(chargeGroup.description).toLowerCase().includes(searchTerm);
                 const inChargeDescription = (charge) => {
                     const result = charge.description.toLowerCase().includes(searchTerm);
-                    console.log(`Charges => inChargeDescription => charge.description: ${charge.description} searchTerm: ${searchTerm} result: ${result}`);
                     return result;
                 }
                 const filteredCharges = [...charges];
-                filteredCharges.map((chargeGroup) => {
+                filteredCharges.forEach((chargeGroup) => {
                     chargeGroup.display = false;
-                    chargeGroup.tasks.map((task) => {
+                    chargeGroup.tasks.forEach((task) => {
                         if ((inChargeGoupDescription(chargeGroup) || inChargeDescription(task) || searchTerm === '' || searchTerm === ' ' || searchTerm === null)) {
                             task.display = true;
                             chargeGroup.display = true;
@@ -465,181 +194,11 @@ const Charges = () => {
                     });
                 });
                 setCharges(filteredCharges);
-            } else if (tracking === 'links' && links !== undefined) {
-                const inLinkGroupTitle = (linkGroup) => linkGroup.title.toLowerCase().includes(searchTerm);
-                const inLinkDescription = (link) => {
-                    const result = link.description.toLowerCase().includes(searchTerm);
-                    console.log(`Charges => inLinkDescription => link.description: ${link.description} searchTerm: ${searchTerm} result: ${result}`);
-                    return result;
-                }
-                const filteredLinks = [...links];
-                filteredLinks.map((linkGroup) => {
-                    linkGroup.display = false;
-                    if (linkGroup.links !== undefined) {
-                        linkGroup.links.map((link) => {
-                            if ((inLinkGroupTitle(linkGroup) || inLinkDescription(link) || searchTerm === '' || searchTerm === ' ' || searchTerm === null)) {
-                                link.display = true;
-                                linkGroup.display = true;
-                            }
-                        });
-                    }
-                });
-                setLinks(filteredLinks);
-            } else if (tracking === 'notes' && notes !== undefined) {
-                const inNoteGroupTitle = (noteGroup) => noteGroup.title.toLowerCase().includes(searchTerm);
-                const inNotes = (noteGroup) => {
-                    if (noteGroup.notes && noteGroup.notes.length > 0) {
-                        return noteGroup.notes.some((note) => {
-                            return (
-                                (note.description && note.description.toLowerCase().includes(searchTerm)) ||
-                                (note.note && note.note.toLowerCase().includes(searchTerm))
-                            );
-                        });
-                    }
-                    return false;
-                };
-                const category = localStorage.getItem('notesCategory') || 'all';
-                const filteredNotes = [...notes];
-                filteredNotes.map((noteGroup) => {
-                    noteGroup.display = false;
-                    if ((inNoteGroupTitle(noteGroup) || inNotes(noteGroup) || searchTerm === '' || searchTerm === ' ' || searchTerm === null)) {
-                        noteGroup.display = true;
-                    }
-                });
-                setNotes(filteredNotes);
-            } else if (tracking === 'journals' && journals !== undefined) {
-                const inJournalGroupTitle = (journal) => journal.title.toLowerCase().includes(searchTerm);
-                const inJournalDescription = (journal) => journal.description.toLowerCase().includes(searchTerm);
-                const inJournal = (journal) => journal.journal.toLowerCase().includes(searchTerm);
-                const inFeelings = (journal) => journal.feelings.toLowerCase().includes(searchTerm);
-                const inTodaysGoals = (journal) => {
-                    if (journal.todaysGoals && journal.todaysGoals.length > 0) {
-                        return journal.todaysGoals.some((goal) => {
-                            return goal[0].toLowerCase().includes(searchTerm);
-                        });
-                    }
-                    return false;
-                }
-                const inFutureGoals = (journal) => {
-                    if (journal.futureGoals && journal.futureGoals.length > 0) {
-                        return journal.futureGoals.some((goal) => {
-                            return goal[0].toLowerCase().includes(searchTerm);
-                        });
-                    }
-                    return false;
-                }
-                const inGratefulFor = (journal) => journal.gratefulFor.toLowerCase().includes(searchTerm);
-                const filteredJournals = [...journals];
-                filteredJournals.map((journalGroup) => {
-                    if (journalGroup.journals && journalGroup?.journals.length > 0) {
-                        journalGroup.display = false;
-                        journalGroup.journals.map((journal) => {
-                            if (inJournalGroupTitle(journalGroup) || inJournalDescription(journal) || inJournal(journal) || inFeelings(journal) || inTodaysGoals(journal) || inFutureGoals(journal) || inGratefulFor(journal) || searchTerm === '' || searchTerm === ' ' || searchTerm === null) {
-                                journal.display = true;
-                                journalGroup.display = true;
-                            }
-                        });
-                    }
-                });
-                setJournals(filteredJournals);
             }
         }
-    }, [newProjectDescription]);
+    }, [newProjectDescription]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const toggleTimer = () => {
-        Sounds.boop(0, 1);
-        setActivated(prev => !prev);
-    }
-
-    const toggleParentTimer = () => toggleTimer();
-
-    const selectTracking = (event) => {
-        setTracking(event.target.value);
-    };
     const addProject = () => {
-        const project = {
-            description: newProjectDescription,
-            createdDate: currentDate(),
-            startTime: currentTime(),
-            tasks: [],
-            journals: [],
-            totalTime: 0,
-            isCollapsed: false
-        };
-        const addLinkGroup = () => {
-            const updatedLinks = [...links];
-            const title = newProjectDescription;
-            if (title) {
-                const linkDescription = prompt('Link description:');
-                const linkURL = prompt('Link url:');
-                const firstLink = {
-                    description: linkDescription || 'New Link',
-                    link: linkURL || 'https://',
-                    display: true
-                }
-                const linkGroup = {
-                    title: title,
-                    links: [firstLink],
-                    isCollapsed: false
-                };
-                updatedLinks.push(linkGroup)
-                setLinks(updatedLinks);
-            }
-        };
-        const addNoteGroup = () => {
-            const updatedNotes = [...notes];
-            const title = newProjectDescription;
-            if (title) {
-                const noteGroup = {
-                    title: title,
-                    notes: [],
-                    isCollapsed: false
-                };
-                updatedNotes.push(noteGroup)
-                setNotes(updatedNotes);
-            }
-        };
-        const addRecipeGroup = () => {
-            const updatedRecipes = [...recipes];
-            const title = newProjectDescription;
-            console.log(`addRecipeGroup => newProjectDescription: ${title}`);
-            if (title) {
-                const recipeGroup = {
-                    category: title,
-                    recipes: [],
-                    isCollapsed: false,
-                    display: true
-                };
-                updatedRecipes.push(recipeGroup)
-                setRecipes(updatedRecipes);
-            }
-        };
-        const addJournalGroup = () => {
-            const updatedJournals = [...journals];
-            const title = newProjectDescription;
-            if (title) {
-                const journalGroup = {
-                    title: title,
-                    journals: [],
-                    isCollapsed: false
-                };
-                updatedJournals.push(journalGroup)
-                setJournals(updatedJournals);
-            }
-        };
-        const addCircuitGroup = () => {
-            const updatedCircuits = [...circuits];
-            const title = newProjectDescription;
-            if (title) {
-                const circuitGroup = {
-                    title: title,
-                    circuits: [],
-                    isCollapsed: false
-                };
-                updatedCircuits.push(circuitGroup)
-                setCircuits(updatedCircuits);
-            }
-        };
         const addChargeGroup = () => {
             const updatedCharges = [...charges];
             const title = newProjectDescription;
@@ -656,140 +215,39 @@ const Charges = () => {
                 setCharges(updatedCharges);
             }
         };
-
-        /*
-        if (tracking === 'project') 
-            setProjects(prevProjects => [project, ...prevProjects]);
-        if (tracking === 'events')
-            setEvents(prevEvents => [project, ...prevEvents]);
-        if (tracking === 'waves') 
-            setProjects(prevProjects => [project, ...prevProjects]);
-        */
-
-        if ((tracking !== 'links' || tracking !== 'notes' || tracking !== 'journals' || tracking !== 'circuits' || tracking !== 'recipes') && trackingMap.hasOwnProperty(tracking)) {
-            trackingMap[tracking][1](prev => [project, ...prev]);
-        }
-        if (tracking === 'links') {
-            addLinkGroup();
-        }
-        if (tracking === 'notes') {
-            addNoteGroup();
-        }
-        if (tracking === 'journals') {
-            addJournalGroup();
-        }
-        if (tracking === 'circuits') {
-            addCircuitGroup();
-        }
-        if (tracking === 'recipes') {
-            addRecipeGroup();
-        }
-        if (tracking === 'charges') {
-            addChargeGroup();
-        }
+        addChargeGroup();
         setNewProjectDescription('');
-    };
-
-    const deleteProject = (index) => {
-        let updatedTrackingData = [...projects];
-        if (trackingMap.hasOwnProperty(tracking)) {
-            updatedTrackingData = [...trackingMap[tracking][0]];
-            updatedTrackingData.splice(index, 1);
-            trackingMap[tracking][1](updatedTrackingData);
-        }
-    };
-    const deleteGroup = (index) => {
-        let updatedTrackingData = [...projects];
-        if (trackingMap.hasOwnProperty(tracking)) {
-            updatedTrackingData = [...trackingMap[tracking][0]];
-            updatedTrackingData.splice(index, 1);
-            trackingMap[tracking][1](updatedTrackingData);
-        }
-    };
-    const toggleCollapseSubmenu = (projectIndex) => {
-        //setIsCollapsed(prev => !prev);
-        const updatedProjects = [...projects];
-        const project = updatedProjects[projectIndex];
-        project.isCollapsed = !project.isCollapsed;
-
-        setProjects(updatedProjects);
-        //return (!project.isCollapsed) ? setIsCollapsed(false) : null;
-        if (!project.isCollapsed) {
-            console.log(`toggleCollapseSubmenu => projectIndex(${projectIndex}): setIsCollapsed(false)`);
-            setIsCollapsed(false);
-        } else {
-            console.log(`toggleCollapseSubmenu => projectIndex(${projectIndex}): setIsCollapsed(true)`);
-            setIsCollapsed(true);
-        }
     };
 
     const getProjectTime = (project) => {
         let projectTotal = 0;
-        trackingMap[tracking][0].forEach((event) => {
+        charges.forEach((event) => {
             projectTotal += event.runningTime;
         });
         project.totalTime = projectTotal;
         return projectTotal;
     };
 
-    const toggleCheckbox = (category, journalGroupIndex, journalIndex, currentGoalIndex) => {
-        const newJournals = [...journals];
-        const selectedGoal = newJournals[journalGroupIndex].journals[journalIndex][category][currentGoalIndex];
-        const goalComplete = (selectedGoal[1]) ? false : true;
-        selectedGoal[1] = goalComplete;
-        setJournals(newJournals);
-    }
-    const deleteLocalData = (tracking) => {
-        if (tracking === 'recipes') {
-            localStorage.removeItem('recipeTracking');
-        } else if (tracking === 'links') {
-            localStorage.removeItem('linkTracking');
-        } else if (tracking === 'notes') {
-            localStorage.removeItem('noteTracking');
-        } else if (tracking === 'journals') {
-            localStorage.removeItem('journalTracking');
-        } else if (tracking === 'circuits') {
-            localStorage.removeItem('circuitTracking');
-        } else if (tracking === 'events') {
-            localStorage.removeItem('eventTracking');
-        } else if (tracking === 'waves') {
-            localStorage.removeItem('waveTracking');
-        } else if (tracking === 'tasks') {
-            localStorage.removeItem('taskTracking');
-        } else if (tracking === 'charges') {
-            localStorage.removeItem('chargeTracking')
-        }
-        window.location.reload();
-    }
-
     return <div className='mt--30'>
         <div className='containerDetail color-lite bg-lite m-5 p-22 size30 contentLeft'>
             <span className='m-5'>{icons.charges}</span> Charges
         </div>
         <div className=''>
-            {//(tracking === 'tasks' || tracking === 'events')
-                (tracking !== '')
-                    ? <AddProjectInterface
-                        newProjectDescription={newProjectDescription}
-                        setNewProjectDescription={setNewProjectDescription}
-                        addProject={addProject}
-                        tracking={tracking}
-                    />
-                    : <React.Fragment></React.Fragment>
-            }
+                <AddProjectInterface
+                    newProjectDescription={newProjectDescription}
+                    setNewProjectDescription={setNewProjectDescription}
+                    addProject={addProject}
+                    tracking={'charges'}
+                />
         </div>
         <div className=''>
-            {
-                (tracking === 'charges')
-                    ? <TrackCharge
-                        charges={charges}
-                        setCharges={setCharges}
-                        newProjectDescription={newProjectDescription}
-                        getProjectTime={getProjectTime}
-                        searchTerm={newProjectDescription}
-                    />
-                    : <React.Fragment></React.Fragment>
-            }
+            <TrackCharge
+                charges={charges}
+                setCharges={setCharges}
+                newProjectDescription={newProjectDescription}
+                getProjectTime={getProjectTime}
+                searchTerm={newProjectDescription}
+            />
         </div>
     </div>
 };

@@ -1,13 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
-import initRecipeTracking from './initRecipeTracking';
 import mobileRecipeTracking from './data_mobile'; 
 import RecipeGroup from './RecipeGroup';
-import getKey from '../utils/KeyGenerator';
-import initializeData from '../utils/InitializeData';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
 import Ingredient from './Ingredient';
-import validate from '../utils/validate';
 import { IngredientContext } from '../context/IngredientContext';
+import { useKitchenInventory } from '../context/KitchenInventoryContext';
 import Selector from '../forms/FunctionalSelector.js';
 
 const TrackRecipe = ({
@@ -24,67 +21,227 @@ const TrackRecipe = ({
         ingredients,
         setIngredients
     } = useContext(IngredientContext);
+    const { upsertInventoryFromIngredients } = useKitchenInventory();
     
     const [ingredientsCollapse, setIngredientsCollapse] = useState(true);
     const [category, setCategory] = useState('all');
     const [collapseAll, setCollapseAll] = useState();
+
+    const normalizeIngredientKey = (ingredientValue) => {
+        const unitAliases = {
+            tsp: 'teaspoon',
+            tsps: 'teaspoon',
+            teaspoon: 'teaspoon',
+            teaspoons: 'teaspoon',
+            tbsp: 'tablespoon',
+            tbsps: 'tablespoon',
+            tablespoon: 'tablespoon',
+            tablespoons: 'tablespoon',
+            cup: 'cup',
+            cups: 'cup',
+            oz: 'ounce',
+            ounce: 'ounce',
+            ounces: 'ounce',
+            lb: 'pound',
+            lbs: 'pound',
+            pound: 'pound',
+            pounds: 'pound',
+            g: 'gram',
+            gram: 'gram',
+            grams: 'gram',
+            kg: 'kilogram',
+            kilogram: 'kilogram',
+            kilograms: 'kilogram',
+            ml: 'milliliter',
+            milliliter: 'milliliter',
+            milliliters: 'milliliter',
+            l: 'liter',
+            liter: 'liter',
+            liters: 'liter',
+            bunch: 'bunch',
+            bunches: 'bunch',
+            handful: 'handful',
+            handfull: 'handful',
+            handfuls: 'handful',
+            handfulls: 'handful',
+            clove: 'clove',
+            cloves: 'clove',
+            stalk: 'stalk',
+            stalks: 'stalk',
+            pinch: 'pinch',
+            pinches: 'pinch'
+        };
+        const unitLabels = new Set(Object.values(unitAliases));
+        const descriptorWords = new Set([
+            'and',
+            'or',
+            'coarse',
+            'ground',
+            'fresh',
+            'freshly',
+            'finely',
+            'thinly',
+            'chopped',
+            'minced',
+            'diced',
+            'sliced',
+            'optional',
+            'to',
+            'taste'
+        ]);
+
+        const normalized = String(ingredientValue || '')
+            .toLowerCase()
+            .replace(/[_-]/g, ' ')
+            .replace(/[^a-z0-9\s/.,⁄-]/g, ' ')
+            .trim();
+
+        const sanitized = normalized
+            .replace(/\b\d+([.,]\d+)?\b/g, ' ')
+            .replace(/\b\d+[/⁄]\d+\b/g, ' ')
+            .replace(/[¼½¾⅓⅔⅛⅜⅝⅞]/g, ' ');
+
+        const tokens = normalized
+            .split(/\s+/)
+            .map(token => token.replace(/^[.,]+|[.,]+$/g, ''))
+            .map(token => unitAliases[token] || token)
+            .filter(Boolean);
+        const isNumberToken = (token) => {
+            return /^\d*\.?\d+$/.test(token)
+                || /^\d+\/\d+$/.test(token)
+                || /^[¼½¾⅓⅔⅛⅜⅝⅞]$/.test(token);
+        };
+
+        const sanitizedTokens = sanitized
+            .split(/\s+/)
+            .map(token => token.replace(/^[.,]+|[.,]+$/g, ''))
+            .map(token => unitAliases[token] || token)
+            .filter(Boolean);
+
+        const ingredientNameTokens = sanitizedTokens.filter(
+            token => !isNumberToken(token) && !unitLabels.has(token) && !descriptorWords.has(token)
+        );
+        const normalizedName = ingredientNameTokens.join(' ').replace(/\s+/g, ' ').trim();
+        return normalizedName || tokens
+            .filter(token => !isNumberToken(token) && !unitLabels.has(token) && !descriptorWords.has(token))
+            .join(' ')
+            .replace(/\s+/g, ' ')
+            .trim() || normalized;
+    };
+
+    const mergeIngredients = (previousIngredients, nextIngredients) => {
+        const current = Array.isArray(previousIngredients) ? previousIngredients : [];
+        const incoming = Array.isArray(nextIngredients) ? nextIngredients : [];
+        const merged = [...current, ...incoming];
+        const uniqueByIngredient = new Map();
+
+        merged.forEach(item => {
+            const key = normalizeIngredientKey(item);
+            if (!uniqueByIngredient.has(key)) {
+                uniqueByIngredient.set(key, item);
+            }
+        });
+
+        return Array.from(uniqueByIngredient.values());
+    };
+
+    useEffect(() => {
+        if (!Array.isArray(ingredients)) {
+            return;
+        }
+        const dedupedIngredients = mergeIngredients([], ingredients);
+        const hasChanged = dedupedIngredients.length !== ingredients.length
+            || dedupedIngredients.some((item, index) => item !== ingredients[index]);
+
+        if (hasChanged) {
+            setIngredients(dedupedIngredients);
+        }
+        upsertInventoryFromIngredients(dedupedIngredients);
+    }, [ingredients]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const addActiveIngredientsToList = () => {
+        const activeIngredients = getIngredients();
+        setIngredients(previousIngredients => mergeIngredients(previousIngredients, activeIngredients));
+        setIngredientsCollapse(false);
+    };
     
     useEffect(() => {
         if (collapseAll === undefined) return; // Don't run on initial mount
-        const newRecipes = recipes.map(recipeGroup => ({
-            ...recipeGroup,
-            isCollapsed: !!collapseAll,
-            collapsed: !!collapseAll
-        }));
-        setRecipes(newRecipes);
-        localStorage.setItem('recipeTracking', JSON.stringify(newRecipes));
-    }, [collapseAll]);
+        const nextCollapsedState = !!collapseAll;
+
+        setRecipes((previousRecipes) => {
+            if (!Array.isArray(previousRecipes)) return previousRecipes;
+
+            const hasAnyChange = previousRecipes.some((recipeGroup) => {
+                const groupChanged = recipeGroup.isCollapsed !== nextCollapsedState || recipeGroup.collapsed !== nextCollapsedState;
+                const recipeChanged = Array.isArray(recipeGroup.recipes)
+                    ? recipeGroup.recipes.some((recipe) => recipe.isCollapsed !== nextCollapsedState || recipe.collapsed !== nextCollapsedState)
+                    : false;
+                return groupChanged || recipeChanged;
+            });
+
+            if (!hasAnyChange) {
+                return previousRecipes;
+            }
+
+            const newRecipes = previousRecipes.map(recipeGroup => ({
+                ...recipeGroup,
+                isCollapsed: nextCollapsedState,
+                collapsed: nextCollapsedState,
+                recipes: Array.isArray(recipeGroup.recipes)
+                    ? recipeGroup.recipes.map(recipe => ({
+                        ...recipe,
+                        isCollapsed: nextCollapsedState,
+                        collapsed: nextCollapsedState
+                    }))
+                    : recipeGroup.recipes
+            }));
+
+            localStorage.setItem('recipeTracking', JSON.stringify(newRecipes));
+            return newRecipes;
+        });
+    }, [collapseAll, setRecipes]);
 
     useEffect(() => {
-        let storedRecipes = recipes;
         if (recipes === null) {
-            storedRecipes = JSON.parse(localStorage.getItem('recipeTracking')) || mobileRecipeTracking;
+            const storedRecipes = JSON.parse(localStorage.getItem('recipeTracking')) || mobileRecipeTracking;
             setRecipes(storedRecipes);
         }
-        //const storedRecipes = (recipes !== null) ? recipes : initializeData('recipeTracking', initRecipeTracking);
-        //const storedRecipes = (recipes !== null) ? recipes : initializeData('recipeTracking', mobileRecipeTracking);
-        //setRecipes(storedRecipes);
-        if (recipes === null) setRecipes(mobileRecipeTracking);
         const storedCategory = localStorage.getItem('recipeCategory');
         if (storedCategory !== null) {
             setCategory(storedCategory);
         } else {
             setCategory('all');
         }
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
     useEffect(() => {
         if ((category === null) || (category === '') || (category === undefined)) {
             localStorage.setItem('recipeCategory', 'all');
         } else {
             localStorage.setItem('recipeCategory', category);
         }
-        const newRecipes = [...recipes];
-        newRecipes.map((recipeGroup) => {
-            if (category === 'all' || recipeGroup.category === category) {
-                recipeGroup.display = true;
-                //recipeGroup.isCollapsed = false;
-            } else {
-                recipeGroup.display = false;
-            }
-        });
-        setRecipes(newRecipes);
-    }, [category]);    
-    useEffect(() => {
-        if (!ingredientsCollapse) {
-            setIngredients(getIngredients());
+        if (!Array.isArray(recipes) || recipes.length === 0) {
+            return;
         }
-    }, [ingredientsCollapse]);
-    useEffect(() => {
-        if (recipes !== undefined) {
-            setIngredients(getIngredients());
-        }
-    }, [recipes]);
 
+        let hasAnyChange = false;
+        const newRecipes = recipes.map((recipeGroup) => {
+            const shouldDisplay = category === 'all' || recipeGroup.category === category;
+            const currentDisplay = recipeGroup.display === true || recipeGroup.display === 'true';
+            if (currentDisplay !== shouldDisplay) {
+                hasAnyChange = true;
+                return {
+                    ...recipeGroup,
+                    display: shouldDisplay
+                };
+            }
+            return recipeGroup;
+        });
+
+        if (hasAnyChange) {
+            setRecipes(newRecipes);
+        }
+    }, [category, recipes, setRecipes]);    
     const notNull = (value) => (value !== null) ? true : false;
     const notEmpty = (value) => (value !== "") ? true : false;
     const isGood = (value) => (notNull(value) && notEmpty(value)) ? true : false;
@@ -104,15 +261,6 @@ const TrackRecipe = ({
         }
 
     };
-    const subtractRecipe = (recipeGroupIndex, recipeIndex) => {
-        const updatedRecipes = [...recipes];
-        const recipe = updatedRecipes[recipeGroupIndex].recipes[recipeIndex];
-        recipe.sessions = recipe.sessions ?? [];
-        recipe.isRunning = false;
-        recipe.sessions.pop();
-        setRecipes(updatedRecipes);
-    };
-
     const deleteGroup = (recipeGroupIndex) => {
         const toggle = window.confirm(`Are you sure you want to remove recipe group ${recipes[recipeGroupIndex].category}`)
         const removeItemByIndex = (array, index) => {
@@ -141,8 +289,16 @@ const TrackRecipe = ({
         setCategory(selected);
     }
     
+    const ingredientHeader = <div>
+                                <span className='size30 mr-10'>
+                                    🛒
+                                </span> 
+                                <span className='size25'>
+                                    Ingredients
+                                </span>
+                            </div>;
     return (
-        <div key={getKey('recipeGroupContainer')}>
+        <div>
             <div className='pr-10'>
                 <Selector
                     groupTitle='Category'
@@ -156,23 +312,30 @@ const TrackRecipe = ({
             </div>
             <div className='containerBox color-yellow bg-lite'>
                 <CollapseToggleButton
-                    title={'Ingredients'}
+                    title={ingredientHeader}
                     isCollapsed={ingredientsCollapse}
                     setCollapse={setIngredientsCollapse}
                     align='left'
                 />
             </div>
+            <div className='containerBox bg-lite'>
+                <button className='button p-10 size20' onClick={addActiveIngredientsToList}>
+                    Add Active Ingredients to Grocery List
+                </button>
+            </div>
             {
                 (ingredientsCollapse)
                 ? null
                 : (ingredients === null || ingredients.length === 0)
-                    ? <div className='containerBox'>Ingredients are added when recipes are active.</div>
-                    : ingredients.map(ingredient => <div key={getKey(ingredient)}>
+                    ? <div className='containerBox'>No ingredients in list. Use Add Active Ingredients to Grocery List.</div>
+                    : <div className='height-400'>
+                        {
+                        ingredients.map(ingredient => <div key={String(ingredient)}>
                                                     <Ingredient
                                                         ingredient={ingredient}
                                                     />
-                                                </div>
-                )
+                                                </div>)}
+                    </div>
             }
             <div className='containerBox bg-lite'>
                 <CollapseToggleButton
@@ -185,7 +348,7 @@ const TrackRecipe = ({
             {
                 recipes.map((recipeGroup, recipeGroupIndex) => {
                     if (recipeGroup.display === true || recipeGroup.display === 'true') {
-                        return <div key={getKey('recipeGroups')}>
+                        return <div key={`${recipeGroup?.category || 'recipe-group'}-${recipeGroupIndex}`}>
                             <RecipeGroup
                                 recipes={recipes}
                                 setRecipes={setRecipes}
@@ -200,6 +363,7 @@ const TrackRecipe = ({
                             />
                         </div>
                     }
+                    return null;
                 })
             }
         </div>

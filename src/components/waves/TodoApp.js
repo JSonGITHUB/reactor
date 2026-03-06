@@ -1,9 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const TodoApp = () => {
 
     const [tasks, setTasks] = useState([]);
     const [newTask, setNewTask] = useState('');
+    const instanceIdRef = useRef(null);
+    if (instanceIdRef.current === null) {
+        instanceIdRef.current = Math.random().toString(36).slice(2, 10);
+    }
+    const instanceId = instanceIdRef.current;
+    const taskInputId = `task-${instanceId}`;
 
     useEffect(() => {
         const savedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
@@ -36,8 +42,8 @@ const TodoApp = () => {
         <div>
             <h1>To-Do List</h1>
             <input
-                id='task'
-                name='task'
+                id={taskInputId}
+                name={taskInputId}
                 type='text'
                 placeholder='Add a new task'
                 value={newTask}
@@ -48,8 +54,8 @@ const TodoApp = () => {
                 {tasks.map((task, index) => (
                     <div key={index} style={{ textDecoration: task.completed ? 'line-through' : 'none' }}>
                         <input
-                            id='taskStatus'
-                            name='taskStatus'
+                            id={`taskStatus-${instanceId}-${index}`}
+                            name={`taskStatus-${instanceId}-${index}`}
                             type='checkbox'
                             checked={task.completed}
                             onChange={() => toggleCompletion(index)}

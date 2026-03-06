@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import icons from '../site/icons';
-import getKey from '../utils/KeyGenerator';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
 import EditableTextField from '../utils/EditableTextField';
 import IngredientDialog from '../utils/IngredientDialog';
 import validate from '../utils/validate';
 import VulgarFractions from '../utils/VulgarFractions';
+import Sounds from '../sound/Sounds';
 
 const Recipe = ({
-
     recipes,
     setRecipes,
     recipeGroupIndex,
     recipeIndex,
     recipe,
     setCollapseAll
-    
 }) => {
 
     const [collapsed, setCollapsed] = useState(recipe.collapsed);
@@ -34,6 +32,7 @@ const Recipe = ({
     const [index, setIndex] = useState();
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [dialogType, setDialogType] = useState();
+    const [help, setHelp] = useState(false);
 
     const unitsOfMeasure = [
         'no unit label', 'unit', 'teaspoon', 'tablespoon', 'cup', 'milliliter', 'liter', 'fluid ounce',
@@ -42,6 +41,58 @@ const Recipe = ({
 
     const closeDialog = () => setDialogOpen(false);
     const valuesArray = [0, .25, .5, .75, 1];
+    const refreshPage = () => {
+        // Store the recipe that was just edited before refresh
+        localStorage.setItem('lastEditedRecipe', JSON.stringify({
+            recipeGroupIndex,
+            recipeIndex,
+            recipeName: recipe.dish
+        }));
+        window.location.reload();
+    };
+
+    const createListItemId = (prefix = 'item') => {
+        return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+    };
+
+    const ensureIngredientId = (ingredient, prefix = 'ingredient') => {
+        if (!Array.isArray(ingredient)) return ingredient;
+        const normalizedIngredient = [...ingredient];
+        if (typeof normalizedIngredient[3] !== 'boolean') {
+            normalizedIngredient[3] = Boolean(normalizedIngredient[3]);
+        }
+        if (!normalizedIngredient[4]) {
+            normalizedIngredient[4] = createListItemId(prefix);
+        }
+        return normalizedIngredient;
+    };
+
+    const ensureInstructionId = (instruction, prefix = 'instruction') => {
+        if (typeof instruction === 'string') {
+            return {
+                id: createListItemId(prefix),
+                step: instruction,
+                ingredients: []
+            };
+        }
+
+        if (!instruction || typeof instruction !== 'object') {
+            return {
+                id: createListItemId(prefix),
+                step: '',
+                ingredients: []
+            };
+        }
+
+        return {
+            ...instruction,
+            id: instruction.id || createListItemId(prefix),
+            ingredients: (Array.isArray(instruction.ingredients) ? instruction.ingredients : []).map((ingredient) =>
+                ensureIngredientId(ingredient, `${prefix}-ingredient`)
+            )
+        };
+    };
+
     const roundToNearest = (value) => {
         const wholePart = Math.floor(value);
         const decimalPart = value - wholePart;
@@ -52,44 +103,66 @@ const Recipe = ({
     };
     useEffect(() => {
         if (editRecipe && editedRecipe !== null) {
-            console.log(`editedRecipe: ${editedRecipe}`);
             setEdit(true);
         }
-    },[editedRecipe])
-
+    }, [editRecipe, editedRecipe])
     useEffect(() => {
         const newRecipes = [...recipes];
         const selectedNewRecipe = newRecipes[recipeGroupIndex].recipes[recipeIndex];
         let dataUpdated = false;
         if (validate(selectedNewRecipe.ingredients) === null) {
-            console.log(`[] => selectedNewRecipe: ${JSON.stringify(selectedNewRecipe, null, 2)}`);
-            selectedNewRecipe.ingredients = [
-                []
-            ];
+            selectedNewRecipe.ingredients = [];
             dataUpdated = true;
         } else if (typeof selectedNewRecipe.ingredients === 'string') {
-            console.log(`[] => String => selectedNewRecipe.ingredients: ${JSON.stringify(selectedNewRecipe.ingredients, null, 2)}`);
             selectedNewRecipe.ingredients = [selectedNewRecipe.ingredients];
             dataUpdated = true;
+        } else if (Array.isArray(selectedNewRecipe.ingredients)) {
+            const validIngredients = selectedNewRecipe.ingredients.filter((item) => {
+                if (!Array.isArray(item)) return false;
+                const ingredientLabel = item[2];
+                if (validate(ingredientLabel) === null) return false;
+                const normalized = String(ingredientLabel).trim().toLowerCase();
+                return normalized !== '' && normalized !== 'undefined';
+            });
+            const normalizedIngredients = validIngredients.map((item) => ensureIngredientId(item));
+            const hadInvalidIngredients = validIngredients.length !== selectedNewRecipe.ingredients.length;
+            const hadMissingIngredientIds = normalizedIngredients.some((item, itemIndex) => item[4] !== validIngredients[itemIndex]?.[4]);
+            if (hadInvalidIngredients || hadMissingIngredientIds) {
+                selectedNewRecipe.ingredients = normalizedIngredients;
+                dataUpdated = true;
+            }
         }
         if (validate(selectedNewRecipe.instructions) === null) {
             //selectedNewRecipe.instructions = [];
+            selectedNewRecipe.instructions = [];
+            dataUpdated = true;
+        } else if (typeof selectedNewRecipe.instructions === 'string') {
             selectedNewRecipe.instructions = [
                 {
-                    step: "Add the following ingredients to a bowl.",
-                    ingredients: [
-                        [
-                            1,
-                            "tsp",
-                            "Garlic"
-                        ]
-                    ]
+                    id: createListItemId('instruction'),
+                    step: selectedNewRecipe.instructions,
+                    ingredients: []
                 }
             ];
             dataUpdated = true;
-        } else if (typeof selectedNewRecipe.instructions === 'string') {
-            selectedNewRecipe.instructions = [selectedNewRecipe.instructions];
-            dataUpdated = true;
+        } else if (Array.isArray(selectedNewRecipe.instructions)) {
+            const normalizedInstructions = selectedNewRecipe.instructions.map((instruction) =>
+                ensureInstructionId(instruction)
+            );
+            const hadInstructionShapeChanges = normalizedInstructions.some((instruction, instructionIndex) => {
+                const originalInstruction = selectedNewRecipe.instructions[instructionIndex];
+                if (typeof originalInstruction === 'string') return true;
+                if (!originalInstruction?.id) return true;
+                const originalIngredients = Array.isArray(originalInstruction?.ingredients) ? originalInstruction.ingredients : [];
+                return originalIngredients.some((ingredient, ingredientIndex) => {
+                    const normalizedIngredient = instruction.ingredients?.[ingredientIndex];
+                    return Array.isArray(ingredient) && normalizedIngredient?.[4] !== ingredient?.[4];
+                });
+            });
+            if (hadInstructionShapeChanges) {
+                selectedNewRecipe.instructions = normalizedInstructions;
+                dataUpdated = true;
+            }
         }
         if (selectedNewRecipe.discription) {
             selectedNewRecipe.description = selectedNewRecipe.discription;
@@ -101,29 +174,55 @@ const Recipe = ({
         if (selectedNewRecipe.description === '') {
             //setEdit(true);
         }
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         const newRecipes = [...recipes];
         const selectedNewRecipe = newRecipes[recipeGroupIndex].recipes[recipeIndex];
         selectedNewRecipe.collapseIngredients = collapseIngredients;
         localStorage.setItem('recipeTracking', JSON.stringify(newRecipes));
-    }, [collapseIngredients]);
+    }, [collapseIngredients, recipeGroupIndex, recipeIndex, recipes]);
 
     useEffect(() => {
         const newRecipes = [...recipes];
         const selectedNewRecipe = newRecipes[recipeGroupIndex].recipes[recipeIndex];
         selectedNewRecipe.collapseInstructions = collapseInstructions;
         localStorage.setItem('recipeTracking', JSON.stringify(newRecipes));
-    }, [collapseInstructions]);
+    }, [collapseInstructions, recipeGroupIndex, recipeIndex, recipes]);
 
     useEffect(() => {
-        const newRecipes = [...recipes];
-        const selectedNewRecipe = newRecipes[recipeGroupIndex].recipes[recipeIndex];
-        selectedNewRecipe.isCollapsed = collapsed;
-        selectedNewRecipe.collapsed = collapsed;
-        localStorage.setItem('recipeTracking', JSON.stringify(newRecipes));
-    }, [collapsed]);
+        setRecipes((previousRecipes) => {
+            if (!Array.isArray(previousRecipes)
+                || !previousRecipes[recipeGroupIndex]
+                || !Array.isArray(previousRecipes[recipeGroupIndex].recipes)
+                || !previousRecipes[recipeGroupIndex].recipes[recipeIndex]) {
+                return previousRecipes;
+            }
+
+            const currentRecipe = previousRecipes[recipeGroupIndex].recipes[recipeIndex];
+            if (currentRecipe.isCollapsed === collapsed && currentRecipe.collapsed === collapsed) {
+                return previousRecipes;
+            }
+
+            const updatedRecipes = [...previousRecipes];
+            const updatedGroupRecipes = [...updatedRecipes[recipeGroupIndex].recipes];
+            updatedGroupRecipes[recipeIndex] = {
+                ...currentRecipe,
+                isCollapsed: collapsed,
+                collapsed: collapsed
+            };
+            updatedRecipes[recipeGroupIndex] = {
+                ...updatedRecipes[recipeGroupIndex],
+                recipes: updatedGroupRecipes
+            };
+            localStorage.setItem('recipeTracking', JSON.stringify(updatedRecipes));
+            return updatedRecipes;
+        });
+    }, [collapsed, recipeGroupIndex, recipeIndex, setRecipes]);
+
+    useEffect(() => {
+        setCollapsed(recipe.isCollapsed ?? recipe.collapsed ?? true);
+    }, [recipe.isCollapsed, recipe.collapsed]);
 
     const toggleEditTitle = () => {
         const toggleTitle = (editTitle)
@@ -177,7 +276,7 @@ const Recipe = ({
                             ) {
                                 return null;
                             }
-                            return [quantity, unit, name];
+                            return [quantity, unit, name, false, createListItemId('ingredient')];
                         }
 
                         // Optional: also skip single-word lines like just 'undefined'
@@ -196,6 +295,7 @@ const Recipe = ({
                 instructions = buffer
                     .filter(Boolean)
                     .map(line => ({
+                        id: createListItemId('instruction'),
                         step: line,
                         ingredients: [] // or extract matched ingredients here if needed
                     }));
@@ -294,11 +394,11 @@ const Recipe = ({
                 recipes: updatedGroupRecipes
             };
             setRecipes(newRecipes);
+            refreshPage();
         }
     }
 
     const toggleEditIngredients = () => {
-        console.log(`toggleEditIngredients => editedIngredients: ${JSON.stringify(editedIngredients, null, 2)}`);
         const toggleIngredients = (editIngredients)
             ? false
             : true;
@@ -333,7 +433,7 @@ const Recipe = ({
             if (index >= 0 && index < array.length) {
                 array.splice(index, 1);
             } else {
-                console.error("Index out of range");
+                //console.error("Index out of range");
             }
         };
         if (toggle) {
@@ -344,12 +444,20 @@ const Recipe = ({
     }
     const ifUndefinedArray = (value) => (validate(value) === null) ? [] : value;
     const addIngredient = (newIngredient) => {
-        console.log(`addIngredient=> newIngredient: ${JSON.stringify(newIngredient, null, 2)}`);
         const newRecipes = [...recipes];
         const selectedNewRecipe = newRecipes[recipeGroupIndex].recipes[recipeIndex];
         const { ingredient, unit, quantity } = newIngredient;
         const unitLabel = (unit.includes('no unit label')) ? '' : unit;
-        const ingredientData = [Number(quantity), unitLabel, ingredient, false];
+        const existingIngredientId = (category.toLowerCase().includes('ingredient') && dialogType === 'edit')
+            ? selectedNewRecipe.ingredients?.[index]?.[4]
+            : null;
+        const ingredientData = [
+            Number(quantity),
+            unitLabel,
+            ingredient,
+            false,
+            existingIngredientId || createListItemId('ingredient')
+        ];
         if (category.toLowerCase().includes('ingredient')) {
             if (dialogType === 'edit') {
                 selectedNewRecipe.ingredients[index] = ingredientData;
@@ -362,27 +470,6 @@ const Recipe = ({
         setRecipes(newRecipes);
 
     }
-    const splitAndCombine = (value) => {
-        const originalIndex = value.split(' ');
-        const newIndex = [];
-        newIndex.push(originalIndex[0]);
-        newIndex.push(originalIndex[1]);
-        if (originalIndex.length > 2) {
-            newIndex.push(originalIndex.slice(2).join(' '));
-        }
-        return newIndex;
-    }
-    const formatIngredient = (newIngredients) => {
-        const ingredients = [];
-        const ingredientConfig = String(newIngredients).split('\n').map(
-            (ingredient, index) => {
-                const ingredientArray = condenseArray(ingredient.split(' '));
-                const newIngredient = splitAndCombine(ingredientArray)
-                ingredients.push(newIngredient);
-            }
-        );
-        console.log(`formatIngredient => ingredientConfig: ${JSON.stringify(ingredientConfig, null, 2)}`);
-    };
     const condenseArray  = (originalArray) => {
         if (originalArray.length < 3) {
             return originalArray;
@@ -396,30 +483,27 @@ const Recipe = ({
     }
 
     const addIngredients = (newIngredients) => {
-        //
-        console.log(`addIngredients => newIngredients1: ${JSON.stringify(newIngredients, null, 2)}`);
-        const ingredientArray = newIngredients.split('\n').map((ingredient) => {
-            return {
-                ingredients: [
-                    condenseArray(ingredient.split(' '))
-                ]
-            }
-        });
-        console.log(`addIngredients => ingredientArray: ${JSON.stringify(ingredientArray, null, 2)}`);
         const newRecipes = [...recipes];
         const selectedNewRecipe = newRecipes[recipeGroupIndex].recipes[recipeIndex];
-        const ingredientData = newIngredients.split('\n').map((ingredient) => condenseArray(ingredient.split(' ')));
-        console.log(`addIngredients => ingredientData: ${JSON.stringify(ingredientData, null, 2)}`);
+        const ingredientData = newIngredients.split('\n').map((ingredient) => {
+            const normalizedIngredient = condenseArray(ingredient.split(' '));
+            return [
+                normalizedIngredient[0],
+                normalizedIngredient[1],
+                normalizedIngredient[2],
+                false,
+                createListItemId('ingredient')
+            ];
+        });
         selectedNewRecipe.ingredients = ingredientData;
-        console.log(`addIngredients => newRecipes: ${JSON.stringify(newRecipes, null, 2)}`);
+        selectedNewRecipe.isCollapsed = false;
+        selectedNewRecipe.collapsed = false;
         setRecipes(newRecipes);
     }
 
     const addCheckbox = (category, index) => {
-        //console.log(`addCheckbox => category: ${category}`)
         const newRecipes = [...recipes];
         const selectedNewRecipe = newRecipes[recipeGroupIndex].recipes[recipeIndex];
-        //console.log(`addCheckbox => selectedNewRecipe: ${JSON.stringify(selectedNewRecipe, null, 2)}`)
         if (category.toLowerCase().includes('ingredient')) {
             setDialogType('add');
             setCategory(category);
@@ -429,6 +513,7 @@ const Recipe = ({
             if (index === null) {
                 const newInstruction = prompt(`Add a new instruction:`, '');
                 const step = {
+                    id: createListItemId('instruction'),
                     step: newInstruction,
                     ingredients: []
                 }
@@ -450,12 +535,15 @@ const Recipe = ({
             const ingredientPrepared = (selectedNewRecipe.ingredients[index][3]) ? false : true;
             selectedNewRecipe.ingredients[index][3] = ingredientPrepared;
             setRecipes(newRecipes);
+            //refreshPage();
         } else if (category === 'instructions') {
             const ingredient = selectedNewRecipe.instructions[index].ingredients[ingredientIndex];
             const ingredientAdded = (ingredient[3]) ? false : true;
             ingredient[3] = ingredientAdded;
             setRecipes(newRecipes);
+            //refreshPage();
         }
+        playSound();
     }
     const editIngredient = (category, index) => {
         const newRecipes = [...recipes];
@@ -472,9 +560,25 @@ const Recipe = ({
         }
     }
 
+    const editSubItem = (category, index, subIndex) => {
+        const editItemByIndex = (array, index) => {
+            if (index >= 0 && index < array.length) {
+                array.splice(index, 1);
+            } else {
+                console.error("Index out of range");
+            }
+        };
+        const newRecipes = [...recipes];
+        if (subIndex === null) {
+            editItemByIndex(newRecipes[recipeGroupIndex].recipes[recipeIndex][category], index);
+        } else {
+            const array = newRecipes[recipeGroupIndex].recipes[recipeIndex][category][index].ingredients
+            editItemByIndex(array, subIndex);
+        }
+        setRecipes(newRecipes);
+    }
     const deleteSubItem = (category, index, subIndex) => {
         const removeItemByIndex = (array, index) => {
-            //console.log(`removeItemByIndex => array: ${array} index: ${index}`)
             if (index >= 0 && index < array.length) {
                 array.splice(index, 1);
             } else {
@@ -491,10 +595,30 @@ const Recipe = ({
         setRecipes(newRecipes);
     }
 
+    const resetCheckboxes = (category) => {
+        const newRecipes = [...recipes];
+        const selectedNewRecipe = newRecipes[recipeGroupIndex].recipes[recipeIndex];
+        
+        if (category.toLowerCase().includes('ingredient')) {
+            // Reset all ingredient checkboxes
+            selectedNewRecipe.ingredients.forEach(ingredient => {
+                ingredient[3] = false;
+            });
+        } else if (category.toLowerCase().includes('instruction')) {
+            // Reset all instruction checkboxes
+            selectedNewRecipe.instructions.forEach(instruction => {
+                instruction.ingredients.forEach(ingredient => {
+                    ingredient[3] = false;
+                });
+            });
+        }
+        setRecipes(newRecipes);
+    };
+
     const recipeHeader = (category, toggleFunction, isEdit) => {
 
-        return <div className='containerBox flexContainer bg-lite centerVertical'>
-            <div className='flex2Column containerDetail color-yellow bg-tinted pt-10 pb-10 mr-5'>
+        return <div className='containerDetail m-5 flexContainer bg-lite centerVertical'>
+            <div className='flex2Column containerDetail color-yellow size20 bg-tinted pt-10 pb-10 mr-5'>
                 <CollapseToggleButton
                     title={category}
                     isCollapsed={(category.toLowerCase().includes('ingredient')) ? collapseIngredients : collapseInstructions}
@@ -506,7 +630,7 @@ const Recipe = ({
                 {
                     (edit)
                         ? <div title='save' className='r-10 p-20 bg-lite color-neogreen button bold' onClick={() => setEdit(prev => !prev)}>save</div>
-                        : <div title='edit' className='r-10 pt-20 pb-20 pl-15 pr-15 bg-lite button' onClick={() => setEdit(prev => !prev)}>{icons.edit}</div>
+                        : <div title='edit' className='r-10 pt-20 pb-20 pl-15 pr-15 bg-lite button size25' onClick={() => setEdit(prev => !prev)}>{icons.edit}</div>
                 }
             </div>
             <div className='flexColumn'>
@@ -518,8 +642,19 @@ const Recipe = ({
                     className='ml-5 r-10 p-20 bg-lite button color-lite centeredContent w-50'
                     onClick={() => addCheckbox(category, null)}
                 >
-                    <div className='text-outline-light size15'>
+                    <div className='text-outline-light size25'>
                         {icons.plus}
+                    </div>
+                </div>
+            </div>
+            <div className='flexColumn'>
+                <div
+                    title={`reset all ${category.toLowerCase().replace(':', '')}`}
+                    className='ml-5 r-10 p-20 bg-lite button color-lite centeredContent w-50'
+                    onClick={() => resetCheckboxes(category)}
+                >
+                    <div className='size35 mt--5 text-outline-dark'>
+                        ↺
                     </div>
                 </div>
             </div>
@@ -561,12 +696,10 @@ const Recipe = ({
                 units = 'tablespoon';
                 quantity = (quantity / 3)
             }
-            //console.log(`mls => ${item[2]} quantity: ${quantity}`)
         }
         if (units === 'tablespoons' || units === 'tblsp' || units === 'tblsps' || units === 'tbsp' || units === 'tbsps') {
             units = 'tablespoon';
         }
-        //console.log(`getItemQuantityDisplay => ${item[2]}  ${item[2]} units: ${units} quantity: ${quantity}`)
         if (units === 'g' || units === 'gs' || units === 'gram' || units === 'grams') {
             units = 'teaspoon';
             newQuantity = Number(quantity / 5.69);
@@ -576,26 +709,19 @@ const Recipe = ({
                 quantity = (quantity / 3)
             }
         }
-        //console.log(`getItemQuantityDisplay => ${item[2]}  ${item[2]} units: ${units} quantity: ${quantity}`)
         if ((units === 'tablespoons' || units === 'tablespoon') && Number(quantity) > 4) {
             units = 'cup';
             newQuantity = Number(quantity / 16);
             quantity = (isNaN(newQuantity)) ? quantity : newQuantity;
-            //console.log(`getItemQuantityDisplay => ${item[2]}  units: ${units} quantity: ${quantity}`)
         }
-        //console.log(`getItemQuantityDisplay => ${item[2]}  ${item[2]} units: ${units} quantity: ${quantity}`)
-
+        
         if (!String(quantity).includes('/')) {
             if (!Number.isInteger(quantity)) {
-                //console.log(`getItemQuantityDisplay => ${item[2]}  ${item[2]} units: ${units} quantity: ${quantity}`)
                 quantity = roundToNearest(quantity);
-                //console.log(`getItemQuantityDisplay => ${item[2]}  ${item[2]} units: ${units} quantity: ${quantity}`)
             }
         }
-        //console.log(`getItemQuantityDisplay => ${item[2]}  ${item[2]} units: ${units} quantity: ${quantity}`)
         
         newQuantity = Number(String(quantity).replace('0.', '.'));
-        //console.log(`getItemQuantityDisplay => item[0]: ${item[0]} quantity: ${quantity} newQuantity: ${newQuantity}`)
         quantity = (isNaN(newQuantity)) ? item[0] : newQuantity;
         units = units.replace('tsp', 'teaspoon');
         units = units.replace('tbsp', 'tablespoon');
@@ -611,18 +737,24 @@ const Recipe = ({
         }
         return <div className='width-100-percent'>
             {
-                (quantity === 0)
+                (quantity === 0 || quantity === '0' || quantity === '' || quantity === undefined || quantity === null || Number.isNaN(quantity))
                 ? null
                 : <VulgarFractions value={quantity} />
             }
-            <span className='mr-10 fl-left'>{unitsDisplay}</span>
+            <span className='mr-10 fl-left'>
+            {
+                (unitsDisplay === 0 || unitsDisplay === '0' || unitsDisplay === '' || unitsDisplay === undefined || unitsDisplay === null || Number.isNaN(unitsDisplay))
+                    ? null
+                    : unitsDisplay
+            }
+            </span>
         </div>
     }
     const getIngredientDisplay = (item, index, category) => <div
-        key={getKey(`ingredient${index}`)}
-        className={`containerBox flexContainer centerVertical ${(item[3]) ? 'bg-lite' : ''}`}
+        key={item?.[4] || `${category || 'ingredient'}-${String(item?.[2] || 'item')}-${index}`}
+        className={`containerDetail m-5 flexContainer centerVertical ${(item[3]) ? 'bg-lite' : ''}`}
     >
-        <div className='containerBox p-20 flex2Column'>
+        <div className='containerDetail size20 p-25 flex2Column'>
             <div
                 title='edit ingredient'
                 className=''
@@ -636,47 +768,62 @@ const Recipe = ({
                 (!edit)
                     ? <div
                         title='toggle checkbox'
-                        className='containerBox bg-lite p-20 button'
+                        className='containerDetail m-5 bg-lite p-20 button'
                         onClick={() => toggleCheckbox(category, index, 0)}
                     >
                         <input
-                            id='completed'
                             name='completed'
                             className='regular-checkbox button'
                             checked={item[3]}
                             type='checkbox'
-                            onChange={() => console.log(`category: ${category}, index: ${index}`)}
+                            onChange={() => {}}
                         />
                     </div>
-                    : <div
-                        title='delete'
-                        className='containerBox bg-lite p-20 button centeredContent'
-                        onClick={() => deleteSubItem(category, index, null)}
-                    >
-                        {icons.delete}
+                    : <div className='containerDetail flexContainer'>
+                        <div
+                            title='edit'
+                            className='containerDetail flexColumn bg-lite p-20 button centeredContent m-5'
+                            onClick={() => editSubItem(category, index, null)}
+                        >
+                            {icons.edit}
+                        </div>
+                        <div
+                            title='delete'
+                            className='containerDetail flexColumn bg-lite p-20 button centeredContent m-5'
+                            onClick={() => deleteSubItem(category, index, null)}
+                        >
+                            {icons.delete}
+                        </div>
                     </div>
             }
         </div>
     </div>
     const getStep = (item) => {
+        if (typeof item === 'string') {
+            return item;
+        }
         if (item !== undefined) {
-            console.log(`getStep => item: ${JSON.stringify(item, null, 2)}`);
             return item.step
         }
         return 'noone';
     }
-    const getIngredients = (item) => {
-        if (item !== undefined) {
-            console.log(`getIngredients => item: ${JSON.stringify(item, null, 2)}`);
-            return item.ingredients
+    const playSound = () => {
+        if (typeof Sounds.playSoftBell === 'function') {
+            Sounds.playSoftBell();
+            return;
         }
-        return 'noone';
-    }
+        if (typeof Sounds.softBell === 'function') {
+            Sounds.softBell(250);
+            return;
+        }
+        if (typeof Sounds.boop === 'function') {
+            Sounds.boop(0, 1);
+        }
+    };
     const getInstructionsDisplay = (item, index, category) => {
-
         return (item !== undefined)
-            ? <div key={getKey(`instruction${index}${Math.random() * 100}`)} className=''>
-                <div className='containerBox p-20 flexContainer centerVertical color-yellow bold'>
+            ? <div key={item?.id || `${category || 'instruction'}-${index}`} className=''>
+                <div className='containerDetail m-5 p-20 flexContainer centerVertical color-yellow size20 bold'>
                     <div className='flex2Column'>
                         <div 
                             title='edit ingredient'
@@ -695,49 +842,70 @@ const Recipe = ({
                                 <div className='flex2Column text-outline-light size15'>{icons.plus}</div>
                                 <div className='ml-5 flex2Column size20'>{icons.chili}</div>
                             </div>
-                            : <div
-                                title='delete'
-                                className='containerBox bg-lite p-20 button centeredContent'
-                                onClick={() => deleteSubItem(category, index, null)}
-                            >
-                                {icons.delete}
+                            : <div className='containerDetail flexContainer'>
+                                <div
+                                    title='edit'
+                                    className='containerDetail flexColumn bg-lite p-20 button centeredContent m-5'
+                                    onClick={() => editSubItem(category, index, null)}
+                                >
+                                    {icons.edit}
+                                </div>
+                                <div
+                                    title='delete'
+                                    className='containerDetail flexColumn bg-lite p-20 button centeredContent m-5'
+                                    onClick={() => deleteSubItem(category, index, null)}
+                                >
+                                    {icons.delete}
+                                </div>
                             </div>
                         }
                     </div>
                 </div>
                 {
                     (item !== undefined)
-                    ? item.ingredients.map((ingredient, ingredientIndex) => <div key={getKey(`ingredient${ingredientIndex}`)} className={`containerBox flexContainer centerVertical ${(ingredient[3]) ? 'bg-lite' : ''}`}>
-                        <div className='flex2Column'>
-                            <div className='containerBox p-20' /* onClick={() => editIngredient(category, ingredientIndex)} */>{ingredient[0]} {ingredient[1]} {ingredient[2]}</div>
-                        </div>
-                        <div className='flexColumn contentRight'>
+                        ? <div className='height-400'>
                             {
-                                (!edit)
-                                ? <div
-                                    title='select'
-                                    className='containerBox bg-lite p-20 button'
-                                    onClick={() => toggleCheckbox(category, index, ingredientIndex)}
-                                >
-                                    <input
-                                        className='regular-checkbox button'
-                                        checked={ingredient[3]}
-                                        type='checkbox'
-                                        id='completed'
-                                        onChange={() => console.log(`category: ${category}, index: ${index}`)}
-                                    />
+                                (Array.isArray(item?.ingredients) ? item.ingredients : []).map((ingredient, ingredientIndex) => <div key={ingredient?.[4] || `${item?.id || `${category || 'instruction'}-${index}`}-ingredient-${ingredientIndex}-${String(ingredient?.[2] || 'item')}`} className={`containerDetail m-5 flexContainer centerVertical ${(ingredient[3]) ? 'bg-lite' : ''}`}>
+                                    <div className='flex2Column'>
+                                        <div className='containerDetail size20 p-25' /* onClick={() => editIngredient(category, ingredientIndex)} */>{ingredient[0]} {ingredient[1]} {ingredient[2]}</div>
+                                    </div>
+                                    <div className='flexColumn contentRight'>
+                                        {
+                                            (!edit)
+                                            ? <div
+                                                title='select'
+                                                className='containerDetail m-5 bg-lite p-20 button'
+                                                onClick={() => toggleCheckbox(category, index, ingredientIndex)}
+                                            >
+                                                <input
+                                                    className='regular-checkbox button'
+                                                    checked={ingredient[3]}
+                                                    type='checkbox'
+                                                    onChange={() => {}}
+                                                />
+                                            </div>
+                                            : <div className='containerDetail flexContainer'>
+                                                <div
+                                                    title='edit'
+                                                    className='containerDetail flexColumn bg-lite p-20 button centeredContent m-5'
+                                                    onClick={() => editSubItem(category, index, ingredientIndex)}
+                                                >
+                                                    {icons.edit}
+                                                </div>
+                                                <div
+                                                    title='delete'
+                                                    className='containerDetail flexColumn bg-lite p-20 button centeredContent m-5'
+                                                    onClick={() => deleteSubItem(category, index,ingredientIndex)}
+                                                >
+                                                    {icons.delete}
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
                                 </div>
-                                : <div
-                                    title='delete'
-                                    className='containerBox bg-lite p-20 button centeredContent'
-                                    onClick={() => deleteSubItem(category, index, ingredientIndex)}
-                                >
-                                    {icons.delete}
-                                </div>
+                                )
                             }
                         </div>
-                    </div>
-                    )
                     : null
                 }
             </div>
@@ -745,8 +913,15 @@ const Recipe = ({
 
     }
     const recipeField = (isEdit, setEdited, edited, data, toggleEdit, category) => {
+        const isValidIngredientItem = (item) => {
+            if (!Array.isArray(item)) return false;
+            const ingredientLabel = item[2];
+            if (validate(ingredientLabel) === null) return false;
+            const normalized = String(ingredientLabel).trim().toLowerCase();
+            return normalized !== '' && normalized !== 'undefined';
+        };
         return <div className=''>
-            <div className='color-soft button'>
+            <div className='color-soft height-400'>
                 {
                     (isEdit)
                         ? <textarea
@@ -760,7 +935,7 @@ const Recipe = ({
                         : (typeof data === 'string')
                             ? <div onClick={() => toggleEdit()}>
                                 {ifUndefinedArray(data).map((line, index) => (
-                                    <React.Fragment key={getKey(`data${index}`)}>
+                                    <React.Fragment key={`data-${index}`}>
                                         {line}
                                         {<br />}
                                     </React.Fragment>
@@ -769,10 +944,12 @@ const Recipe = ({
                             : ifUndefinedArray(data).map((item, index) => {
                                 return (category.toLowerCase().includes('ingredient'))
                                     ? (!collapseIngredients)
-                                        ? getIngredientDisplay(item, index, category)
+                                        ? (isValidIngredientItem(item)
+                                            ? getIngredientDisplay(item, index, category)
+                                            : null)
                                         : null
                                     : (!collapseInstructions)
-                                        ? getInstructionsDisplay()
+                                        ? getInstructionsDisplay(item, index, category)
                                         : null
                             })
                 }
@@ -789,13 +966,36 @@ const Recipe = ({
             setRecipes(newRecipes);
         }
     }
-    const ifUndefinedString = (value) => {
-        let newValue = (validate(value) === null) ? 'empty...' : value;
-        newValue = (value === null) ? 'empty...' : value;
-        return newValue;
+    const scrollToActiveRecipe = (groupIndex, recipeIndex) => {
+        const lastEditedRecipe = localStorage.getItem('lastEditedRecipe');
+        if (lastEditedRecipe) {
+            try {
+                const edited = JSON.parse(lastEditedRecipe);
+                // If this is the recipe that was edited, expand it
+                if (edited.recipeGroupIndex === groupIndex && edited.recipeIndex === recipeIndex) {
+                    setCollapsed(false);
+                    // Scroll to this recipe after a brief delay to allow render
+                    setTimeout(() => {
+                        const recipeElement = document.getElementById(`recipe-${groupIndex}-${recipeIndex}`);
+                        if (recipeElement) {
+                            recipeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }, 300);
+                    // Clear the localStorage flag
+                    localStorage.removeItem('lastEditedRecipe');
+                }
+            } catch (error) {
+                console.error('Error parsing lastEditedRecipe:', error);
+            }
+        }
     }
-    return <div key={`recipe${recipeIndex}`} className='lowerBorder contentLeft'>
-        <div className='containerBox flexContainer bg-lite'>
+    useEffect(() => {
+        // On component mount, check if this recipe was just edited
+        scrollToActiveRecipe(recipeGroupIndex, recipeIndex);
+    }, [recipes, recipeGroupIndex, recipeIndex]);
+
+    return <div key={`recipe${recipeIndex}`} id={`recipe-${recipeGroupIndex}-${recipeIndex}`} className='lowerBorder contentLeft'>
+        <div className='containerDetail m-5 flexContainer bg-lite'>
             <div className='flex1Auto contentLeft'>
                 {
                     (editTitle)
@@ -808,8 +1008,8 @@ const Recipe = ({
                         {recipe.dish}
                     </textarea>
                     : <div>
-                        <div className='containerBox bg-lite centerVertical '>
-                            <div className='containerDetail color-yellow bg-tinted p-20'>
+                        <div className='containerDetail bg-lite'>
+                            <div className='containerDetail color-yellow size20 bg-tinted p-20'>
                                 <CollapseToggleButton
                                     title={recipe.dish}
                                     isCollapsed={collapsed}
@@ -823,12 +1023,18 @@ const Recipe = ({
                             (collapsed)
                             ? null
                             : <div>
-                                <div className='containerBox flexContainer'>
-                                    <div className='flex2Column'>
-                                                <div className='containerDetail pt-10 pb-10 pr-10 pl-20 color-orange size12 flex2Column contentLeft m-5'>
-                                            Use the following headers for easy parsing:
-                                            Ingredients:, Cooking Instructions:, Serving Instructions:, Nutritional Value:
-                                        </div>
+                                <div className='containerDetail flexContainer'>
+                                    <div className='flex2Column contentRight'>
+                                        {
+                                            (help)
+                                            ? <div className='containerDetail pt-10 pb-10 pr-10 pl-20 color-orange size12 flex2Column contentLeft m-5'>
+                                                    Use the following headers for easy parsing:
+                                                    Ingredients:, Cooking Instructions:, Serving Instructions:, Nutritional Value:
+                                                </div>
+                                            : <div className='containerDetail w-100 button p-30 bg-lite size30 ml-auto mr-5 contentCenter' onClick={() => setHelp(true)}>
+                                                ❓
+                                                </div>
+                                        }
                                     </div>
                                     <div
                                         title='delete'
@@ -883,5 +1089,5 @@ const Recipe = ({
             }
         </div>
     </div>
-}
+};
 export default Recipe;

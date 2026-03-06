@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import './TradeView.css';
 import icons from '../site/icons';
 import TradingViewWidgetWrapper from './TradingViewWidgetWrapper';
 import { MarketOverview, TickerTape } from 'react-ts-tradingview-widgets';
-import { formatDate } from '../hooks/formatDate';
 import TradingViewNews from './TradingViewNews';
 
 // TradingView widgets (embed via iframe or script)
@@ -31,26 +30,6 @@ const STOCKS = [
 ];
 
 const TradeView = () => {
-    const [search, setSearch] = useState('');
-
-    const API_TOKEN = process.env.REACT_APP_NEWS_API;
-    const NEWS_API = `https://newsapi.org/v2/top-headlines?category=business&apiKey=${API_TOKEN}`;
-    const TECHNEWS_API = `https://newsapi.org/v2/top-headlines?sources=techcrunch&apiKey=${API_TOKEN}`;
-    const WJS_API = `https://newsapi.org/v2/everything?domains=wsj.com&apiKey=${API_TOKEN}`;
-    const BBC_API = `https://newsapi.org/v2/top-headlines?sources=bbc-news&apiKey=${API_TOKEN}`;
-    const SEARCHTOPSTORIES_API = `https://newsapi.org/v2/top-headlines?q=${search}&apiKey=${API_TOKEN}`;
-    const NEWS_CATEGORIES = [
-        { key: 'NEWS', label: 'Global Business', api: NEWS_API },
-        { key: 'TECH', label: 'Tech Crunch', api: TECHNEWS_API },
-        { key: 'WJS', label: 'Wall Street Journal', api: WJS_API },
-        { key: 'BBC', label: 'BBC Business', api: BBC_API },
-        { key: 'SEARCHTOPSTORIES', label: 'Search Top Stories', api: SEARCHTOPSTORIES_API }
-    ];
-
-    const [selectedCategory, setSelectedCategory] = useState(NEWS_CATEGORIES[0].key);
-    const [currentNewsApi, setCurrentNewsApi] = useState(NEWS_CATEGORIES[0].api);
-    const [news, setNews] = useState([]);
-    const [selectedStory, setSelectedStory] = useState(null);
     const [inputValue, setInputValue] = useState('');
     
     const [favorites, setFavorites] = useState(() =>
@@ -59,45 +38,19 @@ const TradeView = () => {
     const [selected, setSelected] = useState(favorites.length ? favorites[0] : STOCKS[0].symbol);
 
     const debouncedInput = useDebouncedValue(inputValue, 400);
-    useEffect(() => {
-        setSearch(debouncedInput);
-    }, [debouncedInput]);
 
     const filteredStocks = useMemo(() =>
         STOCKS.filter(
             s =>
-                s.name.toLowerCase().includes(search.toLowerCase()) ||
-                s.symbol.toLowerCase().includes(search.toLowerCase())
+                s.name.toLowerCase().includes(debouncedInput.toLowerCase()) ||
+                s.symbol.toLowerCase().includes(debouncedInput.toLowerCase())
         ),
-        [search]
+        [debouncedInput]
     );
 
-    // Update currentNewsApi when category or search changes
-    useEffect(() => {
-        const selectedObj = NEWS_CATEGORIES.find(cat => cat.key === selectedCategory);
-        if (selectedObj.key === 'SEARCHTOPSTORIES') {
-            setCurrentNewsApi(selectedObj.api); // api string already uses latest search
-        } else {
-            setCurrentNewsApi(selectedObj.api);
-        }
-    }, [selectedCategory, search]);
-
-    // Fetch news when currentNewsApi changes
-    /*
-    useEffect(() => {
-        setSelectedStory(null); // Reset selected story when changing category
-        fetch(currentNewsApi)
-            .then(res => res.json())
-            .then(data => setNews(data.articles || []))
-            .catch(() => setNews([]));
-    }, [currentNewsApi]);
-    */
     useEffect(() => {
         localStorage.setItem('tradeFavorites', JSON.stringify(favorites));
     }, [favorites]);
-    useEffect(() => {
-        //console.log(`TradeView => useEffect => news: ${JSON.stringify(news, null, 2)}`);
-    }, [news]);
 
     // Add/remove favorites
     const toggleFavorite = (symbol) => {
@@ -126,78 +79,6 @@ const TradeView = () => {
             ))}
         </div>
     ));
-
-    const getNews = () => (
-        <div>
-            {/* News Category Submenu */}
-            <div className='news-category-menu containerDetail p-10 mb-5 ml-5 mr-5'>
-                {NEWS_CATEGORIES.map(cat => (
-                    <div
-                        key={cat.key}
-                        className={`containerDetail hover button contentLeft pl-15 pt-10 pb-10 pr-10 flex${NEWS_CATEGORIES.length+1}Column${selectedCategory === cat.key ? ' selected' : ''}`}
-                        onClick={() => setSelectedCategory(cat.key)}
-                    >
-                        {cat.label}
-                    </div>
-                ))}
-                {selectedCategory === 'SEARCHTOPSTORIES' && (
-                    <input
-                        type='text'
-                        placeholder='Search news...'
-                        value={inputValue}
-                        onChange={e => setInputValue(e.target.value)}
-                        className='news-search-input width-100-percent m-5 p-20'
-                    />
-                )}
-            </div>
-            {/* Top Stories Menu */}
-            <ul className='containerDetail news-menu p-20 ml-5 mr-5'>
-                {news.length === 0 && <li className='color-soft'>No news available.</li>}
-                {news.slice(0, 8).map((article, idx) => (
-                    <li
-                        key={idx}
-                        className={`contentLeft hover button ${selectedStory === article ? ' selected' : ''}`}
-                        onClick={() => setSelectedStory(article)}
-                    >
-                        <div className='news-source pt-5 pl-10 pr-10'>{`${(selectedCategory === 'TECH' || selectedCategory === 'WJS' || selectedCategory === 'BBC') ? formatDate(article.publishedAt) : article.source?.name}`}</div>
-                        <div className='news-title pl-10 pr-10 pb-10'>{article.title}</div>
-                    </li>
-                ))}
-            </ul>
-            {/* Story Details */}
-            {selectedStory && (
-                <div className='news-detail containerDetail m-5 p-20 bg-lite contentLeft'>
-                    <div className='news-detail-header'>
-                        <h4 className='color-yellow'>{selectedStory.title}</h4>
-                        <span className='news-detail-source'>{selectedStory.source?.name}</span>
-                        <span className='news-detail-date'>
-                            {new Date(selectedStory.publishedAt).toLocaleString()}
-                        </span>
-                    </div>
-                    {selectedStory.urlToImage && (
-                        <img
-                            src={selectedStory.urlToImage}
-                            alt={selectedStory.title}
-                            className='news-detail-image'
-                            style={{ maxWidth: '100%', borderRadius: '8px', margin: '10px 0' }}
-                        />
-                    )}
-                    <div className='news-detail-description contentLeft'>
-                        <p>{selectedStory.description}</p>
-                        <p className='news-detail-content'>{selectedStory.content}</p>
-                    </div>
-                    <a
-                        href={selectedStory.url}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        className='news-detail-link'
-                    >
-                        Read full story
-                    </a>
-                </div>
-            )}
-        </div>
-    );
 
     return (
         <div className='mt--30'>

@@ -17,12 +17,11 @@ const parseSchedule = (rawText, baseStartTime = null) => {
             firstLine.match(
                 /^(?:✅\s*)?(.+?)\s*-\s*(\d+)\s*(min|mins|minutes|hr|hrs|hour|hours|s|sec|secs|seconds)\b/i
         );
-        let title = '', durationStr = '', notes = rest;
+        let title = '', notes = rest;
         let timeInSeconds = 1800; // default 30 min
 
         if (match) {
             title = match[1].trim();
-            durationStr = `${match[2]} ${match[3]}`;
             const num = parseInt(match[2], 10);
             const unit = match[3].toLowerCase();
             if (unit.startsWith('h')) timeInSeconds = num * 60 * 60;
@@ -80,7 +79,6 @@ const Scheduler = () => {
     useEffect(() => {
         const savedTasks = localStorage.getItem('schedulerTasks');
         const savedMeta = localStorage.getItem('schedulerMeta');
-        console.log(`Scheduler => savedTasks: ${JSON.stringify(savedTasks, null, 2)}`);
         if (savedTasks && savedMeta) {
             try {
                 const parsedTasks = JSON.parse(savedTasks);

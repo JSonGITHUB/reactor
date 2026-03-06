@@ -3,11 +3,8 @@ import productList from './productList'
 import getKey from '../utils/KeyGenerator';
 import icons from '../site/icons';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
-import TextColorizer from '../utils/TextColorizer';
 
-const Product = ({
-    
-}) => {
+const Product = () => {
 
 
     const productDisplay = useRef(null);
@@ -19,7 +16,7 @@ const Product = ({
     const [product, setProduct] = useState();
     const [displayImage, setDisplayImage] = useState();
     const [isFront, setIsFront] = useState(true);
-    const [color, setColor] = useState();
+    const [color, setColor] = useState('');
     const [size, setSize] = useState();
 
     useEffect(() => {
@@ -27,15 +24,26 @@ const Product = ({
     }, []);
     useEffect(() => {
         if (product) {
-            console.log(`isFront: ${isFront}`);
-            console.log(`Object.keys(product.colors)[0]: ${JSON.stringify(product.colors[Object.keys(product.colors)[0]], null, 2)}`);
-            setDisplayImage((isFront) ? product.colors[color].front : product.colors[color].back);
+            const colorKeys = Object.keys(product.colors || {});
+            if (colorKeys.length === 0) {
+                setDisplayImage(product.image);
+                return;
+            }
+            const activeColor = color && product.colors?.[color] ? color : colorKeys[0];
+            if (activeColor !== color) {
+                setColor(activeColor);
+            }
+            const nextImage = isFront
+                ? product.colors?.[activeColor]?.front
+                : product.colors?.[activeColor]?.back;
+            setDisplayImage(nextImage || product.image);
         };
-    }, [isFront]);
+    }, [color, isFront, product]);
     useEffect(() => {
         if (product) {
-            setDisplayImage(product.image);
-            setColor(Object.keys(product.colors)[0]);
+            const firstColor = Object.keys(product.colors || {})[0] || '';
+            setColor(firstColor);
+            setDisplayImage((firstColor && product.colors?.[firstColor]?.front) || product.image);
             setIsFront(true);
         }
     }, [product]);
@@ -73,7 +81,6 @@ const Product = ({
         if (cartDisplay.current !== null) {
             console.log(`cartDisplay.current.clientHeight: ${cartDisplay}`);
             console.log(`productDisplay.current.clientHeight: ${productDisplay.current.clientHeight}`);
-            const height = () => productDisplay.current.clientHeight*2;
             window.scrollTo({
                 top: document.documentElement.scrollHeight + 400,
                 behavior: 'smooth',
@@ -102,7 +109,7 @@ const Product = ({
             size: getSize(),
             color: color,
             //image: displayImage
-            image: product.colors[color].front
+            image: product.colors?.[color]?.front || product.image
         };
         if (sizeSelect) {
             newCart.push(item);
@@ -173,7 +180,7 @@ const Product = ({
                                             alt={product.name}
                                             className='ht-100'
                                         />
-                                        <div className={`containerDetail size20 color-dark copyright ${(color == key) ? 'bg-green color-white' :'bg-white color-dark'}`}>{key}</div>
+                                        <div className={`containerDetail size20 color-dark copyright ${(color === key) ? 'bg-green color-white' :'bg-white color-dark'}`}>{key}</div>
                                     </div>
                                 )))
                             )
@@ -181,7 +188,7 @@ const Product = ({
                     </div>
                     <div className='containerDetail flexContainer p-10 contentLeft mt-5 mb-5'>
                         {
-                            product && (product.sizes.map((sizeLabel) => <div key={getKey(sizeLabel)} onClick={() => setSize(sizeLabel)} className={`containerDetail button flex${product.sizes.length}Column p-10 contentCenter ${(size == sizeLabel) ? 'bg-green' :'bg-lite'} m-1 width-50 color-lite size20`}>{sizeLabel}</div>))
+                            product && (product.sizes.map((sizeLabel) => <div key={getKey(sizeLabel)} onClick={() => setSize(sizeLabel)} className={`containerDetail button flex${product.sizes.length}Column p-10 contentCenter ${(size === sizeLabel) ? 'bg-green' :'bg-lite'} m-1 width-50 color-lite size20`}>{sizeLabel}</div>))
                         }
                     </div>
                     {/*

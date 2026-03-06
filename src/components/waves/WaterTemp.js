@@ -22,7 +22,7 @@ const WaterTemp = ({
     const [temp, setTemp] = useState(null);
     // eslint-disable-next-line
     const [retry, setRetry] = useState('');
-    const [data, getData] = useOceanData('water', waterUrl, '', setRetry);
+    const [data] = useOceanData('water', waterUrl, '', setRetry);
 
     useEffect(() => {
         //if (data.data !== undefined) {
@@ -35,7 +35,7 @@ const WaterTemp = ({
                 waterTemp: temp
             }));
         }
-    },[data]);
+    }, [data, setStatus]);
 
     const getCurrentTemp = () => {
         if (retry !=='') {

@@ -160,7 +160,7 @@ const StepContainer = React.memo(( {
     const getEditDialog = (id) => {
         const newDialog = <div className='containerBox'>
             <input
-                id='newStep'
+                id='steptimer-stepcontainer-newStep'
                 name='newStep'
                 type='text'
                 placeholder='Step Description'
@@ -170,7 +170,7 @@ const StepContainer = React.memo(( {
             />
             <br />
             <input
-                id='hours'
+                id='steptimer-stepcontainer-hours'
                 name='hours'
                 type='number'
                 placeholder='Hours'
@@ -178,7 +178,7 @@ const StepContainer = React.memo(( {
                 onChange={(e) => setNewHours(e.target.value)}
             />
             <input
-                id='minutes'
+                id='steptimer-stepcontainer-minutes'
                 name='minutes'
                 type='number'
                 placeholder='Minutes'
@@ -186,7 +186,7 @@ const StepContainer = React.memo(( {
                 onChange={(e) => setNewMinutes(e.target.value)}
             />
             <input
-                id='seconds'
+                id='steptimer-stepcontainer-seconds'
                 name='seconds'
                 type='number'
                 placeholder='Seconds'
@@ -194,7 +194,7 @@ const StepContainer = React.memo(( {
                 onChange={(e) => setNewSeconds(e.target.value)}
             />
             <input
-                id='note'
+                id='steptimer-stepcontainer-note'
                 name='note'
                 type='string'
                 placeholder='Add note'

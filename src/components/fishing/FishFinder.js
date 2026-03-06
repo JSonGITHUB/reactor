@@ -131,18 +131,6 @@ const FishFinder = () => {
         ...data.species.map(s => s.name)
     ];
 
-    // Filter species by season and location
-    const filteredSpecies = data.species.filter(species => {
-        const seasonMatch = selectedSeason === 'All Seasons' || species.season === selectedSeason;
-        const locationMatch = selectedLocation === 'All Locations'
-            || data.locations.some(loc =>
-                loc.name === selectedLocation &&
-                loc.species.some(s => species.name.includes(s))
-            );
-        const speciesMatch = selectedSpecies === 'All Species' || species.name === selectedSpecies;
-        return seasonMatch && locationMatch && speciesMatch;
-    });
-
     // For the main table, show all species filtered by season/location, not by selectedSpecies
     const displayedSpecies = data.species.filter(species => {
         const seasonMatch = selectedSeason === 'All Seasons' || species.season === selectedSeason;

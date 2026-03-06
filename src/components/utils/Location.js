@@ -47,7 +47,7 @@ const Location = ({
     return () => {
       isMounted = false; // Clean up on unmount
     };
-  }, [returnCoordinates]);
+  }, [returnCoordinates, currentPositionExists]);
 
   return (
     <div className='containerDetail p-20'>

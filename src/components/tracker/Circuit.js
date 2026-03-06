@@ -8,8 +8,6 @@ import CircuitEditTitle from './CircuitEditTitle';
 import CircuitNavigation from './CircuitNavigation';
 import CircuitField from './CircuitField';
 import TimeSelectors from '../utils/TimeSelectors';
-import initCircuitTracking from './initCircuitTracking';
-import initializeData from './initializeData';
 
 const Circuit = ({
     circuitGroupIndex,
@@ -22,9 +20,7 @@ const Circuit = ({
         setCircuits,
         activeIndex,
         setActiveIndex,
-        setActivated,
-        edit,
-        setEdit
+        setActivated
     } = useContext(CircuitContext);
 
     const [collapsed, setCollapsed] = useState();
@@ -35,13 +31,6 @@ const Circuit = ({
     const [editedCircuitTitle, setEditedCircuitTitle] = useState(null);
     const [editedTodaysGoals, setEditedTodaysGoals] = useState(null);
 
-    const templateCircuit = {
-        title: 'Empty...',
-        description: 'Empty...',
-        circuit: 'Empty...',
-        excersizes: [],
-        isCollapsed: false
-    }
     /* 
     useEffect(() => {
         if (collapsed) {
@@ -56,10 +45,6 @@ const Circuit = ({
     }, [collapsed]);
     */
     useEffect(() => {
-        const newCircuits = [...circuits];
-        const selectedNewCircuit = newCircuits[circuitGroupIndex].circuits[circuitIndex];
-        console.log(`Circuit => ${selectedNewCircuit.title}.isCollapsed: ${JSON.stringify(selectedNewCircuit.isCollapsed)}`);
-        //setCollapsed((selectedNewCircuit.isCollapsed == {}) ? false : selectedNewCircuit.isCollapsed);
         setCollapsed(false);
     }, []);
     const toggleEditTitle = () => {

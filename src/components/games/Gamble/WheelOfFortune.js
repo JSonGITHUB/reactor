@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './WheelOfFortune.css';
 import Confetti from './Confetti';
 import Sounds from '../../sound/Sounds';
@@ -17,13 +17,6 @@ const SECTORS = [
     '$1000',
 ];
 
-const PHRASES = [
-    { text: 'HELLO WORLD', category: 'Phrase' },
-    { text: 'REACT COMPONENT', category: 'Tech' },
-    { text: 'FULL STACK DEVELOPER', category: 'Occupation' },
-    { text: 'JAVASCRIPT FUNCTION', category: 'Tech' },
-    { text: 'LORD OF THE RINGS', category: 'Movie' },
-];
 const WORD_BANK = [
     // === PHRASES (20) ===
     { text: 'BREAK A LEG', category: 'Phrase' },
@@ -340,6 +333,11 @@ const LS_KEYS = {
     gameHistory: 'wofGameHistory'
 };
 
+const PLAYER_INIT = [
+    { name: 'Player 1', balance: 0 },
+    { name: 'Player 2', balance: 0 },
+];
+
 // Utility to get current date/time string
 const getDateTimeString = () => {
     const now = new Date();
@@ -388,11 +386,6 @@ const WheelOfFortuneGame = () => {
         }
     };
 
-    const playerInit = [
-        { name: 'Player 1', balance: 0 },
-        { name: 'Player 2', balance: 0 },
-    ];
-
     const [phraseData, setPhraseData] = useState(load(LS_KEYS.phraseData, getRandomPhrase()));
     const [phrase, setPhrase] = useState('');
     const [revealed, setRevealed] = useState(load(LS_KEYS.revealed, []));
@@ -400,7 +393,7 @@ const WheelOfFortuneGame = () => {
     const [currentSector, setCurrentSector] = useState(load(LS_KEYS.currentSector, null));
     const [spinning, setSpinning] = useState(false);
     const [message, setMessage] = useState('Lets go!');
-    const [players, setPlayers] = useState(load(LS_KEYS.players, playerInit));
+    const [players, setPlayers] = useState(load(LS_KEYS.players, PLAYER_INIT));
     const [currentPlayer, setCurrentPlayer] = useState(load(LS_KEYS.currentPlayer, 0));
     const [showSolveInput, setShowSolveInput] = useState(load(LS_KEYS.showSolveInput, false));
     const [solveGuess, setSolveGuess] = useState(load(LS_KEYS.solveGuess, ''));
@@ -477,44 +470,23 @@ const WheelOfFortuneGame = () => {
         }
     }, [phraseData]);
 
-    // --- Keyboard logic ---
     useEffect(() => {
-        const handleKeyDown = (e) => {
-            const key = e.key.toUpperCase();
-            if (/^[A-Z]$/.test(key)) {
-                handleLetterClick(key);
-            }
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [guessedLetters, spinning, roundOver, bonusComplete]);
-
-    
-    useEffect(() => {
-        const localPlayers = initializeData('wofPlayers', playerInit);
+        const localPlayers = initializeData('wofPlayers', PLAYER_INIT);
+        if (Array.isArray(localPlayers) && localPlayers.length) {
+            setPlayers(localPlayers);
+        }
     }, []);
     
     useEffect(() => {
         console.log(`WheelOfFortune => useEffect => currentSector: ${JSON.stringify(currentSector, null, 2)}`);
     }, [currentSector]);
 
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            const key = e.key.toUpperCase();
-            if (/^[A-Z]$/.test(key)) {
-                handleLetterClick(key);
-            }
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [guessedLetters, spinning, roundOver, bonusComplete]);
-
     const isLetterRevealed = (char) => revealed.includes(char) || !/[A-Z]/.test(char);
 
-    const switchTurn = () => {
+    const switchTurn = useCallback(() => {
         setCurrentPlayer((prev) => (prev + 1) % players.length);
         setCurrentSector(null);
-    };
+    }, [players.length]);
 
     const handleSpin = () => {
         if (spinning || roundOver || bonusMode) return;
@@ -544,7 +516,7 @@ const WheelOfFortuneGame = () => {
         }, 5000);
     };
 
-    const handleLetterClick = (letter) => {
+    const handleLetterClick = useCallback((letter) => {
         console.log(`WheelOfFortune => handleLetterClick => letter: ${letter}`);
         console.log(`WheelOfFortune => handleLetterClick => bonusComplete ${bonusComplete} guessedLetters: ${JSON.stringify(guessedLetters, null, 2)}`);
         if (guessedLetters.includes(letter) || spinning || roundOver || bonusComplete) return;
@@ -591,7 +563,32 @@ const WheelOfFortuneGame = () => {
                 switchTurn();
             }
         }
-    };
+    }, [
+        bonusComplete,
+        bonusLetters,
+        bonusMode,
+        currentPlayer,
+        currentSector,
+        guessedLetters,
+        phrase,
+        players,
+        revealed,
+        roundOver,
+        spinning,
+        switchTurn,
+    ]);
+
+    // --- Keyboard logic ---
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            const key = e.key.toUpperCase();
+            if (/^[A-Z]$/.test(key)) {
+                handleLetterClick(key);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [handleLetterClick]);
 
     const handleSolveAttempt = () => {
         if (solveGuess.trim().toUpperCase() === phrase) {
@@ -693,7 +690,7 @@ const WheelOfFortuneGame = () => {
     };
 
     // Helper to record a finished game
-    const recordGame = (opts = {}) => {
+    const recordGame = useCallback((opts = {}) => {
         const historyEntry = {
             date: getDateTimeString(),
             players: players.map((p, idx) => ({
@@ -706,14 +703,14 @@ const WheelOfFortuneGame = () => {
             ...opts
         };
         setGameHistory(prev => [historyEntry, ...prev]);
-    };
+    }, [bonusPrize, bonusWon, phrase, players]);
 
     // For bonus round, keep this effect but add a guard:
     useEffect(() => {
         if (bonusComplete && bonusWon) {
             recordGame({ type: 'bonus', bonusComplete: true });
         }
-    }, [bonusComplete, bonusWon]);
+    }, [bonusComplete, bonusWon, recordGame]);
 
     // Delete selected history items
     const deleteSelectedHistory = () => {

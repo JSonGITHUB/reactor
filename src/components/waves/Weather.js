@@ -66,13 +66,6 @@ const Weather = () => {
         96: { icon: '⛈️', desc: 'Thunderstorm with hail' },
         99: { icon: '🌩️', desc: 'Severe thunderstorm with hail' },
     };
-    // small helper that returns a clock emoji based on the hour
-    const getClockIcon = (hour) => {
-        const normalized = ((hour % 12) || 12);
-        const clocks = ['🕐', '🕑', '🕒', '🕓', '🕔', '🕕', '🕖', '🕗', '🕘', '🕙', '🕚', '🕛'];
-        return clocks[normalized - 1];
-    };
-
 
     useEffect(() => {
         const fetchWeather = async () => {
@@ -168,80 +161,77 @@ const Weather = () => {
         if (Number.isNaN(d.getTime())) return dateStr;
         return d.toLocaleDateString(undefined, { weekday: 'long' }); // e.g. "Monday"
     };
-    const getIcon = (precipIn) => {
-        if (precipIn >= 0.5) return '🌧️';
-        if (precipIn > 0) return '🌦️';
-        return '';
-    }
 
     return (
         <div className='containerDetail bg-lite color-lite size20 contentLeft ml-5 mr-5 mt--20'>
-            <div className='containerDetail bg-lite m-5 p-10 color-yellow size20'>
+            <div className='containerDetail bg-lite mb-5 p-20 color-yellow size20'>
                 Weather
             </div>
-            <div className='containerDetail bg-lite m-5 size20 contentLeft'>
-                <div className='containerDetail bg-lite m-5 p-10 color-yellow size20'>
+            <div className='containerDetail bg-lite mb-5 size20 contentLeft'>
+                <div className='containerDetail bg-lite p-10 mb-5 color-yellow size20'>
                     Temperature:
                 </div>
-                <div className='containerDetail bg-tintedMedium m-5 p-10 size20'>
+                <div className='containerDetail bg-tintedMedium p-10 size20'>
                     🌡️ {current ? `${current.temperature}°F` : 'N/A'}
                 </div>
             </div>
-            <div className='containerDetail bg-lite m-5 size20 contentLeft'>
-                <div className='containerDetail bg-lite m-5 p-10 color-yellow size20'>
+            <div className='containerDetail bg-lite mb-5 size20 contentLeft'>
+                <div className='containerDetail bg-lite mb-5 p-10 color-yellow size20'>
                     Wind Speed:
                 </div>
-                <div className='containerDetail bg-tintedMedium m-5 p-10 size20'>
+                <div className='containerDetail bg-tintedMedium p-10 size20'>
                     💨 {current ? `${current.windspeed} mph` : 'N/A'}
                 </div>
             </div>
-            <div className='containerDetail bg-lite m-5 size20 contentLeft'>
-                <div className='containerDetail bg-lite m-5 p-10 color-yellow size20'>
+            <div className='containerDetail bg-lite mb-5 size20 contentLeft'>
+                <div className='containerDetail bg-lite mb-5 p-10 color-yellow size20'>
                     Current Weather:
                 </div>
-                <div className='containerDetail bg-tintedMedium m-5 p-10 size20'>
+                <div className='containerDetail bg-tintedMedium p-10 size20'>
                     {current ? WEATHER_CODE_LABEL[current.weathercode] : 'N/A'}
                 </div>
             </div>
-            <div className='containerDetail bg-lite m-5 size20'>
-                <div className='containerDetail bg-lite m-5 p-10 color-yellow size20 contentLeft'>
+            <div className='containerDetail bg-lite mb-5 size20'>
+                <div className='containerDetail bg-lite mb-5 p-10 color-yellow size20 contentLeft'>
                     Hourly Forecast
                 </div>
-                <div className='containerDetail bg-lite m-5 size20'>
+                <div className='containerDetail bg-lite size20'>
                     {hourly.map((h, idx) => {
                         const hour = new Date(h.time).getHours();
-                        const clock = getClockIcon(hour);
                         const w = weatherCodeMap[h.code] || { };
-                        return <div key={idx} className='containerDetail flexContainer bg-tintedMedium m-5 p-10 size20'>
-                                    <div className='flex2Column color-yellow'>
-                                        {clock} {hour}:00 {w.icon || '❔'} {w.desc || 'Unknown'}
+                        return <div key={idx} className={`containerDetail flexContainer bg-tintedMedium ${(idx === hourly.length - 1)?'':'mb-5'} p-10 size20`}>
+                                    <div className='flex6Column color-yellow contentRight pr-10'>
+                                        {hour}:00
                                     </div>
-                                    <div className='flex2Column'>
-                                        🌡️ {h.tempF}°F {(h.precipIn > 0) ? `, ${getIcon(h.precipI)} ${h.precipI} inches` : null}
+                                    <div className='flex2Column contentLeft pl-5'>
+                                        {w.icon || '❔'} {w.desc || 'Unknown'}
+                                    </div>
+                                    <div className='flex6Column contentLeft pl-10'>
+                                        {h.tempF.toFixed(0)}°F
                                     </div>
                                 </div>
                     })}
                 </div>
-                <div className='containerDetail bg-lite m-5 size20'>
-                    <div className='containerDetail bg-lite m-5 p-10 color-yellow size20 contentLeft'>
-                        Daily Forecast
-                    </div>
-                    <div className='containerDetail bg-lite m-5 size20'>
-                        {daily.map((d, idx) => {
-                            const w = weatherCodeMap[d.code] || {};
-                            return <div key={idx} className='containerDetail flexContainer bg-tintedMedium m-5 p-10 size20'>
-                                        <div className='color-yellow flex3Column'>
-                                            📅 {formatToWeekday(d.date)}
-                                        </div>
-                                        <div className='color-yellow flex3Column'>
-                                            {w.icon || '❔'} {w.desc || 'Unknown'}
-                                        </div>
-                                        <div className='flex3Column'>
-                                            🌡️ {d.maxF}°F / {d.minF}°F
-                                        </div>
+            </div>
+            <div className='containerDetail bg-lite size20'>
+                <div className='containerDetail bg-lite mb-5 p-10 color-yellow size20 contentLeft'>
+                    Daily Forecast
+                </div>
+                <div className='containerDetail bg-lite size20'>
+                    {daily.map((d, idx) => {
+                        const w = weatherCodeMap[d.code] || {};
+                        return <div key={idx} className={`containerDetail flexContainer bg-tintedMedium ${(idx === daily.length - 1)?'':'mb-5'} p-10 size20`}>
+                                    <div className='color-yellow flex6Column'>
+                                        {formatToWeekday(d.date).substring(0,3)}
                                     </div>
-                    })}
-                    </div>
+                                    <div className='flex2Column'>
+                                        {w.icon || '❔'} {w.desc || 'Unknown'}
+                                    </div>
+                                    <div className='flex6Column contentRight ml-20'>
+                                        {d.maxF.toFixed(0)}°F
+                                    </div>
+                                </div>
+                })}
                 </div>
             </div>
         </div>

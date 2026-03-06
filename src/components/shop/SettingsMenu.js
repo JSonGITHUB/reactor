@@ -58,9 +58,6 @@ const SettingsMenu = ({
 
     useEffect(() => {
         console.log(`aislessss: ${JSON.stringify(aisles, null, 2)}`);
-    }, []);
-    useEffect(() => {
-        console.log(`aislessss: ${JSON.stringify(aisles, null, 2)}`);
     }, [aisles]);
 
     const getSetting = (index) => {
@@ -147,7 +144,7 @@ const SettingsMenu = ({
         return itemMenuDefault.concat(aislesInit).slice(5);
     } 
     */
-    const settingsMenu = <div id='settingsMenu' className='bg-lite'>
+    const settingsMenu = <div id='shopSettingsMenu' className='bg-lite'>
             {
                 (state.displaySettings) 
                 ? status.settings.map((item, index) => {

@@ -1,6 +1,4 @@
-import { useContext } from 'react';
 import { findTwoHighestIndices } from './HighScores.js';
-import { PlayerContext } from '../../context/PlayerContext';
 
 const SurfScoringLogic = ({
     heat,
@@ -8,10 +6,6 @@ const SurfScoringLogic = ({
     completed,
     oneLine
 }) => {
-
-    const {
-        players
-    } = useContext(PlayerContext);
 
     const playerId = index;
     const scoreDifference = () => {
@@ -31,8 +25,8 @@ const SurfScoringLogic = ({
                 //console.log(`SurfScoringLogic => scoreDifference: ${heat[newPlayerId].name} - ${difference}`);
                 return difference;
             } else {
+                console.error('Invalid player ID or missing surfScore.');
                 return 0;
-                console.error("Invalid player ID or missing surfScore.");
             }
         } else {
             return 0;

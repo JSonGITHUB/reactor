@@ -74,35 +74,36 @@ const Sessions = ({ title, message }) => {
             const condition = conditionIcons[conditionsIndex];
             
             return (
-                <div className='App-content containerBox bg-veryLite button' onClick={() => sessionClick(item, spot)} key={getKey('link')}>
-                    <div className='containerBoxDetail width-100-percent'>
-                        <div className='containerBoxDetail bold color-yellow flexContainer'>
-                            <div className='flex1Auto contentLeft pl-10 pt-10'>
+                <div className='containerDetail bg-lite m-5 button color-lite' onClick={() => sessionClick(item, spot)} key={getKey('link')}>
+                    <div className='width-100-percent'>
+                        <div className='containerDetail size20 color-yellow flexContainer'>
+                            <div className='flex1Auto contentLeft pl-10 p-10'>
                                 <span className='mr-10'>{icons.wave}</span>{spot}
                             </div>
                             <DeleteButton />
                         </div>
-                        <div className='size15 contentLeft pl-25'>
-                            <div className='bold'>{month + ' ' + day + suffix[Number(String(day).slice(-1))]} {year}</div>
+                        <div className='size15 contentLeft p-10'>
                             <div>
-                                <span>
-                                    {height}
-                                </span>
-                                <span className='ml-5'>
-                                    {direction}
-                                </span>
-                                <span className='ml-5'>
-                                    {angle}
-                                </span>
-                                <span className='ml-5'>
-                                    {interval}
-                                </span>
-                                <span className='ml-5'>
-                                    {icons[condition]}
-                                </span>
+                                {month + ' ' + day + suffix[Number(String(day).slice(-1))]} {year}</div>
+                                <div>
+                                    <span>
+                                        {height}
+                                    </span>
+                                    <span className='ml-5'>
+                                        {direction}
+                                    </span>
+                                    <span className='ml-5'>
+                                        {angle}
+                                    </span>
+                                    <span className='ml-5'>
+                                        {interval}
+                                    </span>
+                                    <span className='ml-5'>
+                                        {icons[condition]}
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                    </div>
                 </div>
             )
         }

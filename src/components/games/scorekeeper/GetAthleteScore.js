@@ -1,11 +1,8 @@
-
-import React, { useContext } from 'react';
+import React from 'react';
 import getKey from '../../utils/KeyGenerator';
 import SurfScoringLogic from './SurfScoringLogic';
 import jerseyColors from './JerseyColors';
 import getMedal from './GetMedal';
-import { PlayerContext } from '../../context/PlayerContext';
-import icons from '../../site/icons';
 
 const GetAthleteScore = ({
     heat,

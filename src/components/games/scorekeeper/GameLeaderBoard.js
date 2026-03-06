@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { games, gameIcons } from './games';
+import { games } from './games';
 import icons from '../../site/icons';
 import getMedal from './GetMedal';
 import initializeData from '../../tracker/initializeData';
@@ -14,7 +14,6 @@ const GameLeaderboard = () => {
     const [shakas, setShakas] = useState([]);
     
     useEffect(() => {
-        const add = 'add Game/Sport';
         const gamesDir = initializeData('games', games);
         //if (!gamesDir.includes(add)) {
             //const newGamesDir = ['add Game / Sport', ...gamesDir];
@@ -50,7 +49,7 @@ const GameLeaderboard = () => {
                 } else {
                     dataset = initializeData(`${gameCategory}Games`, []);
                 }
-                if (dataset != []) {
+                if (dataset.length > 0) {
                     if (gameCategory === 'surf') {
                         dataset.forEach((game) => {
                             const winner = game.scores.reduce((prev, current) =>
@@ -92,7 +91,6 @@ const GameLeaderboard = () => {
             .sort((a, b) => b.wins - a.wins);
 
         //console.log(`GameLeaderBoard => sortedPlayers: ${JSON.stringify(sortedPlayers, null, 2)}`);
-        const goldArray = [];
         const getGold = sortedPlayers
             .map((player, index) => {
                 if (sortedPlayers[0]?.wins === player.wins) {
@@ -118,7 +116,7 @@ const GameLeaderboard = () => {
         const bronzeArray = [];
         const getBronze = sortedPlayers
             .map((player, index) => {
-                if (sortedPlayers[silver[0]]?.wins > player.wins && (sortedPlayers[bronzeArray[0]]?.wins === player.wins || bronzeArray.length < 1)) {
+                if (sortedPlayers[silverArray[0]]?.wins > player.wins && (sortedPlayers[bronzeArray[0]]?.wins === player.wins || bronzeArray.length < 1)) {
                     bronzeArray.push(index);
                     return index;
                 } else {
@@ -130,7 +128,7 @@ const GameLeaderboard = () => {
         const shakasArray = [];
         const getShakas = sortedPlayers
             .map((player, index) => {
-                if (sortedPlayers[bronze[0]]?.wins > player.wins && (sortedPlayers[shakasArray[0]]?.wins === player.wins || shakasArray.length<1)) {
+                if (sortedPlayers[bronzeArray[0]]?.wins > player.wins && (sortedPlayers[shakasArray[0]]?.wins === player.wins || shakasArray.length<1)) {
                     shakasArray.push(index);
                     return index;
                 } else {

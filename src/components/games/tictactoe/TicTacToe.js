@@ -1,15 +1,12 @@
 import { useState } from 'react';
-import Sounds from '../../sound/Sounds.js';
 
 const Game = () => {
 
     const [history, setHistory] = useState([Array(9).fill(null)]);
     const [currentMove, setCurrentMove] = useState(0);
-    const [ winningLine, setWinningLine] = useState(null);
     const xIsNext = currentMove % 2 === 0;
     const currentSquares = history[currentMove];
     const [squaresDisplay, setSquaresDisplay] = useState(Array(9).fill(null));
-    const [squares, setSquares] = useState(Array(9).fill(null));
 
     const boxes = [
         'squareTopLeft',
@@ -24,7 +21,6 @@ const Game = () => {
     ];
 
     const Square = ({
-        index,
         value,
         onSquareClick 
     }) => {
@@ -122,7 +118,6 @@ const Game = () => {
     const restart = () => {
         setHistory([Array(9).fill(null)]);
         setCurrentMove(0);
-        setWinningLine(null);
         setSquaresDisplay(Array(9).fill(null));
     }
 

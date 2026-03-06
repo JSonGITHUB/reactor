@@ -4,6 +4,39 @@ import useCurrentTime from '../utils/useCurrentTime';
 import TideDisplay from './TideDisplay';
 import initializeData from '../utils/InitializeData';
 
+const defaultTide = {
+    data: {
+        predictions: [
+            {
+                t: '2024-07-01 11:40',
+                v: 1.960,
+                type: 'L'
+            },
+            {
+                t: '2024-07-01 18:23',
+                v: 6.064,
+                type: 'H'
+            },
+            {
+                t: '2024-07-02 01:53',
+                v: -0.341,
+                type: 'L'
+            },
+            {
+                t: '2024-07-02 08:22',
+                v: 3.338,
+                type: 'H'
+            },
+            {
+                t: '2024-07-02 12:34',
+                v: 2.232,
+                type: 'L'
+            }
+        ]
+    },
+    timestamp: 1719874078612
+};
+
 const NewTide = ({
     display
 }) => {
@@ -15,38 +48,6 @@ const NewTide = ({
     const startTime = time[0].startTime;
     const endTime = time[0].endTime;
     const uriMLL = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=NOS.COOPS.TAC.WL&begin_date=${startTime}&end_date=${endTime}&datum=MLLW&station=9410230&time_zone=lst_ldt&units=english&interval=hilo&format=json`;
-    const defaultTide = {
-        data: {
-            predictions: [
-                {
-                    t: "2024-07-01 11:40",
-                    v: 1.960,
-                    type: "L"
-                },
-                {
-                    t: "2024-07-01 18:23",
-                    v: 6.064,
-                    type: "H"
-                },
-                {
-                    t: "2024-07-02 01:53",
-                    v: -0.341,
-                    type: "L"
-                },
-                {
-                    t: "2024-07-02 08:22",
-                    v: 3.338,
-                    type: "H"
-                },
-                {
-                    t: "2024-07-02 12:34",
-                    v: 2.232,
-                    type: "L"
-                }
-            ]
-        },
-        "timestamp": 1719874078612
-    }
     const findClosestDate = (data) => {
         let datesArray = (data.predictions) ? data.predictions.map((tide) => tide.t) : [];
         if (!Array.isArray(datesArray) || datesArray.length === 0) {
@@ -141,7 +142,7 @@ const NewTide = ({
         };
 
         fetchData();
-    }, []);
+    }, [uriMLL]);
     
     const handleOverride = async () => {
         setLoading(true);

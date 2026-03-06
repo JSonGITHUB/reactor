@@ -1,15 +1,14 @@
-import React, { useEffect, useState, PureComponent } from 'react';
+import React, { useMemo, PureComponent } from 'react';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 
 const TideGraph = ({
     tideChart
 }) => {
 
-    const [isDataConverted, setIsDataConverted] = useState(false);
-    const [convertedData, setConvertedData] = useState();
-    //const [convertedTideData, setConvertedTideData] = useState();
-
-    useEffect(() => {
+    const convertedData = useMemo(() => {
+        if (!tideChart?.predictions || tideChart.predictions.length === 0) {
+            return [];
+        }
         const newData = [...tideChart.predictions];
         const get12Hour = (hour) => {
             const getLabel = (hour >= 12) ? 'pm' : 'am';
@@ -43,11 +42,11 @@ const TideGraph = ({
             value: Number(tide.v),
             time: getTime(tide.t)
         }));
-        //console.log(`displayData: ${JSON.stringify(displayData, null, 2)}`);
-        setConvertedData(updatedData);
-        console.log(`updatedData: ${JSON.stringify(updatedData, null, 2)}`);
-        setIsDataConverted(true);
-    }, []);
+        //console.log(`updatedData: ${JSON.stringify(updatedData, null, 2)}`);
+        return updatedData;
+    }, [tideChart?.predictions]);
+
+    const isDataConverted = convertedData.length > 0;
 
     const box = {
         borderRadius: 10,
@@ -55,21 +54,9 @@ const TideGraph = ({
         fontSize: 20,
     }
 
-    class CustomizedLabel extends PureComponent {
-        render() {
-            const { x, y, stroke, value } = this.props;
-
-            return (
-                <text x={x} y={y - 10} dy={-4} fill={'white'} fontWeight='bold' fontSize={15} rotate={5} textAnchor='middle'>
-                    {value}ft
-                </text>
-            );
-        }
-    }
-
     class CustomizedAxisTick extends PureComponent {
         render() {
-            const { x, y, stroke, payload } = this.props;
+            const { x, y, payload } = this.props;
 
             return (
                 <g transform={`translate(${x},${y})`}>
@@ -82,7 +69,7 @@ const TideGraph = ({
     }
     class CustomizedXAxisTick extends PureComponent {
         render() {
-            const { x, y, stroke, payload } = this.props;
+            const { x, y, payload } = this.props;
 
             return (
                 <g transform={`translate(${x},${y})`}>
@@ -155,37 +142,9 @@ const TideGraph = ({
                     <div className='containerBox bg-tintedMedium contentCenter'>
                         <span className='color-yellow'>{`${getTide(payload)}`}</span>  {`${Number(payload[0].value).toFixed(1)} ft`}
                     </div>
-                    {/*<div>{`${payload[0].value} ft`}</div>*/}
-                    {/*<div className='intro'>{getIntroOfPage(label)}</div>*/}
-                    {/*<div className='desc'>Anything you want can be displayed here.</div>*/}
                 </div>
             );
         }
-        /*
-        'stroke': '#0099ff',
-        'fill': '#0099ff',
-        'strokeWidth': 5,
-        'fillOpacity': 0.6,
-        'dataKey': 'tide',
-        'name': 'tide',
-        'color': '#0099ff',
-        'value': '4.9',
-        'payload': {
-        't': '2024-06-27 01:04',
-        'v': '4.924',
-        'type': 'H',
-        'name': 'H',
-        'pv': '4.924',
-        'amt': '4.924',
-        'uv': '4.924',
-        'tide': '4.9',
-        'Tide': '4.9',
-        'Tide_Height': '4.9',
-        'feet': '4.9',
-        'Feet': '4.9',
-        'ht': '4.9ft',
-        'time': '1:04am'
-        */
 
         return null;
     };
@@ -196,20 +155,6 @@ const TideGraph = ({
                 <div className='color-yellow size20 containerDetail contentLeft pl-20 pt-10 pb-10 bg-lite'>
                     La Jolla
                 </div>
-                {/*
-                <div className='ml--30 pr-20'>
-                    <ResponsiveContainer width='100%' height={300}>
-                        <LineChart width='100%' height={50} data={convertedData}>
-                            <CartesianGrid />
-                            <XAxis dataKey='time' tick={<CustomizedXAxisTick />} />
-                            <YAxis dataKey='tide' tick={<CustomizedAxisTick />} />
-                            <Line type='monotone' dataKey='tide' stroke='#0099ff' activeDot={{ r: 8 }} strokeWidth={5} dot={false} label={<CustomizedLabel />} />
-                            <Tooltip contentStyle={box} />
-                            <Legend />
-                        </LineChart>
-                    </ResponsiveContainer>
-                </div>
-                */}
                 <div className='mb-20'></div>
                 <div className='ml--20 mb-20'>
                     <ResponsiveContainer width='100%' height={400}>
@@ -232,25 +177,10 @@ const TideGraph = ({
                                 contentStyle={box}
                                 content={<CustomTooltip />}
                             />
-                            <Area type='monotone' dataKey='tide' stroke='#0099ff' fill='#0099ff' activeDot={{ r: 8, stroke:'#0099ff', fill:'orange'}} strokeWidth={3} dot={false} /*label={<CustomizedLabel />}*/ />
+                            <Area type='monotone' dataKey='tide' stroke='#0099ff' fill='#0099ff' activeDot={{ r: 8, stroke:'#0099ff', fill:'orange'}} strokeWidth={3} dot={false} />
                         </AreaChart>
                     </ResponsiveContainer>
                 </div>
-                {/*
-                    <div className='ml--30 pr-20'>
-                        <ResponsiveContainer width='100%' height={300}>
-                            <LineChart width='100%' height={50} data={convertedTideData}>
-                                <CartesianGrid />
-                                <XAxis dataKey='time' tick={<CustomizedXAxisTick />} />
-                                <YAxis dataKey='tide' tick={<CustomizedAxisTick />} />
-                                <Line type='monotone' dataKey='v' stroke='#0099ff' activeDot={{ r: 8 }} strokeWidth={5} dot={false} />
-                                <Tooltip contentStyle={box} />
-                                <Legend />
-                            </LineChart>
-                        </ResponsiveContainer>
-                    </div>
-                    */
-                }
             </div>
             : null
     )

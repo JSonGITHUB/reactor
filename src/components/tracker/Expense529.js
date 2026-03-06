@@ -584,10 +584,4 @@ const Expense529 = () => {
     );
 };
 
-const td = {
-    padding: '8px 12px',
-    borderBottom: '1px solid #f5f5f5',
-    verticalAlign: 'top',
-};
-
 export default Expense529;

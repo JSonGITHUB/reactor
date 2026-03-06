@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
 import initializeData from '../utils/InitializeData';
 //import InventoryManager from './InventoryManager';
+const HOUSE_FOCUS_TASK_KEY = 'houseFocusTaskKey';
+const makeTaskKey = (task) => `${task.description || ''}|${task.nextDue || ''}`;
+const CATEGORIES_INIT = ['Kitchen', 'Garage', 'Electronics', 'Bathroom'];
 // LocalStorage helpers
 const getStoredInventory = () => {
     const stored = localStorage.getItem('homeInventory');
@@ -29,14 +32,13 @@ const getStoredFutureTasks = () => {
 
 const Dashboard = () => {
     const taskRefs = useRef([]);
-    const categoriesInit = ['Kitchen', 'Garage', 'Electronics', 'Bathroom']
     const [inventory, setInventory] = useState(getStoredInventory());
     const [inventoryDisplay, setInventoryDisplay] = useState(true);
     const [categories, setCategories] = useState();
     const [newItem, setNewItem] = useState({ name: '', category: '', quantity: 1, notes: '' });
     const [filterCategory, setFilterCategory] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
-    const [newCategory, setNewCategory] = useState('');
+    const [, setNewCategory] = useState('');
     const [inventoryForm, setInventoryForm] = useState(true);
     const [tasks, setTasks] = useState(getStoredTasks());
     const [masterTasks, setMasterTasks] = useState(getStoredMasterTasks());
@@ -51,9 +53,10 @@ const Dashboard = () => {
     const [filteredTasks, setFilteredTasks] = useState([]);
     const [editTaskIndex, setEditTaskIndex] = useState(-1);
     const [editTask, setEditTask] = useState(null);
+    const [focusTaskKey, setFocusTaskKey] = useState('');
 
     useEffect(() => {
-        if (!filteredTasks.length) return;
+        if (!filteredTasks.length || focusTaskKey) return;
         const todayStr = new Date().toISOString().slice(0, 10);
         let scrollIdx = filteredTasks.findIndex(task => task.nextDue >= todayStr && !task.completed);
         if (scrollIdx === -1) {
@@ -62,7 +65,59 @@ const Dashboard = () => {
         if (taskRefs.current[scrollIdx]) {
             taskRefs.current[scrollIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-    }, [filteredTasks]);
+    }, [filteredTasks, focusTaskKey]);
+
+    useEffect(() => {
+        const focusFromStorage = () => {
+            const key = localStorage.getItem(HOUSE_FOCUS_TASK_KEY) || '';
+            if (!key) return;
+            setMaintenanceDisplay(false);
+            setFilterCompleted('All');
+            setSearchMaintenance('');
+            setFocusTaskKey(key);
+        };
+
+        focusFromStorage();
+        window.addEventListener('house-focus-task', focusFromStorage);
+        window.addEventListener('focus', focusFromStorage);
+        return () => {
+            window.removeEventListener('house-focus-task', focusFromStorage);
+            window.removeEventListener('focus', focusFromStorage);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!focusTaskKey || !filteredTasks.length) return;
+        const targetIndex = filteredTasks.findIndex((task) => makeTaskKey(task) === focusTaskKey);
+        if (targetIndex < 0) {
+            const todayStr = new Date().toISOString().slice(0, 10);
+            let fallbackIndex = filteredTasks.findIndex(task => task.nextDue >= todayStr && !task.completed);
+            if (fallbackIndex === -1) {
+                fallbackIndex = filteredTasks.length - 1;
+            }
+            const fallbackTarget = taskRefs.current[fallbackIndex];
+            if (fallbackTarget) {
+                fallbackTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                fallbackTarget.classList.add('bg-lite');
+                setTimeout(() => fallbackTarget.classList.remove('bg-lite'), 1800);
+            }
+            localStorage.removeItem(HOUSE_FOCUS_TASK_KEY);
+            setFocusTaskKey('');
+            return;
+        }
+
+        const target = taskRefs.current[targetIndex];
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            target.classList.add('bg-lite');
+            const timeout = setTimeout(() => {
+                target.classList.remove('bg-lite');
+            }, 1800);
+            localStorage.removeItem(HOUSE_FOCUS_TASK_KEY);
+            setFocusTaskKey('');
+            return () => clearTimeout(timeout);
+        }
+    }, [filteredTasks, focusTaskKey]);
     useEffect(() => saveInventory(inventory), [inventory]);
     useEffect(() => {
         localStorage.setItem('maintenanceTasks', JSON.stringify(futureTasks));
@@ -77,13 +132,13 @@ const Dashboard = () => {
         setFilteredTasks(newFilteredTasks);
     }, [futureTasks, searchMaintenance, filterCompleted]);
     useEffect(() => {
-        const initializedCategories = initializeData('inventoryCategories', categoriesInit);
+        const initializedCategories = initializeData('inventoryCategories', CATEGORIES_INIT);
         setCategories(initializedCategories);
     }, []);
     useEffect(() => {
         const newCategories = [];
-        if (categoriesInit && categoriesInit.length > 0) {
-            categoriesInit.forEach(cat => {
+        if (CATEGORIES_INIT && CATEGORIES_INIT.length > 0) {
+            CATEGORIES_INIT.forEach(cat => {
                 if (!newCategories.includes(cat)) {
                     newCategories.push(cat);
                 }
@@ -121,12 +176,6 @@ const Dashboard = () => {
         setNewItem({ name: '', category: '', quantity: 1, notes: '' });
         setInventoryForm(true);
     };
-    const handleAddCategory = (cat) => {
-        if (cat && !categories.includes(cat)) {
-            setCategories([...categories, cat]);
-        }
-    };
-
     // --- Maintenance Handlers ---
     const generateFutureTasks = (task) => {
         const futureTasks = [];
@@ -137,7 +186,6 @@ const Dashboard = () => {
         const endDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
     
         // Prevent infinite loop for invalid recurrence
-        const validRecurrence = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
         let count = 0, maxTasks = 100;
         while (nextDate <= endDate && count < maxTasks) {
             futureTasks.push({
@@ -158,15 +206,6 @@ const Dashboard = () => {
         console.log(`Dashboard => generateFutureTasks => futureTasks: ${JSON.stringify(futureTasks, null, 2)}`);
         return futureTasks;
     };
-    const handleAddTask = () => {
-        console.log(`Dashboard => handleAddTask => newTask: ${JSON.stringify(newTask, null, 2)}`);
-        if (!newTask.description) return;
-        const future = generateFutureTasks(newTask);
-        const combined = [...future, ...tasks].sort((a, b) => new Date(a.nextDue) - new Date(b.nextDue));
-        setTasks(combined);
-        setNewTask({ description: '', category: '', recurrence: 'Weekly', nextDue: new Date().toISOString().slice(0, 10) });
-    };
-
     const toggleTaskCompletion = (index) => {
         const updated = [...futureTasks];
         updated[index].completed = !updated[index].completed;
@@ -269,32 +308,6 @@ const Dashboard = () => {
         const id = masterTasks[idx].id;
         setMasterTasks(masterTasks.filter((_, i) => i !== idx));
         setFutureTasks(futureTasks.filter(ft => ft.masterId !== id || ft.isDetached));
-        setEditTaskIndex(-1);
-        setEditTask(null);
-    };
-
-    // Edit or delete individual future task
-    const startEditFutureTask = (idx) => {
-        setEditTaskIndex(idx);
-        setEditTask({ ...futureTasks[idx] });
-    };
-    const saveEditedFutureTask = () => {
-        if (editTaskIndex < 0 || !editTask) return;
-        // Mark as detached (converted to one-time)
-        const updatedFuture = [...futureTasks];
-        updatedFuture[editTaskIndex] = {
-            ...editTask,
-            recurrence: 'One-Time',
-            isDetached: true
-        };
-        setFutureTasks(updatedFuture);
-        setEditTaskIndex(-1);
-        setEditTask(null);
-    };
-    const deleteFutureTask = (idx) => {
-        const updatedFuture = [...futureTasks];
-        updatedFuture.splice(idx, 1);
-        setFutureTasks(updatedFuture);
         setEditTaskIndex(-1);
         setEditTask(null);
     };

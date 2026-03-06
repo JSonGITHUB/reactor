@@ -28,8 +28,8 @@ const WindSelector = ({
     //console.log(`WindSelector => isWind: ${isWind}`);
     
     //const [filterByWind, setFilterByWind] = useState(isWind);
-    const backgroundColorClass = (status.isWind === true) ? 'bg-veryLite fadeInFaded' : 'bg-tinted fadeOutFaded';
-    const windClass = () => `${backgroundColorClass} containerBox flex2Column contentCenter`;
+    const backgroundColorClass = (status.isWind === true) ? 'bg-veryLite fadeInFaded brdr-green' : 'bg-tinted fadeOutFaded';
+    const windClass = () => `${backgroundColorClass} containerDetail flex2Column contentCenter mt-5 ml-5 mb-5`;
     const handleWindSelection = (groupTitle, label, selected) => {
         setStatus(selected)
     }
@@ -37,11 +37,11 @@ const WindSelector = ({
     return (
         <div className={windClass()}>
             {/*console.log(`windSelector => windDirection: ${status.windDirection}`)*/}
-                <div className='containerBox'>
-                    <div className='containerBox bg-lite'>
-                        Wind {icons.wind}
+                <div className='size20'>
+                    <div className='containerDetail bg-lite p-15 contentLeft color-yellow'>
+                        {icons.wind} Wind
                     </div>
-                    <div className='mt-10 mr-10 mb-5'>
+                    <div className='mb-5'>
                         <Selector
                             groupTitle='Wind' 
                             selected={windDirection} 
@@ -53,9 +53,9 @@ const WindSelector = ({
                             width='93%'
                         />
                     </div>
-                </div>
-                <div className='containerBoxDetail button size40 p-20' onClick={handleWindCheck} >
-                    {(status.isWind === true) ? icons.good : icons.bad }
+                    <div className='containerBoxDetail button size40 p-20' onClick={handleWindCheck} >
+                        {(status.isWind === true) ? icons.good : icons.bad }
+                    </div>
                 </div>
         </div>
     );

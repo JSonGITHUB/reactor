@@ -1,5 +1,4 @@
 import { useState, useRef } from 'react';
-import initializeData from './utils/InitializeData';
 
 const Step = ({
     type,
@@ -20,8 +19,6 @@ const Step = ({
     const [newStepDescription, setNewStepDescription] = useState('');
     const [newStepDuration, setNewStepDuration] = useState({ hours: 0, minutes: 0, seconds: 0 });
     const [newStepNote, setNewStepNote] = useState('');
-    const [note, setNote] = useState('');
-    const [collapseAdd, setCollapseAdd] = useState(false);
     const [tempNote, setTempNote] = useState(step.note || '');
     
     const noteInputRef = useRef(null);
@@ -69,54 +66,6 @@ const Step = ({
         newSchedules[scheduleIndex].steps[stepIndex].description = newStep;
         setSchedules(newSchedules);
     };
-    const handleDurationChange = (index, newDuration) => {
-        const newSchedules = [...stepSchedules];
-        newSchedules[scheduleIndex].steps[index].duration = newDuration;
-        setSchedules(newSchedules);
-    };
-
-    const setStepDescription = (index, description) => {
-        const newSchedules = [...stepSchedules];
-        const newStep = {
-            description: description,
-            duration: 0,
-            note: ''
-        }
-        if (newSchedules[scheduleIndex].steps[index]) {
-            console.log(`StepManager => setStepDescription => step: ${JSON.stringify(newSchedules[scheduleIndex].steps[index].description, null, 2)}`);
-            newSchedules[scheduleIndex].steps[index].description = description;
-        } else {
-            newSchedules[scheduleIndex].steps.push(newStep)
-        }
-        setSchedules(newSchedules);
-    }
-    const setStepHours = (index, hours) => {
-        const newSchedules = [...stepSchedules];
-        const durationHours = Number(formatDuration(newSchedules[scheduleIndex].steps[index].duration).split(':')[0])
-        const durationMinutes = Number(formatDuration(newSchedules[scheduleIndex].steps[index].duration).split(':')[1])
-        const durationSeconds = Number(formatDuration(newSchedules[scheduleIndex].steps[index].duration).split(':')[2])
-        const durationInSeconds = hours * 3600 + durationMinutes * 60 + durationSeconds;
-        newSchedules[scheduleIndex].steps[index].duration = durationInSeconds;
-        setSchedules(newSchedules);
-    }
-    const setStepMinutes = (index, minutes) => {
-        const newSchedules = [...stepSchedules];
-        const durationHours = Number(formatDuration(newSchedules[scheduleIndex].steps[index].duration).split(':')[0])
-        const durationMinutes = Number(formatDuration(newSchedules[scheduleIndex].steps[index].duration).split(':')[1])
-        const durationSeconds = Number(formatDuration(newSchedules[scheduleIndex].steps[index].duration).split(':')[2])
-        const durationInSeconds = durationHours * 3600 + minutes * 60 + durationSeconds;
-        newSchedules[scheduleIndex].steps[index].duration = durationInSeconds;
-        setSchedules(newSchedules);
-    }
-    const setStepSeconds = (index, seconds) => {
-        const newSchedules = [...stepSchedules];
-        const durationHours = Number(formatDuration(newSchedules[scheduleIndex].steps[index].duration).split(':')[0])
-        const durationMinutes = Number(formatDuration(newSchedules[scheduleIndex].steps[index].duration).split(':')[1])
-        const durationSeconds = Number(formatDuration(newSchedules[scheduleIndex].steps[index].duration).split(':')[2])
-        const durationInSeconds = durationHours * 3600 + durationMinutes * 60 + seconds;
-        newSchedules[scheduleIndex].steps[index].duration = durationInSeconds;
-        setSchedules(newSchedules);
-    }
     const removeStep = (index) => {
         const newSteps = [...stepSchedules[scheduleIndex].steps.slice(0, index), ...stepSchedules[scheduleIndex].steps.slice(index + 1)];
         const newSchedules = [...stepSchedules];

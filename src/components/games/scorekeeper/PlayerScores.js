@@ -11,14 +11,12 @@ import { findTwoHighestIndices, getTwoHighestScores } from './HighScores';
 import GetAthleteScore from './GetAthleteScore';
 import initHeatLog from './initHeatLog';
 import getCurrentTime from '../../utils/getCurrentTime';
-import { initNewPlayer, initPlayers } from './PlayerInit';
+import { initPlayers } from './PlayerInit';
 import surfScoring from './SurfScoring';
 import { games, gameIcons } from './games';
 import dominoWinners from './dominoWinners';
 import heatLengths from './heatLengths';
-import dartScoring from './dartScoring';
 import golfScoring from './golfScoring';
-import dominoScoring from './dominoScoring';
 import getWinner from './getWinner';
 import GolfScoreboard from './GolfScoreboard';
 import NumberInputKeypad from './NumberInputKeypad';
@@ -38,22 +36,21 @@ import { initGolfShots } from './initGolfShots';
 import CricketScoreboard from './CricketScoreboard';
 import BonesScores from './BonesScores';
 import { GolfContext } from '../../context/GolfContext';
-import getLocations from '../../waves/Locations'
 import { WavesContext } from '../../context/WavesContext';
+
+const SCORES_STATUS_EVENT = 'scoresRecordedGamesChanged';
 
 const PlayerScores = () => {
 
     const {
         players,
         setPlayers,
-        editPlayer,
         playersInGame
     } = useContext(PlayerContext);
     
     const {
         currentWave,
-        setCurrentWave,
-        updateLocations
+        setCurrentWave
     } = useContext(WavesContext);
 
     const [allGames, setAllGames] = useState(initializeData('games', games));
@@ -68,17 +65,11 @@ const PlayerScores = () => {
     const [heatLength, setHeatLength] = useState(Number(initializeData('surfWinner', 21)) * 60);
     const [time, setTime] = useState(Number(initializeData('surfWinner', heatLength) * 60));
     const locations = initializeData('spots', []);
-    const [gameSelections, setGameSelections] = useState();
 
     //console.log(`PlayerScores => playersInGame: ${JSON.stringify(playersInGame(), null, 2)}`);
 
     const {
-        golfPars,
-        setPars,
         courses,
-        setCourses,
-        updatePar,
-        updateDistance,
         course,
         setCourse,
         addCourse,
@@ -130,29 +121,32 @@ const PlayerScores = () => {
     useEffect(() => {
         console.log(`PlayerScores => useEffect => PlayerScores => time: ${time}`);
     }, [time]);
+    // Winner + surf heat setup intentionally recomputes on game change only.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         localStorage.setItem('game', game)
         localStorage.setItem('gameStatus', 'inProgress');
         let newWinner = initializeData(`${game}Winner`, getWinner(game));
-        if (isCurrentGame('golf')) {
+        if (game === 'golf') {
             newWinner = 3000;
         }
         setWinner(newWinner);
-        if (isCurrentGame('surf')) {
-            setHeatLength(winner);
+        if (game === 'surf') {
+            setHeatLength(newWinner);
         }
         setLogData(initializeData(`${game}Games`, []));
     }, [game]);
 
     useEffect(() => {
         localStorage.setItem(`${game}Winner`, winner);
-        if (isCurrentGame('surf')) {
+        if (game === 'surf') {
             setHeatLength(winner);
         }
-    }, [winner]);
+    }, [game, winner]);
     useEffect(() => {
         localStorage.setItem(`${game}Games`, JSON.stringify(logData));
-    }, [logData]);
+        window.dispatchEvent(new Event(SCORES_STATUS_EVENT));
+    }, [logData, game]);
     useEffect(() => {
         localStorage.setItem('heatLog', JSON.stringify(heatLog));
     }, [heatLog]);
@@ -189,8 +183,10 @@ const PlayerScores = () => {
             setAllGames(gamesDir);
         }
     }, []);
+    // setPlayers comes from context and is not memoized; key this init effect to allGames only.
     useEffect(() => {
         localStorage.setItem('games', JSON.stringify(allGames));
+        window.dispatchEvent(new Event(SCORES_STATUS_EVENT));
         const localPlayers = initializeData('players', initPlayers);
         if ((validate(localPlayers) !== null) && (localPlayers !== '[]')) {
             //setPlayers(localPlayers);
@@ -199,14 +195,14 @@ const PlayerScores = () => {
             //newPlayer();
         }
         const newPlayers = [...localPlayers];
-        newPlayers.map((player) => {
+        newPlayers.forEach((player) => {
             if (!player.cricketScores) {
                 player.cricketScores = [0, 0, 0, 0, 0, 0, 0];
                 player.dartsScore = 0;
             }
         });
         const initGolfStats = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false]
-        newPlayers.map((player) => {
+        newPlayers.forEach((player) => {
             if (!player.golfPutts || !player.golfFW || !player.golfGIR) {
                 player.golfPutts = golfScoring;
                 player.golfFW = initGolfStats;
@@ -217,7 +213,7 @@ const PlayerScores = () => {
         setLogCollapse(true);
         setStandingsCollapse(true);
         console.log(`PlayerScores => allGames: ${JSON.stringify(allGames, null, 2)}`);
-    }, [allGames]);
+    }, [allGames]); // eslint-disable-line react-hooks/exhaustive-deps
     const setGameInProgress = (playerIndex) => {
         if (playerIndex > 0) {
             if (initializeData(`player${playerIndex - 1}`, 'loser') !== 'winner') {
@@ -361,12 +357,6 @@ const PlayerScores = () => {
 
     const displayHeatLog = () => {
         const completed = true;
-        const sortedData = heatLog.map(obj => {
-            const dateTimeString = `${obj.date} ${obj.time}`;
-            const dateTime = new Date(dateTimeString);
-            return { ...obj, dateTime };
-        }).sort((a, b) => b.dateTime - a.dateTime);
-
         const log = () => heatLog.map((heat, index) => <div className='scrollSnapTop relative size15 p-10 bg-tinted color-lite r-10 ml-10 mr-10 mt-10 mb-15' key={getKey(`heat${index}`)}>
             <div 
                 title='delete' 
@@ -381,7 +371,7 @@ const PlayerScores = () => {
             <div className='m-10 contentLeft'>highest wave score: { heat.heatHighestScore }!!!</div>
             <div className='flexContainer width-100-percent h-scroll'>
                 {heat.scores.map((player, index) => {
-                    if ((player.surfScore !== 0) && (player.surfScores != ["", "", "", "", "", "", "", "", "", ""])) {
+                    if (player.surfScore !== 0) {
                         return <div className='flexContainer width-100-percent' key={getKey(`heatScore${index}`)}>
                                 <GetAthleteScore
                                     //heat.scores
@@ -418,7 +408,7 @@ const PlayerScores = () => {
                 const { scores } = heat;
                 let playerIndex = 0;
                 scores.forEach((player) => {
-                    const { name, surfScore, surfScores } = player;
+                    const { name, surfScores } = player;
                     const firstName = name.split(' ')[0]
                     const highestScore = Math.max(...surfScores.map(score => score));
 
@@ -533,13 +523,15 @@ const PlayerScores = () => {
                 sortedPlayers.sort((a, b) => getSurfTotal(b) - getSurfTotal(a));
                 newPlayers = [...sortedPlayers];
             } else {
-                newPlayers.map((player, index) => newPlayers[index][`${game}Score`] = initValue);
+                newPlayers.forEach((player, index) => {
+                    newPlayers[index][`${game}Score`] = initValue;
+                });
             }
             localStorage.setItem('gameStatus', 'inProgress');
             if (isCurrentGame('darts')) {
                 setPlayers(updatedPlayers);
             } else {
-                if (newPlayers != []) {
+                if (newPlayers.length !== 0) {
                     //console.log(`reset => 5`);
                     setPlayers(newPlayers);
                 }
@@ -617,13 +609,13 @@ const PlayerScores = () => {
         const gamesData = [...logData];
         const gameData = {
             date: newDate(),
-            location: `${(game == 'golf') ? course.name : (game == 'surf') ? currentWave : 'Home'}`,
+            location: `${(game === 'golf') ? course.name : (game === 'surf') ? currentWave : 'Home'}`,
             time: getCurrentTime(),
             players: []
         };
         players.forEach(player => {
             if (player[game]) {
-                const playerScore = player[`${(game == 'dominos') ? 'domino' : game}Score`] || 0;
+                const playerScore = player[`${(game === 'dominos') ? 'domino' : game}Score`] || 0;
                 gameData.players.push({
                     name: player.name,
                     score: playerScore
@@ -643,7 +635,7 @@ const PlayerScores = () => {
             newPlayers = [...players];
             let updatedPlayers = [...newPlayers];
             const initValue = 0;
-            const gamesData = generateGamesData();
+            generateGamesData();
             //console.log(`gamesData: ${JSON.stringify(gamesData, null, 2)}`);
             if (isCurrentGame('darts')) {
                 updatedPlayers = newPlayers.map((player) => {
@@ -689,13 +681,15 @@ const PlayerScores = () => {
                 newPlayers = [...sortedPlayers];
                 newHeatTimer();
             } else {
-                newPlayers.map((player, index) => newPlayers[index][`${game}Score`] = initValue);
+                newPlayers.forEach((player, index) => {
+                    newPlayers[index][`${game}Score`] = initValue;
+                });
             }
             localStorage.setItem('gameStatus', 'inProgress');
             if (isCurrentGame('darts')) {
                 setPlayers(updatedPlayers);
             } else {
-                if (newPlayers != []) {
+                if (newPlayers.length !== 0) {
                     setPlayers(newPlayers);
                 }
             }
@@ -812,64 +806,9 @@ const PlayerScores = () => {
     const place = (index) => (isTieScore(index) && (index !== 0)) ? index : (index + 1);
     const placeSuffix = (index) => rank[(isTieScore(index) && (index !== 0)) ? (index - 1) : (index > 2) ? 3 : (index)];
     const rank = ['st', 'nd', 'rd', 'th'];
-    const rankStatus = (player, index) => {
-        const scoreDifference = Number(players[(index === 0) ? 0 : (index - 1)].surfScore - players[(index === 0) ? 1 : (index)].surfScore);
-        const difference = (scoreDifference < 0) ? (-1 * scoreDifference) : scoreDifference;
-        const winningScore = Number(players[(index === 0) ? 0 : ((index < 3) ? (index - 1) : 1)].surfScore);
-        const highestScoresIndices = findTwoHighestIndices(players[index].surfScores);
-        const losersHeighestScore = players[index].surfScores[highestScoresIndices[0]];
-        const need = (winningScore - losersHeighestScore) + .01;
-        const winsBy = `Wins by ${difference.toFixed(2)}`;
-        const needs = `Needs ${need.toFixed(2)}`;
-        if (index === 0) {
-            return winsBy;
-        }
-        return needs;
-    }
-    const selectJersey = (playerId, selection) => {
-        const newPlayers = [...players];
-        newPlayers[playerId].surfJerseyColor = (selection);
-        if (newPlayers != []) {
-            setPlayers(newPlayers);
-        }
-    }
     const setNewStartTime = () => {
         setStartTime(getCurrentTime());
     };
-
-    const setSurfScore = (playerId, index, score) => {
-        //alert(`setSurfScore = (playerId: ${playerId}, index: ${index}, score: ${score})`);
-        const newPlayers = [...players];
-        const currentScore = newPlayers[playerId].surfScores[index];
-        const change = (currentScore !== '' && currentScore !== 0) ? false : true;
-        newPlayers[playerId].surfScores[index] = Number(score) || '';
-        newPlayers[playerId].surfScore = scoreTotal(playerId, newPlayers);
-        /*
-        if ((newPlayers[playerId].surfPriority === 1 || newPlayers[playerId].surfPriority === 0) && change) {
-            newPlayers.map((player, index) => {
-                if (index === playerId) {
-                    return {
-                        ...player,
-                        surfPriority: players.length
-                    }
-                } else if (player.surfPriority !== 0) {
-                    return {
-                        ...player,
-                        surfPriority: player.surfPriority - 1
-                    }
-                }
-                return {
-                    ...player
-                }
-            });
-        }
-        */
-        const sortedPlayers = [...newPlayers];
-        sortedPlayers.sort((a, b) => b.surfScore - a.surfScore);
-        //console.log('setSurfScore => sortedPlayers: ', sortedPlayers)
-        setPlayers(sortedPlayers);
-        setDisplayNumberPad(false);
-    }
     const getSurfScore = (index, playerId, score) => {
         setIndex(index);
         setPlayerId(playerId);
@@ -920,7 +859,7 @@ const PlayerScores = () => {
         newPlayers[playerId].surfScore = scoreTotal(playerId, newPlayers);
         //console.log(`setSurfScores => ${newPlayers[playerId].name} newPlayers[${playerId}].surfScores[${currentScoreIndex}]: ${newPlayers[playerId].surfScores[currentScoreIndex]} newPlayers[${playerId}].surfScore: ${newPlayers[playerId].surfScore} newPlayers[${playerId}].surfPriority: ${newPlayers[playerId].surfPriority}`);
         if (newPlayers[playerId].surfPriority < playersInGame().length && change) {
-            newPlayers.map((player, index) => {
+            newPlayers.forEach((player, index) => {
                 if (player[game]) {
                     if (index === playerId) {
                         player.surfPriority = playersInGame().length;
@@ -1010,19 +949,6 @@ const PlayerScores = () => {
             </div>
             return wave
         }
-        const getPlayerCount = () => {
-            let index = 0;
-            let count = 0;
-            players.forEach((player) => {
-                if (player[game]) {
-                    count++
-                }
-                index++
-            });
-            return count
-
-        }
-
         const displayInterferenceCount = (playerId) => {
             const character = icons.dont;
             const count = (players[playerId].interferenceCount) ? Number(players[playerId].interferenceCount) : 0;
@@ -1110,111 +1036,7 @@ const PlayerScores = () => {
         const renderedItems = () => players.map(
             (player, index) => (player[game]) ? scorecard(index, 0, 0) : null
         );
-        const getColumns = () => (players.length * 2) - 1;
-        const getPlayers = () => players.length;
-
-        const anyMorePlayers = (playerIndex) => {
-            if (!Array.isArray(players) || typeof game !== 'string') {
-                console.error('Invalid players array or game string');
-                return false;
-            }
-
-            return players.slice(playerIndex + 1).some(player => player[game]);
-        };
-
-        const dartScores = () => dartScoring.map((score, index) => <div key={getKey(`${score}${index}`)} className='flexContainer width-100-percent'>
-            {
-                players.map((player, playerIndex) => (player[game])
-                    ? <div key={getKey(`${player.name}${playerIndex}`)} className={`flex${getPlayers()}Column`}>
-                        <div className='width-50-percent flexContainer flex2Column'>
-                            <div className={`flex2Column`}>
-                                {scorecard(playerIndex, index, 0)}
-                            </div>
-                            <div className={`flex2Column pt-10 mr--50 mb-1 font50 color-yellow`}>
-                                {
-                                    (players[playerIndex + 1] && players[playerIndex + 1][game])
-                                    ? score
-                                    : null
-                                }
-                            </div>
-                        </div>
-                    </div>
-                    : null
-                )
-            }
-            {
-                //<div className='flex3Column'>
-                //{scorecard(0, index, 0)}
-                //</div>
-                //<div className='ml-10 bg-tinted p-15 r-10 mb-1 font50 color-yellow flex3Column20Percent'>
-                //{score}
-                //</div>
-                //<div className='flex3Column ml-10'>
-                //{scorecard(1, index, 0)}
-                //</div>
-            }
-        </div>);
-        const bonesScores = () => dominoScoring.map((score, scoreIndex) => <div key={getKey(`${score}${scoreIndex}`)} className='flexContainer width-100-percent'>
-            {
-                players.map((player, playerIndex) => (player[game])
-                    ? <div key={getKey(`${player.name}${playerIndex}`)} className={`flex${getPlayers()}Column`}>
-                        <div className='flexContainer ml-20'>
-                            <div className={`flexColumn faded`}>
-                                {scorecard(playerIndex, scoreIndex, score)}
-                            </div>
-                            {
-                                /* (players[playerIndex + 1] && players[playerIndex + 1][game]) */
-                                (anyMorePlayers(playerIndex))
-                                ? <div className={`flexColumn size30 color-yellow bold centeredContent`}>
-                                    {score}
-                                </div>
-                                : null
-                                //score
-                            }
-                        </div>
-                    </div>
-                    : null
-                )
-            }
-        </div>);
-
         const surfingScoreboard = () => players.map((player, index) => (player[game]) ? surfingScores(player, index) : null);
-        const firstPlayer = (playerIndex) => {
-            let index = 0;
-
-            const player = players.find((player) => {
-                if (player[game]) {
-                    if (index === playerIndex) {
-                        //console.log(`firstPlayer: ${player.name} index: ${index} playerIndex: ${playerIndex}`);
-                        return true;
-                    }
-                    index++;
-                }
-                return false;
-            });
-            return player || null;
-        };
-
-
-        const dominoScores = (playerIndex) => dominoScoring.map((score, scoreIndex) => (players[playerIndex][game]) ? <div className={`flex${getPlayers()}Column`}>
-            <div className='flexContainer scrollSnapTop width-100-percent' key={getKey(`score${scoreIndex}${score}`)}>
-                <div className={`flex${getPlayers()}Column contentCenter p-5 bg-white`}>
-                    1
-                </div>
-                <div className={`flex${getColumns()}Column contentCenter p-5`}>
-                    {scorecard(playerIndex, scoreIndex, score)}
-                </div>
-                <div className={`flexColumn r-5 size40 bold color-yellow`}>
-                {
-                    (anyMorePlayers(playerIndex))
-                    ? {score}
-                    : null
-                }
-                </div>
-            </div>
-        </div>
-            : null
-        );
 
         const isDominoWinner = (playerIndex) => (getDominoTotal(playerIndex) >= winner) ? setGameOver(playerIndex) : setGameInProgress(playerIndex);
 
@@ -1242,12 +1064,6 @@ const PlayerScores = () => {
             <div className='width-100-percent h-scroll'>
                 {/*dartScores()*/}
                  <CricketScoreboard/>
-            </div>
-        </div>
-
-        const bonesScoreboard = () => <div className='containerBox'>
-            <div>
-                {bonesScores()}
             </div>
         </div>
 
@@ -1333,7 +1149,7 @@ const PlayerScores = () => {
         setShowButtons(false);
     }
     const getStandings = () => {
-        if (allGames != []) {
+        if (allGames.length !== 0) {
             const filteredGames = allGames.filter(game => !game.includes('add'));
             const standings = filteredGames.map((game, index) => (
                 <div key={getKey(game)} className="containerDetail flexColumn scrollSnapLeft m-1">
@@ -1453,7 +1269,7 @@ const PlayerScores = () => {
                                                 groupTitle='winner'
                                                 label='winner selector'
                                                 items={(isCurrentGame('dominos')) ? dominoWinners : ((isCurrentGame('surf')) ? heatLengths : winners)}
-                                                selected={winner}
+                                                selected={(isCurrentGame('surf')) ? heatLength : winner}
                                                 onChange={selectWinner}
                                                 fontSize='25'
                                                 padding='10px'
@@ -1465,7 +1281,7 @@ const PlayerScores = () => {
                                     groupTitle='winner'
                                     label='winner selector'
                                     items={(isCurrentGame('dominos')) ? dominoWinners : ((isCurrentGame('surf')) ? heatLengths : winners)}
-                                    selected={winner}
+                                    selected={(isCurrentGame('surf')) ? heatLength : winner}
                                     onChange={selectWinner}
                                     fontSize='25'
                                     padding='10px'
@@ -1476,7 +1292,7 @@ const PlayerScores = () => {
             </div>
             {(isCurrentGame('surf')) ?
                 <SurfScores
-                    heatLength={winner}
+                    heatLength={heatLength}
                     time={time}
                     newHeatTimer={newHeatTimer}
                     setTime={setTime}
@@ -1489,7 +1305,6 @@ const PlayerScores = () => {
                 ></SurfScores>
                 :
                 <React.Fragment></React.Fragment>
-
             }
             <div className='bg-stealthLite'>
                 <div className={`containerDetail m-5 scrollHeight550 ${(priorityCollapse) ? 'sticky180' : 'sticky260'} bg-lite`}>

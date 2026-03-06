@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import getKey from '../utils/KeyGenerator.js';
 import validate from '../utils/validate';
+
+let functionalSelectorIdCounter = 0;
 
 const FunctionalSelector = React.memo(({
     items,
@@ -14,8 +16,22 @@ const FunctionalSelector = React.memo(({
     width,
     bgColor = null,
     color = null,
+    inputId,
     onChange
 }) => {
+
+    const uniqueRef = useRef(null);
+    const toSlug = (value) => String(value || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    if (uniqueRef.current === null) {
+        functionalSelectorIdCounter += 1;
+        uniqueRef.current = `fs-${functionalSelectorIdCounter}`;
+    }
+    const uniqueBaseId = inputId || `${toSlug(groupTitle)}-${toSlug(label)}-${toSlug(uniqueRef.current)}`;
+    const selectId = `${uniqueBaseId}-selector`;
+    const labelId = `${uniqueBaseId}-label`;
 
     //console.log(`FunctionalSelector => label: ${label}`);
     //console.log(`FunctionalSelector => selected: ${selected} `)
@@ -55,8 +71,8 @@ const FunctionalSelector = React.memo(({
         return contentAlign;
     }
     return (
-        <label id={label} key={getKey('selectorContainer')}>
-            <select id={`${label}Selector`} className={`containerBox ${getAlignment()} button width-100-percent ${color || 'color-soft'} ${bgColor || 'bg-tintedMediumDark'}`} value={(selected) || ''} onChange={handleChange}>
+        <label id={labelId} key={getKey('selectorContainer')} htmlFor={selectId}>
+            <select id={selectId} className={`containerDetail p-10 ${getAlignment()} button width-100-percent ${color || 'color-soft'} ${bgColor || 'bg-tintedMediumDark'}`} value={(selected) || ''} onChange={handleChange}>
                 {selectItems()}
             </select>
         </label>

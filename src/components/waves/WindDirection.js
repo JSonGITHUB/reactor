@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import N from '../../assets/images/windN.png';
 import NE from '../../assets/images/windNE.png';
 import E from '../../assets/images/windE.png';
@@ -16,6 +16,13 @@ const WindDirection = ({
     height,
     collapse
 }) => {
+
+    const setWindRef = useRef(setWind);
+    const loggedFetchFailureRef = useRef(false);
+
+    useEffect(() => {
+        setWindRef.current = setWind;
+    }, [setWind]);
     
     const [status, setStatus] = useState({
         columns: columns,
@@ -26,7 +33,7 @@ const WindDirection = ({
         gusts: null
     });
             
-    const getWindData = () => {
+    const getWindData = useCallback((signal, isMounted) => {
         let data;
         const returnJSON = (response) => response.json();
         const returnRejection = (response) => Promise.reject({status: response.status, data});
@@ -47,13 +54,18 @@ const WindDirection = ({
         //const uriWindTest = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=20200520%2020:00&end_date=20200520%2020:00&station=9410230&product=wind&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
         const tri = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=latest&station=9410230&product=wind&time_zone=lst&units=english&format=json'
         const uri = tri;
-        const proxyurl = 'https://cors-anywhere.herokuapp.com/';
         //const waterTempuri = `https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=${getCurrentTime}&end_date=${getCurrentTime}&station=9410230&product=water_temperature&datum=mllw&units=english&time_zone=gmt&application=web_services&format=json`;
         //fetch(proxyurl + uri)
-        fetch(uri)
+        fetch(uri, { signal })
             .then(response => validate(response))
             .then(data => {
-                setWind(data.data[data.data.length - 1].dr, data.data[data.data.length - 1].d, data.data[data.data.length - 1].s, data.data[data.data.length - 1].g)
+                if (!isMounted()) return;
+                setWindRef.current(
+                    data.data[data.data.length - 1].dr,
+                    data.data[data.data.length - 1].d,
+                    data.data[data.data.length - 1].s,
+                    data.data[data.data.length - 1].g
+                )
                 setStatus(prevState => ({
                     ...prevState,
                     station: data.metadata.name,
@@ -63,9 +75,29 @@ const WindDirection = ({
                     gusts: data.data[data.data.length - 1].g
                 }))
             })
-            .catch(err => console.log(`Something went wrong!\nuri: ${uri} \npath: ${window.location.pathname}\n`, err));
+            .catch(err => {
+                if (err?.name === 'AbortError') return;
+                const cachedDirection = initializeData('windDirection', 'N');
+                const cachedSpeed = String(initializeData('windSpeed', '0mph')).replace('mph', '');
+                const fallbackSpeed = Number(cachedSpeed) || 0;
+                if (isMounted()) {
+                    setWindRef.current(cachedDirection, 0, fallbackSpeed, fallbackSpeed);
+                    setStatus(prevState => ({
+                        ...prevState,
+                        station: prevState.station || 'cached',
+                        speed: fallbackSpeed,
+                        angle: 0,
+                        direction: cachedDirection,
+                        gusts: fallbackSpeed
+                    }));
+                }
+                if (!loggedFetchFailureRef.current) {
+                    loggedFetchFailureRef.current = true;
+                    console.warn(`WindDirection fetch unavailable (likely CORS). Using cached wind data instead.`);
+                }
+            });
 
-    }
+            }, []);
     /*
     {
         'metadata':{
@@ -88,7 +120,10 @@ const WindDirection = ({
     */
 
     useEffect(() => {   
-        getWindData();  
+        const controller = new AbortController();
+        let mounted = true;
+        const isMounted = () => mounted;
+        getWindData(controller.signal, isMounted);  
         /*		
         const timerID = setInterval(
             () => getWindData(),
@@ -98,7 +133,11 @@ const WindDirection = ({
             clearInterval(timerID);
         }
         */
-    },[]);
+        return () => {
+            mounted = false;
+            controller.abort();
+        };
+    }, [getWindData]);
 
     /*
     Water Level: 2.01 ft Above MLLW
@@ -133,17 +172,6 @@ const WindDirection = ({
         }
         return `${speed}-${gusts}`
     }
-
-    const knots = () => {
-
-        const getKnots = (knots) => Number(knots).toFixed(0);
-
-        const speed = getKnots(status.speed);
-        const gusts = getKnots(status.gusts);
-
-        return displayWindSpeed(speed, gusts);
-
-    }
     const mph = () => {
 
         const getMPH = (knots) => Number(knots / .868976).toFixed(0);
@@ -170,7 +198,6 @@ const WindDirection = ({
         return <div className='r-10 p-10 white'>
                 <div>{getWindIcon()}</div>
                 <div className='mb-10'>{`${status.direction} ${Number(status.angle).toFixed(0)}°`}</div>
-                {/*<div>{knots()} <span className=''>knots</span></div>*/}
                 <div>{mph()} <span className=''>mph</span></div>
             </div>
     }

@@ -18,19 +18,13 @@ const Home = () => {
   const [result, setResult] = useState();
   const [firstTime, setFirstTime] = useState();
   const [categorySort, setCategorySort] = useState();
-  const [longitude, setLongitude] = useState();
-  const [latitude, setLatitude] = useState();
-  const [distance, setDistance] = useState();
-  const [tracking, setTracking] = useState();
-  const [markedLongitude, setMarkedLongitude] = useState();
-  const [markedLatitude, setMarkedLatitude] = useState();
   const [menus, setMenus] = useState();
   const [menuItems, setMenuItems] = useState();
   const [categories, setCategories] = useState();
   const [addCategoryDialog, setAddCategoryDialog] = useState();
-  const [newCategory, setNewCategory] = useState();
-  const [selectedApps, setSelectedApps] = useState();
-  const [appSearch, setAppSearch] = useState();
+  const [newCategory, setNewCategory] = useState('');
+  const [selectedApps, setSelectedApps] = useState([]);
+  const [appSearch, setAppSearch] = useState('');
   const [meta, setMeta] = useState();
   const [editCategory, setEditCategory] = useState();
 
@@ -49,6 +43,8 @@ const Home = () => {
       //"CrosswordPuzzle",
       "Roulette",
       "BlackJack",
+      "Poker",
+      "Animation",
       "Checkers",
       "WheelOfFortune"
     ],
@@ -62,18 +58,23 @@ const Home = () => {
       "Journals",
       "Scores",
       "Fuel",
+      "Parks",
+      "Moon",
+      "PhotoAssistant",
       "Notes",
       "Tasks",
       "Sets",
-      "Events",
+      //"Events",
       "Links",
       "Sessions",
       "Dose",
       "Expenses",
+      "Interest",
       "Budget",
       "TradeView",
       "Pricing",
       "Collections",
+      "WorkDay",
       "BusinessTax",
       "GeoZipFind",
       "Weather"
@@ -81,12 +82,17 @@ const Home = () => {
     convert: [
       "TrainingLog",
       "Fuel",
+      "Parks",
+      "PhotoAssistant",
       "Expenses",
+      "Interest",
       "Budget",
       "Pricing",
       "Converter",
       "Currency",
-      "Collections"
+      "Collections",
+      "WorkDay",
+      "NaturalRX"
     ],
     schedule: [
       "Scheduler",
@@ -98,16 +104,19 @@ const Home = () => {
       "Journals",
       "Scores",
       "Cook",
+      "NaturalRX",
       "Notes",
       "Tasks",
       "Sets",
-      "Events",
+      //"Events",
       "Links",
       "Sessions",
       "Expenses",
+      "Interest",
       "Budget",
       "Pricing",
       "Collections",
+      "WorkDay",
       "BusinessTax",
       "Note",
       "Charges"
@@ -117,6 +126,8 @@ const Home = () => {
       "Journals",
       "Scores",
       "Fuel",
+      "Parks",
+      "PhotoAssistant",
       "Notes",
       "Links",
       "Sessions",
@@ -136,6 +147,7 @@ const Home = () => {
       "Vote",
       "House",
       "Cook",
+      "NaturalRX",
       "Links",
       "Garden",
       "Fishing",
@@ -147,7 +159,8 @@ const Home = () => {
       "TrainingLog",
       "Journals",
       "Scheduler",
-      "Circuit"
+      "Circuit",
+      "NaturalRX"
     ]
     ,admin: [
       "MenuScreen",
@@ -196,17 +209,25 @@ const Home = () => {
     localStorage.setItem('firstTime', 'false');
     setMeta(initializeData('NavItemsMeta', NavItemsMeta));
     const storedCategories = initializeData('categories', initCategories);
-    console.log(`useEffect => storedCategories: ${JSON.stringify(storedCategories, null, 2)}`);
-    console.log(`useEffect => storedCategories.length: ${storedCategories.length}`);
+    //console.log(`useEffect => storedCategories: ${JSON.stringify(storedCategories, null, 2)}`);
+    //console.log(`useEffect => storedCategories.length: ${storedCategories.length}`);
     if (storedCategories.length > 0) {
       setCategories(storedCategories);
     } else {
       setCategories(initCategories);
     }
     const storedMenus = initializeData('menus', menusInit);
-    console.log(`Home => useEffect => storedMenus: ${JSON.stringify(storedMenus, null, 2)}`);
-    if (Object.keys(storedMenus).length > 1) {
-      setMenus(storedMenus);
+    const mergedMenus = { ...menusInit, ...storedMenus };
+
+    Object.keys(menusInit).forEach((category) => {
+      const defaultItems = Array.isArray(menusInit[category]) ? menusInit[category] : [];
+      const existingItems = Array.isArray(mergedMenus[category]) ? mergedMenus[category] : [];
+      mergedMenus[category] = Array.from(new Set([...existingItems, ...defaultItems]));
+    });
+
+    //console.log(`Home => useEffect => storedMenus: ${JSON.stringify(storedMenus, null, 2)}`);
+    if (Object.keys(mergedMenus).length > 1) {
+      setMenus(mergedMenus);
     } else {
       setMenus(menusInit);
     }
@@ -219,7 +240,7 @@ const Home = () => {
       }
     }
     // If no menus found, set to default
-    if (Object.keys(storedMenus).length === 0)
+    if (Object.keys(mergedMenus).length === 0)
     setMenus();
     setShowCalc(false);
     // Redirect to /reactor/home if needed
@@ -239,7 +260,7 @@ const Home = () => {
       clearTimeout(timer);
       clearTimeout(timer2);
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (editCategory) {
       setSelectedApps(menuItems);
@@ -258,80 +279,24 @@ const Home = () => {
         localStorage.setItem('categories', JSON.stringify(categories));
       }
     }
-  }, [categories]);
+  }, [categories, categorySort]);
   useEffect(() => {
     if (meta && Object.keys(meta).length === 0) return;
     localStorage.setItem('NavItemsMeta', JSON.stringify(meta));
   }, [meta]);
   useEffect(() => {
     if (menus && categorySort && menus[categorySort]) {
-      console.log(`Home => useEffect(menus) => menus[${categorySort}]: ${JSON.stringify(menus[categorySort], null, 2)}`);
       const newMenuItems = menus[categorySort];
       setMenuItems(newMenuItems);
       localStorage.setItem('menuItems', JSON.stringify(newMenuItems));
-    }
-  }, [menus]);
-  useEffect(() => {
-    if (menus && categorySort && menus[categorySort]) {
-      console.log(`Home => useEffect(categorySort) => menus[${categorySort}]: ${JSON.stringify(menus[categorySort], null, 2)}`);
-      const newMenuItems = menus[categorySort];
-      setMenuItems(newMenuItems);
       localStorage.setItem('categorySort', categorySort);
     }
-  }, [categorySort]);
+  }, [menus, categorySort]);
 
   // Category selector handler
   const selectSort = (_, __, value) => setCategorySort(value);
 
-  // Distance calculation logic
-  const calculateDistance = () => {
-    const lat1 = markedLatitude;
-    const lat2 = latitude;
-    const lon1 = markedLongitude;
-    const lon2 = longitude;
-    let unit = 'feet';
-    if ((lat1 === lat2 && lon1 === lon2) || !lat1 || !lat2 || !lon1 || !lon2) {
-      return 0;
-    } else if (tracking) {
-      const radlat1 = (Math.PI * lat1) / 180;
-      const radlat2 = (Math.PI * lat2) / 180;
-      const theta = lon1 - lon2;
-      const radtheta = (Math.PI * theta) / 180;
-      const feetOrYards = (dist) =>
-        dist * 5280 > 30
-          ? `${(dist * 1760).toFixed(2)} yards`
-          : `${(dist * 5280).toFixed(2)} feet`;
-      let dist =
-        Math.sin(radlat1) * Math.sin(radlat2) +
-        Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-      if (dist > 1) dist = 1;
-      dist = Math.acos(dist);
-      dist = (dist * 180) / Math.PI;
-      dist = dist * 60 * 1.1515;
-      dist = dist < 0.25 ? feetOrYards(dist) : `${dist.toFixed(2)} miles`;
-      if (unit === 'Kilometers') dist = dist * 1.609344;
-      if (unit === 'Nautical') dist = dist * 0.8684;
-      return dist;
-    }
-    return distance;
-  };
-
-  // Location update logic
-  const updateCurrentLocation = (longitude, latitude) => {
-    setLongitude(longitude);
-    setLatitude(latitude);
-    setDistance(calculateDistance());
-  };
-
   const getIcon = (label) => icons[String(label).replace(' ', '').toLowerCase()];
-
-  const startDistance = () => {
-    setTracking(true);
-    setMarkedLatitude(latitude);
-    setMarkedLongitude(longitude);
-  };
-  const stopTracking = () => setTracking(false);
-  const getDistance = () => distance;
 
   // Portrait button for menu items
   const classes = 'containerBox button bg-lite w-150 height-100 ml-auto mr-10 mt-10 mb-10';
@@ -360,10 +325,10 @@ const Home = () => {
       onKeyDown={e => { if (e.key === 'Enter') getApp(label); }}
     >
       <div className={classes}>
-        <div className='size30 m-10 mt-20'>
+        <div className='size50 m-10 mt-20 text-outline-dark'>
           {getIcon(label)}
         </div>
-        <div className='color-yellow'>
+        <div className='color-yellow text-outline-dark'>
           {label}
         </div>
       </div>
@@ -375,13 +340,13 @@ const Home = () => {
     );
   };
   const selectButton = (label) => {
-    const isSelected = selectedApps.includes(label);
-    const btnClasses = `containerDetail pl-20 pr-20 pb-20 m-5 flexColumn bg-${isSelected ? 'black' : 'lite'}`;
+    const isSelected = Array.isArray(selectedApps) && selectedApps.includes(label);
+    const btnClasses = `containerDetail fl-left pb-15 m-5 pl-15 pr-15 bg-${isSelected ? 'black' : 'lite'}`;
     return (
       <div
         className={btnClasses}
         title={label}
-        key={getKey(label)}
+        key={label}
         tabIndex={0}
         aria-label={`Select ${label}`}
         onClick={() => selectCategory(label)}
@@ -445,8 +410,8 @@ const Home = () => {
             </div>
           </div>
           <input
-            id='app search'
-            name='app search'
+            id='home-app-search'
+            name='home-app-search'
             className='containerBox color-lite bg-dark width--10'
             type='text'
             placeholder={'Find an app...'}
@@ -457,25 +422,25 @@ const Home = () => {
           <div className='containerBox'>
             {addCategoryDialog && (
               <div className='containerBox bg-lite color-dark'>
-                <div className='containerBox color-yellow'>
+                <div className='containerDetail mb-5 contentLeft p-15 color-yellow'>
                   {editCategory ? 'Edit category' : 'Add category'}
                 </div>
-                <div className='containerBox'>
-                  <input
-                    id='category'
-                    name='category'
-                    className='containerBox columnLeftAlign width--10'
-                    type='text'
-                    placeholder='Category'
-                    value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value)}
-                  />
-                </div>
-                <div className='containerBox'>
+                <input
+                  id='category'
+                  name='category'
+                  className='containerDetail columnLeftAlign width-100-percent color-lite p-10 mt-5'
+                  type='text'
+                  placeholder='Category'
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                />
+                <div className='containerDetail mt-5  mb-5 contentLeft p-15 color-yellow'>
                   Activate apps for {newCategory}
                 </div>
-                <div className='containerBox flexContainer h-scroll ht-50'>
-                  {NavItems.map(item => selectButton(item))}
+                <div className='containerDetail ht-120 x-scroll-only'>
+                  <div className='content-width-fit'>
+                    {NavItems.map(item => selectButton(item))}
+                  </div>
                 </div>
                 <div className='containerBox flexContainer'>
                   <div className='flex3Column button containerBox bg-green' onClick={editCategory ? saveEditedCategory : addNewCategory}>

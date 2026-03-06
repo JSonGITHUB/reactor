@@ -2,13 +2,11 @@
 import React from 'react';
 import { 
     AdvancedRealTimeChart, 
-    SymbolOverview, 
     TechnicalAnalysis, 
     SymbolInfo, 
     CompanyProfile,
     FundamentalData
 } from 'react-ts-tradingview-widgets';
-import TradingViewNews from './TradingViewNews';
 
 const TradingViewWidgetWrapper = ({ 
     symbol,
@@ -62,7 +60,6 @@ const TradingViewWidgetWrapper = ({
                     hotlist={false}
                     interval='D'
                     save_image={true}
-                    style={1}
                     timezone='Etc/UTC'
                     backgroundColor='#0F0F0F'
                     gridColor='rgba(242, 242, 242, 0.06)'

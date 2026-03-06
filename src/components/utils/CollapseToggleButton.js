@@ -53,7 +53,7 @@
                             }
                         </div>
                 }
-        <div title={(String(title).toLocaleLowerCase() === 'sort')?'sort':(isCollapsed)?'expand':'collapse'} className={`rt-25 mr-5 size25 button contentRight bold ${(isDescription) ? 'mt--60 pb-10' : 'mt--20'}`} onClick={() => toggle()}>
+            <div title={(String(title).toLocaleLowerCase() === 'sort')?'sort':(isCollapsed)?'expand':'collapse'} className={`size25 button contentRight ${(isDescription) ? 'mt--55 pb-10' : 'mt--20'}`} onClick={() => toggle()}>
                 {
                     (!isCollapsed)
                     ? <div>{icons.up}</div>

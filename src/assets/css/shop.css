@@ -56,7 +56,9 @@ body {
     opacity: .7;
     cursor:pointer;
 }
-#settingsMenu {
+#settingsMenu,
+#productEntryMenu,
+#shopSettingsMenu {
     width: 100%;
     left:0px;
     top:85px;
@@ -164,7 +166,9 @@ body {
 .bg-neogreen {
     background-color: #00FF00;
 }
-#settingsMenu {
+#settingsMenu,
+#productEntryMenu,
+#shopSettingsMenu {
     margin-top: 60px;
 }
 .inputItem {

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import initJournalTracking from './initJournalTracking';
 import JournalGroup from './JournalGroup';
-import getKey from '../utils/KeyGenerator';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
 import initializeData from '../utils/InitializeData';
 
@@ -21,7 +20,6 @@ const TrackJournal = ({
             //setJournals(initJournalTracking);
         } else {
             if (journals !== null && journals !== undefined && journals !== 'undefined' && journals[0] !== undefined) {
-                console.log(`TrackJournal => useEffect => journals[0]: ${journals[0]} journals: ${JSON.stringify(journals, null, 2)}`);
                 localStorage.setItem('journalTracking', JSON.stringify(journals));
             }
         }
@@ -31,9 +29,8 @@ const TrackJournal = ({
         const storedJournals = (journals !== null && journals !== undefined) 
                                 ? journals 
                                 : initializeData('journalTracking', initJournalTracking)
-        console.log(`TrackJournal => useEffect => storedJournals: ${JSON.stringify(storedJournals, null, 2)}`);
         setJournals(storedJournals);
-    }, []);
+    }, [journals, setJournals]);
 
     useEffect(() => {
         localStorage.setItem('journalSort', sort);
@@ -73,8 +70,8 @@ const TrackJournal = ({
         }
     }
     return (
-        <div key={getKey('journalGroupContainer')} className='containerDetail bg-lite m-5'>
-            <div className='containerBox'>
+        <div key='journal-group-container' className='containerDetail bg-lite m-5'>
+            <div className='containerDetail color-lite size20 mb-5'>
                 <CollapseToggleButton
                     title={'Sort'}
                     isCollapsed={sort}
@@ -84,9 +81,9 @@ const TrackJournal = ({
             </div>
         {
             (sort && journals)
-            ? <div className='containerBox'>
+            ? <div className='containerDetail color-lite size20 mb-5'>
                 {
-                    journals.slice().reverse().map((journalGroup, journalGroupIndex, array) => <div key={getKey('journalGroups')} className=''>
+                    journals.slice().reverse().map((journalGroup, journalGroupIndex, array) => <div key={`journal-group-sorted-${array.length - 1 - journalGroupIndex}-${String(journalGroup?.title || 'group')}`} className=''>
                         <JournalGroup
                             journals={journals}
                             setJournals={setJournals}
@@ -105,7 +102,7 @@ const TrackJournal = ({
             : (journals)
                 ? journals.map((journalGroup, journalGroupIndex) => (
                     (journalGroup.display && journalGroup.display === true)
-                        ? <div key={getKey('journalGroups')} className=''>
+                        ? <div key={`journal-group-${journalGroupIndex}-${String(journalGroup?.title || 'group')}`} className=''>
                             <JournalGroup
                                 journals={journals}
                                 setJournals={setJournals}

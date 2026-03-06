@@ -45,8 +45,8 @@ const GallonsCalculator = () => {
         </div>
         <div className='p-10 columnLeftAlign width-50-percent'>
           <input className='r-5 p-10 w-200 bg-darker color-soft'
-            id='exchangeRate'
-            name='exchangeRate'
+            id='gallons-exchangeRate'
+            name='gallons-exchangeRate'
             type='number'
             value={exchangeRate}
             onChange={(e) => setExchangeRate(e.target.value)}
@@ -59,8 +59,8 @@ const GallonsCalculator = () => {
         </div>
         <div className='p-10 columnLeftAlign width-50-percent'>
           <input className='r-5 p-10 w-200 bg-darker color-soft'
-            id='pricePerLiter'
-            name='pricePerLiter'
+            id='gallons-pricePerLiter'
+            name='gallons-pricePerLiter'
             type='number'
             value={pricePerLiter}
             onChange={(e) => setPricePerLiter(e.target.value)}
@@ -73,8 +73,8 @@ const GallonsCalculator = () => {
         </div>
         <div className='p-10 columnLeftAlign width-50-percent'>
           <input 
-            id='litersPurchased'
-            name='litersPurchased'
+            id='gallons-litersPurchased'
+            name='gallons-litersPurchased'
             className='r-5 p-10 w-200 bg-darker color-soft'
             type='number'
             value={litersPurchased}

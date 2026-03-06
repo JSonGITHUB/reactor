@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import EditableTextField from './EditableTextField';
-import { validate } from 'uuid';
 
 const itemsAmount = ['single item', 'multiple items'];
 
@@ -42,17 +41,16 @@ const IngredientDialog = ({
             console.log(`IngredientDialog => ingredientDisplay: ${ingredientDisplay}`)
             setIngredients(ingredientDisplay);
         }
-    }, [items]);
+    }, [items, recipe.ingredients]);
     useEffect(() => {
         if (isOpen && dialogType === 'edit') {
             setIngredient(recipe.ingredients[index][2]);
             setUnit(recipe.ingredients[index][1]);
             setQuantity(recipe.ingredients[index][0]);
         }
-    }, [isOpen]);
+    }, [isOpen, dialogType, index, recipe.ingredients]);
     
     useEffect(() => {
-        const newRecipeIngredients = [];
         setRecipeIngredients(ingredients);
     }, [ingredients]);
 

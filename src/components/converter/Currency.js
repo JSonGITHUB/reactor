@@ -21,8 +21,15 @@ const Currency = () => {
     const [isToUsd, setIsToUsd] = useState(true);
 
     useEffect(() => {
-        handleConversion();
-    }, [usdAmount]);
+        if (!usdAmount) {
+            setConvertedAmount('');
+            return;
+        }
+        const rate = exchangeRates[selectedCurrency];
+        if (!rate) return;
+        const convertedValue = isToUsd ? usdAmount / rate : usdAmount * rate;
+        setConvertedAmount(convertedValue.toFixed(2));
+    }, [usdAmount, exchangeRates, selectedCurrency, isToUsd]);
 
     const handleConversion = () => {
         if (usdAmount) {
@@ -53,15 +60,6 @@ const Currency = () => {
 
     const currencyConverting = () => {
         return currencies[selectedCurrency]
-    }
-    const setConversion = (event) => {
-        const { name, value } = event.target;
-        console.log(`Currency => setConversion => setIsToUsd(${value === false})`);
-        if (value === 'false' || value === false) {
-            setIsToUsd(false);
-        } else {
-            setIsToUsd(true);
-        }
     }
     const formatNumber = (amount) => {
         const formattedNumber = Number(amount).toLocaleString();

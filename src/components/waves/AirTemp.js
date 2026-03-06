@@ -4,6 +4,9 @@ const AirTemp = ({isMotionOn}) => {
     
     const [temp,setTemp] = useState() ;      
     useEffect(() => {
+        let isMounted = true;
+        const controller = new AbortController();
+
         async function fetchAirTemp(stationId = '9410230') {
             const formatDate = (date) => date.toISOString().slice(0, 10).replace(/-/g, '');
 
@@ -11,7 +14,7 @@ const AirTemp = ({isMotionOn}) => {
                 const dateStr = formatDate(date);
                 const airUrl = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${dateStr}&end_date=${dateStr}&station=${stationId}&product=air_temperature&units=english&time_zone=lst_ldt&application=ports_screen&format=json`;
 
-                const res = await fetch(airUrl);
+                const res = await fetch(airUrl, { signal: controller.signal });
                 if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
 
                 const json = await res.json();
@@ -34,21 +37,39 @@ const AirTemp = ({isMotionOn}) => {
                 const latest = data[data.length - 1];
                 return parseFloat(latest.v);
             } catch (error) {
+                if (error?.name === 'AbortError') {
+                    return null;
+                }
                 console.error('Error fetching air temperature:', error);
                 return null;
             }
         }
         fetchAirTemp().then(temp => {
+            if (!isMounted) return;
             if (temp !== null) {
                 console.log(`AirTemp => fetchAirTemp => Current air temperature: ${temp} °F`);
                 setTemp(temp)
             } else {
-                console.log('AirTemp => fetchAirTemp => No temperature data available');
+                const cachedTempRaw = localStorage.getItem('airTemp');
+                const cachedTemp = cachedTempRaw ? JSON.parse(cachedTempRaw) : null;
+                if (cachedTemp !== null && cachedTemp !== undefined && cachedTemp !== '') {
+                    setTemp(cachedTemp);
+                    console.warn('AirTemp => Using cached air temperature');
+                } else {
+                    console.log('AirTemp => fetchAirTemp => No temperature data available');
+                }
             }
         });
+
+        return () => {
+            isMounted = false;
+            controller.abort();
+        };
     }, []);
     useEffect(() => {
-        localStorage.setItem('airTemp', JSON.stringify(temp));
+        if (temp !== null && temp !== undefined && temp !== '') {
+            localStorage.setItem('airTemp', JSON.stringify(temp));
+        }
     }, [temp]);
 
     return <div>

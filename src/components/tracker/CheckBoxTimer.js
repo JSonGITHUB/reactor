@@ -1,52 +1,50 @@
 import React from 'react';
-import Sounds from '../sound/Sounds';
-import ScheduleParent, { useSchedule } from './ScheduleContext';
+import { useSchedule } from './ScheduleContext';
 
 const CheckBoxTimer = ({
     idx,
     dose,
     status,
     pushDose,
-    doseTime
+    doseTime,
+    doseKey
 }) => {
 
-    const { 
-        timeline, 
-        setTimeline, 
-        meds, 
-        setMeds,
-        handleCheck
-    } = useSchedule();
+    const { handleCheck } = useSchedule();
 
     return (
-        <ScheduleParent>
         <div
             key={idx}
-                className={`${status === 'missed' ? 'color-lite' : status === 'upcoming' ? 'color-orange' : 'color-lite'}`}
+            className={`${status === 'missed' ? 'color-lite' : status === 'upcoming' ? 'color-orange' : 'color-lite'}`}
             data-dose-time={doseTime.toISOString()}
+            data-dose-key={doseKey}
             onClick={() => handleCheck(dose, idx)}
         >
-                <div className={`containerDetail m-10 ${(!!dose.completed) ? 'bg-green' : 'bg-lite'}`}>
-                <div className='containerDetail m-5 contentLeft'>
-                    <div className='ml-10 mt-10 size30 bold'>{dose.name}</div>
-                    <div className='pl-15 size15'>{dose.instruction}</div>
+                <div className={`containerDetail mt-5 ${(!!dose.completed) ? 'bg-green' : 'bg-lite'}`}>
+                <div className='containerDetail contentLeft'>
+                    <div className='ml-10 mt-10 size25 bold'>
+                        {dose.name}
+                    </div>
+                    <div className='pl-15 size15'>
+                        {dose.instruction}
+                    </div>
                     {dose.warning && (
                         <div className='i color-yellow mb-5 mt-5 ml-10 size15'>
                             ⚠️ {dose.warning}
                         </div>
                     )}
                 </div>
-                <div className='containerDetail flexContainer bg-lite'>
-                        <div className={`containerDetail p-25 m-5 size40 bg-${(!!dose.completed) ?'dkGreen':'dkRed'} flex2Column`}>
+                <div className='flexContainer'>
+                    <div className={`containerDetail p-25 mt-5 size40 bg-${(!!dose.completed) ?'dkGreen':'dkRed'} flex2Column`}>
                         {
-                                (!!dose.completed)
-                                ? <span className=''>✔️</span>
-                                : <span className=''>❌</span>
+                            (!!dose.completed)
+                            ? <span className=''>✔️</span>
+                            : <span className=''>❌</span>
                         }
                     </div>
                     <div
                         title='Push Dose'
-                        className={`containerDetail p-25 m-5 size40 bg-lite flex2Column`}
+                        className={`containerDetail p-25 ml-5 mt-5 size40 bg-lite flex2Column`}
                         onClick={e => {
                             e.stopPropagation();
                             const minutes = Number(prompt('Enter time in minutes to push', dose.pushInput || 0));
@@ -65,7 +63,6 @@ const CheckBoxTimer = ({
                 </div>
             </div>
         </div>
-        </ScheduleParent>
     );
 };
 

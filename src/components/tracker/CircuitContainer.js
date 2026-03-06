@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from 'react';
 import { CircuitContext } from '../context/CircuitContext';
 import CircuitCheckbox from './CircuitCheckbox';
 import CircuitTimer from './CircuitTimer';
-import getKey from '../utils/KeyGenerator';
 import Breathing from '../breathing/Breathing';
 import AnimatedLine from '../breathing/AnimatedLine';
 //import FullWidthButton from '../utils/FullWidthButton';
@@ -26,14 +25,11 @@ const CircuitContainer = ({
         jumpToActive,
         setVideoId,
         setVideoActive,
-        dimensions,
-        edit,
-        setEdit
+        dimensions
     } = useContext(CircuitContext);
 
     const [active, setActive] = useState(false);
-    const chillComplete = (index) => console.log(`${circuits[circuitGroupIndex].circuits[circuitIndex].excersizes[index].title} chill complete`);
-    const [chilling, setChilling] = useState(false);
+    const chillComplete = () => {};
     const getVideoID = () => {
         if (goal.link.includes('/shorts/')) {
             return goal.link.split('/shorts/')[1];
@@ -42,11 +38,7 @@ const CircuitContainer = ({
         }
     }
     useEffect(() => {
-    }, [chilling]);
-
-    useEffect(() => {
         if (activeIndex === `sessionindex${index}groupIndex${circuitGroupIndex}subgroupIndex${circuitIndex}`) {
-            console.log(`CircuitContainer => ${goal.title} = activeIndex: ${activeIndex}`);
             setActive(true);
             if (goal.link.includes('youtu')) {
                 setVideoId(getVideoID());
@@ -55,20 +47,16 @@ const CircuitContainer = ({
         } else {
             setActive(false);
         }
-    }, [activeIndex]);
+    }, [activeIndex]); // eslint-disable-line react-hooks/exhaustive-deps
     
     const triggerChill = (index, groupIndex, subgroupIndex) => {
         const nextIndex = `chillindex${Number(index)}groupIndex${groupIndex}subgroupIndex${subgroupIndex}`;
-        setChilling(true);
-        console.log(`triggerChill => ${goal.title} chilling: ${chilling} ${nextIndex}`)
         setActiveIndex(nextIndex);
         setVideoActive(false);
         jumpToActive();
     }
     const triggerTimer = (index, groupIndex, subgroupIndex) => {
         const nextIndex = `sessionindex${Number(index + 1)}groupIndex${groupIndex}subgroupIndex${subgroupIndex}`;
-        setChilling(false);
-        console.log(`triggerTimer => ${goal.title} chilling: ${chilling} ${nextIndex}`)
         setActiveIndex(nextIndex);
         jumpToActive();
     }
@@ -113,7 +101,7 @@ const CircuitContainer = ({
 }
 
     const getCircuitDetails = (index, goal) => <div
-                            key={getKey(`goal${index}`)}
+                            key={`circuit-goal-${circuitGroupIndex}-${circuitIndex}-${index}-${String(goal?.title || 'goal')}`}
                             className={`containerBox centerVertical ${(active) ? 'bg-dark' : 'bg-lite'}`}
                         >
                             <CircuitCheckbox

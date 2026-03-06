@@ -18,11 +18,14 @@ import validate from '../utils/validate';
 import initializeData from '../utils/InitializeData';
 import { IngredientContext } from '../context/IngredientContext';
 
+/* eslint-disable react-hooks/exhaustive-deps */
+
 const List = () => {
 
     const {
         ingredients,
-        setIngredients
+        setIngredients,
+        ingredientStatus
     } = useContext(IngredientContext);
 
     const getTodos = () => initializeData('vueTodos', initData);
@@ -69,6 +72,8 @@ const List = () => {
         sortByIndex: true,
         item: ''
     });
+    // Keep recalculation tied to todo updates; helper functions are intentionally not deps.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         localStorage.setItem('vueTodosSaved', JSON.stringify(todos));
         localStorage.setItem('vueTodos', JSON.stringify(todos));
@@ -119,19 +124,21 @@ const List = () => {
         }
         setTodos(newTodos);
     };
+    
     const getTaxCheckBox = (todo, index) => {
+        const taxId = `tax-${index}`;
         if (todo.tax) {
             return <input
-                id='tax'
-                name='tax'
+                id={taxId}
+                name={taxId}
                 className='regular-checkbox button glassy'
                 checked type='checkbox'
                 onChange={() => toggleTax(index)}
             />
         } else {
             return <input
-                id='tax'
-                name='tax'
+                id={taxId}
+                name={taxId}
                 className='regular-checkbox button glassy'
                 type='checkbox'
                 onChange={() => toggleTax(index)}
@@ -366,6 +373,8 @@ const List = () => {
             localStorage.setItem('shopFilter', shopFilter);
         }
     }, [shopFilter]);
+    // Run initial filter/category setup once on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         setCategory(initializeData('shopCategory', ''));
         const filter = localStorage.getItem('shopFilter');
@@ -373,12 +382,16 @@ const List = () => {
         setShopFilter(filter);
         updateAisles();
     }, []);
+    // Apply ingredient sync on ingredient changes; todos dependency intentionally omitted.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
+        const checkedIngredients = (ingredients || []).filter((item) => ingredientStatus?.[item] === true);
+
         const isIngredient = (item) => {
-            if (!ingredients) {
+            if (!checkedIngredients || checkedIngredients.length === 0) {
                 return false;
             }
-            return ingredients.some((ingredient) => (item.toLowerCase() === String(ingredient.split(' ')[0]).toLowerCase()) ? true : false);
+            return checkedIngredients.some((ingredient) => (item.toLowerCase() === String(ingredient.split(' ')[0]).toLowerCase()) ? true : false);
         };
 
         const updatedTodos = todos.map((item) => {
@@ -388,8 +401,8 @@ const List = () => {
             return item;
         });
 
-        if (ingredients) {
-            const newIngredients = ingredients.filter((item) => {
+        if (checkedIngredients.length > 0) {
+            const newIngredients = checkedIngredients.filter((item) => {
                 return todos.some((ingredient) =>
                     ingredient.title.toLowerCase().includes(String(item.split(' ')[0]).toLowerCase())
                 );
@@ -415,11 +428,13 @@ const List = () => {
         }
 
         setTodos(updatedTodos);
-    }, [ingredients]);
+    }, [ingredients, ingredientStatus]);
     useEffect(() => {
         console.log(`Shop ==> useEffect category: ${category}`);
         localStorage.setItem('shopCategory', category);
     }, [category]);
+    // Tax toggle should recompute totals; helper is intentionally stable by usage pattern.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         getTotal();
     }, [status.tax]);
@@ -651,7 +666,7 @@ const List = () => {
         const ok = window.confirm(`changeing all => ${category} to ${newCategory}`);
         if (ok) {
             const newTodos = [...todos];
-            newTodos.map(todo => {
+            newTodos.forEach((todo) => {
                 if (todo.aisle === category) {
                     todo.aisle = newCategory;
                 }
@@ -665,7 +680,7 @@ const List = () => {
     const emptyCart = () => {
         localStorage.setItem('vueTodosRevert', JSON.stringify(todos));
         const newTodos = [...todos];
-        newTodos.map(todo => {
+        newTodos.forEach((todo) => {
             todo.cart = false;
         });
         setTodos(newTodos);

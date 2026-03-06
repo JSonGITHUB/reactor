@@ -1,6 +1,4 @@
 import icons from '../site/icons';
-import initCircuitTracking from './initCircuitTracking';
-import initializeData from './initializeData';
 
 const CircuitHeader = ({
     header,

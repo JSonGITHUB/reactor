@@ -37,7 +37,6 @@ const OceanParent = ({
     const [retry, setRetry] = useState('');
     const swellData = useOceanData('swell', swellUrl, '', setRetry);
     const [swell, setSwell] = useState(null);
-    const [dataInit, setDataInit] = useState(false);
 
     const [status, setStatusData] = useState();
 
@@ -100,14 +99,14 @@ const OceanParent = ({
             //console.log(`OceanContext => newValue: ${JSON.stringify(newValue, null, 2)}`);
             
             newValue.pause = true;
-            newValue.swell1Direction = swell1Angle;
-            newValue.swell1Angle = roundToNearestFive(swellData.swell_wave_direction);
-            newValue.swell1Height = Number(swellData.swell_wave_height).toFixed(0);
-            newValue.swell1Interval = `${Number(swellData.swell_wave_period).toFixed(0)}`;
-            newValue.swell2Direction = swell2Angle;
-            newValue.swell2Angle = roundToNearestFive(swellData.wave_direction);
-            newValue.swell2Height = Number(swellData.wave_height).toFixed(0);
-            newValue.swell2Interval = `${Number(swellData.wave_period).toFixed(0)}`;
+            newValue.swell1Direction = swell2Angle;
+            newValue.swell1Angle = roundToNearestFive(swellData.wave_direction);
+            newValue.swell1Height = Number(swellData.wave_height).toFixed(0);
+            newValue.swell1Interval = `${Number(swellData.wave_period).toFixed(0)}`;
+            newValue.swell2Direction = swell1Angle;
+            newValue.swell2Angle = roundToNearestFive(swellData.swell_wave_direction);
+            newValue.swell2Height = Number(swellData.swell_wave_height).toFixed(0);
+            newValue.swell2Interval = `${Number(swellData.swell_wave_period).toFixed(0)}`;
             newValue.swellData = swellData;
             //////////////////////////////////////////////////////////////
             setStatusData(newValue);
@@ -152,7 +151,7 @@ const OceanParent = ({
             matches: [],
             init: false
         })
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
     useEffect(() => {
         
     }, [status]);
@@ -181,7 +180,6 @@ const OceanParent = ({
                 localStorage.setItem('swellData', JSON.stringify(swellData[0].current));
                 setSwell(swellData[0].current);
             }
-            setDataInit(true);
         }
     }, [swellData]);
 
