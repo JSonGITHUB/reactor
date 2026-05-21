@@ -40,3 +40,5 @@ function showCams() {
     document.getElementById("resume").scrollLeft = 0;
     resize();   
 }
+const Cams = () => showCams();
+export default Cams;

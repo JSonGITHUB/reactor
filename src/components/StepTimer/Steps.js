@@ -39,7 +39,7 @@ const Steps = () => {
     const getEditDialog = (id) => {
         const newDialog = <div className='containerBox'>
             <input
-                id='newStep'
+                id='steptimer-edit-newStep'
                 name='newStep'
                 type='text'
                 placeholder='Step Description'
@@ -49,7 +49,7 @@ const Steps = () => {
             />
             <br />
             <input
-                id='hours'
+                id='steptimer-edit-hours'
                 name='hours'
                 type='number'
                 placeholder='Hours'
@@ -57,7 +57,7 @@ const Steps = () => {
                 onChange={(e) => setNewHours(e.target.value)}
             />
             <input
-                id='minuts'
+                id='steptimer-edit-minutes'
                 name='minutes'
                 type='number'
                 placeholder='Minutes'
@@ -65,7 +65,7 @@ const Steps = () => {
                 onChange={(e) => setNewMinutes(e.target.value)}
             />
             <input
-                id='seconds'
+                id='steptimer-edit-seconds'
                 name='seconds'
                 type='number'
                 placeholder='Seconds'
@@ -125,7 +125,7 @@ const Steps = () => {
                     ? null
                     : <div className='containerBox'>
                         <input
-                            id='step'
+                            id='steptimer-add-step'
                             name='step'
                             type='text'
                             placeholder='Description'
@@ -144,7 +144,7 @@ const Steps = () => {
                         />
                         */}
                         <input
-                            id='hours'
+                            id='steptimer-add-hours'
                             name='hours'
                             type='number'
                             placeholder='Hours'
@@ -153,7 +153,7 @@ const Steps = () => {
                             className='containerBox width-100-percent'
                         />
                         <input
-                            id='minutes'
+                            id='steptimer-add-minutes'
                             name='minutes'
                             type='number'
                             placeholder='Minutes'
@@ -162,7 +162,7 @@ const Steps = () => {
                             className='containerBox width-100-percent'
                         />
                         <input
-                            id='seconds'
+                            id='steptimer-add-seconds'
                             name='seconds'
                             type='number'
                             placeholder='Seconds'

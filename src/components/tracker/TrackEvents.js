@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import getKey from '../utils/KeyGenerator';
 import TimerDisplay from '../utils/TimerDisplay';
 import {currentTime, currentDate} from '../utils/CurrentCalendar.js';
 import initSession from './initSession.js';
@@ -24,7 +23,7 @@ const TrackEvents = ({
     useEffect(() => {
         const storedEvents = initializeData('eventTracking', [initSession(currentDate(), currentTime(), currentDate(), currentTime(), 0)]);
         setEvents(storedEvents);
-    }, []);
+    }, [setEvents]);
 
     const addEvent = (index) => {
         const eventDescription = prompt('Enter event description:');
@@ -41,7 +40,6 @@ const TrackEvents = ({
 
             };
             const updateEvents = [...events];
-            console.log(`TrackEvents => index: ${index} updateEvents: ${JSON.stringify(updateEvents[index], null, 2)}`);
             updateEvents[index].tasks.unshift(event);
             updateEvents[index].isCollapsed = false;
             setEvents(updateEvents);
@@ -116,7 +114,6 @@ const TrackEvents = ({
     };
 
     const handleStartSubEvent = (eventProjectIndex, eventIndex) => {
-        console.log(`handleStartSubEvent => eventProjectIndex: ${eventProjectIndex}, eventIndex: ${eventIndex}`);
         const updatedEvents = [...events];
         const event = updatedEvents[eventProjectIndex].events[eventIndex];
         event.sessions = event.sessions ?? [];
@@ -241,7 +238,7 @@ const TrackEvents = ({
                                             <div>{event.sessions.length} Total: {event.runningTimeDisplay} </div>
                                         </div>
                                         {event.sessions.map((session, sessionIndex) => (
-                                            <div className='color-lite containerBox' key={getKey('tracker')}>
+                                            <div className='color-lite containerBox' key={`event-session-${index}-${eventIndex}-${sessionIndex}`}>
                                                 {event.sessions.map((session, sessionIndex) => (
                                                     <div>
                                                         <div className='containerBox flexContainer'>

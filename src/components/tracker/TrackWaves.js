@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import {currentTime, currentDate} from '../utils/CurrentCalendar';
 import initSession from './initSession';
 import WaveTrack from './WaveTrack';
-import getKey from '../utils/KeyGenerator';
 import initializeData from '../utils/InitializeData';
 
 const TrackWaves = ({
@@ -20,7 +19,7 @@ const TrackWaves = ({
         const initData = [initSession(currentDate(), currentTime(), currentDate(), currentTime(), 0)];
         const storedWaves = initializeData('waveTracking', initData);
         setWaves(storedWaves);
-    }, []);
+    }, [setWaves]);
 
     const likeWave = (waveProjectIndex, waveIndex, sessionIndex) => {
         const newWaves = [...waves];
@@ -58,7 +57,6 @@ const TrackWaves = ({
     const addWave = (waveProjectIndex, waveIndex) => {
         const updatedWaves = [...waves];
         const wave = updatedWaves[waveProjectIndex].tasks[waveIndex];
-        console.log(`updatedWaves[${waveProjectIndex}].tasks: ${JSON.stringify(updatedWaves[waveProjectIndex].tasks, null,2)}`)
         wave.sessions = wave.sessions || [];
         wave.isRunning = false;
         //wave.startDate = currentDate();
@@ -78,7 +76,7 @@ const TrackWaves = ({
             {
                 waves.map((wave, waveProjectIndex) => (
                     (wave.display && wave.display === true)
-                    ? <div key={getKey(`wave${waveProjectIndex}`)}>
+                    ? <div key={`wave-project-${waveProjectIndex}-${String(wave?.description || 'wave')}`}>
                         <WaveTrack
                             waveProjectIndex={waveProjectIndex}
                             wave={wave}

@@ -1,30 +1,6 @@
 import { useState } from 'react';
 
-const currentTime = new Date();
 const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const getDaysInMonth = () => {
-    const month = currentTime.getMonth()+1;
-    const year = currentTime.getYear();
-    const daysInMonth = new Date(year, month, 0).getDate();
-    return daysInMonth;
-}
-const getNextDay = (currentDate) => {
-    currentDate = Number(currentDate)+1;
-    if (currentDate >= getDaysInMonth()) {
-        return '01'
-    }
-    currentDate = (currentDate<10) ? `0${currentDate}` : currentDate;
-    return currentDate;
-}
-const getNextMonth = (currentMonth) => {
-    // eslint-disable-next-line
-    let endOfMonth = false;
-    if (currentTime.getDate() === getDaysInMonth()) {
-        currentMonth = currentMonth + 1;
-    }
-    const month = ((currentMonth)<10) ? `0${(currentMonth)}` : currentMonth;
-    return month
-}
 
 const useCurrentTime = () => {
     const getCurrentTime = new Date();
@@ -73,10 +49,10 @@ const useCurrentTime = () => {
     const getTideEndTime = `${year}${month}${date}%2021:00`;
 
     // Set up state
-    const [startTime, setStartTime] = useState(getStartTime);
-    const [tideStartTime, setTideStartTime] = useState(getTideStartTime);
-    const [endTime, setEndTime] = useState(getEndTime);
-    const [tideEndTime, setTideEndTime] = useState(getTideEndTime);
+    const [startTime] = useState(getStartTime);
+    const [tideStartTime] = useState(getTideStartTime);
+    const [endTime] = useState(getEndTime);
+    const [tideEndTime] = useState(getTideEndTime);
     const currentTime = new Date();
 
     const time = {

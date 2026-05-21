@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
+
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import getKey from '../utils/KeyGenerator';
 import WaveUtils from '../wavefinder/WaveUtils';
 import { BrowserRouter as Link } from 'react-router-dom';
@@ -9,6 +10,40 @@ import { date, day, month, year } from '../utils/CurrentCalendar';
 import initializeData from '../utils/InitializeData';
 //import FullWidthButton from '../utils/FullWidthButton';
 import { WavesContext } from '../context/WavesContext';
+import validate from '../utils/validate';
+
+// Debounced state hook
+function useDebouncedState(initialValue, delay = 300) {
+    const [value, setValue] = useState(initialValue);
+    const [debouncedValue, setDebouncedValue] = useState(initialValue);
+    const handler = useRef();
+
+    useEffect(() => {
+        if (handler.current) clearTimeout(handler.current);
+        handler.current = setTimeout(() => {
+            setDebouncedValue(value);
+        }, delay);
+        return () => clearTimeout(handler.current);
+    }, [value, delay]);
+
+    return [debouncedValue, setValue, value];
+}
+
+// Isolated timer component — re-renders only itself every second
+function SessionTimer({ sessionStart, sessionEnd }) {
+    const [timer, setTimer] = useState(0);
+    useEffect(() => {
+        if (!sessionStart || sessionEnd) return;
+        const id = setInterval(() => {
+            setTimer(Math.floor((Date.now() - sessionStart) / 1000));
+        }, 1000);
+        return () => clearInterval(id);
+    }, [sessionStart, sessionEnd]);
+
+    return (
+        <span>{Math.floor(timer / 60)}:{('0' + (timer % 60)).slice(-2)}</span>
+    );
+}
 
 const SurfLocation = ({
     state,
@@ -16,25 +51,20 @@ const SurfLocation = ({
     matches,
     regionMatch,
     tideDisplay,
-    locationCollapse
+    locationCollapse,
+    currentConditions
 }) => {
     const { /*edit, */windDirection, windSpeed, windGusts, swell1Direction, swell2Direction, swell1Angle, swell2Angle, swell1Height, swell2Height, swell1Interval, swell2Interval, tide, stars } = state;
     // eslint-disable-next-line
     const [collapse, setCollapse] = useState(item.collapse);
-    const [showLabel, setShowLabel] = useState(false);
     const {
         locations,
-        setLocations,
-        currentWave,
-        setCurrentWave,
-        handleResetLocations,
-        handleEditToggle,
         edit,
-        setEdit,
+        handleEditToggle,
         updateLocations
     } = useContext(WavesContext);
 
-    const [status, setStatus] = useState({
+    const [status] = useState({
         module: 'SurfLocation',
         logged: false,
         edit: edit,
@@ -58,53 +88,11 @@ const SurfLocation = ({
         const newLocations = [...locations];
         const index = newLocations.findIndex(location => location === item);
         newLocations[index].collapse = collapse;
-        //setLocations(newLocations)
         localStorage.setItem('locations', JSON.stringify(newLocations))
-    }, [collapse]);
+    }, [collapse, item, locations]);
 
     const style = {
         height: '50px'
-    }
-    const editWave = (location, index) => {
-        console.log(`editWaveSave => index: ${index}`)
-        const waveLocations = [...locations];
-        let swells = location.swell;
-        let winds = location.wind;
-        let tides = location.tide;
-        let i = 0;
-        let wave = prompt('wave: ', location.name);
-        let latitude = prompt('lat: ', location.latitude);
-        let longitude = prompt('long: ', location.longitude);
-        const swellCount = prompt('swell count: ', swells.length);
-        for (i = 0; i < swellCount; i++) {
-            swells[i] = prompt('edit swell direction', swells[i]).toLocaleUpperCase();
-        }
-        swells = swells.slice(0, swellCount);
-        const windCount = prompt('wind count: ', winds.length);
-        for (i = 0; i < windCount; i++) {
-            winds[i] = prompt('edit wind direction', winds[i]).toLocaleUpperCase();
-        }
-        winds = winds.slice(0, windCount);
-        const tideCount = prompt('tide count: ', tides.length);
-        for (i = 0; i < tideCount; i++) {
-            tides[i] = prompt('edit tide direction', tides[i]).toLocaleLowerCase();
-        }
-        tides = tides.slice(0, tideCount);
-        const getObj = () => {
-            return {
-                name: wave,
-                latitude: latitude,
-                longitude: longitude,
-                swell: swells,
-                wind: winds,
-                tide: tides
-            }
-        }
-        waveLocations[index] = getObj();
-        console.log(`editWaveSave => wave: ${wave} ${JSON.stringify(waveLocations[index], null, 2)}`)
-        localStorage.setItem('locations', JSON.stringify(waveLocations));
-        setLocations(waveLocations);
-        updateLocations(waveLocations);
     }
 
     const getCurrentWind = () => {
@@ -183,6 +171,7 @@ const SurfLocation = ({
                 </div>
     });
     const waterLevel = Number(initializeData('height', 0));
+    console.log(`SurfLocation => height: ${waterLevel}`);
     const getCurrentTide = (waterLevel > 3) ? 'high' : (waterLevel < 2) ? 'low' : 'medium';
 
     const windOrientation = () => {
@@ -237,7 +226,7 @@ const SurfLocation = ({
         }
         return 'victory at sea';
     }
-    const conditions = () => {
+    const getConditions = () => {
 
         const isSwellHeightGood = (Number(state.swell1Height) > 4) ? true : false;
         const isWindGood = (windOrientation() !== 'onshore') ? true : false;
@@ -297,14 +286,41 @@ const SurfLocation = ({
         }
         return waveHeights[0];
     }
+
+    const normalizeTemperature = (value, fallback = '') => {
+        if (value === null || value === undefined || value === '') {
+            return fallback;
+        }
+
+        const numeric = Number(String(value).replace(/[^\d.-]/g, ''));
+        if (!Number.isFinite(numeric)) {
+            return fallback;
+        }
+
+        return String(Math.round(numeric));
+    };
+
+    const getStoredWaterTemp = () => {
+        const rawWaterTemp = initializeData('waterTemp', '');
+        return normalizeTemperature(rawWaterTemp, '');
+    };
+
+    const getStoredAirTemp = () => {
+        const rawAirTemp = initializeData('airTemp', '');
+        return normalizeTemperature(rawAirTemp, '');
+    };
     const notes = () => {
         const longMonth = () => months[month() - 1];
         const suffix = ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th', 'th'];
+        const waterTemp = getStoredWaterTemp();
+        const airTemp = getStoredAirTemp();
+        const waterTempStr = waterTemp ? ` Water temp was ${waterTemp}°. ` : '';
+        const airTempStr = airTemp ? `Air temp was ${airTemp}°. ` : '';
         const note = `On ${longMonth()} ${day()}${suffix[Number(String(day()).slice(-1))]} ${year()}, ` +
             `${item.name} was ${waveSize()} with ${state.swell1Height}ft close-outs out of the ${directions[state.swell1Direction]}, ` +
             `on a ${initializeData('height', 0)}ft ${getCurrentTide} tide.` +
             `The wind was ${windOrientation()} at ${initializeData('windSpeed', '0mph')} out of the ${directions[state.windDirection]} ` +
-            `and surface conditions were ${surfaceCondition()}. Overall the surf was ${conditions().toLocaleLowerCase()}.`;
+            `and surface conditions were ${surfaceCondition()}.${waterTempStr}${airTempStr}Overall the surf was ${getConditions().toLocaleLowerCase()}.`;
         return note;
     }
     const logTemplateData = (name) => {
@@ -350,10 +366,12 @@ const SurfLocation = ({
                     Direction: state.windDirection,
                     Orientation: windOrientation(),
                     MPH: `${initializeData('windSpeed', 0)}`,
-                    Surface: surfaceCondition()
+                    Surface: surfaceCondition(),
+                    WaterTemp: getStoredWaterTemp(),
+                    AirTemp: getStoredAirTemp()
                 },
                 Conditions: {
-                    Conditions: conditions()
+                    Conditions: getConditions()
                 },
                 Comments: {
                     'notes': notes()
@@ -361,29 +379,153 @@ const SurfLocation = ({
             }
         )
     };
-    const logLocation = (item) => {
-        console.log(`logLocation => item: ${JSON.stringify(item, null, 2)}`);
-        const id = date();
-        localStorage.setItem('logId', id);
-        localStorage.setItem(id, JSON.stringify(logTemplateData(item.name)));
-        window.location.pathname = '/reactor/Session';
-    }
+    // Session Timer State
+    const [sessionActive, setSessionActive] = useState(false);
+    const [sessionStart, setSessionStart] = useState(null);
+    const [sessionEnd, setSessionEnd] = useState(null);
+    const [shape, setShape, shapeInput] = useDebouncedState('');
+    const [conditions, setConditions, conditionsInput] = useDebouncedState('');
+    const [sessionData, setSessionData] = useState(null);
+    const [notice, setNotice] = useState('');
+
+    // Start session: show dashboard, start timer
+    const startSession = (item) => {
+        const localTideData = localStorage.getItem('tideData');
+        const tideData = localTideData ? (JSON.parse(localTideData).data || []) : [];
+        console.log(`SurfLocation => startSession => tideData: ${JSON.stringify(tideData, null, 2)}`);
+        const lastIndex = tideData.length - 1;
+        const lastEntry = tideData[lastIndex];
+        const height = lastEntry ? lastEntry.v : 0;
+        const localTide = Number(height).toFixed(1);
+        const waterLevel = (validate(tideData) !== null && lastEntry) ? Number(lastEntry.v).toFixed(1) : localTide;
+        const getCurrentTide = (waterLevel > 3) ? "high" : (waterLevel < 2) ? "low" : "medium";
+        console.log(`SurfLocation => startSession => height: ${waterLevel}, getCurrentTide: ${getCurrentTide}`);
+        localStorage.setItem('height', waterLevel);
+        setSessionData(logTemplateData(item.name));
+        setSessionStart(Date.now());
+        setSessionActive(true);
+        setSessionEnd(null);
+    };
+
+    // End session: record end time
+    const endSession = () => {
+        setSessionEnd(Date.now());
+    };
+
+    // Submit session: combine all data and log
+    const submitSession = () => {
+        if (!sessionData) return;
+        // Compose the session log in the same structure Session.js expects
+        const sessionSummary = {
+            ...sessionData,
+            Surf: {
+                ...sessionData.Surf,
+                Shape: shape
+            },
+            // Store Conditions as an object for Session.js compatibility
+            Conditions: { Conditions: conditions },
+            SessionTime: {
+                startTime: sessionStart ? new Date(sessionStart).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : '',
+                endTime: sessionEnd ? new Date(sessionEnd).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : '',
+                accumulatedTime: Math.floor((sessionEnd - sessionStart) / 60 / 1000)
+            }
+        };
+
+        // --- Logic from handleSubmit in LogEntryFunctional ---
+        // Generate a new logId (recordId)
+        const generateNewLogId = () => {
+            const dateObj = new Date();
+            const st = dateObj.toDateString().replace(/ /g, '');
+            const nd = dateObj.toLocaleTimeString().replace(/ /g, '');
+            return `${st}${nd}`;
+        };
+        const recordId = generateNewLogId();
+        // Store the session log in localStorage
+        localStorage.setItem(recordId, JSON.stringify(sessionSummary));
+        // Update postDirectory in localStorage
+        let postDirectory = [];
+        try {
+            postDirectory = JSON.parse(localStorage.getItem('postDirectory')) || [];
+        } catch (e) {
+            postDirectory = [];
+        }
+        const newPostDirectory = [...postDirectory, recordId];
+        localStorage.setItem('postDirectory', JSON.stringify(newPostDirectory));
+        localStorage.setItem('lastPostId', recordId);
+        // Remove any session draft notes
+        localStorage.removeItem('sessionDraftNotes');
+
+        // Show a timed notice to the user that the session has been logged
+        setNotice('Session has been logged!');
+        setTimeout(() => {
+            setNotice('');
+            // Now reset state as before
+            setSessionActive(false);
+            setSessionStart(null);
+            setSessionEnd(null);
+            setShape('');
+            setConditions('');
+            setSessionData(null);
+        }, 2000);
+    };
+    const toggleEditMode = () => {
+        handleEditToggle();
+    };
+
+    const camButton = (item) => {
+        if (!item.cam) {
+            return null;
+        }
+
+        return <a
+            className='noUnderline'
+            href={item.cam}
+            target='_blank'
+            rel='noopener noreferrer'
+        >
+            <div className='App button bg-blue brdr-yellow color-white p-10 r-10 mt-10'>
+                Cam
+            </div>
+        </a>;
+    };
+
+    const camHeaderButton = (item) => {
+        if (!item.cam) {
+            return null;
+        }
+
+        return <a
+            className='noUnderline ml-10'
+            href={item.cam}
+            target='_blank'
+            rel='noopener noreferrer'
+            onClick={(event) => event.stopPropagation()}
+        >
+            <span className='button pl-10 pr-10 pt-5 pb-5 r-10 size15'>
+                👀
+            </span>
+        </a>;
+    };
+
     const logLocationButton = (item) => {
         return <React.Fragment>
             {
-                (initializeData('edit', 'false'))
+                edit
                 ? <div className='mb--10'>
                     <WaveUtils
                         item={item}
-                        logLocation={logLocation}
+                        logLocation={startSession}
                         updateLocations={updateLocations}
                     >
                     </WaveUtils>
                 </div>
-                : <div className='App button bg-dkYellow color-black p-10 r-10 mt-20' onClick={() => logLocation(item)}>
+                : <div className='App button bg-dkYellow brdr-yellow color-yellow p-10 r-10 mt-20' onClick={() => startSession(item)}>
                     Log Session
                 </div>
             }
+            <div className='App button bg-gray brdr-yellow color-white p-10 r-10 mt-10 size12' onClick={toggleEditMode}>
+                {edit ? 'Exit ✏️ Edit Mode' : '✏️ Edit Mode'}
+            </div>
         </React.Fragment>
     }
     // eslint-disable-next-line
@@ -459,11 +601,15 @@ const SurfLocation = ({
                                         }
                                     </div>
                                 </div>
+    const getLocationHeaderDetails = <div className='flexContainer centerVertical contentLeft'>
+        <span>{icons.wave}{starIcons(item, matches.length)}</span>
+        {camHeaderButton(item)}
+    </div>;
 
     const getLocationContainer = <div className={`containerDetail mt-5 mb-5 ml-5 ${collapse ? null : 'pb-10'} bg-${(matches.length > 3) ? 'great' : (matches.length === 3) ? 'good' : (matches.length === 2) ? 'fair' : 'bad'}`}>
             <div className={`containerDetail color-yellow size25 bold`}>
                 <CollapseToggleButton
-                    title={`${icons.wave}${starIcons(item, matches.length)}`}
+                component={getLocationHeaderDetails}
                     isCollapsed={collapse}
                     setCollapse={setCollapse}
                     align='left'
@@ -494,21 +640,326 @@ const SurfLocation = ({
             }
         </div>
 
-    const transitionClass = `button ease`;
+    // Update a nested field in sessionData (e.g. updateSessionField('Surf', 'Height', 'head high'))
+    const updateSessionField = (section, field, value) => {
+        setSessionData(prev => ({
+            ...prev,
+            [section]: {
+                ...prev[section],
+                [field]: value
+            }
+        }));
+    };
 
-    const handleTransitionEnd = () => {
-        if (!collapse) {
-            setShowLabel(true);
-        }
+    // Session Dashboard UI
+    const renderSessionDashboard = () => {
+        if (!sessionActive || !sessionData) return null;
+        // Helper to safely render any value as a string
+        const safeRender = (val) => {
+            if (val == null) return '';
+            if (typeof val === 'function') return safeRender(val());
+            if (val instanceof Date) return val.toLocaleString();
+            if (Array.isArray(val)) return val.map(safeRender).join(', ');
+            if (typeof val === 'object') return JSON.stringify(val);
+            return String(val);
+        };
+        const startTimeStr = sessionStart ? new Date(sessionStart).toLocaleString() : '';
+        const endTimeStr = sessionEnd ? new Date(sessionEnd).toLocaleString() : '';
+        let tidePhase = sessionData.Tide.Phase;
+        tidePhase = safeRender(tidePhase);
+        return (
+            <div className='containerDetail bg-lite size20 color-lite contentLeft m-5'>
+                <div className='containerDetail bg-lite size30 color-yellow p-20'>
+                    Session Dashboard
+                </div>
+                <div className='containerDetail p-20 size25 color-yellow mb-5'>
+                    {safeRender(sessionData.Location.Break)}
+                </div>
+                <div className='containerDetail flexContainer color-yellow p-20 mb-5'>
+                    <div className='flex2Column'>
+                        {startTimeStr.split(',')[1]}
+                    </div>
+                    <div className='flexColumn'>
+                        <SessionTimer sessionStart={sessionStart} sessionEnd={sessionEnd} />
+                    </div>
+                </div>
+                <div className='containerDetail p-10 mb-5'>
+                    {/* Surf Height Selector */}
+                    <div className='containerDetail flexContainer mb-5'>
+                         <div className='flexColumn p-10'>
+                            {icons.surf}
+                        </div>
+                        <label className='flex2Column'>
+                            <select 
+                                className='containerDetail color-lite p-10 mt--1 width--5' 
+                                value={safeRender(sessionData.Surf.Height)} 
+                                onChange={e => updateSessionField('Surf', 'Height', e.target.value)}
+                            >
+                                {require('./InterfaceData').default.find(d => d.description === 'Surf').group.find(g => g.description === 'Height').selections.map(opt => (
+                                    <option key={opt} value={opt}>{opt}</option>
+                                ))}
+                            </select>
+                        </label>
+                    </div>
+                    {/* Swell1 Selector */}
+                    <div className='containerDetail flexContainer mb-5 noScroll'>
+                        <div className='flexColumn p-10'>
+                            {icons.swell}
+                        </div>
+                        <label className='flex2Column flexContainer mt--5 mb-5 mr-5'>
+                            <select 
+                                className='flex6Column containerDetail color-lite w-60'
+                                value={safeRender(sessionData.Swell1.Height)} 
+                                onChange={e => updateSessionField('Swell1', 'Height', e.target.value)}
+                            >
+                                {require('./InterfaceData').default.find(d => d.description === 'Swell1').group.find(g => g.description === 'Height').selections.map(opt => (
+                                    <option key={opt} value={opt}>{opt}</option>
+                                ))}
+                            </select>
+                            <select
+                                className='flex6Column containerDetail color-lite p-10 w-90'
+                                value={safeRender(sessionData.Swell1.Direction)} 
+                                onChange={e => updateSessionField('Swell1', 'Direction', e.target.value)}
+                            >
+                                {require('./InterfaceData').default.find(d => d.description === 'Swell1').group.find(g => g.description === 'Direction').selections.map(opt => (
+                                    <option key={opt} value={opt}>{opt}</option>
+                                ))}
+                            </select>
+                            <select
+                                className='flex6Column containerDetail color-lite p-10 w-90'
+                                value={safeRender(sessionData.Swell1.Angle)} 
+                                onChange={e => updateSessionField('Swell1', 'Angle', e.target.value)}
+                            >
+                                {require('./InterfaceData').default.find(d => d.description === 'Swell1').group.find(g => g.description === 'Angle').selections.map(opt => (
+                                    <option key={opt} value={opt}>{opt}</option>
+                                ))}
+                            </select>
+                            <select
+                                className='flex4Column w-50 containerDetail color-lite p-10'
+                                value={safeRender(sessionData.Swell1.Interval)} 
+                                onChange={e => updateSessionField('Swell1', 'Interval', e.target.value)}
+                            >
+                                {require('./InterfaceData').default.find(d => d.description === 'Swell1').group.find(g => g.description === 'Interval').selections.map(opt => (
+                                    <option key={opt} value={opt}>{opt}</option>
+                                ))}
+                            </select>
+                        </label>
+                    </div>
+                    {/* Swell2 Selector */}
+                    <div className='containerDetail flexContainer mb-5 noScroll'>
+                        <div className='flexColumn p-10'>
+                            {icons.swell}
+                        </div>
+                        <label className='flex2Column flexContainer mt--5 mb-5 mr-5'>
+                            <select
+                                className='flex6Column containerDetail color-lite w-60'
+                                value={safeRender(sessionData.Swell2.Height)} 
+                                onChange={e => updateSessionField('Swell2', 'Height', e.target.value)}
+                            >
+                                {require('./InterfaceData').default.find(d => d.description === 'Swell2').group.find(g => g.description === 'Height').selections.map(opt => (
+                                    <option key={opt} value={opt}>{opt}</option>
+                                ))}
+                            </select>
+                            <select
+                                className='flex6Column containerDetail color-lite p-10 w-90' 
+                                value={safeRender(sessionData.Swell2.Direction)} 
+                                onChange={e => updateSessionField('Swell2', 'Direction', e.target.value)}
+                            >
+                                {require('./InterfaceData').default.find(d => d.description === 'Swell2').group.find(g => g.description === 'Direction').selections.map(opt => (
+                                    <option key={opt} value={opt}>{opt}</option>
+                                ))}
+                            </select>
+                            <select
+                                className='flex6Column containerDetail color-lite p-10 w-90' 
+                                value={safeRender(sessionData.Swell2.Angle)} 
+                                onChange={e => updateSessionField('Swell2', 'Angle', e.target.value)}
+                            >
+                                {require('./InterfaceData').default.find(d => d.description === 'Swell2').group.find(g => g.description === 'Angle').selections.map(opt => (
+                                    <option key={opt} value={opt}>{opt}</option>
+                                ))}
+                            </select>
+                            <select
+                                className='flex4Column w-50 containerDetail color-lite p-10'
+                                value={safeRender(sessionData.Swell2.Interval)} 
+                                onChange={e => updateSessionField('Swell2', 'Interval', e.target.value)}
+                            >
+                                {require('./InterfaceData').default.find(d => d.description === 'Swell2').group.find(g => g.description === 'Interval').selections.map(opt => (
+                                    <option key={opt} value={opt}>{opt}</option>
+                                ))}
+                            </select>
+                        </label>
+                    </div>
+                    {/* Tide Selector */}
+                    <div className='containerDetail flexContainer mb-5'>
+                        <div className='flexColumn p-10'>
+                            {icons.tide}
+                        </div>
+                        <label className='flex2Column flexContainer mt--5 mb-5 mr-5'>
+                            <select
+                                className='flex2Column containerDetail color-lite' 
+                                value={tidePhase} 
+                                onChange={e => updateSessionField('Tide', 'Phase', e.target.value)}
+                            >
+                                {require('./InterfaceData').default.find(d => d.description === 'Tide').group.find(g => g.description === 'Phase').selections.map(opt => (
+                                    <option key={opt} value={opt}>{opt}</option>
+                                ))}
+                            </select>
+                            <select 
+                                className='flex2Column containerDetail color-lite'
+                                value={safeRender(sessionData.Tide.Height)} 
+                                onChange={e => updateSessionField('Tide', 'Height', e.target.value)}
+                            >
+                                {require('./InterfaceData').default.find(d => d.description === 'Tide').group.find(g => g.description === 'Height').selections.map(opt => (
+                                    <option key={opt} value={opt}>{opt}</option>
+                                ))}
+                            </select>
+                        </label>
+                    </div>
+                    {/* Wind Selector */}
+                    <div className='containerDetail flexContainer mb-5'>
+                        <div className='flexColumn p-10'>
+                            {icons.wind}
+                        </div>
+                        <label className='flex2Column flexContainer mt--5 mb-5 mr-5'>
+                            <select
+                                className='flex4Column containerDetail color-lite w-40' 
+                                value={safeRender(sessionData.Wind.Direction)} 
+                                onChange={e => updateSessionField('Wind', 'Direction', e.target.value)}
+                            >
+                                {require('./InterfaceData').default.find(d => d.description === 'Wind').group.find(g => g.description === 'Direction').selections.map(opt => (
+                                    <option key={opt} value={opt}>{opt}</option>
+                                ))}
+                            </select>
+                            <select
+                                className='flex3Column containerDetail color-lite w-100' 
+                                value={safeRender(sessionData.Wind.Orientation)} 
+                                onChange={e => updateSessionField('Wind', 'Orientation', e.target.value)}
+                            >
+                                {require('./InterfaceData').default.find(d => d.description === 'Wind').group.find(g => g.description === 'Orientation').selections.map(opt => (
+                                    <option key={opt} value={opt}>{opt}</option>
+                                ))}
+                            </select>
+                            <select className='flex3Column containerDetail color-lite' 
+                                value={safeRender(sessionData.Wind.MPH)} 
+                                onChange={e => updateSessionField('Wind', 'MPH', e.target.value)}
+                            >
+                                {require('./InterfaceData').default.find(d => d.description === 'Wind').group.find(g => g.description === 'MPH').selections.map(opt => (
+                                    <option key={opt} value={opt}>{opt}</option>
+                                ))}
+                            </select>
+                        </label>
+                    </div>
+                    {/* Surface Selector */}
+                    <div className='containerDetail flexContainer mb-5'>
+                        <div className='flexColumn p-10'>
+                            {icons.surface}
+                        </div>
+                        <label className='flex2Column'>
+                            <select className='containerDetail color-lite mb-5 mt-5 width--5'
+                                value={safeRender(sessionData.Wind.Surface)} 
+                                onChange={e => updateSessionField('Wind', 'Surface', e.target.value)}
+                            >
+                                {require('./InterfaceData').default.find(d => d.description === 'Wind').group.find(g => g.description === 'Surface').selections.map(opt => (
+                                    <option key={opt} value={opt}>{opt}</option>
+                                ))}
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <div className='containerDetail p-10 mb-5'>
+                    <div className='color-yellow mr-5'>
+                        Notes:
+                    </div>
+                    <div className='ht-50'>
+                        {safeRender(sessionData.Comments.notes)}
+                    </div>
+                </div>
+                {!sessionEnd && (
+                    <div 
+                        className='button bg-green color-yellow p-10 r-10 mt-10 width-100-percent contentCenter' 
+                        onClick={endSession}
+                    >
+                        End Session
+                    </div>
+                )}
+                {sessionEnd && (
+                    <div className='mt-10'>
+                        <div className='containerDetail p-10 mb-5'>
+                            <div className='color-yellow mr-5'>
+                                End Time:
+                            </div>
+                            {endTimeStr}
+                        </div>
+                        <div className='containerDetail p-10 mb-5'>
+                            <div className='color-yellow mr-5'>
+                                Total Duration:
+                            </div>
+                            {Math.floor((sessionEnd-sessionStart)/60000)}:{('0'+(Math.floor((sessionEnd-sessionStart)/1000)%60)).slice(-2)}
+                        </div>
+                        <div className='containerDetail p-10 mb-5'>
+                            <div className='mb-10 color-yellow'>
+                                <label>
+                                    Shape:
+                                    <select
+                                        className='ml-10 containerDetail p-10 color-lite'
+                                        value={shapeInput}
+                                        onChange={e => setShape(e.target.value)}
+                                    >
+                                        {['', 'speedy runners', 'peaky', 'bowly', 'close-outs', 'barreling', 'skatepark', 'mush burgers', 'slopey', 'slabbing'].map(opt => (
+                                            <option key={opt} value={opt}>{opt || 'Select shape'}</option>
+                                        ))}
+                                    </select>
+                                </label>
+                            </div>
+                        </div>
+                        <div className='containerDetail p-10 mb-5'>
+                            <div className='mb-10 color-yellow'>
+                                <label>
+                                    Conditions:
+                                    <select
+                                        className='ml-10 containerDetail p-10 color-lite'
+                                        value={conditionsInput}
+                                        onChange={e => setConditions(e.target.value)}
+                                    >
+                                        {['', 'Firing', 'Good', 'Bad'].map(opt => (
+                                            <option key={opt} value={opt}>{opt || 'Select conditions'}</option>
+                                        ))}
+                                    </select>
+                                </label>
+                            </div>
+                        </div>
+                        <div className='button bg-green color-yellow p-20 r-10 mt-10 size20 contentCenter' onClick={submitSession}>
+                            Submit Session
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
     };
 
     return (
         <div 
             className={`scrollSnap`} 
-            key={getKey('loc')} 
-            /*onClick={() => this.props.editLocation()}*/
         >
-            {getLocationContainer}
+            {notice && (
+                <div style={{
+                    position: 'fixed',
+                    top: 20,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: '#222',
+                    color: '#ffe066',
+                    padding: '16px 32px',
+                    borderRadius: 10,
+                    zIndex: 9999,
+                    fontSize: 22,
+                    boxShadow: '0 2px 12px rgba(0,0,0,0.2)'
+                }}>
+                    {notice}
+                </div>
+            )}
+            {renderSessionDashboard()}
+            {!sessionActive && getLocationContainer}
         </div>
     );
 }

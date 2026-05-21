@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
 const Weather = () => {
+    const HOURLY_HOURS_TO_SHOW = 24;
+    const REFRESH_INTERVAL_MS = 15 * 60 * 1000;
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [current, setCurrent] = useState(null);
@@ -66,22 +69,26 @@ const Weather = () => {
         96: { icon: '⛈️', desc: 'Thunderstorm with hail' },
         99: { icon: '🌩️', desc: 'Severe thunderstorm with hail' },
     };
-    // small helper that returns a clock emoji based on the hour
-    const getClockIcon = (hour) => {
-        const normalized = ((hour % 12) || 12);
-        const clocks = ['🕐', '🕑', '🕒', '🕓', '🕔', '🕕', '🕖', '🕗', '🕘', '🕙', '🕚', '🕛'];
-        return clocks[normalized - 1];
-    };
-
 
     useEffect(() => {
-        const fetchWeather = async () => {
-            setLoading(true);
+        if (!latitude || !longitude) {
+            setError('No coordinates provided');
+            setLoading(false);
+            return undefined;
+        }
+
+        const fetchWeather = async (isInitialLoad = false) => {
+            if (isInitialLoad) {
+                setLoading(true);
+            }
             setError('');
             try {
                 // Example endpoint for Open-Meteo: gets current + hourly + daily forecast
                 const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,precipitation,weathercode&daily=temperature_2m_max,temperature_2m_min,weathercode&current_weather=true&timezone=auto`;
                 const resp = await fetch(url);
+                if (!resp.ok) {
+                    throw new Error(`Weather request failed: ${resp.status}`);
+                }
                 const data = await resp.json();
 
                 // conversion helpers
@@ -101,13 +108,25 @@ const Weather = () => {
                     setCurrent(null);
                 }
 
-                // hourly: pick next ~12 hours and convert units
-                const hours = data.hourly.time.map((t, idx) => ({
+                // hourly: pick upcoming hours from now and convert units.
+                const allHours = data.hourly.time.map((t, idx) => ({
                     time: t,
                     tempF: cToF(data.hourly.temperature_2m[idx]),
                     precipIn: mmToInches(data.hourly.precipitation[idx]),
                     code: data.hourly.weathercode[idx],
-                })).slice(0, 12);
+                }));
+
+                const nowMs = Date.now();
+                const upcomingHours = allHours
+                    .filter((h) => {
+                        const hourMs = new Date(h.time).getTime();
+                        return Number.isFinite(hourMs) && hourMs >= (nowMs - (30 * 60 * 1000));
+                    })
+                    .slice(0, HOURLY_HOURS_TO_SHOW);
+
+                const hours = upcomingHours.length > 0
+                    ? upcomingHours
+                    : allHours.slice(0, HOURLY_HOURS_TO_SHOW);
                 setHourly(hours);
 
                 // daily: next ~7 days, convert temps to °F
@@ -122,16 +141,20 @@ const Weather = () => {
             } catch (err) {
                 setError('Failed to load weather data');
             } finally {
-                setLoading(false);
+                if (isInitialLoad) {
+                    setLoading(false);
+                }
             }
         };
 
-        if (latitude && longitude) {
-            fetchWeather();
-        } else {
-            setError('No coordinates provided');
-            setLoading(false);
-        }
+        fetchWeather(true);
+        const timerId = setInterval(() => {
+            fetchWeather(false);
+        }, REFRESH_INTERVAL_MS);
+
+        return () => {
+            clearInterval(timerId);
+        };
     }, [latitude, longitude]);
 
     useEffect(() => {
@@ -156,10 +179,10 @@ const Weather = () => {
     }, []);
 
     if (loading) {
-        return <div>Loading weather…</div>;
+        return <div className='color-yellow'><span className='blinking-fade'>⏳</span> Loading weather…</div>;
     }
     if (error) {
-        return <div>Error: {error}</div>;
+        return <div className='color-red'>Error: {error}</div>;
     }
     const formatToWeekday = (dateStr) => {
         if (!dateStr) return '';
@@ -168,80 +191,111 @@ const Weather = () => {
         if (Number.isNaN(d.getTime())) return dateStr;
         return d.toLocaleDateString(undefined, { weekday: 'long' }); // e.g. "Monday"
     };
-    const getIcon = (precipIn) => {
-        if (precipIn >= 0.5) return '🌧️';
-        if (precipIn > 0) return '🌦️';
-        return '';
-    }
+
+    const formatHourAmPm = (dateStr) => {
+        const date = new Date(dateStr);
+        if (Number.isNaN(date.getTime())) {
+            return dateStr;
+        }
+        return date.toLocaleTimeString(undefined, {
+            hour: 'numeric',
+            hour12: true
+        });
+    };
+
+    const mostCurrentHourlyIndex = hourly.reduce((closestIndex, hourEntry, index, all) => {
+        const entryMs = new Date(hourEntry.time).getTime();
+        if (!Number.isFinite(entryMs)) {
+            return closestIndex;
+        }
+
+        if (closestIndex === -1) {
+            return index;
+        }
+
+        const closestMs = new Date(all[closestIndex].time).getTime();
+        if (!Number.isFinite(closestMs)) {
+            return index;
+        }
+
+        return Math.abs(entryMs - Date.now()) < Math.abs(closestMs - Date.now())
+            ? index
+            : closestIndex;
+    }, -1);
 
     return (
         <div className='containerDetail bg-lite color-lite size20 contentLeft ml-5 mr-5 mt--20'>
-            <div className='containerDetail bg-lite m-5 p-10 color-yellow size20'>
+            <div className='containerDetail bg-lite mb-5 p-20 color-yellow size20'>
                 Weather
             </div>
-            <div className='containerDetail bg-lite m-5 size20 contentLeft'>
-                <div className='containerDetail bg-lite m-5 p-10 color-yellow size20'>
+            <div className='containerDetail bg-lite mb-5 size20 contentLeft'>
+                <div className='containerDetail bg-lite p-10 mb-5 color-yellow size20'>
                     Temperature:
                 </div>
-                <div className='containerDetail bg-tintedMedium m-5 p-10 size20'>
+                <div className='containerDetail bg-tintedMedium p-10 size20'>
                     🌡️ {current ? `${current.temperature}°F` : 'N/A'}
                 </div>
             </div>
-            <div className='containerDetail bg-lite m-5 size20 contentLeft'>
-                <div className='containerDetail bg-lite m-5 p-10 color-yellow size20'>
+            <div className='containerDetail bg-lite mb-5 size20 contentLeft'>
+                <div className='containerDetail bg-lite mb-5 p-10 color-yellow size20'>
                     Wind Speed:
                 </div>
-                <div className='containerDetail bg-tintedMedium m-5 p-10 size20'>
+                <div className='containerDetail bg-tintedMedium p-10 size20'>
                     💨 {current ? `${current.windspeed} mph` : 'N/A'}
                 </div>
             </div>
-            <div className='containerDetail bg-lite m-5 size20 contentLeft'>
-                <div className='containerDetail bg-lite m-5 p-10 color-yellow size20'>
+            <div className='containerDetail bg-lite mb-5 size20 contentLeft'>
+                <div className='containerDetail bg-lite mb-5 p-10 color-yellow size20'>
                     Current Weather:
                 </div>
-                <div className='containerDetail bg-tintedMedium m-5 p-10 size20'>
+                <div className='containerDetail bg-tintedMedium p-10 size20'>
                     {current ? WEATHER_CODE_LABEL[current.weathercode] : 'N/A'}
                 </div>
             </div>
-            <div className='containerDetail bg-lite m-5 size20'>
-                <div className='containerDetail bg-lite m-5 p-10 color-yellow size20 contentLeft'>
+            <div className='containerDetail bg-lite mb-5 size20'>
+                <div className='containerDetail bg-lite mb-5 p-10 color-yellow size20 contentLeft'>
                     Hourly Forecast
                 </div>
-                <div className='containerDetail bg-lite m-5 size20'>
+                <div className='containerDetail bg-lite size20'>
                     {hourly.map((h, idx) => {
-                        const hour = new Date(h.time).getHours();
-                        const clock = getClockIcon(hour);
                         const w = weatherCodeMap[h.code] || { };
-                        return <div key={idx} className='containerDetail flexContainer bg-tintedMedium m-5 p-10 size20'>
-                                    <div className='flex2Column color-yellow'>
-                                        {clock} {hour}:00 {w.icon || '❔'} {w.desc || 'Unknown'}
+                        const isMostCurrentHour = idx === mostCurrentHourlyIndex;
+                        return <div key={idx} className={`containerDetail flexContainer ${isMostCurrentHour ? 'bg-yellow color-dark bold' : 'bg-tintedMedium'} ${(idx === hourly.length - 1)?'':'mb-5'} p-10 size20`}>
+                                    <div className='flex6Column color-yellow contentRight pr-10'>
+                                        {formatHourAmPm(h.time)}
                                     </div>
-                                    <div className='flex2Column'>
-                                        🌡️ {h.tempF}°F {(h.precipIn > 0) ? `, ${getIcon(h.precipI)} ${h.precipI} inches` : null}
+                                    <div className='flexColumn contentCenter mr-10'>
+                                        {isMostCurrentHour ? 'Now' : ''}
+                                    </div>
+                                    <div className='flex2Column contentLeft pl-5'>
+                                        {w.icon || '❔'} {w.desc || 'Unknown'}
+                                    </div>
+                                    <div className='flex6Column contentLeft pl-10'>
+                                        {(typeof h.tempF === 'number') ? `${h.tempF.toFixed(0)}°F` : 'N/A'}
                                     </div>
                                 </div>
                     })}
                 </div>
-                <div className='containerDetail bg-lite m-5 size20'>
-                    <div className='containerDetail bg-lite m-5 p-10 color-yellow size20 contentLeft'>
-                        Daily Forecast
-                    </div>
-                    <div className='containerDetail bg-lite m-5 size20'>
-                        {daily.map((d, idx) => {
-                            const w = weatherCodeMap[d.code] || {};
-                            return <div key={idx} className='containerDetail flexContainer bg-tintedMedium m-5 p-10 size20'>
-                                        <div className='color-yellow flex3Column'>
-                                            📅 {formatToWeekday(d.date)}
-                                        </div>
-                                        <div className='color-yellow flex3Column'>
-                                            {w.icon || '❔'} {w.desc || 'Unknown'}
-                                        </div>
-                                        <div className='flex3Column'>
-                                            🌡️ {d.maxF}°F / {d.minF}°F
-                                        </div>
+            </div>
+            <div className='containerDetail bg-lite size20'>
+                <div className='containerDetail bg-lite mb-5 p-10 color-yellow size20 contentLeft'>
+                    Daily Forecast
+                </div>
+                <div className='containerDetail bg-lite size20'>
+                    {daily.map((d, idx) => {
+                        const w = weatherCodeMap[d.code] || {};
+                        return <div key={idx} className={`containerDetail flexContainer bg-tintedMedium ${(idx === daily.length - 1)?'':'mb-5'} p-10 size20`}>
+                                    <div className='color-yellow flex6Column'>
+                                        {formatToWeekday(d.date).substring(0,3)}
                                     </div>
-                    })}
-                    </div>
+                                    <div className='flex2Column'>
+                                        {w.icon || '❔'} {w.desc || 'Unknown'}
+                                    </div>
+                                    <div className='flex6Column contentRight ml-20'>
+                                        {d.maxF.toFixed(0)}°F
+                                    </div>
+                                </div>
+                })}
                 </div>
             </div>
         </div>

@@ -122,7 +122,7 @@ const NumberInputKeypad = ({
         }
     }, [displayNumberPad]);
 
-    const buttonClasses = (button) => `button fancyClick flex3Column bg-tintedMediumDark p-15 r-50 m-2 brdr-light p-20 ${(isInterference(button)[0] > 0) ? 'color-red' : ''}`;
+    const buttonClasses = (button) => `button fancyClick flex3Column bg-tintedMediumDark p-15 r-50 m-2 brdr-lite p-20 ${(isInterference(button)[0] > 0) ? 'color-red' : ''}`;
 
     const renderButtonRow1 = () => {
         const buttons = ['1', '2', '3'];
@@ -262,8 +262,8 @@ const NumberInputKeypad = ({
         (displayNumberPad)
             ? <div className='modal-overlay containerBox bg-tintedMediumDark'>
                 <div className='modal'>
-                    <div className={`containerBox brdr-light ht-70 bold bg-${jerseyColors[player.surfJerseyColor]}`}>
-                        <div className='minHeight40 fl-left ml-10 pt-15 size25 color-dark text-outline-light'>
+                    <div className={`containerBox brdr-lite ht-70 bold bg-${jerseyColors[player.surfJerseyColor]}`}>
+                        <div className='minHeight40 fl-left ml-10 pt-15 size25 color-dark text-outline-lite'>
                             {prompt()}:
                         </div>
                         <div className='containerBox bg-white color-dark ht-auto minHeight40 minWidth50 fl-right'>

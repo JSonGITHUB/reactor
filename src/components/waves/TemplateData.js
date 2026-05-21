@@ -39,7 +39,9 @@ const templateData = {
         Direction: '',
         Orientation: '',
         MPH: '',
-        Surface: ''
+        Surface: '',
+        WaterTemp: '',
+        AirTemp: ''
     },
     Conditions: {
         Conditions: ''

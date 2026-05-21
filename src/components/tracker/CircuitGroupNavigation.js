@@ -9,9 +9,7 @@ const CircuitGroupNavigation = ({
 }) => {
 
     const {
-        targetElementRef,
-        edit,
-        setEdit
+        targetElementRef
     } = useContext(CircuitContext);
 
     return <div className='containerBox'>
@@ -22,7 +20,7 @@ const CircuitGroupNavigation = ({
                         onClick={() => addToGroup(circuitGroupIndex, targetElementRef)}
                     >
                         <div className='flexContainer'>
-                            <div className='flex2Column text-outline-light size20 mt-5'>
+                            <div className='flex2Column text-outline-lite size20 mt-5'>
                                 {icons.plus}
                             </div>
                             <div className='flex2Column p-5 size25'>

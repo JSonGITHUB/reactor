@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import useCurrentTime from '../utils/useCurrentTime';
 
 const useOceanData = (component, uri, params, setRetry) => {
@@ -6,21 +6,25 @@ const useOceanData = (component, uri, params, setRetry) => {
     oceanData: {},
     updated: false,
   });
-  const defaultParams = {
+  const defaultParams = useMemo(() => ({
     origin: '*',
     format: 'json',
-  }
-  
-  const handleParams = () => {
+  }), []);
+  const handleParams = useCallback(() => {
     if (params === '') {
       return defaultParams;
     }
     return params;
-  }
-  const date = useCurrentTime()[0].startTime.split('%')[0];
+  }, [params, defaultParams]);
+  const currentTime = useCurrentTime();
+  const date = useMemo(() => currentTime[0].startTime.split('%')[0], [currentTime]);
   const MAX_RETRIES = 3;
-  let retryCount = 0;
-    const getOceanData = async () => {
+  const retryCountRef = useRef(0);
+  const retryTimeoutRef = useRef(null);
+  const mountedRef = useRef(true);
+  const loggedFallbackRef = useRef(false);
+
+  const getOceanData = useCallback(async (signal) => {
     try {
       const url = new URL(uri);
       const params = handleParams();
@@ -28,6 +32,7 @@ const useOceanData = (component, uri, params, setRetry) => {
   
       const response = await fetch(url, {
         method: 'GET',
+        signal,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -38,6 +43,9 @@ const useOceanData = (component, uri, params, setRetry) => {
       }
   
       const data = await response.json();
+      if (!mountedRef.current) {
+        return;
+      }
   
       localStorage.setItem(`${component}Data`, JSON.stringify(data));
       localStorage.setItem(`${component}Date`, date);
@@ -48,35 +56,66 @@ const useOceanData = (component, uri, params, setRetry) => {
       }));
       setRetry('');
     } catch (error) {
-      console.error('Failed to fetch data:', error);
-      if (retryCount < MAX_RETRIES) {
-        retryCount++;
-        setRetry(retryCount);
-        setTimeout(getOceanData, 10000); // Retry after 10 seconds
+      if (error?.name === 'AbortError' || !mountedRef.current) {
+        return;
+      }
+
+      const cachedRaw = localStorage.getItem(`${component}Data`);
+      if (cachedRaw) {
+        try {
+          const cachedData = JSON.parse(cachedRaw);
+          if (mountedRef.current) {
+            setStatus((prevState) => ({
+              ...prevState,
+              oceanData: cachedData,
+              update: true,
+            }));
+            setRetry('');
+          }
+          if (!loggedFallbackRef.current) {
+            loggedFallbackRef.current = true;
+            console.warn(`Using cached ${component} data due to fetch issue.`);
+          }
+          return;
+        } catch (parseError) {
+          // ignore parse failure and continue retry logic
+        }
+      }
+
+      if (!loggedFallbackRef.current) {
+        loggedFallbackRef.current = true;
+        console.warn(`Failed to fetch ${component} data, retrying...`, error);
+      }
+      if (retryCountRef.current < MAX_RETRIES) {
+        retryCountRef.current += 1;
+        setRetry(retryCountRef.current);
+        retryTimeoutRef.current = setTimeout(() => {
+          getOceanData();
+        }, 10000);
       } else {
-        console.error('Max retry attempts reached. Unable to fetch data.');
-        // Handle failure scenario or notify the user
+        if (!loggedFallbackRef.current) {
+          console.warn('Max retry attempts reached. Unable to fetch data.');
+        }
       }
     }
-  };
+  }, [component, date, handleParams, uri, setRetry]);
   useEffect(() => {
-    //console.log(`OceanData => ${ component }`)
-    let ignore = false;
-    //console.log(`useOceanData => CHECK\nstatus.oceanData: ${JSON.stringify(status.oceanData,null,2)}\ndate: ${date}`)
-    if (!ignore && JSON.stringify(status.oceanData) === '{}') {
-      getOceanData();
-    }
-    return () => {
-      ignore = true;
-    };
-  }, []);
+    mountedRef.current = true;
+    const controller = new AbortController();
 
-  useEffect(() => {
-    //console.log(`useOceanData => component: ${component}`);
-    //console.log(`useOceanData => uri: ${uri}`);
-    //console.log(`useOceanData => params: ${JSON.stringify(params,null,2)}`);
-    //console.log(`useOceanData => status: ${JSON.stringify(status,null,2)}`);
-  }, [status]);
+    if (JSON.stringify(status.oceanData) === '{}') {
+      getOceanData(controller.signal);
+    }
+
+    return () => {
+      mountedRef.current = false;
+      controller.abort();
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
+    };
+  }, [getOceanData, status.oceanData]);
 
   return [status.oceanData, getOceanData];
 };

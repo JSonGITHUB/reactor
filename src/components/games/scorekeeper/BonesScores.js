@@ -7,10 +7,7 @@ import getKey from '../../utils/KeyGenerator';
 const BonesScores = () => {
 
     const {
-        players,
-        setPlayers,
-        editPlayer,
-        playersInGame
+        players
     } = useContext(PlayerContext);
 
     const activePlayers = players.filter(player => player['dominos'] === true);

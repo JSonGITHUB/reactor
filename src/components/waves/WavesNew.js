@@ -4,13 +4,11 @@ import WaveUtils from '../wavefinder/WaveUtils';
 import calculateDistance from '../location/CalculateDistance';
 import NewTide from './NewTide';
 import ConditionsDashboard from './ConditionsDashboard';
+import SurfDashboard from './SurfDashboard';
 import SurfLocation from './SurfLocation';
-import { getSurfSpots } from './SurfSpots';
-import ConditionsSelectors from './ConditionsSelectors';
 import Location from '../utils/Location'
 import useOceanData from './useOceanData';
 import useCurrentTime from '../utils/useCurrentTime';
-import ConditionsContext from '../context/ConditionsContext';
 import ArrowsNorthSouth from './ArrowsNorthSouth';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
 import icons from '../site/icons';
@@ -19,44 +17,26 @@ import validate from '../utils/validate';
 import initializeData from '../utils/InitializeData';
 import SearchBar from '../utils/SearchBar';
 import debounceType from '../utils/DebouncerType';
-import OceanParent, { OceanContext } from '../context/OceanContext';
+import { OceanContext } from '../context/OceanContext';
 import WavesParent, { WavesContext } from '../context/WavesContext';
 
 const WavesNew = () => {
+    const [showOnlyCams, setShowOnlyCams] = useState(false);
 
     const targetElementRef = useRef(null);
 
     const {
         status,
         setStatus,
-        swellData,
         setTide,
-        setWind,
         setWindStatus,
-        handleTideCheck,
-        handleTideSelection,
-        handleWindCheck,
-        handleSwellCheck,
-        handleSwell1Selection,
-        handleSwell2Selection,
         handleSwell1LiveSelection,
-        handleSwell2LiveSelection,
-        handleSwell1Angle,
-        handleSwell2Angle,
-        handleSwell1Height,
-        handleSwell2Height,
-        handleSwell1Interval,
-        handleSwell2Interval,
-        handleStarSelection,
-        handleDistanceSelection,
-        pause
+        handleSwell2LiveSelection
     } = useContext(OceanContext);
 
     const {
         locations,
         setLocations,
-        currentWave,
-        setCurrentWave,
         edit,
         setEdit,
         updateLocations
@@ -73,44 +53,31 @@ const WavesNew = () => {
     const [matchCollapse, setMatchCollapse] = useState(collapseStateInit('matchCollapse'));
     const [gpsCollapse, setGpsCollapse] = useState(true);
     const [conditionsCollapse, setConditionsCollapse] = useState(true);
-    const [buttonsVisible, setButtonsVisible] = useState(false);
     const toggleButtons = () => {
-        setButtonsVisible(prev => !prev);
+        //setButtonsVisible(prev => !prev);
     };
     const time = useCurrentTime();
     const startTime = time[0].startTime;
     const endTime = time[0].endTime;
     // Example: Carlsbad (KNFG)
-    const currentConditionsLink = `https://api.weather.gov/stations/KNFG/observations/latest`
-    const hourlyForecastLink = `https://api.weather.gov/gridpoints/MTR/${status.longitude},${status.latitude}/forecast/hourly`;
+    //const currentConditionsLink = `https://api.weather.gov/stations/KNFG/observations/latest`
+    //const hourlyForecastLink = `https://api.weather.gov/gridpoints/MTR/${status.longitude},${status.latitude}/forecast/hourly`;
     const tideNowLink = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${startTime}&end_date=${endTime}&station=9410660&product=water_level&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
-    const uriMLL = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=NOS.COOPS.TAC.WL&begin_date=${startTime}&end_date=${endTime}&datum=MLLW&station=9410230&time_zone=lst_ldt&units=english&interval=hilo&format=json`;
+    //const uriMLL = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=NOS.COOPS.TAC.WL&begin_date=${startTime}&end_date=${endTime}&datum=MLLW&station=9410230&time_zone=lst_ldt&units=english&interval=hilo&format=json`;
     // eslint-disable-next-line
     const [retry, setRetry] = useState('');
-    const data = useOceanData('tides', uriMLL, '', setRetry);
+    //const data = useOceanData('tides', uriMLL, '', setRetry);
     // eslint-disable-next-line
     const tideNow = useOceanData('tide', tideNowLink, '', setRetry);
 
-    const tick = () => {
-        console.log(`tick => pause: ${status.pause}`)
-        if (status.pause === false) {
-            setStatus(prevState => ({
-                ...prevState,
-                date: new Date(),
-                pause: true
-            }));
-        }
-    }
     const currentPositionExists = () => (status.longitude) ? true : false;
     const updateCurrentLocation = ({
         latitude,
         longitude
     }) => {
-        console.log(`UPDATING CURRENT POSITION ======> longitude: ${longitude} latitude: ${latitude}`)
         if (currentPositionExists()) {
 
             if ((Math.abs(status.longitude - longitude) > .0001) || (Math.abs(status.latitude - latitude) > .0001) || (status.init === false)) {
-                console.log(`updateCurrentLocation => satus coords ^^^^^^^^^^^ ${longitude}, ${latitude}`)
                 setStatus(prevState => ({
                     ...prevState,
                     longitude,
@@ -119,7 +86,6 @@ const WavesNew = () => {
                 }));
             }
         } else if ((Math.abs(Number(initializeData('longitude', null)) - longitude) > .000003) || (Math.abs(initializeData('latitude', null) - latitude) > .000003)) {
-            console.log(`updateCurrentLocation => local coords ^^^^^^^^^^^ ${longitude}, ${latitude}`)
             setStatus(prevState => ({
                 ...prevState,
                 longitude,
@@ -175,6 +141,8 @@ const WavesNew = () => {
     }
     const tideDisplay = (display) => <NewTide
         display={display}
+        lat={status.latitude || 32.87}
+        lon={status.longitude || -117.26}
     />
     // eslint-disable-next-line
     const getState = (kind) => {
@@ -216,33 +184,35 @@ const WavesNew = () => {
     const tideConfirm = (matches) => ((status.isTide && matches.includes('tide')) || status.isTide === false) ? true : false;
     const windConfirm = (matches) => ((status.isWind && matches.includes('wind')) || status.isWind === false) ? true : false;
     const showAll = false;
-    let norths = 0;
-    let souths = 0;
-    const getMatchingLocation = (item, category) => {
-        //console.log(`WavesNew => getMatchingLocation => item: ${JSON.stringify(item, null, 2)}`);
+    const getMatchingLocation = (item) => {
         const matches = match(item);
-        //console.log(`matches: ${JSON.stringify(matches, null, 2)}`);
         const inRegion = regionMatch(item);
+        const starsRequired = Number(status.stars);
+        const inDistance = inRegion !== false;
+
+        if (!inDistance) {
+            return null;
+        }
+
+        // 0 stars means "show everything within distance".
+        if (starsRequired === 0) {
+            return {
+                item,
+                matches,
+                inRegion
+            };
+        }
+
         if ((swell1Confirm(matches) && swell2Confirm(matches) && tideConfirm(matches) && windConfirm(matches)) || showAll) {
-            if (inRegion !== false) {
-                if (matches.length >= Number(status.stars)) {
-                    if (category === 'south') {
-                        souths += 1;
-                    } else {
-                        norths += 1;
-                    }
-                    return <SurfLocation
-                                key={getKey('link')}
-                                state={status}
-                                item={item}
-                                matches={matches}
-                                regionMatch={inRegion}
-                                tideDisplay={tideDisplay}
-                                locationCollapse={locationCollapse}
-                            />
-                }
+            if (matches.length >= starsRequired) {
+                return {
+                    item,
+                    matches,
+                    inRegion
+                };
             }
         }
+        return null;
     }
     const setScroll = () => {
         const height = () => (northRef.current) ? (northRef.current.clientHeight + northSouthRef.current.clientHeight) - 255 : 100;
@@ -275,29 +245,14 @@ const WavesNew = () => {
             setConditionsCollapse(false)
         }, 2000);
         return () => clearTimeout(timer);
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
     useEffect(() => {
         const newLocations = [...locations];
         newLocations.forEach((loc) => {
             loc.collapse = locationCollapse
          });
         setLocations(newLocations);
-    }, [locationCollapse]);
-    const currentTide = () => {
-
-        window.scrollTo({
-            top: 20,
-            left: 0,
-            behavior: 'smooth',
-        });
-
-        const localTide = Number(initializeData('tideData', null).data[initializeData('tideData', null).data.length - 1].v).toFixed(1);
-        const waterLevel = (validate(tideNow[0].data) !== null) ? Number(tideNow[0].data[tideNow[0].data.length - 1].v).toFixed(1) : localTide;
-        const getCurrentTide = (waterLevel > 3) ? "high" : (waterLevel < 2) ? "low" : "medium";
-        localStorage.setItem('height', waterLevel);
-        setTide(getCurrentTide);
-        toggleButtons();
-    }
+    }, [locationCollapse]); // eslint-disable-line react-hooks/exhaustive-deps
     const currentConditions = () => {
 
         window.scrollTo({
@@ -305,36 +260,21 @@ const WavesNew = () => {
             left: 0,
             behavior: 'smooth',
         });
-
-        const localTide = Number(initializeData('tideData', null).data[initializeData('tideData', null).data.length - 1].v).toFixed(1);
-        const waterLevel = (validate(tideNow[0].data) !== null) ? Number(tideNow[0].data[tideNow[0].data.length - 1].v).toFixed(1) : localTide;
-        const getCurrentTide = (waterLevel > 3) ? "high" : (waterLevel < 2) ? "low" : "medium";
-        localStorage.setItem('height', waterLevel);
-        setTide(getCurrentTide);
         setWindStatus(initializeData('wind', null));
         toggleButtons();
     }
-    const conditionsEntry = () => {
-
-        window.scrollTo({
-            top: 1340,
-            left: 0,
-            behavior: 'smooth',
-        });
-        toggleButtons();
-    }
-    const getCount = () => initializeData('waveCount', 0);
-    // eslint-disable-next-line
     const sortedSpots = () => {
         const latitude = (validate(status.latitude) !== null) ? status.latitude : 33.079940;
         const north = [];
         const south = [];
-        locations.forEach((item) => {
+        let filteredLocations = locations;
+        if (showOnlyCams) {
+            filteredLocations = filteredLocations.filter((item) => Boolean(item.cam));
+        }
+        filteredLocations.forEach((item) => {
             if ((latitude > item.latitude) && (String(item.name).toLowerCase().includes(String(itemEntry).toLowerCase()))) {
-                //console.log(`spot name: ${item.name}`);
                 south.push(item);
             } else if (String(item.name).includes(itemEntry)) {
-                //console.log(`north ${item.name} distance: ${getDistance(item)}`);
                 north.push(item);
             }
         });
@@ -343,44 +283,44 @@ const WavesNew = () => {
 
         const northSorted = north.sort((a, b) => getDistance(a) - getDistance(b));
         const southSorted = south.sort((a, b) => getDistance(a) - getDistance(b));
+        const northMatches = northSorted.reverse().map((item) => getMatchingLocation(item)).filter(Boolean);
+        const southMatches = southSorted.map((item) => getMatchingLocation(item)).filter(Boolean);
 
-        const northLocations = northSorted.reverse().map((item) => <div key={getKey('northLocation')}>
-            {getMatchingLocation(item, 'north')}
-        </div>
-        )
-        const southLocations = southSorted.map((item) => <div key={getKey('southLocation')}>
-            {getMatchingLocation(item, 'south')}
-        </div>
-        )
+        const northLocations = northMatches.map(({ item, matches, inRegion }) => {
+            const locationKey = `${item.name}-${item.latitude}-${item.longitude}`;
+            return <div key={locationKey}>
+                <SurfLocation
+                    state={status}
+                    item={item}
+                    matches={matches}
+                    regionMatch={inRegion}
+                    tideDisplay={tideDisplay}
+                    locationCollapse={locationCollapse}
+                />
+            </div>;
+        });
+        const southLocations = southMatches.map(({ item, matches, inRegion }) => {
+            const locationKey = `${item.name}-${item.latitude}-${item.longitude}`;
+            return <div key={locationKey}>
+                <SurfLocation
+                    state={status}
+                    item={item}
+                    matches={matches}
+                    regionMatch={inRegion}
+                    tideDisplay={tideDisplay}
+                    locationCollapse={locationCollapse}
+                />
+            </div>;
+        });
 
-        let sortedCount = 0;
-        let sortedSouthCount = 0;
-        let sortedNorthCount = 0;
-
-        localStorage.setItem('waveCount', sortedCount);
-
-        // Function to enable scroll snapping
-        const enableScrollSnap = () => {
-            if (locationScrollerRef.current) {
-                locationScrollerRef.current.style.scrollSnapType = "y mandatory";
-            }
-        };
-
-        // Function to disable scroll snapping
-        const disableScrollSnap = () => {
-            if (locationScrollerRef.current) {
-                locationScrollerRef.current.style.scrollSnapType = "none";
-            }
-        };
-        return <div
+        const sortedCount = northMatches.length + southMatches.length;
+        return {
+            count: sortedCount,
+            content: <div
                 id='locationScroller'
                 ref={locationScrollerRef}
                 className='locationScroller r-10'
-                //onMouseEnter={enableScrollSnap}
-                //onMouseLeave={disableScrollSnap}
-                //onMouseDown={disableScrollSnap}
-                //onMouseUp={enableScrollSnap}
-                onScroll={() => console.log(`scrollTop: ${northSouthRef.current.clientHeight + northRef.current.clientHeight}`)}
+                onScroll={() => {}}
                 style={{
                     scrollSnapType: "none",
                 }}
@@ -391,34 +331,21 @@ const WavesNew = () => {
             <div id='northSouth' ref={northSouthRef} className='pt-15'>
                 <div className='flex3Column'>
                     <ArrowsNorthSouth
-                        north={norths}
-                        south={souths}
+                        north={northMatches.length}
+                        south={southMatches.length}
                     />
                 </div>
             </div>
             <div id='south' ref={southRef} key={getKey('southLocations')} className='mb-100'>
                 {southLocations}
             </div>
-        </div>;
+        </div>
+        };
     }
     const repositionButton = () => {
         return (
-            <div onClick={() => setScroll()} className='size12 p-10 button r-5 color-lite bold bg-tinted m-1 box-shadow'>
+            <div onClick={() => setScroll()} className='size12 p-10 button r-5 color-lite bg-tinted m-1 box-shadow'>
                 Closest {icons.waveSet} {icons.upDownArrow}
-            </div>
-        )
-    }
-    const conditionsButton = () => {
-        return (
-            <div onClick={() => conditionsEntry()} className='size12 p-10 button r-5 color-lite bold bg-tinted m-1 box-shadow'>
-                Conditions
-            </div>
-        )
-    }
-    const currentTideButton = () => {
-        return (
-            <div onClick={() => currentTide()} className='size12 p-10 button r-5 color-lite bold bg-tinted m-1 box-shadow'>
-                Tide
             </div>
         )
     }
@@ -427,26 +354,28 @@ const WavesNew = () => {
     }
     const currentButton = () => {
         return (
-            <div onClick={() => currentConditions()} className='size12 p-10 button r-5 color-lite bold bg-tinted m-1 box-shadow'>
+            <div onClick={() => currentConditions()} className='size12 p-10 button r-5 color-lite bg-tinted m-1 box-shadow'>
                 Conditions
             </div>
         )
     }
     const setEntry = (value) => {
-        console.log(`setEntry ${value}`);
         debounceType(setItemEntry, value);
     }
+
+    const { count: visibleWaveCount, content: visibleWaveSpots } = sortedSpots();
 
     return (
         (retry !== '')
         ? <div>
             WATER TEMP: Error fetching data retry attempt {retry}
         </div>
-        : <OceanParent targetElementRef={targetElementRef} >
-            <div className='containerDetail bg-lite bold mt--25'>
-                <div className='containerDetail color-yellow bg-lite p-20 size20 contentLeft'>
+        : <>
+            <div className='containerDetail bg-lite mt--25'>
+                <div className='containerDetail color-yellow bg-lite p-20 size20 contentLeft mb-5'>
                     <span className='size30 m-5'>🌊</span> Waves
                 </div>
+                <SurfDashboard />
                 <div className='containerDetail size20 mb-5 mt-5 color-yellow bg-lite p-20'>
                     <CollapseToggleButton
                         title={`${icons.earth1} Current Conditions`}
@@ -470,13 +399,12 @@ const WavesNew = () => {
                         </div>
                     </div>
                     : <div className='containerDetail p-5'>
-                        <div className='containerBox color-yellow bg-lite p-20'>
+                        <div className='containerDetail size20 color-yellow bg-lite p-20'>
                             <CollapseToggleButton
-                                title={'GPS'}
+                                title={`${icons.gps} GPS`}
                                 isCollapsed={gpsCollapse}
                                 setCollapse={setGpsCollapse}
                                 align='left'
-                                icon={settings}
                             />
                         </div>
                         {
@@ -490,7 +418,7 @@ const WavesNew = () => {
                             />
                         </div>
                         <div className=''>
-                            <div className='containerBox color-yellow bg-lite p-20'>
+                            <div className='containerDetail size20 color-yellow bg-lite p-20'>
                                 <CollapseToggleButton
                                     title={`${icons.wave} Wave Summary`}
                                     isCollapsed={matchCollapse}
@@ -501,10 +429,10 @@ const WavesNew = () => {
                             {
                                 (matchCollapse)
                                     ? <div></div>
-                                    : <div>
-                                        <div className='m-10 mt-20'>
+                                    : <div className='containerDetail size15 color-yellow bg-lite p-15 mt-5'>
+                                        <div className=''>
                                             <span className='bold color-lite'>
-                                                {(getCount() === 1) ? `1 wave` : `${getCount()} waves`}
+                                                {(visibleWaveCount === 1) ? `1 wave` : `${visibleWaveCount} waves`}
                                             </span> of {locations.length}
                                         </div>
                                         <div className='m-5'>
@@ -512,6 +440,9 @@ const WavesNew = () => {
                                         </div>
                                         <div className='m-5 bold'>
                                             prefer:
+                                        </div>
+                                        <div className='m-5'>
+                                            <span className='bold color-lite'>{status.stars}</span> match minimum
                                         </div>
                                         <div className='m-5'>
                                             <span className='bold color-neogreen'>{status.swell1Direction} </span>and <span className='color-orange bold'>{status.swell2Direction} </span>swell
@@ -528,7 +459,7 @@ const WavesNew = () => {
                         </div>
                     </div>
                 }
-                <div className='containerDetail mt-5 mb-5 bold color-yellow bg-lite p-20'>
+                <div className='containerDetail mt-5 mb-5 color-yellow bg-lite p-20'>
                     <SearchBar
                         onSubmit={setEntry}
                         onChange={setEntry}
@@ -550,11 +481,24 @@ const WavesNew = () => {
                         align='left'
                     />
                 </div>
-                <div className={`mt-5 ${(edit) ? '' : 'mb-40'}`}>
-                    {sortedSpots()}
+                <div className='flexContainer mt-5 mb-5'>
+                    <div
+                            className={`containerDetail flex2Column button ${(!showOnlyCams) ? 'bg-dkGreen brdr-green color-yellow' : 'bg-lite brdr-lite color-lite' } p-20 size20 m-5`}
+                        onClick={() => setShowOnlyCams(false)}
+                    >
+                        All
+                    </div>
+                    <div
+                            className={`containerDetail flex2Column button ${(showOnlyCams) ? 'bg-dkGreen brdr-green color-yellow' : 'bg-lite brdr-lite color-lite' } p-20 size20 m-5`}
+                        onClick={() => setShowOnlyCams(true)}
+                    >
+                        Cams
+                    </div>
                 </div>
-                <div className='containerBox'></div>
-                <div className='mb--10'>
+                <div className={`mt-5 ${(edit) ? '' : 'mb-40'}`}>
+                    {visibleWaveSpots}
+                </div>
+                <div className='mb-50'>
                     <WavesParent targetElementRef={targetElementRef} >
                         <WaveUtils
                             item={status}
@@ -563,7 +507,7 @@ const WavesNew = () => {
                         </WaveUtils>
                     </WavesParent>
                 </div>
-                <div className={`containerBox bt--20 width--10 bg-tintedDark`}>
+                <div className={`containerDetail size20 bt--20 width--10 bg-tintedDark`}>
                     <div className={`button-container mt-5`}>
                         {/*
                             <div className='scrollSnapRight'>
@@ -582,15 +526,15 @@ const WavesNew = () => {
                         <div className='scrollSnapRight mr-10'>
                             {repositionButton()}
                         </div>
-                        <span title='toggle edit' className='containerBox button scrollSnapRight' onClick={handleEditToggle}>{(edit) ? `${icons.dont}${icons.edit}` : icons.edit}</span>
-                        <div className='containerBox button scrollSnapRight' onClick={addWave}>
-                            <span className='mr-5 text-outline-light button'>{icons.plus}</span>
+                        <span title='toggle edit' className='containerDetail size20 button scrollSnapRight' onClick={handleEditToggle}>{(edit) ? `${icons.dont}${icons.edit}` : icons.edit}</span>
+                        <div className='containerDetail size20 button scrollSnapRight' onClick={addWave}>
+                            <span className='mr-5 text-outline-lite button'>{icons.plus}</span>
                             <span className=''>{icons.wave}</span>
                         </div>
                     </div>
                 </div>
             </div>
-        </OceanParent>
+        </>
     )
 }
 export default WavesNew;

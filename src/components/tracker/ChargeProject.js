@@ -5,7 +5,6 @@ import CollapseToggleButton from '../utils/CollapseToggleButton';
 import { currentTime, currentDate } from '../utils/CurrentCalendar';
 import Charge from './Charge';
 import initSession from './initSession';
-import getKey from '../utils/KeyGenerator';
 import validate from '../utils/validate';
 
 const ChargeProject = ({
@@ -25,7 +24,7 @@ const ChargeProject = ({
         newCharges[chargeProjectIndex].isCollapsed = projectCollapse;
         let dataToString = JSON.stringify(newCharges);
         localStorage.setItem('chargeTracking', dataToString);
-    }, [projectCollapse]);
+    }, [chargeProjectIndex, charges, projectCollapse]);
 
     const handleStopTask = (chargeProjectIndex, taskIndex) => {
         const updatedCharges = [...charges];
@@ -55,13 +54,10 @@ const ChargeProject = ({
             runningTimeDisplay: runningTimeDisplay
         }
         task.sessions.push(session);
-        console.log(`handleStopTask => task:${JSON.stringify(task,null,2)}`)
         const taskRunningTime = calculateTotalRunningTime(task);
         const taskRunningTimeDisplay = getTotalTime(taskRunningTime);
-        console.log(`handleStopTask => taskRunnningTime: ${taskRunningTime} taskRunningTimeDisplay: ${taskRunningTimeDisplay}`)
         task.runningTime = taskRunningTime;
         task.runningTimeDisplay = taskRunningTimeDisplay;
-        task.sessions.map((session, index) => console.log(`handleStopTask => session(${index}): runningTime: ${session.runningTime} totalTime: ${session.totalTime}`));
         setCharges(updatedCharges);
         stopTimer(chargeProjectIndex, taskIndex);
     };
@@ -111,7 +107,7 @@ const ChargeProject = ({
     const getTasks = (chargeProject, chargeProjectIndex) => {
         return (
             chargeProject.tasks.map((task, taskIndex) => (
-                <div className = '' key={getKey(`chargeTask${taskIndex}`)}>
+                <div className = '' key={`charge-task-${chargeProjectIndex}-${taskIndex}-${String(task?.description || 'task')}`}>
                     <Charge
                         taskIndex={taskIndex}
                         task={task}

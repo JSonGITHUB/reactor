@@ -1,9 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useContext } from 'react';
 import getKey from '../../utils/KeyGenerator';
-import golfScoring from './golfScoring';
-import parsDefault from './parsDefault';
 import ScoreCardGolf from './ScoreCardGolf';
-import initializeData from '../../utils/InitializeData';
 import { GolfContext } from '../../context/GolfContext';
 import icons from '../../site/icons';
 
@@ -16,14 +13,7 @@ const GolfScores = ({
         golfPars,
         setPars, 
         course,
-        setCourse,
-        updatePar,
-        updateDistance,
-        courses,
-        setCourses,
-        addCourse,
-        editCourse,
-        deleteCourse
+        updatePar
     } = useContext(GolfContext);
 
     const editGolfPar = (hole) => {

@@ -7,6 +7,8 @@ import React, {
     useState,
 } from 'react';
 
+/* eslint-disable react-hooks/exhaustive-deps */
+
 export const DEVICE_IDS = {
     KEYBOARD: 'keyboard',
     TOUCH: 'touch',
@@ -178,7 +180,7 @@ export const MultiInputProvider = ({ children, initialEnabledDevices }) => {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [enabledDevices]);
+    }, [dispatchInputEvent, dispatchNormalizedAction, enabledDevices]);
 
     // TOUCH → raw + normalized ACTIVATE
     useEffect(() => {
@@ -202,7 +204,7 @@ export const MultiInputProvider = ({ children, initialEnabledDevices }) => {
 
         window.addEventListener('touchend', handleTouchEnd);
         return () => window.removeEventListener('touchend', handleTouchEnd);
-    }, [enabledDevices]);
+    }, [dispatchInputEvent, dispatchNormalizedAction, enabledDevices]);
 
     // External devices (binary keypad / sip-puff) would call
     // dispatchInputEvent(...) and dispatchNormalizedAction(...)

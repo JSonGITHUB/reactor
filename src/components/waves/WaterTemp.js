@@ -1,41 +1,61 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Loader from '../site/Loader';
-import useOceanData from './useOceanData';
-//import useCurrentTime from './useCurrentTime';
-import useCurrentTime from '../utils/useCurrentTime';
-import validate from '../utils/validate';
+import fetchCurrentWaterTemp from './waterTempService';
 
 const WaterTemp = ({
     setStatus,
     isMotionOn
 }) => {
-
-    //const [ time ] = useCurrentTime();
-    const time = useCurrentTime();
-    const startTime = time[0].startTime;
-    const endTime = time[0].endTime;
-    const waterUrl = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${startTime}&end_date=${endTime}&station=9410230&product=water_temperature&units=english&time_zone=lst_ldt&application=ports_screen&format=json`;
-    
-    //console.log(`WaterTemp => time: ${JSON.stringify(time,null,2)}`);
-    //console.log(`WaterTemp => startTime: ${startTime} endTime: ${endTime}`);
-
     const [temp, setTemp] = useState(null);
-    // eslint-disable-next-line
     const [retry, setRetry] = useState('');
-    const [data, getData] = useOceanData('water', waterUrl, '', setRetry);
+    const setStatusRef = useRef(setStatus);
 
     useEffect(() => {
-        //if (data.data !== undefined) {
-        if (validate(data.data) !== null) {
-            const temp = Number(data.data[data.data.length - 1].v).toFixed(0);
-            setTemp(temp);
-            localStorage.setItem('waterTemp', temp);
-            setStatus(prevState => ({
-                ...prevState,
-                waterTemp: temp
-            }));
-        }
-    },[data]);
+        setStatusRef.current = setStatus;
+    }, [setStatus]);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const loadWaterTemp = async () => {
+            try {
+                setRetry('');
+                const reading = await fetchCurrentWaterTemp({
+                    noaaStationId: '9410230',
+                    ndbcStationId: '46254',
+                });
+
+                if (!isMounted || !Number.isFinite(reading?.valueF)) return;
+
+                const roundedTemp = Number(reading.valueF).toFixed(0);
+                setTemp(roundedTemp);
+                localStorage.setItem('waterTemp', roundedTemp);
+
+                if (reading.timestamp) {
+                    localStorage.setItem('waterTempTimestamp', reading.timestamp.toISOString());
+                }
+                if (reading.source) {
+                    localStorage.setItem('waterTempSource', reading.source);
+                }
+
+                setStatusRef.current(prevState => ({
+                    ...prevState,
+                    waterTemp: roundedTemp,
+                    waterTempTimestamp: reading.timestamp ? reading.timestamp.toISOString() : null,
+                    waterTempSource: reading.source || null,
+                }));
+            } catch (error) {
+                if (!isMounted) return;
+                setRetry('1');
+            }
+        };
+
+        loadWaterTemp();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     const getCurrentTemp = () => {
         if (retry !=='') {

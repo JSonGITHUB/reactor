@@ -2,7 +2,6 @@ import React, { createContext, useEffect, useState, useContext } from 'react';
 
 import validate from '../utils/validate';
 import initializeData from '../utils/InitializeData';
-import parsDefault from '../games/scorekeeper/parsDefault';
 import courseData from './courseData';
 
 export const GolfContext = createContext();
@@ -42,7 +41,6 @@ const GolfParent = ({
         const newCourseHoleCount = Number(prompt(`Enter hole count:`, 18));
         const newCourseFees = Number(prompt(`Enter fees:`, 60));
         const newCourseDistance = Number(prompt(`Enter course distance:`, 4800));
-        const newCourseHoles = newCourseHoleCount;
 
         const newHoles = (count) => {
             if (typeof count !== 'number' || count < 0) {
@@ -115,7 +113,6 @@ const GolfParent = ({
         const newCourseHoleCount = Number(prompt(`Enter hole count:`, course.holes.length));
         const newCourseFees = Number(prompt(`Enter fees:`, course.fees));
         const newCourseDistance = Number(prompt(`Enter course distance:`, course.totalDistance));
-        const newCourseHoles = newCourseHoleCount;
 
         if (!updatedName || !updatedAddress) {
             console.error('Course name and address cannot be empty.');
@@ -177,7 +174,7 @@ const GolfParent = ({
 
         const newCourses = [...courses];
 
-        if (course != '{}' && validate(course) !== null) {
+        if (course !== '{}' && validate(course) !== null) {
             const courseIndex = courses.findIndex(c => JSON.stringify(c) === JSON.stringify(course));
             setCourseIndex(courseIndex);
             newCourses[courseIndex] = getUpdatedCourse();
@@ -205,7 +202,7 @@ const GolfParent = ({
                 }
             };
 
-            if (course != '{}' && validate(course) !== null) {
+            if (course !== '{}' && validate(course) !== null) {
                 const courseIndex = courses.findIndex(c => JSON.stringify(c) === JSON.stringify(course));
                 //setCourseIndex(courseIndex);
                 //newCourses[courseIndex] = getUpdatedCourse();
@@ -252,7 +249,7 @@ const GolfParent = ({
         }
     }, [golfPars]);
     useEffect(() => {
-        if (course != '{}' && validate(course) !== null) {
+        if (course !== '{}' && validate(course) !== null) {
             //console.log(`useEffect[course] course: ${JSON.stringify(course, null, 2)}`);
             localStorage.setItem('course', JSON.stringify(course));
             const newPars = course.holes.map(hole => hole.par);
@@ -261,7 +258,7 @@ const GolfParent = ({
             const courseIndex = courses.findIndex(c => JSON.stringify(c) === JSON.stringify(course));
             setCourseIndex(courseIndex);
         }
-    }, [course]);
+    }, [course, courses]);
     useEffect(() => {
         console.log(`edit: ${edit}`);
     }, [edit]);

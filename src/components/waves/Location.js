@@ -1,87 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import useLocationData from './useLocationData';
 
 const Location = ({
-    mode
+    mode,
+    onLocationData
 }) => {
-    const [location, setLocation] = useState(null);
-    const [data, setData] = useState(null);
-    const [zipCode, setZipCode] = useState('');
-    const [city, setCity] = useState('');
-    const [road, setRoad] = useState('');
-    const [address, setAddress] = useState('');
-    const [suburb, setSuburb] = useState('');
-    const [county, setCounty] = useState('');
-    const [state, setState] = useState('');
-    const [country, setCountry] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-
-    const getLocation = () => {
-        if (!navigator.geolocation) {
-            setError('Geolocation is not supported by your browser.');
-            return;
-        }
-
-        setLoading(true);
-        setError('');
-
-        navigator.geolocation.getCurrentPosition(
-            async (position) => {
-                const { latitude, longitude } = position.coords;
-                setLocation({ latitude, longitude });
-
-                try {
-                    // Use Nominatim reverse geocoding API
-                    const response = await fetch(
-                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
-                    );
-                    const data = await response.json();
-                    setData(data);
-                    const zip =
-                        data.address.postcode ||
-                        data.address.zip ||
-                        'No zip code found for your location.';
-                    setZipCode(zip);
-                    const address = data.address;
-                    setAddress(address);
-                    const road = address.road || '';
-                    setRoad(road);
-                    const suburb = address.suburb || '';
-                    setSuburb(suburb);
-                    const city = address.city || address.town || address.village || '';
-                    setCity(city);
-                    const state = address.state || '';
-                    setState(state);
-                    const country = address.country || '';
-                    setCountry(country);
-                    const county = address.county || '';
-                    setCounty(county);
-
-                    // Extract city/town/village/hamlet/county from address (best-effort)
-                    const cityName =
-                        data.address.city ||
-                        data.address.town ||
-                        data.address.village ||
-                        data.address.hamlet ||
-                        data.address.county ||
-                        '';
-                    setCity(cityName);
-                } catch (err) {
-                    setError('Failed to retrieve zip code from location data.');
-                } finally {
-                    setLoading(false);
-                }
-            },
-            (err) => {
-                setError('Unable to retrieve your location. Please allow location access.');
-                setLoading(false);
-            }
-        );
-    };
+    const {
+        snapshot,
+        requestLocation,
+        location,
+        data,
+        zipCode,
+        city,
+        road,
+        suburb,
+        county,
+        state: region,
+        country,
+        loading,
+        error
+    } = useLocationData({ autoRequest: true });
 
     useEffect(() => {
-        getLocation();
-    }, []);
+        if (onLocationData) {
+            onLocationData(snapshot);
+        }
+    }, [onLocationData, snapshot]);
     useEffect(() => {
         console.log(`Location => useEffect => data: ${JSON.stringify(data, null, 2)}`);
     }, [data]);
@@ -89,20 +33,19 @@ const Location = ({
     return (zipCode && mode === 'zipOnly')
         ? (location && zipCode) ? zipCode : 'Loading zip code...'
         : <div className='containerDetail mr-5 ml-5 mt--20'>
-            <div className='containerDetail m-5 bg-lite color-yellow size20 p-10 contentLeft'>
+            <div className='containerDetail m-5 bg-lite color-yellow size20 p-20 contentLeft'>
                 Find My Zip Code
             </div>
             <div
                 className='containerDetail m-5 bg-blue color-lite p-20 size20 button'
-                onClick={getLocation} disabled={loading}
+                onClick={requestLocation} disabled={loading}
             >
                 {loading ? 'Getting Location...' : 'Current Location'}
             </div>
 
             {error && <div className='color-red mt-10'>{error}</div>}
 
-            {location && (
-                <div className='containerDetail m-5 bg-lite size20 bg-lite contentLeft'>
+            {location && <div className='containerDetail m-5 bg-lite size20 bg-lite contentLeft'>
 
                     <div className='containerDetail m-5 bg-lite size20 bg-lite'>
                         <div className='containerDetail m-5 bg-lite size20 bg-lite color-yellow p-10'>
@@ -154,7 +97,7 @@ const Location = ({
                             State / Region:
                         </div>
                         <div className='containerDetail m-5 bg-tintedMedium size20 color-lite p-10'>
-                            {state || 'State not available'}
+                            {region || 'State not available'}
                         </div>
                     </div>
 
@@ -176,7 +119,7 @@ const Location = ({
                         </div>
                     </div>
                 </div>
-            )}
+            }
         </div>
 };
 

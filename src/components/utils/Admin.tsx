@@ -288,8 +288,8 @@ const Admin: React.FC = () => {
                         <div className="flexContainer">
                             <div className="containerBox flex9Column contentRight">Key:</div>
                             <input
-                                id="key"
-                                name="key"
+                                id="admin-ts-key"
+                                name="admin-ts-key"
                                 className="containerBox flex2Column"
                                 type="text"
                                 value={key}

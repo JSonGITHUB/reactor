@@ -40,7 +40,7 @@ const initCircuitTracking = [
         excersizes: [
           {
             title: "Goblet Squat",
-            link: "https://www.youtube.com/watch?v=pEGfGwp6IEA",
+            //link: "https://www.youtube.com/watch?v=pEGfGwp6IEA",
             link: "https://www.youtube.com/watch?v=42bFodPahBU",
             type: "timer",
             complete: false
@@ -65,7 +65,7 @@ const initCircuitTracking = [
           },
           {
             title: "Goblet Squat",
-            link: "https://www.youtube.com/watch?v=pEGfGwp6IEA",
+            //link: "https://www.youtube.com/watch?v=pEGfGwp6IEA",
             link: "https://www.youtube.com/watch?v=42bFodPahBU",
             type: "timer",
             complete: false
@@ -105,22 +105,22 @@ const initCircuitTracking = [
           },
           {
             title: "Jane Fonda's Right",
-            link: "https://www.youtube.com/shorts/0wLcrmxwvW8",
+            //link: "https://www.youtube.com/shorts/0wLcrmxwvW8",
             link: "https://www.youtube.com/watch?v=VlwBJE1WtOQ",
             type: "timer",
             complete: false
           },
           {
             title: "Abductor Left Hip Slides one and a half style",
-            link: "https://www.youtube.com/watch?v=-6Ksus4QfE4",
+            //link: "https://www.youtube.com/watch?v=-6Ksus4QfE4",
             link: "https://www.youtube.com/watch?v=mYMardCrLSk",
             type: "timer",
             complete: false
           },
           {
             title: "Abductor Right Hip Slides one and a half style",
-            link: "https://www.youtube.com/watch?v=-6Ksus4QfE4",
-            link: "https://www.youtube.com/watch?v=VlwBJE1WtOQ",
+            //link: "https://www.youtube.com/watch?v=-6Ksus4QfE4",
+            //link: "https://www.youtube.com/watch?v=VlwBJE1WtOQ",
             link: "https://www.youtube.com/watch?v=mYMardCrLSk",
             type: "timer",
             complete: false
@@ -136,44 +136,44 @@ const initCircuitTracking = [
         excersizes: [
           {
             title: "Reverse Lunge",
-            link: "https://www.youtube.com/watch?v=xrPteyQLGAo",
+            //link: "https://www.youtube.com/watch?v=xrPteyQLGAo",
             link: "https://www.youtube.com/watch?v=_LGpDtENZ5U",
             type: "timer",
             complete: false
           },
           {
             title: "Sprinter",
-            link: "https://www.youtube.com/watch?v=g8-Ge9S0aUw",
-            link: "https://www.youtube.com/watch?v=1J8mVmtyYpk",
+            //link: "https://www.youtube.com/watch?v=g8-Ge9S0aUw",
+            //link: "https://www.youtube.com/watch?v=1J8mVmtyYpk",
             link: "https://www.youtube.com/watch?v=B0_E6hzVaDE",
             type: "timer",
             complete: false
           },
           {
             title: "Jump Squats",
-            link: "https://www.youtube.com/shorts/IfqrxS_-8oU",
+            //link: "https://www.youtube.com/shorts/IfqrxS_-8oU",
             link: "https://www.youtube.com/watch?v=txLE-jOCEsc",
             type: "timer",
             complete: false
           },
           {
             title: "Reverse Lunge",
-            link: "https://www.youtube.com/watch?v=xrPteyQLGAo",
+            //link: "https://www.youtube.com/watch?v=xrPteyQLGAo",
             link: "https://www.youtube.com/watch?v=_LGpDtENZ5U",
             type: "timer",
             complete: false
           },
           {
             title: "Sprinter",
-            link: "https://www.youtube.com/watch?v=g8-Ge9S0aUw",
-            link: "https://www.youtube.com/watch?v=1J8mVmtyYpk",
+            //link: "https://www.youtube.com/watch?v=g8-Ge9S0aUw",
+            //link: "https://www.youtube.com/watch?v=1J8mVmtyYpk",
             link: "https://www.youtube.com/watch?v=B0_E6hzVaDE",
             type: "timer",
             complete: false
           },
           {
             title: "Jump Squats",
-            link: "https://www.youtube.com/shorts/IfqrxS_-8oU",
+            //link: "https://www.youtube.com/shorts/IfqrxS_-8oU",
             link: "https://www.youtube.com/watch?v=txLE-jOCEsc",
             type: "timer",
             complete: false
@@ -195,22 +195,22 @@ const initCircuitTracking = [
           },
           {
             title: "Jane Fonda's (one and a half style)",
-            link: "https://www.youtube.com/shorts/0wLcrmxwvW8",
+            //link: "https://www.youtube.com/shorts/0wLcrmxwvW8",
             link: "https://www.youtube.com/watch?v=VlwBJE1WtOQ",
             type: "timer",
             complete: false
           },
           {
             title: "Abductor Left Hip Slides one and a half style",
-            link: "https://www.youtube.com/watch?v=KeoRRIqmSqY",
+            //link: "https://www.youtube.com/watch?v=KeoRRIqmSqY",
             link: "https://www.youtube.com/watch?v=mYMardCrLSk",
             type: "timer",
             complete: false
           },
           {
             title: "Abductor Right Hip Slides one and a half style",
-            link: "https://www.youtube.com/watch?v=KeoRRIqmSqY",
-            link: "https://www.youtube.com/watch?v=VlwBJE1WtOQ",
+            //link: "https://www.youtube.com/watch?v=KeoRRIqmSqY",
+            //link: "https://www.youtube.com/watch?v=VlwBJE1WtOQ",
             link: "https://www.youtube.com/watch?v=mYMardCrLSk",
             type: "timer",
             complete: false
@@ -265,22 +265,22 @@ const initCircuitTracking = [
           },
           {
             title: "Jane Fonda's Right",
-            link: "https://www.youtube.com/shorts/0wLcrmxwvW8",
+            //link: "https://www.youtube.com/shorts/0wLcrmxwvW8",
             link: "https://www.youtube.com/watch?v=VlwBJE1WtOQ",
             type: "timer",
             complete: false
           },
           {
             title: "Abductor Left Hip Slides one and a half style",
-            link: "https://www.youtube.com/watch?v=KeoRRIqmSqY",
+            //link: "https://www.youtube.com/watch?v=KeoRRIqmSqY",
             link: "https://www.youtube.com/watch?v=mYMardCrLSk",
             type: "timer",
             complete: false
           },
           {
             title: "Abductor Right Hip Slides one and a half style",
-            link: "https://www.youtube.com/watch?v=KeoRRIqmSqY",
-            link: "https://www.youtube.com/watch?v=VlwBJE1WtOQ",
+            //link: "https://www.youtube.com/watch?v=KeoRRIqmSqY",
+            //link: "https://www.youtube.com/watch?v=VlwBJE1WtOQ",
             link: "https://www.youtube.com/watch?v=mYMardCrLSk",
             type: "timer",
             complete: false
@@ -308,7 +308,7 @@ const initCircuitTracking = [
           },
           {
             title: "Sprinter Plyo Lunge",
-            link: "https://www.youtube.com/watch?v=JCyJ_jW0lHo",
+            //link: "https://www.youtube.com/watch?v=JCyJ_jW0lHo",
             link: "https://www.youtube.com/watch?v=B0_E6hzVaDE",
             type: "timer",
             complete: false
@@ -326,7 +326,7 @@ const initCircuitTracking = [
           },
           {
             title: "Sprinter Plyo Lunge",
-            link: "https://www.youtube.com/watch?v=JCyJ_jW0lHo",
+            //link: "https://www.youtube.com/watch?v=JCyJ_jW0lHo",
             link: "https://www.youtube.com/watch?v=B0_E6hzVaDE",
             type: "timer",
             complete: false
@@ -348,22 +348,22 @@ const initCircuitTracking = [
           },
           {
             title: "Jane Fonda's Right (one and a half style)",
-            link: "https://www.youtube.com/shorts/0wLcrmxwvW8",
+            //link: "https://www.youtube.com/shorts/0wLcrmxwvW8",
             link: "https://www.youtube.com/watch?v=VlwBJE1WtOQ",
             type: "timer",
             complete: false
           },
           {
             title: "Abductor Left Hip Slides one and a half style",
-            link: "https://www.youtube.com/watch?v=KeoRRIqmSqY",
+            //link: "https://www.youtube.com/watch?v=KeoRRIqmSqY",
             link: "https://www.youtube.com/watch?v=mYMardCrLSk",
             type: "timer",
             complete: false
           },
           {
             title: "Abductor Right Hip Slides one and a half style",
-            link: "https://www.youtube.com/watch?v=KeoRRIqmSqY",
-            link: "https://www.youtube.com/watch?v=VlwBJE1WtOQ",
+            //link: "https://www.youtube.com/watch?v=KeoRRIqmSqY",
+            //link: "https://www.youtube.com/watch?v=VlwBJE1WtOQ",
             link: "https://www.youtube.com/watch?v=mYMardCrLSk",
             type: "timer",
             complete: false
@@ -391,14 +391,14 @@ const initCircuitTracking = [
           },
           {
             title: "Jack Knives",
-            link: "https://www.youtube.com/shorts/Kufye7qsUXI",
+            //link: "https://www.youtube.com/shorts/Kufye7qsUXI",
             link: "https://www.youtube.com/watch?v=5kvKmRGADlQ",
             type: "timer",
             complete: false
           },
           {
             title: "Boat Holds",
-            link: "https://www.youtube.com/watch?v=VN-6jygZ094",
+            //link: "https://www.youtube.com/watch?v=VN-6jygZ094",
             link: "https://www.youtube.com/watch?v=WGwI629aTAY",
             type: "timer",
             complete: false
@@ -435,7 +435,7 @@ const initCircuitTracking = [
           },
           {
             title: "Mountain Climbers",
-            link: "https://www.youtube.com/watch?v=YZstn7BkgvU",
+            //link: "https://www.youtube.com/watch?v=YZstn7BkgvU",
             link: "https://www.youtube.com/watch?v=wQq3ybaLZeA",
             type: "timer",
             complete: false
@@ -478,8 +478,8 @@ const initCircuitTracking = [
           },
           {
             title: "In and Out Planks",
-            link: "https://www.youtube.com/watch?v=Fcbw82ykBvY",
-            link: "https://www.youtube.com/watch?v=JqZJW-bow2I",
+            //link: "https://www.youtube.com/watch?v=Fcbw82ykBvY",
+            //link: "https://www.youtube.com/watch?v=JqZJW-bow2I",
             link: "https://www.youtube.com/watch?v=clsucWwp5Oc",
             type: "timer",
             complete: false
@@ -498,7 +498,7 @@ const initCircuitTracking = [
           },
           {
             title: "Chair Sit-ups Switching",
-            link: "https://www.youtube.com/watch?v=swOyWKk7Oko",
+            //link: "https://www.youtube.com/watch?v=swOyWKk7Oko",
             link: "https://www.youtube.com/watch?v=KojXAk4lXkE",
             type: "timer",
             complete: false
@@ -577,8 +577,8 @@ const initCircuitTracking = [
         excersizes: [
           {
             title: "Single Leg Hinge Stretch 20 second hold three times",
-            link: "https://www.youtube.com/watch?v=6AZ85oH5A-I",
-            link: "https://www.youtube.com/watch?v=0hxtMb6kcbs",
+            //link: "https://www.youtube.com/watch?v=6AZ85oH5A-I",
+            //link: "https://www.youtube.com/watch?v=0hxtMb6kcbs",
             link: "https://www.youtube.com/watch?v=_UB6Tp8fzEQ",
             type: "timer",
             complete: false
@@ -654,14 +654,14 @@ const initCircuitTracking = [
           },
           {
             title: "Single Leg Romanian Deadlift (until failure)",
-            link: "https://www.youtube.com/watch?v=GoKjrvJi-Iw",
+            //link: "https://www.youtube.com/watch?v=GoKjrvJi-Iw",
             link: "https://www.youtube.com/watch?v=gBPbL3AxzzE",
             type: "timer",
             complete: false
           },
           {
             title: "Single Leg Romanian Deadlift Straight Leg (until failure single leg)",
-            link: "https://www.youtube.com/watch?v=HtHxnWmMgzM",
+            //link: "https://www.youtube.com/watch?v=HtHxnWmMgzM",
             link: "https://www.youtube.com/watch?v=gBPbL3AxzzE",
             type: "timer",
             complete: false
@@ -680,28 +680,28 @@ const initCircuitTracking = [
           },
           {
             title: "Elevated Split Squat (until failure)",
-            link: "https://www.youtube.com/shorts/uODWo4YqbT8",
+            //link: "https://www.youtube.com/shorts/uODWo4YqbT8",
             link: "https://www.youtube.com/watch?v=OUnSPY8KLfE",
             type: "timer",
             complete: false
           },
           {
             title: "Goblet Squat (until failure)",
-            link: "https://www.youtube.com/watch?v=pEGfGwp6IEA",
+            //link: "https://www.youtube.com/watch?v=pEGfGwp6IEA",
             link: "https://www.youtube.com/watch?v=42bFodPahBU",
             type: "timer",
             complete: false
           },
           {
             title: "Back Deadlifts (until failure)",
-            link: "https://www.youtube.com/shorts/vfKwjT5-86k",
+            //link: "https://www.youtube.com/shorts/vfKwjT5-86k",
             link: "https://www.youtube.com/watch?v=VyFDPMOy-eA",
             type: "timer",
             complete: false
           },
           {
             title: "Overhead Squat (until failure)",
-            link: "https://www.youtube.com/watch?v=X1RI-qbO30I",
+            //link: "https://www.youtube.com/watch?v=X1RI-qbO30I",
             link: "Overhead Squat",
             type: "timer",
             complete: false
@@ -876,7 +876,7 @@ const initCircuitTracking = [
           },
           {
             title: "Reverse Lunges",
-            link: "https://www.youtube.com/watch?v=xrPteyQLGAo",
+            //link: "https://www.youtube.com/watch?v=xrPteyQLGAo",
             link: "https://www.youtube.com/watch?v=_LGpDtENZ5U",
             type: "timer",
             complete: false
@@ -889,7 +889,7 @@ const initCircuitTracking = [
           },
           {
             title: "Glute Bridges",
-            link: "https://www.youtube.com/watch?v=ZgvzRn-16zI",
+            //link: "https://www.youtube.com/watch?v=ZgvzRn-16zI",
             link: "https://www.youtube.com/watch?v=9qo48CYN06w",
             type: "timer",
             complete: false
@@ -997,7 +997,7 @@ const initCircuitTracking = [
             complete: false
           },
           {
-            title: "Chest Strecth",
+            title: "Chest Stretch",
             link: "https://www.youtube.com/watch?v=NS64IgKUyeY",
             type: "timer",
             complete: false
@@ -3735,6 +3735,315 @@ const initCircuitTracking = [
           {
             title: "Kick Crunch",
             link: "https://www.youtube.com/watch?v=ARMq_MaZMq0",
+            type: "timer",
+            complete: false
+          }
+        ]
+      },
+      {
+        title: "Upper Body Circuit",
+        description: "Upper-body focused bodyweight circuit from Bodyweight Complete exercises.",
+        time: 35,
+        restTime: 20,
+        isCollapsed: true,
+        excersizes: [
+          {
+            title: "Knee Push Ups",
+            link: "https://www.youtube.com/watch?v=jWxvty2KROs",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Push ups",
+            link: "https://www.youtube.com/watch?v=R08gYyypGto",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Tricep Dips",
+            link: "https://www.youtube.com/watch?v=JhX1nBnirNw",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Hover Pushups",
+            link: "https://www.youtube.com/watch?v=6wdVoBSkU0Y",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Hindu Pushups",
+            link: "https://www.youtube.com/watch?v=HE0ijmUc6Og",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Military Push-Ups",
+            link: "https://www.youtube.com/watch?v=H8LoGZ-ZN48",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Prone Triceps Push-Ups",
+            link: "https://www.youtube.com/watch?v=Rr43jMaoJ9g",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Up and Down Plank",
+            link: "https://www.youtube.com/watch?v=Rr1Xq5Hmg7A",
+            type: "timer",
+            complete: false
+          }
+        ]
+      },
+      {
+        title: "Lower Body Circuit",
+        description: "Lower-body focused bodyweight circuit from Bodyweight Complete exercises.",
+        time: 35,
+        restTime: 20,
+        isCollapsed: true,
+        excersizes: [
+          {
+            title: "Squats",
+            link: "https://www.youtube.com/watch?v=42bFodPahBU",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Side Lunges",
+            link: "https://www.youtube.com/watch?v=tlUg1DXhHm8",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Curtsy Lunges",
+            link: "https://www.youtube.com/watch?v=-rTyKlHjYT8",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Backward Lunge",
+            link: "https://www.youtube.com/watch?v=_LGpDtENZ5U",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Lunges",
+            link: "https://www.youtube.com/watch?v=1J8mVmtyYpk",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Toy Soldiers",
+            link: "https://www.youtube.com/watch?v=6NVowqZQiYQ",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Roundhouse Squat Kicks",
+            link: "https://www.youtube.com/watch?v=GfEXIcAaEBM",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Step-Up on to Chair",
+            link: "https://www.youtube.com/watch?v=XNpkt8s9r2w",
+            type: "timer",
+            complete: false
+          }
+        ]
+      },
+      {
+        title: "Core Circuit",
+        description: "Core-focused bodyweight circuit from Bodyweight Complete exercises.",
+        time: 35,
+        restTime: 20,
+        isCollapsed: true,
+        excersizes: [
+          {
+            title: "Abdominal Crunches",
+            link: "https://www.youtube.com/watch?v=RUNrHkbP4Pc",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Russian Twist",
+            link: "https://www.youtube.com/watch?v=DJQGX2J4IVw",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Bicycle Crunches",
+            link: "https://www.youtube.com/watch?v=-nJkAJpQemI",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Flutter kicks",
+            link: "https://www.youtube.com/watch?v=K5wuM_gNWyw",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Leg Raises",
+            link: "https://www.youtube.com/watch?v=dGKbTKLnym4",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "V Crunch",
+            link: "https://www.youtube.com/watch?v=AkHgaJiwtFE",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Cross Arm Crunches",
+            link: "https://www.youtube.com/watch?v=Qz3ylqqJ90M",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Plank",
+            link: "https://www.youtube.com/watch?v=Fcbw82ykBvY",
+            type: "timer",
+            complete: false
+          }
+        ]
+      },
+      {
+        title: "Cardio Circuit",
+        description: "Cardio-focused bodyweight circuit from Bodyweight Complete exercises.",
+        time: 35,
+        restTime: 20,
+        isCollapsed: true,
+        excersizes: [
+          {
+            title: "Jumping Jacks",
+            link: "https://www.youtube.com/watch?v=2W4ZNSwoW_4",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "High Stepping",
+            link: "https://www.youtube.com/watch?v=Cmxr9xcNhgU",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Burpees",
+            link: "https://www.youtube.com/watch?v=818SkLAPyKY",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Star Jumps",
+            link: "https://www.youtube.com/watch?v=VVEO_J1tIXU",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Butt Kicks",
+            link: "https://www.youtube.com/watch?v=vXVPvY1UbJI",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Skipping Without Rope",
+            link: "https://www.youtube.com/watch?v=CYGeazlNbU4",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Side Hop",
+            link: "https://www.youtube.com/watch?v=nYmUEJIBj3c",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Quick Feet",
+            link: "https://www.youtube.com/watch?v=fz59j4a3QMQ",
+            type: "timer",
+            complete: false
+          }
+        ]
+      },
+      {
+        title: "Mobility/Recovery Circuit",
+        description: "Mobility and recovery focused circuit from Bodyweight Complete exercises.",
+        time: 35,
+        restTime: 20,
+        isCollapsed: true,
+        excersizes: [
+          {
+            title: "Cobra Stretch",
+            link: "https://www.youtube.com/watch?v=z21McHHOpAg",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Chest Stretch",
+            link: "https://www.youtube.com/watch?v=NS64IgKUyeY",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Lying Twist Stretch Left",
+            link: "https://www.youtube.com/watch?v=ZI-j_POtzlU",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Lying Twist Stretch Right",
+            link: "https://www.youtube.com/watch?v=ZI-j_POtzlU",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Biceps Stretch Left",
+            link: "https://www.youtube.com/watch?v=jw8EXo5h0ec",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Biceps Stretch Right",
+            link: "https://www.youtube.com/watch?v=jw8EXo5h0ec",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Triceps Stretch Left",
+            link: "https://www.youtube.com/watch?v=L9IGOcrdcFk",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Triceps Stretch Right",
+            link: "https://www.youtube.com/watch?v=L9IGOcrdcFk",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Shoulder Stretch",
+            link: "https://www.youtube.com/watch?v=9k0EN2RCGgU",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Child Pose",
+            link: "https://www.youtube.com/watch?v=DMwRPGMPB10",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Cat Cow Pose",
+            link: "https://www.youtube.com/watch?v=w_UKcI1Ftn8",
+            type: "timer",
+            complete: false
+          },
+          {
+            title: "Downward Facing Dog",
+            link: "https://www.youtube.com/watch?v=ahBd-oI76Zs",
             type: "timer",
             complete: false
           }

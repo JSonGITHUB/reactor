@@ -5,8 +5,6 @@ const API_URL = 'https://api.mymemory.translated.net/get';
 // Example API (Paid)
 //const API_URL = "https://translation.googleapis.com/language/translate/v2"; 
 
-const API_KEY = ''; // Add API key if using a paid service
-
 const Translator = () => {
   const languageOptions = [
     { code: 'en', label: 'English' },

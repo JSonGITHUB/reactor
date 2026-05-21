@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import parser from 'xml2js';
 
+const isLocalDev = typeof window !== 'undefined' && window.location?.hostname === 'localhost';
+const NDBC_BASE = isLocalDev ? '/api/ndbc' : 'https://www.ndbc.noaa.gov';
+
 const RssFeedComponent = () => {
     const [rssData, setRssData] = useState(null);
 
     useEffect(() => {
         const fetchRssData = async () => {
             try {
-                // Using cors-anywhere to avoid CORS issues
-                const corsAnywhereUrl = 'https://cors-anywhere.herokuapp.com/';
-                const rssUrl = 'https://www.ndbc.noaa.gov/data/latest_obs/46274.rss';
-
-                const response = await fetch(`${corsAnywhereUrl}${rssUrl}`);
+                const rssUrl = `${NDBC_BASE}/data/latest_obs/46274.rss`;
+                const response = await fetch(rssUrl);
                 const xmlText = await response.text();
 
                 // Parse the XML data using xml2js

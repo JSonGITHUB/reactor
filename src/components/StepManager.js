@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import debounce from 'lodash/debounce';
 import getKey from './utils/KeyGenerator';
 import initializeData from './utils/InitializeData';
 import CollapseToggleButton from './utils/CollapseToggleButton';
@@ -68,14 +67,14 @@ const StepManager = () => {
       setCurrentSchedule(stepSchedules[scheduleIndex]);
       setSteps(updatedSteps());
     }
-  }, [scheduleIndex]);
+  }, [scheduleIndex]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (stepSchedules.length > 0) {
       setCurrentSchedule(stepSchedules[scheduleIndex]);
       console.log(`StepManager => updatedSteps(): ${JSON.stringify(updatedSteps(), null, 2)}`);
       setSteps(updatedSteps())
     }
-  }, [stepSchedules]);
+  }, [stepSchedules]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const storedState = JSON.parse(localStorage.getItem('stepManagerState'));
@@ -98,7 +97,7 @@ const StepManager = () => {
       }
     }
     setSteps(updatedSteps());
-  }, [stepSchedules]);
+  }, [stepSchedules]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (isRunning) {
@@ -119,7 +118,7 @@ const StepManager = () => {
     localStorage.setItem('stepManagerState', JSON.stringify(stateToStore));
     localStorage.setItem('currentStep', currentStepIndex);
     setSteps(updatedSteps())
-  }, [currentStepIndex]);
+  }, [currentStepIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     localStorage.setItem('stepSchedules', JSON.stringify(stepSchedules));
@@ -129,7 +128,7 @@ const StepManager = () => {
     if (currentTimer <= 0 && isRunning) {
       handleNextStep();
     }
-  }, [currentTimer, isRunning]);
+  }, [currentTimer, isRunning]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const handleBeforeUnload = () => {

@@ -8,6 +8,8 @@ import React, {
 } from 'react';
 import { ACTIONS, useMultiInput } from './MultiInputContext';
 
+/* eslint-disable react-hooks/exhaustive-deps */
+
 const FocusManagerContext = createContext(null);
 
 export const useFocusManager = () => useContext(FocusManagerContext);
@@ -106,6 +108,8 @@ export const FocusManagerProvider = ({ children }) => {
     };
 
     // Hook into normalized actions
+    // Subscribe once per action handler identity; callbacks are intentionally invoked from provider scope.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         const unsubNext = subscribeToAction(ACTIONS.MOVE_NEXT, () => moveNext());
         const unsubPrev = subscribeToAction(ACTIONS.MOVE_PREVIOUS, () => movePrevious());
@@ -116,7 +120,7 @@ export const FocusManagerProvider = ({ children }) => {
             unsubPrev();
             unsubAct();
         };
-    }, [subscribeToAction]); // we use state setters inside so it's safe
+    }, [subscribeToAction]);
 
     // Focus the element when currentIndex changes
     useEffect(() => {

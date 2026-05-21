@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import initializeData from './initializeData';
 import { newDate } from '../utils/Dates';
-import CollapseToggleButton from '../utils/CollapseToggleButton';
 import icons from '../site/icons';
 
 const categories = [
@@ -17,10 +16,10 @@ const categories = [
 
 const BusinessTax = () => {
     const today = () => newDate();
-    const [income, setIncome] = useState();
+    const [income, setIncome] = useState('');
     const [expenses, setExpenses] = useState([]);
     const [entry, setEntry] = useState({ date: today(), category: '', amount: '', notes: '' });
-    const [edit, setEdit] = useState({ date: today(), category: '', amount: '', notes: '' });
+    const [edit] = useState({ date: today(), category: '', amount: '', notes: '' });
     const [activeTab, setActiveTab] = useState('tracker');
     const [editIndex, setEditIndex] = useState();
     const [addCollapse, setAddCollapse] = useState(true);
@@ -28,9 +27,6 @@ const BusinessTax = () => {
     const handleChange = (e) => {
         const { name, id, value } = e.target;
         
-        console.log(`BusinessTax => handleChage => id: ${id}`);
-        console.log(`BusinessTax => handleChage => name: ${name}`);
-        console.log(`BusinessTax => handleChage => name: value: ${ value }`);
 
 
         if (name === 'income') {
@@ -74,19 +70,15 @@ const BusinessTax = () => {
     });
     useEffect(() => {
         const localIncome = initializeData('taxIncome', 0);
-        console.log(`BusinessTax => useEffect => localIncome: ${localIncome}`);
-        setIncome(localIncome);
+        setIncome(localIncome ?? '');
         const localExpenses = initializeData('taxExpenses', []);
         setExpenses(localExpenses);
         const localEditIndex = initializeData('taxEditIndex', null);
         setEditIndex(localEditIndex);
-        console.log(`BusinessTax => useEffect => today: ${JSON.stringify(today(),null,2)}`);
     }, []);
     useEffect(() => {
-        console.log(`BusinessTax => useEffect => entry: ${JSON.stringify(entry, null, 2)}`);
     }, [entry]);
     useEffect(() => {
-        console.log(`BusinessTax => useEffect => edit: ${JSON.stringify(edit, null, 2)}`);
     }, [edit]);
     useEffect(() => {
         localStorage.setItem('taxIncome', income);
@@ -98,30 +90,26 @@ const BusinessTax = () => {
         localStorage.setItem('taxEditIndex', editIndex);
     }, [editIndex]);
 
-    const isEven = (index) => {
-        return index % 2 === 0;
-    }
-    
     return (
         <div className='tax-tracker containerDetail mt--30'>
             <div className='containerDetail color-lite bg-dkGreen m-5 p-22 size30 contentLeft'>
-                <span className='m-5 text-outline-light'>{icons.businesstax}</span> Business Tax
+                <span className='m-5 text-outline-lite'>{icons.businesstax}</span> Business Tax
             </div>
-            <div className='tabs containerBox flexContainer bg-dkGreen'>
+            <div className='tabs containerDetail m-5 size20 bg-lite color-lite flexContainer bg-dkGreen'>
                 <div 
-                    className='containerBox button flex3Column bg-green' 
+                    className='containerDetail m-5 size20 bg-lite color-yellow button flex3Column bg-green' 
                     onClick={() => setActiveTab('tracker')}
                 >
                     Expense Tracker
                 </div>
                 <div 
-                    className='containerBox button flex3Column bg-green' 
+                    className='containerDetail m-5 size20 bg-lite color-yellow button flex3Column bg-green' 
                     onClick={() => setActiveTab('summary')}
                 >
                     Summary
                 </div>
                 <div 
-                    className='containerBox button flex3Column bg-green' 
+                    className='containerDetail m-5 size20 bg-lite color-yellow button flex3Column bg-green' 
                     onClick={() => setActiveTab('quarterly')}
                 >
                     Quarterly Estimate
@@ -130,31 +118,31 @@ const BusinessTax = () => {
 
             {activeTab === 'tracker' && (
                 <div className='tracker-tab'>
-                    <div className='containerBox flexContainer bg-lite'>
-                        <div className='containerDetail p-15 m-5 flexColumn contentRight color-yellow b size30'>
+                    <div className='containerDetail p-15 m-5 size20 bg-lite color-lite flexContainer bg-lite'>
+                        <div className='containerDetail p-15 m-5 flex2Column contentRight color-yellow b size20'>
                             Quarterly income: 
                         </div>
                         <input
-                            className='flex2Column containerDetail button w-100 m-5 p-10 color-lite'
+                            className='flexColumn containerDetail button w-100 m-5 p-10 color-lite'
                             name='income'
-                            value={income}
+                            value={income ?? ''}
                             onChange={handleChange}
                             placeholder={income || 0}
                         />
                     </div>
-                    <div className='containerBox'>
+                    <div className=''>
                     {
                         (!addCollapse)
                         ? null
-                        : <div className='containerBox button contentLeft' onClick={() => setAddCollapse(false)}>
-                            <span className='color-yellow bold size30'>➕ Add Expense</span>
+                        : <div className='containerDetail p-15 m-5 size20 bg-lite color-lite button contentLeft bg-green' onClick={() => setAddCollapse(false)}>
+                                    <span className='color-yellow bold size30'><span className='text-outline-lite'>➕</span> Add Expense</span>
                         </div>
                     }
                     {
                         (addCollapse)
                         ? null
-                        : <div className='containerBox bg-lite'>
-                            <div className='input-row containerBox flexContainer'>
+                        : <div className='containerDetail p-15 m-5 size20 bg-lite color-lite bg-lite'>
+                            <div className='input-row containerDetail p-15 m-5 size20 bg-lite color-lite flexContainer'>
                                 <input 
                                     className='containerDetail button flex2Column w-100 m-5 p-10 color-lite' 
                                     name='date' 
@@ -171,22 +159,22 @@ const BusinessTax = () => {
                                     type='number' 
                                 />
                             </div>
-                            <div className='input-row containerBox'>
+                            <div className='input-row containerDetail p-15 m-5 size20 bg-lite color-lite'>
                                 <input 
                                     className='containerDetail button p-10 color-lite width-100-percent' 
                                     name='category' 
                                     value={entry.category} 
                                     onChange={handleChange} 
                                     placeholder='Category' 
-                                    list='category-list' 
+                                    list='category-list-add' 
                                 />
                             </div>
-                            <datalist id='category-list'>
+                            <datalist id='category-list-add'>
                                 {categories.map((c) => (
                                     <option key={c} value={c} />
                                 ))}
                             </datalist>
-                            <div className='containerBox'>
+                            <div className='containerDetail p-15 m-5 size20 bg-lite color-lite'>
                                 <input 
                                     className='containerDetail button p-10 color-lite width-100-percent' 
                                     name='notes' 
@@ -196,13 +184,13 @@ const BusinessTax = () => {
                                 />
                             </div>
                             <div 
-                                className='containerBox button bg-green' 
+                                className='containerDetail p-15 m-5 size20 bg-lite color-lite button bg-green' 
                                 onClick={addExpense}
                             >
                                 Add Expense
                             </div>
                             <div 
-                                className='containerBox button bg-green' 
+                                className='containerDetail p-15 m-5 size20 bg-lite color-lite button bg-green' 
                                 onClick={() => setAddCollapse(true)}
                             >
                                 Cancel
@@ -210,11 +198,11 @@ const BusinessTax = () => {
                         </div>
                     }
                     </div>
-                    <div className='containerBox'>
+                    <div className='size20 color-lite'>
                         {expenses.map((e, idx) => (
-                            <div className='containerBox contentLeft bg-lite' key={idx}>
-                                <div className='containerDetail button'>
-                                    <div className='containerDetail flexContainer color-yellow bg-lite' onClick={() => setEditIndex((editIndex === idx) ? null : idx)}>
+                            <div className='size20 color-lite contentLeft mb-5' key={idx}>
+                                <div className='containerDetail button bg-lite'>
+                                    <div className='containerDetail flexContainer color-dark bg-yellow' onClick={() => setEditIndex((editIndex === idx) ? null : idx)}>
                                         <div className='flex2Column pt-15 pl-10'>
                                             {e.date || '(No Date)'}
                                         </div>
@@ -234,20 +222,23 @@ const BusinessTax = () => {
                                         </div>
                                         
                                     </div>
-                                    <div className='containerBox color-graphite' onClick={() => setEditIndex((editIndex === idx) ? null : idx)}>
-                                        {e.category}:
+                                     <div className='flexContainer'>
+                                        <div className='containerDetail flex2Column p-15 mt-5 size20 bg-lite color-lite color-graphite' onClick={() => setEditIndex((editIndex === idx) ? null : idx)}>
+                                            {e.category}:
+                                        </div>
+                                        <div className='containerDetail flex2Column p-15 ml-5 mt-5 size20 bg-lite color-lite button i color-graphite' onClick={() => setEditIndex((editIndex === idx) ? null : idx)}>
+                                            {e.notes}
+                                        </div>
                                     </div>
-                                    <div className='containerBox' onClick={() => setEditIndex((editIndex === idx) ? null : idx)}>
+                                    <div className='containerDetail p-15 mt-5 size20 bg-lite color-yellow' onClick={() => setEditIndex((editIndex === idx) ? null : idx)}>
                                         ${e.amount.toFixed(2)}
                                     </div>
-                                    <div className='containerBox button i color-graphite' onClick={() => setEditIndex((editIndex === idx) ? null : idx)}>
-                                        {e.notes}
-                                    </div>
+                                    
                                 </div>
                                 {
                                     (editIndex === idx)
-                                    ? <div className='containerBox bg-lite mt-20'>
-                                        <div className='containerBox flexContainer'>
+                                    ? <div className='containerDetail p-15 m-5 size20 bg-lite color-lite bg-lite mt-20'>
+                                        <div className='containerDetail p-15 m-5 size20 bg-lite color-lite flexContainer'>
                                             <div className='flex2Column contentRight color-yellow'>
                                                 <div className='p-15 m-5'>
                                                     Date:
@@ -258,13 +249,13 @@ const BusinessTax = () => {
                                                         className='containerDetail button flex5Column m-5 p-10 color-lite width-100-percent' 
                                                         id={idx}
                                                         name='edit-date' 
-                                                        value={e.date} 
+                                                        value={e.date ?? ''} 
                                                         onChange={handleChange} 
                                                         placeholder='Date' 
                                                     />
                                             </div>
                                         </div>
-                                        <div className='containerBox flexContainer'>
+                                        <div className='containerDetail p-15 m-5 size20 bg-lite color-lite flexContainer'>
                                             <div className='flex2Column contentRight color-yellow'>
                                                 <div className='p-15 m-5'>
                                                     Category:
@@ -275,14 +266,14 @@ const BusinessTax = () => {
                                                         className='containerDetail button flex5Column m-5 p-10 color-lite width-100-percent' 
                                                         id={idx}
                                                         name='edit-category' 
-                                                        value={e.category} 
+                                                        value={e.category ?? ''} 
                                                         onChange={handleChange} 
                                                         placeholder='Category' 
-                                                        list='category-list' 
+                                                        list='category-list-edit' 
                                                     />
                                             </div> 
                                         </div>
-                                        <div className='containerBox flexContainer'>
+                                        <div className='containerDetail p-15 m-5 size20 bg-lite color-lite flexContainer'>
                                             <div className='flex2Column contentRight color-yellow'>
                                                 <div className='p-15 m-5'>
                                                     Amount:
@@ -293,14 +284,14 @@ const BusinessTax = () => {
                                                     className='containerDetail button flex5Column m-5 p-10 color-lite width-100-percent' 
                                                     id={idx}
                                                     name='edit-amount' 
-                                                    value={Number(e.amount)} 
+                                                    value={e.amount ?? ''} 
                                                     onChange={handleChange} 
                                                     placeholder='Amount' 
                                                     type='number' 
                                                 />
                                             </div>
                                         </div>
-                                        <div className='containerBox  flexContainer'>
+                                        <div className='containerDetail p-15 m-5 size20 bg-lite color-lite  flexContainer'>
                                             <div className='flex2Column contentRight color-yellow'>
                                                 <div className='p-15 m-5'>
                                                     Notes:
@@ -311,20 +302,20 @@ const BusinessTax = () => {
                                                     className='containerDetail button flex5Column m-5 p-10 color-lite width-100-percent' 
                                                     id={idx}
                                                     name='edit-notes' 
-                                                    value={e.notes} 
+                                                    value={e.notes ?? ''} 
                                                     onChange={handleChange} 
                                                     placeholder='Notes' 
                                                 />
                                             </div>
                                         </div>
-                                        <div className='input-row containerBox flexContainer'>
-                                            <datalist id='category-list'>
+                                        <div className='input-row containerDetail p-15 m-5 size20 bg-lite color-lite flexContainer'>
+                                            <datalist id='category-list-edit'>
                                                 {categories.map((c) => (
                                                     <option key={c} value={c} />
                                                 ))}
                                             </datalist>
                                         </div>
-                                        <div className='containerBox bg-green color-lite button contentCenter' onClick={() => setEditIndex((editIndex === idx) ? null : idx)}>
+                                        <div className='containerDetail p-15 m-5 size20 bg-lite color-lite bg-green color-lite button contentCenter' onClick={() => setEditIndex((editIndex === idx) ? null : idx)}>
                                             submit
                                         </div>
                                     </div>
@@ -350,15 +341,15 @@ const BusinessTax = () => {
             )}
 
             {activeTab === 'quarterly' && (
-                <div className='containerBox h-scroll'>
+                <div className='containerDetail p-15 m-5 size20 bg-lite color-lite h-scroll'>
                     <table className='width-100-percent'>
                         <thead>
                             <tr className='bg-dkGreen text-left'>
-                                <th className='containerBox color-yellow'>Quarter</th>
-                                <th className='containerBox color-yellow'>Estimated Income</th>
-                                <th className='containerBox color-yellow'>Estimated Expenses</th>
-                                <th className='containerBox color-yellow'>Taxable Income</th>
-                                <th className='containerBox color-yellow'>Estimated Tax (25%)</th>
+                                <th className='containerDetail p-15 m-5 size20 bg-lite color-lite color-yellow'>Quarter</th>
+                                <th className='containerDetail p-15 m-5 size20 bg-lite color-lite color-yellow'>Estimated Income</th>
+                                <th className='containerDetail p-15 m-5 size20 bg-lite color-lite color-yellow'>Estimated Expenses</th>
+                                <th className='containerDetail p-15 m-5 size20 bg-lite color-lite color-yellow'>Taxable Income</th>
+                                <th className='containerDetail p-15 m-5 size20 bg-lite color-lite color-yellow'>Estimated Tax (25%)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -367,11 +358,11 @@ const BusinessTax = () => {
                                     key={q.quarter}
                                     className={index % 2 === 0 ? 'bg-lite' : 'bg-blue text-white'}
                                 >
-                                    <td className='containerBox font-bold'>{q.quarter}</td>
-                                    <td className='containerBox'>${q.income.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                                    <td className='containerBox'>${q.expenses.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                                    <td className='containerBox'>${q.taxable.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                                    <td className='containerBox text-yellow'>${q.tax.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                    <td className='containerDetail p-15 m-5 size20 bg-lite color-lite font-bold'>{q.quarter}</td>
+                                    <td className='containerDetail p-15 m-5 size20 bg-lite color-lite'>${q.income.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                    <td className='containerDetail p-15 m-5 size20 bg-lite color-lite'>${q.expenses.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                    <td className='containerDetail p-15 m-5 size20 bg-lite color-lite'>${q.taxable.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                    <td className='containerDetail p-15 m-5 size20 bg-lite color-lite text-yellow'>${q.tax.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                                 </tr>
                             ))}
                         </tbody>

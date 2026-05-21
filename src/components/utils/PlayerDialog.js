@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useContext } from 'react';
 import { PlayerContext } from '../context/PlayerContext';
-import initializeData from './InitializeData';
-import { initNewPlayer, initPlayers } from '../games/scorekeeper/PlayerInit';
+import { initNewPlayer } from '../games/scorekeeper/PlayerInit';
 import getKey from './KeyGenerator';
 import icons from '../site/icons';
 
@@ -13,16 +12,8 @@ const PlayerDialog = ({
 
     const {
         players,
-        setPlayers,
-        playersInGame
+        setPlayers
     } = useContext(PlayerContext);
-
-    const [gamePlayers, setGamePlayers] = useState();
-
-    useEffect(() => {
-        const playerArray = [...players || initializeData('players', initPlayers)];
-        setGamePlayers(playerArray);
-    }, []);
 
     const newPlayer = () => {
         const newPlayer = prompt('Enter new name', '');
@@ -30,9 +21,7 @@ const PlayerDialog = ({
         let newPlayers = [...players];
         if (newPlayer !== null) {
             newPlayers.push(initializedNewPlayer);
-            if (newPlayers != []) {
-                setPlayers(newPlayers);
-            }
+            setPlayers(newPlayers);
             onClose();
         }
     }
@@ -49,8 +38,7 @@ const PlayerDialog = ({
 
     const handleSubmit = () => {
         console.log('PlayerDialog => handleSubmit')
-        console.log(`gamePlayers: ${JSON.stringify(gamePlayers, null, 2)}`);
-        //setPlayers(gamePlayers);
+        console.log(`players: ${JSON.stringify(players, null, 2)}`);
         onClose();
     };
 
@@ -60,9 +48,11 @@ const PlayerDialog = ({
 
     const togglePlayer = (index) => {
         const newPlayers = [...players];
-        newPlayers[index][game] = !newPlayers[index][game];
-        const udatedGamePlayers = newPlayers.filter(player => player[game] === true);
-        setGamePlayers(udatedGamePlayers);
+        newPlayers[index] = {
+            ...newPlayers[index],
+            [game]: !newPlayers[index][game]
+        };
+        setPlayers(newPlayers);
     }
 
     if (!isOpen) return null;

@@ -2,9 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Sounds from './Sounds';
 import getKey from '../utils/KeyGenerator';
 import Selector from '../forms/FunctionalSelector';
-import Breathing from '../breathing/Breathing';
-import BreathingPath from '../breathing/BreathingPath';
-import AnimatedLine from '../breathing/AnimatedLine';
 import LoungeBeatPlayer from './LoungeBeatPlayer';
 import DogWhistle from './DogWhistle';
 import icons from '../site/icons';
@@ -100,6 +97,10 @@ const SoundBoard = () => {
             sound: 'water'
         },
         {
+            title: 'Soft Bell',
+            sound: 'playSoftBell'
+        },
+        {
             title: 'Boop',
             sound: 'boop'
         },
@@ -110,10 +111,6 @@ const SoundBoard = () => {
         {
             title: 'Bell',
             sound: 'bell'
-        },
-        {
-            title: 'Soft Bell',
-            sound: 'softBell'
         },
         {
             title: 'Purr',
@@ -130,6 +127,10 @@ const SoundBoard = () => {
         {
             title: 'Water',
             sound: 'water'
+        },
+        {
+            title: 'Soft Bell',
+            sound: 'softBell'
         },
         {
             title: 'Ping',

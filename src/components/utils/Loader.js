@@ -20,14 +20,14 @@ const Loader = props => {
     return (
         <div onClick={() => waveFinder()}>
             <div className="ml--28">
-                <img id="shaka" src={shakaBlack} className={shakaClass} alt="js" />
+                <img id="utils-shaka" src={shakaBlack} className={shakaClass} alt="js" />
             </div>
             <div className="flexContainer width-100-percent">
                 <div className="flex3Column height200" />
                 <div className="flex3Column height200">
-                    <img id="logo1" src={logoRed} className={logo1Class} alt="logoRed" />
-                    <img id="logo2" src={logoYellow} className={logo2Class} alt="logoYellow" />
-                    <img id="logo3" src={logoGreen} className={logo3Class} alt="logoGreen" />
+                    <img id="utils-logo1" src={logoRed} className={logo1Class} alt="logoRed" />
+                    <img id="utils-logo2" src={logoYellow} className={logo2Class} alt="logoYellow" />
+                    <img id="utils-logo3" src={logoGreen} className={logo3Class} alt="logoGreen" />
                 </div>
                 <div className="flex3Column height200" />
             </div>

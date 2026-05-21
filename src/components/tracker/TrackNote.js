@@ -1,7 +1,6 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import initNoteTracking from './initNoteTracking';
 import NoteGroup from './NoteGroup';
-import getKey from '../utils/KeyGenerator';
 import initializeData from '../utils/InitializeData';
 
 const TrackNote = ({
@@ -16,19 +15,16 @@ const TrackNote = ({
             setNotes(initNoteTracking);
         }
         localStorage.setItem('noteTracking', JSON.stringify(notes));
-    }, [notes]);
+    }, [notes, setNotes]);
 
     useEffect(() => {
-        console.log(`notes1: ${JSON.stringify(notes, null, 2)}`)
-        console.log(`notes2: ${localStorage.getItem('noteTracking')}`)
         const storedNotes = (notes !== null) ? notes : initializeData('noteTracking', initNoteTracking);
-        console.log(`storedNotes: ${JSON.stringify(storedNotes, null, 2)}`)
         if (storedNotes) {
             setNotes(storedNotes);
         } else {
             setNotes(initNoteTracking);
         }
-    }, []);
+    }, [notes, setNotes]);
 
     const notNull = (value) => (value !== null) ? true : false;
     const notEmpty = (value) => (value !== "") ? true : false;
@@ -69,7 +65,7 @@ const TrackNote = ({
     return (
             <div>
                 {notes.map((noteGroup, noteGroupIndex) => (
-                    <div key={getKey(`noteGroup${noteGroupIndex}`)}>
+                    <div key={`note-group-${noteGroupIndex}-${String(noteGroup?.title || 'group')}`}>
                         <NoteGroup
                             notes={notes}
                             setNotes={setNotes}

@@ -2,10 +2,38 @@ import React, { useState, useEffect, useRef } from 'react';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
 import initializeData from '../utils/InitializeData';
 //import InventoryManager from './InventoryManager';
+const HOUSE_FOCUS_TASK_KEY = 'houseFocusTaskKey';
+const makeTaskKey = (task) => `${task.description || ''}|${task.nextDue || ''}`;
+const CATEGORIES_INIT = ['Kitchen', 'Garage', 'Electronics', 'Bathroom'];
+const createEmptyInventoryItem = () => ({ name: '', category: '', quantity: 1, notes: '', value: '', photos: [] });
+
+const normalizeInventoryPhoto = (photo) => ({
+    id: photo?.id,
+    name: photo?.name || 'photo',
+    size: Number(photo?.size) || 0,
+    type: photo?.type || 'image/*',
+    lastModified: Number(photo?.lastModified) || Date.now(),
+    url: photo?.url || '',
+});
+
+const normalizeInventoryItem = (item) => ({
+    ...item,
+    photos: Array.isArray(item?.photos)
+        ? item.photos.filter((photo) => photo?.url).map(normalizeInventoryPhoto)
+        : [],
+});
+
 // LocalStorage helpers
 const getStoredInventory = () => {
     const stored = localStorage.getItem('homeInventory');
-    return stored ? JSON.parse(stored) : [];
+    if (!stored) return [];
+    try {
+        const parsed = JSON.parse(stored);
+        return Array.isArray(parsed) ? parsed.map(normalizeInventoryItem) : [];
+    } catch (error) {
+        console.error('Unable to parse homeInventory from localStorage:', error);
+        return [];
+    }
 };
 
 const saveInventory = (inventory) => {
@@ -29,14 +57,20 @@ const getStoredFutureTasks = () => {
 
 const Dashboard = () => {
     const taskRefs = useRef([]);
-    const categoriesInit = ['Kitchen', 'Garage', 'Electronics', 'Bathroom']
+    const inventoryPhotoInputRef = useRef(null);
     const [inventory, setInventory] = useState(getStoredInventory());
     const [inventoryDisplay, setInventoryDisplay] = useState(true);
     const [categories, setCategories] = useState();
-    const [newItem, setNewItem] = useState({ name: '', category: '', quantity: 1, notes: '' });
+    const [newItem, setNewItem] = useState(createEmptyInventoryItem());
+    const [expandedDraftPhoto, setExpandedDraftPhoto] = useState(null);
+    const [inventoryPhotoEditMode, setInventoryPhotoEditMode] = useState(false);
+    const [isInventoryPhotoRowCollapsed, setIsInventoryPhotoRowCollapsed] = useState(true);
+    const [expandedItemPhoto, setExpandedItemPhoto] = useState(null);
+    const [inventoryItemPhotoEditMode, setInventoryItemPhotoEditMode] = useState({});
+    const [inventoryItemPhotoRowCollapsed, setInventoryItemPhotoRowCollapsed] = useState({});
     const [filterCategory, setFilterCategory] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
-    const [newCategory, setNewCategory] = useState('');
+    const [, setNewCategory] = useState('');
     const [inventoryForm, setInventoryForm] = useState(true);
     const [tasks, setTasks] = useState(getStoredTasks());
     const [masterTasks, setMasterTasks] = useState(getStoredMasterTasks());
@@ -44,25 +78,84 @@ const Dashboard = () => {
     const [newTask, setNewTask] = useState({ description: '', category: '', recurrence: 'Weekly', nextDue: new Date().toISOString().slice(0, 10) });
     const [searchMaintenance, setSearchMaintenance] = useState('');
     const [filterCompleted, setFilterCompleted] = useState('All');
-    const [maintenanceDisplay, setMaintenanceDisplay] = useState(true);
+    const [maintenanceDisplay, setMaintenanceDisplay] = useState(false);
     const [masterTasksDisplay, setMasterTasksDisplay] = useState(true);
     const [addTaskCollapse, setAddTaskCollapse] = useState(true);
     const [inventoryEdit, setInventoryEdit] = useState(-1);
     const [filteredTasks, setFilteredTasks] = useState([]);
     const [editTaskIndex, setEditTaskIndex] = useState(-1);
     const [editTask, setEditTask] = useState(null);
-
+    const [focusTaskKey, setFocusTaskKey] = useState('');
+    
     useEffect(() => {
+        if (!maintenanceDisplay) return;
         if (!filteredTasks.length) return;
+        if (focusTaskKey) return;
         const todayStr = new Date().toISOString().slice(0, 10);
         let scrollIdx = filteredTasks.findIndex(task => task.nextDue >= todayStr && !task.completed);
+        console.log(`Dashboard => useEffect => scrollIdx: ${scrollIdx}, focusTaskKey: ${focusTaskKey}`);
         if (scrollIdx === -1) {
             scrollIdx = filteredTasks.length - 1;
         }
         if (taskRefs.current[scrollIdx]) {
             taskRefs.current[scrollIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-    }, [filteredTasks]);
+    }, [maintenanceDisplay, filteredTasks, focusTaskKey]);
+    
+    useEffect(() => {
+        const focusFromStorage = () => {
+            const key = localStorage.getItem(HOUSE_FOCUS_TASK_KEY) || '';
+            if (!key) return;
+            setMaintenanceDisplay(false);
+            setFilterCompleted('All');
+            setSearchMaintenance('');
+            setFocusTaskKey(key);
+        };
+
+        focusFromStorage();
+        window.addEventListener('house-focus-task', focusFromStorage);
+        window.addEventListener('focus', focusFromStorage);
+        return () => {
+            window.removeEventListener('house-focus-task', focusFromStorage);
+            window.removeEventListener('focus', focusFromStorage);
+        };
+    }, []);
+    
+    useEffect(() => {
+        if (!focusTaskKey || !filteredTasks.length) return;
+        const targetIndex = filteredTasks.findIndex((task) => makeTaskKey(task) === focusTaskKey);
+        console.log(`Dashboard => useEffect => focusTaskKey: ${focusTaskKey}, targetIndex: ${targetIndex}`);
+        if (targetIndex < 0) {
+            const todayStr = new Date().toISOString().slice(0, 10);
+            let fallbackIndex = filteredTasks.findIndex(task => task.nextDue >= todayStr && !task.completed);
+            if (fallbackIndex === -1) {
+                fallbackIndex = filteredTasks.length - 1;
+            }
+            const fallbackTarget = taskRefs.current[fallbackIndex];
+            if (fallbackTarget) {
+                fallbackTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                fallbackTarget.classList.add('bg-lite');
+                setTimeout(() => fallbackTarget.classList.remove('bg-lite'), 1800);
+            }
+            localStorage.removeItem(HOUSE_FOCUS_TASK_KEY);
+            setFocusTaskKey('');
+            return;
+        }
+
+        const target = taskRefs.current[targetIndex];
+
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            target.classList.add('bg-lite');
+            const timeout = setTimeout(() => {
+                target.classList.remove('bg-lite');
+            }, 1800);
+            localStorage.removeItem(HOUSE_FOCUS_TASK_KEY);
+            setFocusTaskKey('');
+            return () => clearTimeout(timeout);
+        }
+    }, [filteredTasks, focusTaskKey]);
+    
     useEffect(() => saveInventory(inventory), [inventory]);
     useEffect(() => {
         localStorage.setItem('maintenanceTasks', JSON.stringify(futureTasks));
@@ -77,13 +170,13 @@ const Dashboard = () => {
         setFilteredTasks(newFilteredTasks);
     }, [futureTasks, searchMaintenance, filterCompleted]);
     useEffect(() => {
-        const initializedCategories = initializeData('inventoryCategories', categoriesInit);
+        const initializedCategories = initializeData('inventoryCategories', CATEGORIES_INIT);
         setCategories(initializedCategories);
     }, []);
     useEffect(() => {
         const newCategories = [];
-        if (categoriesInit && categoriesInit.length > 0) {
-            categoriesInit.forEach(cat => {
+        if (CATEGORIES_INIT && CATEGORIES_INIT.length > 0) {
+            CATEGORIES_INIT.forEach(cat => {
                 if (!newCategories.includes(cat)) {
                     newCategories.push(cat);
                 }
@@ -103,30 +196,118 @@ const Dashboard = () => {
             localStorage.setItem('inventoryCategories', JSON.stringify(categories));
         }
     }, [categories]);
+
+    const isImageLikeFile = (file) => {
+        const mime = String(file?.type || '').toLowerCase();
+        if (mime.startsWith('image/')) return true;
+        return /\.(jpg|jpeg|png|gif|webp|bmp|svg|heic|heif|avif|tiff?)$/i.test(String(file?.name || ''));
+    };
+
+    const buildPhotoId = (file) => {
+        const relativePath = String(file?.webkitRelativePath || file?.relativePath || '').replace(/\\/g, '/');
+        return `${relativePath || file.name}-${file.size}-${file.lastModified}`;
+    };
+
+    const formatBytes = (bytes) => {
+        if (!Number.isFinite(bytes) || bytes <= 0) return '--';
+        if (bytes < 1024) return `${bytes} B`;
+        if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    };
+
+    const fileToDataUrl = (file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ''));
+        reader.onerror = () => reject(new Error('Unable to read file.'));
+        reader.readAsDataURL(file);
+    });
+
+    const addInventoryPhotos = async (fileList) => {
+        const files = Array.from(fileList || []).filter(isImageLikeFile);
+        if (files.length === 0) return;
+
+        const existingIds = new Set((newItem.photos || []).map((photo) => photo.id));
+        const newPhotos = [];
+
+        for (const file of files) {
+            const id = buildPhotoId(file);
+            if (existingIds.has(id)) continue;
+            const url = await fileToDataUrl(file);
+            newPhotos.push({
+                id,
+                name: file.name,
+                size: file.size,
+                type: file.type,
+                lastModified: file.lastModified,
+                url,
+            });
+        }
+
+        if (newPhotos.length > 0) {
+            setNewItem((prev) => ({
+                ...prev,
+                photos: [...(prev.photos || []), ...newPhotos],
+            }));
+        }
+    };
+
+    const removeDraftInventoryPhoto = (id) => {
+        setNewItem((prev) => ({
+            ...prev,
+            photos: (prev.photos || []).filter((photo) => photo.id !== id),
+        }));
+
+        if (expandedDraftPhoto?.id === id) {
+            setExpandedDraftPhoto(null);
+        }
+    };
+
+    const removeInventoryPhotoFromItem = (inventoryIndex, id) => {
+        if (inventoryIndex < 0) return;
+        setInventory((prev) => prev.map((entry, idx) => {
+            if (idx !== inventoryIndex) return entry;
+            return {
+                ...entry,
+                photos: (entry.photos || []).filter((photo) => photo.id !== id),
+            };
+        }));
+
+        if (inventoryEdit === inventoryIndex) {
+            setNewItem((prev) => ({
+                ...prev,
+                photos: (prev.photos || []).filter((photo) => photo.id !== id),
+            }));
+        }
+
+        if (expandedItemPhoto?.inventoryIndex === inventoryIndex && expandedItemPhoto?.id === id) {
+            setExpandedItemPhoto(null);
+        }
+    };
+
     const handleAddInventory = () => {
         console.log(`Dashboard => handleAddInventory => newItem: ${JSON.stringify(newItem, null, 2)}`);
         if (!newItem.name || !newItem.category) return;
         // Avoid duplicates
         //const exists = inventory.some(item => item.name.toLowerCase() === newItem.name.toLowerCase() && item.category === newItem.category);
         //if (!exists) {
-            setInventory([{ ...newItem }, ...inventory]);
+            setInventory([{ ...normalizeInventoryItem(newItem) }, ...inventory]);
         //}
-        setNewItem({ name: '', category: '', quantity: 1, notes: '' });
+        setNewItem(createEmptyInventoryItem());
+        setExpandedDraftPhoto(null);
+        setInventoryPhotoEditMode(false);
+        setIsInventoryPhotoRowCollapsed(true);
     };
     const handleEditInventory = () => {
         const newInventory = [...inventory];
-        newInventory[inventoryEdit] = {...newItem};
+        newInventory[inventoryEdit] = { ...normalizeInventoryItem(newItem) };
         setInventory(newInventory);
         setInventoryEdit(-1);
-        setNewItem({ name: '', category: '', quantity: 1, notes: '' });
+        setNewItem(createEmptyInventoryItem());
+        setExpandedDraftPhoto(null);
+        setInventoryPhotoEditMode(false);
+        setIsInventoryPhotoRowCollapsed(true);
         setInventoryForm(true);
     };
-    const handleAddCategory = (cat) => {
-        if (cat && !categories.includes(cat)) {
-            setCategories([...categories, cat]);
-        }
-    };
-
     // --- Maintenance Handlers ---
     const generateFutureTasks = (task) => {
         const futureTasks = [];
@@ -137,7 +318,6 @@ const Dashboard = () => {
         const endDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
     
         // Prevent infinite loop for invalid recurrence
-        const validRecurrence = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
         let count = 0, maxTasks = 100;
         while (nextDate <= endDate && count < maxTasks) {
             futureTasks.push({
@@ -158,15 +338,6 @@ const Dashboard = () => {
         console.log(`Dashboard => generateFutureTasks => futureTasks: ${JSON.stringify(futureTasks, null, 2)}`);
         return futureTasks;
     };
-    const handleAddTask = () => {
-        console.log(`Dashboard => handleAddTask => newTask: ${JSON.stringify(newTask, null, 2)}`);
-        if (!newTask.description) return;
-        const future = generateFutureTasks(newTask);
-        const combined = [...future, ...tasks].sort((a, b) => new Date(a.nextDue) - new Date(b.nextDue));
-        setTasks(combined);
-        setNewTask({ description: '', category: '', recurrence: 'Weekly', nextDue: new Date().toISOString().slice(0, 10) });
-    };
-
     const toggleTaskCompletion = (index) => {
         const updated = [...futureTasks];
         updated[index].completed = !updated[index].completed;
@@ -273,32 +444,6 @@ const Dashboard = () => {
         setEditTask(null);
     };
 
-    // Edit or delete individual future task
-    const startEditFutureTask = (idx) => {
-        setEditTaskIndex(idx);
-        setEditTask({ ...futureTasks[idx] });
-    };
-    const saveEditedFutureTask = () => {
-        if (editTaskIndex < 0 || !editTask) return;
-        // Mark as detached (converted to one-time)
-        const updatedFuture = [...futureTasks];
-        updatedFuture[editTaskIndex] = {
-            ...editTask,
-            recurrence: 'One-Time',
-            isDetached: true
-        };
-        setFutureTasks(updatedFuture);
-        setEditTaskIndex(-1);
-        setEditTask(null);
-    };
-    const deleteFutureTask = (idx) => {
-        const updatedFuture = [...futureTasks];
-        updatedFuture.splice(idx, 1);
-        setFutureTasks(updatedFuture);
-        setEditTaskIndex(-1);
-        setEditTask(null);
-    };
-
     // Persist master and future tasks
     useEffect(() => {
         localStorage.setItem('masterMaintenanceTasks', JSON.stringify(masterTasks));
@@ -325,7 +470,17 @@ const Dashboard = () => {
         //const newNotes = prompt('notes:', item.notes);
         //const newValue = prompt('value:', item.value);
         //const updated = [...inventory];
-        setNewItem({ name: item.name, category: item.category, quantity: item.quantity, notes: item.notes, value: item.value });
+        setNewItem({
+            name: item.name,
+            category: item.category,
+            quantity: item.quantity,
+            notes: item.notes,
+            value: item.value,
+            photos: Array.isArray(item.photos) ? item.photos.map(normalizeInventoryPhoto) : [],
+        });
+        setExpandedDraftPhoto(null);
+        setInventoryPhotoEditMode(false);
+        setIsInventoryPhotoRowCollapsed(true);
         //updated.splice(index, 1);
         //setInventory(updated);
         setInventoryEdit(index);
@@ -370,16 +525,26 @@ const Dashboard = () => {
                                         {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                                     </select>
                                 </div>
-                                <div className='containerDetail mt-5 mb-5 scrollHeight250'>
+                                <div className='containerDetail mt-5 mb-5 scroll height-500'>
                                 {
                                     filteredInventory.map((item, i) => (
+                                        (() => {
+                                            const inventoryIndex = inventory.findIndex((entry) => entry === item);
+                                            const itemPhotos = Array.isArray(item.photos) ? item.photos : [];
+                                            const expandedForItem = expandedItemPhoto?.inventoryIndex === inventoryIndex
+                                                ? itemPhotos.find((photo) => photo.id === expandedItemPhoto.id)
+                                                : null;
+                                            const isRowCollapsed = inventoryItemPhotoRowCollapsed[inventoryIndex] ?? true;
+                                            const isItemPhotoEditMode = Boolean(inventoryItemPhotoEditMode[inventoryIndex]);
+
+                                            return (
                                         <div key={i} className='containerBox contentLeft bg-lite'>
                                             <div className='containerDetail flexContainer'>
                                                     <div className='color-yellow p-10 m-1 flex2Column'>
                                                     {item.name}
                                                 </div>
                                                 <div className='m-1 flexColumn w-40'>
-                                                    <div className='containerDetail p-10 button size15' onClick={() => deleteInventory(i)}>
+                                                    <div className='containerDetail p-10 button size15' onClick={() => deleteInventory(inventoryIndex)}>
                                                         🗑️
                                                     </div>
                                                 </div>
@@ -399,11 +564,121 @@ const Dashboard = () => {
                                                         ${item.value}
                                                     </div>
                                                     <div className='m-1 flexColumn w-40'>
-                                                        <div className='containerDetail mt--15 p-10 button size15' onClick={() => editInventory(i)}>✏️</div>
+                                                        <div className='containerDetail mt--15 p-10 button size15' onClick={() => editInventory(inventoryIndex)}>✏️</div>
                                                     </div>
                                                 </div>
+                                                {itemPhotos.length > 0 && (
+                                                    <div className='containerDetail bg-dark mt-5 mb-5 p-5'>
+                                                        <div className='containerDetail flexContainer'>
+                                                            <div className='size12 color-soft p-5'>
+                                                                Photos: {itemPhotos.length}
+                                                            </div>
+                                                            <div className='flex2Column ml-5 flexContainer' style={{ alignItems: 'center', gap: 8 }}>
+                                                                <div
+                                                                    className='containerDetail button bg-lite color-yellow p-10 size12'
+                                                                    onClick={() => setInventoryItemPhotoEditMode((prev) => ({
+                                                                        ...prev,
+                                                                        [inventoryIndex]: !prev[inventoryIndex],
+                                                                    }))}
+                                                                    title={isItemPhotoEditMode ? 'Hide remove buttons' : 'Show remove buttons'}
+                                                                >
+                                                                    ✏️
+                                                                </div>
+                                                                <div
+                                                                    className='containerDetail button bg-lite color-yellow p-10 size12'
+                                                                    onClick={() => setInventoryItemPhotoRowCollapsed((prev) => ({
+                                                                        ...prev,
+                                                                        [inventoryIndex]: !(prev[inventoryIndex] ?? true),
+                                                                    }))}
+                                                                    title='Toggle between wrapped grid and single-row horizontal scrolling'
+                                                                >
+                                                                    {isRowCollapsed ? 'Expand Grid' : 'Collapse to Row'}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        {expandedForItem && (
+                                                            <div className='containerDetail bg-dark mb-10'>
+                                                                <img
+                                                                    src={expandedForItem.url}
+                                                                    alt={expandedForItem.name}
+                                                                    style={{
+                                                                        width: '100%',
+                                                                        maxHeight: 220,
+                                                                        objectFit: 'contain',
+                                                                        borderRadius: 4,
+                                                                    }}
+                                                                />
+                                                                <div className='color-soft size12 p-5 contentCenter'>
+                                                                    {expandedForItem.name}
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        <div
+                                                            className='flexContainer mt--15'
+                                                            style={{
+                                                                flexWrap: isRowCollapsed ? 'nowrap' : 'wrap',
+                                                                gap: 8,
+                                                                overflowX: isRowCollapsed ? 'auto' : 'visible',
+                                                                overflowY: 'hidden',
+                                                                paddingBottom: isRowCollapsed ? 6 : 0,
+                                                            }}
+                                                        >
+                                                            {itemPhotos.map((photo) => (
+                                                                <div key={photo.id} style={{ position: 'relative', width: 64, height: 64, flex: '0 0 auto' }}>
+                                                                    <img
+                                                                        src={photo.url}
+                                                                        alt={photo.name}
+                                                                        title={`${photo.name} (${formatBytes(photo.size || 0)})`}
+                                                                        onClick={() => {
+                                                                            setExpandedItemPhoto((prev) => (
+                                                                                prev?.inventoryIndex === inventoryIndex && prev?.id === photo.id
+                                                                                    ? null
+                                                                                    : { inventoryIndex, id: photo.id }
+                                                                            ));
+                                                                        }}
+                                                                        style={{
+                                                                            width: '100%',
+                                                                            height: '100%',
+                                                                            objectFit: 'cover',
+                                                                            borderRadius: 4,
+                                                                            display: 'block',
+                                                                            cursor: 'pointer',
+                                                                            border: expandedForItem?.id === photo.id ? '2px solid #0f0' : '2px solid transparent',
+                                                                        }}
+                                                                    />
+                                                                    {isItemPhotoEditMode && (
+                                                                        <div
+                                                                            className='button'
+                                                                            onClick={() => removeInventoryPhotoFromItem(inventoryIndex, photo.id)}
+                                                                            title='Remove photo'
+                                                                            style={{
+                                                                                position: 'absolute',
+                                                                                top: 2,
+                                                                                right: 2,
+                                                                                background: 'rgba(0,0,0,0.65)',
+                                                                                color: '#fff',
+                                                                                borderRadius: '50%',
+                                                                                width: 20,
+                                                                                height: 20,
+                                                                                display: 'flex',
+                                                                                alignItems: 'center',
+                                                                                justifyContent: 'center',
+                                                                                fontSize: 12,
+                                                                                lineHeight: 1,
+                                                                            }}
+                                                                        >
+                                                                            ✕
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
+                                            );
+                                        })()
                                     ))
                                 }
                                 </div>
@@ -418,7 +693,7 @@ const Dashboard = () => {
                                             (inventoryEdit > -1)
                                                 ? '✏️ Edit Inventory'
                                                 : <span className='size20'>
-                                                    <span className='text-outline-light'>
+                                                    <span className='text-outline-lite'>
                                                         ➕
                                                     </span> Add Inventory
                                                 </span>
@@ -495,6 +770,124 @@ const Dashboard = () => {
                                         onChange={e => setNewItem({ ...newItem, notes: e.target.value })}
                                         className='containerDetail mr-5 flex2Column color-lite size20 p-10 bg-tintedMedium width--10 ml-5 mb-5'
                                     />
+                                    <div className='containerDetail m-5 bg-dark p-5'>
+                                        <div className='containerDetail flexContainer'>
+                                            <label
+                                                className='containerDetail flexColumn bg-yellow button bg-lite color-dark size12 p-10'
+                                            >
+                                                ➕📷
+                                                <input
+                                                    ref={inventoryPhotoInputRef}
+                                                    type='file'
+                                                    accept='image/*'
+                                                    multiple
+                                                    style={{ display: 'none' }}
+                                                    onChange={async (e) => {
+                                                        await addInventoryPhotos(e.target.files);
+                                                        e.target.value = '';
+                                                    }}
+                                                />
+                                            </label>
+                                            {(newItem.photos || []).length > 0 && (
+                                                <div className='flex2Column ml-5 flexContainer' style={{ alignItems: 'center', gap: 8 }}>
+                                                    <div
+                                                        className='containerDetail button bg-lite color-yellow p-10 size12'
+                                                        onClick={() => setInventoryPhotoEditMode((prev) => !prev)}
+                                                        title={inventoryPhotoEditMode ? 'Hide remove buttons' : 'Show remove buttons'}
+                                                    >
+                                                        ✏️
+                                                    </div>
+                                                    <div
+                                                        className='containerDetail button bg-lite color-yellow p-10 size12'
+                                                        onClick={() => setIsInventoryPhotoRowCollapsed((prev) => !prev)}
+                                                        title='Toggle between wrapped grid and single-row horizontal scrolling'
+                                                    >
+                                                        {isInventoryPhotoRowCollapsed ? 'Expand Grid' : 'Collapse to Row'}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className='color-soft size12 ml-10'>
+                                            {(newItem.photos || []).length > 0
+                                                ? `${(newItem.photos || []).length} image${(newItem.photos || []).length > 1 ? 's' : ''}`
+                                                : 'No images attached yet.'}
+                                        </div>
+                                        {(newItem.photos || []).length > 0 && (
+                                            <div>
+                                                {expandedDraftPhoto && (
+                                                    <div className='containerDetail bg-dark mb-10'>
+                                                        <img
+                                                            src={expandedDraftPhoto.url}
+                                                            alt={expandedDraftPhoto.name}
+                                                            style={{
+                                                                width: '100%',
+                                                                maxHeight: 240,
+                                                                objectFit: 'contain',
+                                                                borderRadius: 4,
+                                                            }}
+                                                        />
+                                                        <div className='color-soft size12 p-5 contentCenter'>
+                                                            {expandedDraftPhoto.name}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                <div
+                                                    className='flexContainer mt--15'
+                                                    style={{
+                                                        flexWrap: isInventoryPhotoRowCollapsed ? 'nowrap' : 'wrap',
+                                                        gap: 8,
+                                                        overflowX: isInventoryPhotoRowCollapsed ? 'auto' : 'visible',
+                                                        overflowY: 'hidden',
+                                                        paddingBottom: isInventoryPhotoRowCollapsed ? 6 : 0,
+                                                    }}
+                                                >
+                                                    {(newItem.photos || []).map((photo) => (
+                                                        <div key={photo.id} style={{ position: 'relative', width: 64, height: 64, flex: '0 0 auto' }}>
+                                                            <img
+                                                                src={photo.url}
+                                                                alt={photo.name}
+                                                                title={`${photo.name} (${formatBytes(photo.size || 0)})`}
+                                                                onClick={() => setExpandedDraftPhoto((prev) => prev?.id === photo.id ? null : photo)}
+                                                                style={{
+                                                                    width: '100%',
+                                                                    height: '100%',
+                                                                    objectFit: 'cover',
+                                                                    borderRadius: 4,
+                                                                    display: 'block',
+                                                                    cursor: 'pointer',
+                                                                    border: expandedDraftPhoto?.id === photo.id ? '2px solid #0f0' : '2px solid transparent',
+                                                                }}
+                                                            />
+                                                            {inventoryPhotoEditMode && (
+                                                                <div
+                                                                    className='button'
+                                                                    onClick={() => removeDraftInventoryPhoto(photo.id)}
+                                                                    title='Remove photo'
+                                                                    style={{
+                                                                        position: 'absolute',
+                                                                        top: 2,
+                                                                        right: 2,
+                                                                        background: 'rgba(0,0,0,0.65)',
+                                                                        color: '#fff',
+                                                                        borderRadius: '50%',
+                                                                        width: 20,
+                                                                        height: 20,
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        justifyContent: 'center',
+                                                                        fontSize: 12,
+                                                                        lineHeight: 1,
+                                                                    }}
+                                                                >
+                                                                    ✕
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                     <div
                                         onClick={(inventoryEdit > -1) ? handleEditInventory : handleAddInventory}
                                         className='containerBox width--10 button bg-blue'
@@ -509,7 +902,10 @@ const Dashboard = () => {
                                         onClick={() => {
                                             setInventoryForm(true);
                                             setInventoryEdit(-1);
-                                            setNewItem({ name: '', category: '', quantity: 1, notes: '' });
+                                            setNewItem(createEmptyInventoryItem());
+                                            setExpandedDraftPhoto(null);
+                                            setInventoryPhotoEditMode(false);
+                                            setIsInventoryPhotoRowCollapsed(true);
                                         }}
                                         className='containerBox width--10 button bg-lite'
                                     >
@@ -530,7 +926,7 @@ const Dashboard = () => {
                     />
                 </div>
                 {
-                    (maintenanceDisplay)
+                    (!maintenanceDisplay)
                     ? null
                     : <div className='containerDetail color-lite mt-5'>
                         {editTaskIndex < 0 && !editTask && (
@@ -617,7 +1013,7 @@ const Dashboard = () => {
                             onClick={() => setAddTaskCollapse(prev => !prev)}
                             className='color-yellow button size20'
                         >
-                            <span className='text-outline-light'>
+                            <span className='text-outline-lite'>
                                 ➕
                             </span> Add Task
                         </span>

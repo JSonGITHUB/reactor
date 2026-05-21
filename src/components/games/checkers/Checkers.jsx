@@ -310,7 +310,7 @@ const Checkers = () => {
     const [aiLabel, setAILabel] = useState('Strategist');
     const [games, setGames] = useState(loadSavedGames());
     const [hoverTargets, setHoverTargets] = useState([]);
-    const [dark, setDark] = useState(() => {
+    const [dark] = useState(() => {
         const v = localStorage.getItem(STORAGE_KEYS.DARK);
         return v ? JSON.parse(v) : true;
     });
@@ -558,7 +558,6 @@ const Checkers = () => {
     useEffect(() => {
         const onKey = (e) => {
             if (isAnimating) return;
-            const [r, c] = cursor;
             if (e.key === 'ArrowUp') setCursor(([rr, cc]) => [Math.max(0, rr - 1), cc]);
             if (e.key === 'ArrowDown') setCursor(([rr, cc]) => [Math.min(7, rr + 1), cc]);
             if (e.key === 'ArrowLeft') setCursor(([rr, cc]) => [rr, Math.max(0, cc - 1)]);
@@ -794,16 +793,14 @@ const Checkers = () => {
                                 <div key={`row-${r}`} className={`board-row ${(r === 0) ? null : 'mt--15'}`}>
                                     {row.map((cell, c) => {
                                         const playable = (r + c) % 2 === 1;
-                                        const isSelected = selected && selected[0] === r && selected[1] === c;
-                                        const isCursor = cursor[0] === r && cursor[1] === c;
                                         const showTargets = legalMoves.some(m => m.to[0] === r && m.to[1] === c);
-                                        const hoverTargets = hoverHints && selected == null && computeHoverTargets(r, c).length > 0 && board[r][c] && board[r][c].player === turn;
+                                        const showHoverTargets = hoverHints && selected == null && board[r][c] && board[r][c].player === turn;
                                         const isHoverTarget = Array.isArray(hoverTargets) && hoverTargets.some(([hr, hc]) => hr === r && hc === c);
                                         
                                         return (
                                             <div
                                                 key={cellKey(r, c)}
-                                                className={`cell ${playable ? 'playable' : 'blocked'} ${isHoverTarget ? 'hover-target' : ''}`}
+                                                className={`cell ${playable ? 'playable' : 'blocked'} ${(showHoverTargets && isHoverTarget) ? 'hover-target' : ''}`}
                                                 onClick={() => handleCellClick(r, c)}
                                                 onMouseEnter={() => {
                                                     if (board[r][c] && board[r][c].player === turn) {

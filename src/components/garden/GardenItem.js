@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import CollapseToggleButton from '../utils/CollapseToggleButton';
 import icons from '../site/icons';
 
@@ -7,32 +7,14 @@ const GardenItem = ({
     index,
     setModalData,
     crops,
-    setCrops
+    setCrops,
+    onEditItem,
+    onDeleteCustom
 }) => {
     const [collapsed, setCollapsed] = useState(true);
-    const [planted, setPlanted] = useState(!!crops[item.index].planted);
+    const planted = !!crops[item.index].planted;
 
     //console.log(`GardenItem => item: ${JSON.stringify(item, null, 2)}`);
-
-    useEffect(() => {
-        const newCrops = [...crops];
-        newCrops[item.index].planted = !!planted;
-        console.log(`GardenItem => ${item.index} - ${newCrops[item.index].name} newCrops[item.index].planted: ${newCrops[item.index].planted}`);
-        console.log(`GardenItem => ${item.index} - ${crops[item.index].name} crops[item.index].planted: ${crops[item.index].planted}`);
-        //setCrops(newCrops);
-        //localStorage.setItem('gardenData', JSON.stringify(newCrops));
-    }, [planted]);
-
-    useEffect(() => {
-        const newCrops = [...JSON.parse(localStorage.getItem('gardenData'))];
-        console.log(`GardenItem => ${item.index} - ${newCrops[item.index].name} newCrops[item.index].planted: ${newCrops[item.index].planted}`);
-        console.log(`GardenItem => ${item.index} - ${crops[item.index].name} crops[item.index].planted: ${crops[item.index].planted}`);
-        /* if (newCrops[item.index].planted) {
-            setPlanted(!!crops[item.index].planted);
-        } else {
-            setPlanted(false);
-        } */
-    }, []);
     const suns = {
         'Full sun': '☀️', 
         'Partial shade': '🌙' 
@@ -91,7 +73,6 @@ const GardenItem = ({
     };
 
     const togglePlanted = () => {
-        //setPlanted(prev => !prev);
         const newCrops = [...crops];
         newCrops[item.index].planted = !planted;
         setCrops(newCrops);
@@ -114,6 +95,30 @@ const GardenItem = ({
                 setCollapse={setCollapsed}
                 align='left'
             />
+            {
+                !collapsed
+                    ? <div className='containerBox flexContainer bg-lite mb-5'>
+                        <button
+                            type='button'
+                            className='containerBox bg-dkYellow color-dark mr-5'
+                            onClick={() => onEditItem && onEditItem(item)}
+                        >
+                            ✏️ Edit Item
+                        </button>
+                        {
+                            item.isCustom
+                                ? <button
+                                    type='button'
+                                    className='containerBox bg-red color-yellow'
+                                    onClick={() => onDeleteCustom && onDeleteCustom(item)}
+                                >
+                                    🗑 Delete Custom
+                                </button>
+                                : null
+                        }
+                    </div>
+                    : null
+            }
             {
                 (goodMonth) 
                 ? <div className='containerBox columnLeftAlign' title={determineHarvestDate(item)}>{icons.garden} ✂️ {determineHarvestDate(item)}</div> 

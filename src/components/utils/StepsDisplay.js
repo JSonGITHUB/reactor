@@ -3,9 +3,6 @@ import CollapseToggleButton from './CollapseToggleButton';
 import { StepContext } from '../context/StepContext';
 import icons from '../site/icons';
 import getKey from './KeyGenerator';
-import Sounds from '../sound/Sounds';
-import Dialog from '../functional/Dialog';
-import initStepSchedules from '../utils/initStepSchedules';
 import CurrentTimer from './CurrentTimer';
 import StepContainer from './StepContainer';
 
@@ -126,29 +123,21 @@ const StepsDisplay = React.memo(() => {
             Add steps...
         </div>
     }
-    const setScroll = () => {
-
-        const height = () => currentStepIndex * 300;
-
-        console.log(`StepTimerContainer => setScroll => height: ${height()}`);
+    useEffect(() => {
+        const height = currentStepIndex * 300;
 
         window.scrollTo({
-            top: height(),
+            top: height,
             behavior: 'smooth',
         });
 
         if (locationScrollerRef.current) {
-            //console.log(`setScroll => height: ${height()}`)
-            //console.log(`setScroll => locationScrollerRef.current.scrollHeight: ${locationScrollerRef.current.scrollHeight}`)
             locationScrollerRef.current.scrollTo({
-                top: height(),
+                top: height,
                 left: 0,
                 behavior: 'smooth',
             });
         }
-    }
-    useEffect(() => {
-        setScroll();
     }, [currentStepIndex]);
 
     useEffect(() => {
@@ -160,7 +149,7 @@ const StepsDisplay = React.memo(() => {
             //console.log(`StepsDisplay => useEffect => 2 setStepCollapse(true) steps: ${JSON.stringify(steps, null, 2)}`);
             setStepCollapse(true);
         }
-    }, []);
+    }, [steps, setStepCollapse]);
 
     return (
         <div className='containerBox'>
@@ -215,7 +204,7 @@ const StepsDisplay = React.memo(() => {
                 ? null
                 : <div className='containerBox'>
                     <input
-                        id='newStep'
+                        id='utils-stepsdisplay-newStep'
                         name='newStep'
                         type='text'
                         placeholder='Description'
@@ -234,7 +223,7 @@ const StepsDisplay = React.memo(() => {
                     />
                 */}
                     <input
-                        id='hours'
+                        id='utils-stepsdisplay-hours'
                         name='hours'
                         type='number'
                         placeholder='Hours'
@@ -243,7 +232,7 @@ const StepsDisplay = React.memo(() => {
                         className='containerBox width-100-percent'
                     />
                     <input
-                        id='minutes'
+                        id='utils-stepsdisplay-minutes'
                         name='minutes'
                         type='number'
                         placeholder='Minutes'
@@ -252,7 +241,7 @@ const StepsDisplay = React.memo(() => {
                         className='containerBox width-100-percent'
                     />
                     <input
-                        id='seconds'
+                        id='utils-stepsdisplay-seconds'
                         name='seconds'
                         type='number'
                         placeholder='Seconds'

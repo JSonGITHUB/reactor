@@ -20,6 +20,7 @@ const Roulette = () => {
     const [balance, setBalance] = useState(100);
     const [result, setResult] = useState(null);
     const [spinning, setSpinning] = useState(false);
+    const [spinHistory, setSpinHistory] = useState([]);
 
     const spinWheel = () => {
         if ((selectedNumber === null && selectedColor === null) || balance < betAmount) return;
@@ -42,18 +43,61 @@ const Roulette = () => {
 
             setBalance(balance + (win ? payout : -betAmount));
             setSpinning(false);
+            
+            // Add to history (keep last 20 spins)
+            setSpinHistory(prev => [outcome, ...prev].slice(0, 20));
         }, 2000);
     };
 
     return (
-        <div className='containerDetail p-20 mt--30 color-lite'>
-            <div className='containerDetail p-20 color-yellow size30 mb-20 bg-lite'>🎰 Roulette</div>
-            <div className='board'>
-                <div className='zero-slot' onClick={() => {
-                    setSelectedNumber(0);
-                    setSelectedColor(null);
-                }}>
-                    <div className={`slot green ${selectedNumber === 0 ? 'selectedRoulette' : ''}`}>0</div>
+        <div className='containerDetail mt--30 color-lite'>
+            <div className='containerDetail p-20 color-yellow size30 mb-5 bg-lite contentLeft'>
+                <span className='size40 color-red'>✵</span> Roulette
+            </div>
+            
+            {/* Spin History Display */}
+            {spinHistory.length > 0 && (
+                <div className='containerDetail bg-tintedDark h-scroll'>
+                    <div className='flexContainer contentLeft pl-15 pt-5'>
+                        {spinHistory.map((spin, index) => (
+                            <span
+                                key={index} 
+                                className={`history-circle ${spin.color} fl-left mr-5 w-50`}
+                                title={`${spin.number} (${spin.color})`}
+                            >
+                                {spin.number}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            )}
+            
+            <div className='containerDetail mt-5 p-10 bg-tintedDark'>
+                <div className='flexContainer mb-5'>
+                    <div className='zero-slot flexColumn' onClick={() => {
+                        setSelectedNumber(0);
+                        setSelectedColor(null);
+                    }}>
+                        <div className={`slot green ${selectedNumber === 0 ? 'selectedRoulette' : ''}`}>0</div>
+                    </div>
+                    <div
+                        className={`slot flex2Column button red ${selectedColor === 'red' ? 'selectedRoulette' : ''}`}
+                        onClick={() => {
+                            setSelectedColor('red');
+                            setSelectedNumber(null);
+                        }}
+                    >
+                        Bet on Red
+                    </div>
+                    <div
+                        className={`slot flex2Column button black ${selectedColor === 'black' ? 'selectedRoulette' : ''}`}
+                        onClick={() => {
+                            setSelectedColor('black');
+                            setSelectedNumber(null);
+                        }}
+                    >
+                        Bet on Black
+                    </div>
                 </div>
                 <div className='main-grid h-scroll'>
                     {[...Array(12)].map((_, colIdx) => (
@@ -78,32 +122,11 @@ const Roulette = () => {
                     ))}
                 </div>
             </div>
-
-            <div className='color-bets'>
-                <button
-                    className={`color-bet red ${selectedColor === 'red' ? 'selectedRoulette' : ''}`}
-                    onClick={() => {
-                        setSelectedColor('red');
-                        setSelectedNumber(null);
-                    }}
-                >
-                    Bet on Red
-                </button>
-                <button
-                    className={`color-bet black ${selectedColor === 'black' ? 'selectedRoulette' : ''}`}
-                    onClick={() => {
-                        setSelectedColor('black');
-                        setSelectedNumber(null);
-                    }}
-                >
-                    Bet on Black
-                </button>
-            </div>
-            <div className='containerDetail mt-10 p-30 color-yellow bg-lite size50'>
+            <div className='containerDetail mt-5 p-20 color-yellow bg-lite size40'>
                 💰{balance}
             </div>
             <div className='containerDetail flexContainer p-10 controls bg-lite'>
-                <label className='flex2Column pl-5 contentLeft size25 pt-2'>
+                <label className='flex2Column pl-5 contentLeft size20 pt-5'>
                     Bet Amount: $
                     <input
                         type='number'
@@ -113,18 +136,18 @@ const Roulette = () => {
                         className='containerDetail color-lite'
                     />
                 </label>
-                <button
+                <div
                     onClick={spinWheel}
                     disabled={spinning || (selectedNumber === null && selectedColor === null) || balance < betAmount}
-                    className='containeDetail flexColumn p-10 r-10 button size20'
+                    className='containeDetail flexColumn p-10 r-10 button size20 bg-green'
                 >
                     {spinning ? 'Spinning...' : 'SPIN'}
-                </button>
+                </div>
             </div>
 
             <div>
                 {(result && (selectedNumber !== null || selectedColor !== null)) && (
-                    <div className='size25 mt-10'>
+                    <div className='size25 mt-5'>
                         {(selectedNumber !== null && result.number === selectedNumber) ||
                             (selectedColor !== null && result.color === selectedColor && result.number !== 0)
                             ? <div className='containerDetail p-10 bg-green'>✅ You win!</div>
@@ -132,9 +155,9 @@ const Roulette = () => {
                     </div>
                 )}
                 {result && (
-                    <div className={`containerDetail mt-10 mb-10 p-20 size20 ${(result.color === 'black') ? 'bg-dkGreen' : 'bg-dkRed'} color-yellow`}>
+                    <div className={`containerDetail mt-5 mb-10 p-20 size20 ${(result.color === 'black') ? 'bg-tintedMedium' : (result.color === 'red') ? 'bg-dkRed' : 'bg-green'} color-yellow`}>
                         🎯 Result:
-                        <div className={`containerDetail size30 size50 mt-10 pt-30 pb-30 ${(result.color === 'black') ? 'bg-dark' : 'bg-dkRed'} ${(result.color === 'black') ? 'color-yellow' : 'color-lite'}`}>
+                        <div className={`containerDetail size30 size50 mt-5 pt-30 pb-30 ${(result.color === 'black') ? 'bg-dark' : (result.color === 'red') ? 'bg-dkRed' : 'bg-dkGreen'} ${(result.color === 'black') ? 'color-yellow' : 'color-lite'}`}>
                             {result.number}
                         </div>
                     </div>

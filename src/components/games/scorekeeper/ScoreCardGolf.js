@@ -4,11 +4,10 @@ import Selector from '../../forms/FunctionalSelector';
 import { PlayerContext } from '../../context/PlayerContext';
 import { GolfContext } from '../../context/GolfContext';
 import initializeData from '../../utils/InitializeData';
-import { initNewPlayer, initPlayers } from '../scorekeeper/PlayerInit';
+import { initPlayers } from '../scorekeeper/PlayerInit';
 import Location from '../../utils/Location'
 import getKey from '../../utils/KeyGenerator';
-import validate from '../../utils/validate';
-import { initAllGolfShots, initGolfShots } from './initGolfShots';
+import { initAllGolfShots } from './initGolfShots';
 import ShotDialog from '../../utils/ShotDialog';
 import clubs from './clubs';
 import icons from '../../site/icons.js';
@@ -22,24 +21,14 @@ const ScoreCardGolf = ({
     const {
         players,
         setPlayers,
-        edit,
-        editPlayer,
-        setEdit,
-        deletePlayer
     } = useContext(PlayerContext);
 
     const {
         golfPars,
-        setPars,
         course,
-        setCourse,
-        updatePar,
         updateDistance,
         courses,
         setCourses,
-        addCourse,
-        editCourse,
-        deleteCourse
     } = useContext(GolfContext);
 
     const getScore = () => {
@@ -47,7 +36,6 @@ const ScoreCardGolf = ({
         return newPlayers[playerIndex].golfScores[scoreIndex];
     }
     const [score, setScore] = useState(getScore());
-    const player = players[playerIndex];
     const initGolfStats = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
     const initGolfPutts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     const puttsArray = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -57,7 +45,6 @@ const ScoreCardGolf = ({
     const [longitude, setLongitude] = useState();
     const [latitude, setLatitude] = useState();
     const [distance, setDistance] = useState(0);
-    const [tracking, setTracking] = useState();
     const [markedLongitude, setMarkedLongitude] = useState();
     const [markedLatitude, setMarkedLatitude] = useState();
     const [shotDialog, setShotDialog] = useState(false);
@@ -79,7 +66,6 @@ const ScoreCardGolf = ({
         const lat2 = end[0];
         const lon1 = start[1];
         const lon2 = end[1];
-        const unit = 'Yrd'
         //if ((lat1 === lat2) && (lon1 === lon2)) {
         //return 0;
         //} else {
@@ -102,7 +88,6 @@ const ScoreCardGolf = ({
 
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         const feetInMiles = 5280;
-        const feetInYard = 3;
         return ((R * c) * feetInMiles) / 3;
 
     };
@@ -121,7 +106,7 @@ const ScoreCardGolf = ({
         }
         //console.log(`ScoreCardGolf => currentLongitude: ${currentLongitude} currentLatitude: ${currentLatitude}]`);
         //console.log(`ScoreCardGolf => markedLongitude: ${markedLongitude}, markedLatitude: ${markedLatitude}`);
-    }, [markedLongitude, markedLatitude]);
+    }, [markedLongitude, markedLatitude, players, playerIndex, scoreIndex]);
     useEffect(() => {
         //setDistance(shotDistance([markedLongitude, markedLatitude], [currentLongitude, currentLatitude]));
         //console.log(`ScoreCardGolf => currentLongitude: ${currentLongitude} currentLatitude: ${currentLatitude}, markedLatitude: ${markedLatitude}]`);
@@ -144,7 +129,7 @@ const ScoreCardGolf = ({
     useEffect(() => {
         //console.log(`ScoreCardGolf => players: ${JSON.stringify(players, null, 2)}`);
         const newPlayers = [...players];
-        newPlayers.map((player, index) => {
+        newPlayers.forEach((player) => {
             if (!player.golfShots) {
                 player.golfShots = initAllGolfShots;
             } else if (checkItemType(player.golfShots[0]) === 'Object') {
@@ -153,49 +138,7 @@ const ScoreCardGolf = ({
         });
         //console.log(`ScoreCardGolf => newPlayers: ${JSON.stringify(newPlayers, null, 2)}`);
         //setPlayers(newPlayers);
-    }, []);
-
-    const calculateDistance = () => {
-        const lat1 = markedLatitude;
-        const lat2 = currentLatitude;
-        const lon1 = markedLongitude;
-        const lon2 = currentLongitude;
-        let unit = 'feet';
-        //console.log(
-        //    `lat1: ${lat1} === lat2: ${lat2} && lon1: ${lon1} === lon2: ${lon2}`
-        //);
-        if ((lat1 === lat2 && lon1 === lon2) || !lat1 || !lat2 || !lon1 || !lon2) {
-            return 0;
-        } else if (tracking === true) {
-            const radlat1 = (Math.PI * lat1) / 180;
-            const radlat2 = (Math.PI * lat2) / 180;
-            const theta = lon1 - lon2;
-            const radtheta = (Math.PI * theta) / 180;
-            const feetOrYards = (dist) =>
-                dist * 5280 > 30
-                    ? `${(dist * 1760).toFixed(2)} yards`
-                    : `${(dist * 5280).toFixed(2)} feet`;
-            let dist =
-                Math.sin(radlat1) * Math.sin(radlat2) +
-                Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-            if (dist > 1) {
-                dist = 1;
-            }
-            dist = Math.acos(dist);
-            dist = (dist * 180) / Math.PI;
-            dist = dist * 60 * 1.1515;
-            dist = dist < 0.25 ? feetOrYards(dist) : `${dist.toFixed(2)} miles`;
-            if (unit === 'Kilometers') {
-                dist = dist * 1.609344;
-            }
-            if (unit === 'Nautical') {
-                dist = dist * 0.8684;
-            }
-            //console.log(`distance => ${dist} unit => ${unit}`);
-            return dist;
-        }
-        return distance;
-    };
+    }, [players]);
     const updateScore = (newScore) => {
         let total = 0;
         const addToTotal = (value) => total = total + value;
@@ -222,13 +165,6 @@ const ScoreCardGolf = ({
             */
             //newPlayers[playerIndex].golfShots[scoreButtonClasses][newScore] = null;
             newPlayers[playerIndex].golfShots[scoreIndex][newScore] = null;
-            const item = () => {
-                return {
-                    longitude: Number(currentLongitude),
-                    latitude: Number(currentLatitude)
-                }
-            }
-            //alert(calculateDistance({}, item));
 
             newPlayers[playerIndex].golfShots[scoreIndex].splice((Number(newScore)), 1, {
                 coords: [currentLongitude, currentLatitude],
@@ -250,7 +186,7 @@ const ScoreCardGolf = ({
             newPlayers[playerIndex].golfPutts = initGolfPutts;
         }
         localStorage.setItem('players', JSON.stringify(newPlayers))
-        if (newPlayers != []) {
+        if (newPlayers.length !== 0) {
             setPlayers(newPlayers);
         }
 
@@ -295,30 +231,6 @@ const ScoreCardGolf = ({
         setPlayers(newScore)
         updateScore(newScore);
     }
-    const editNav = () => {
-        if (edit) {
-            return <div className='containerBox t-0 relative flexContainer color-yellow bold'>
-                <div className='flex2Column'>
-                    <div 
-                        title='edit player'
-                        className='containerBox button' 
-                        onClick={() => editPlayer(playerIndex)}
-                    >
-                        EDIT
-                    </div>
-                </div>
-                <div className='flex2Column'>
-                    <div 
-                        title='delete player'
-                        className='containerBox button' 
-                        onClick={() => deletePlayer(playerIndex)}
-                    >
-                        DELETE
-                    </div>
-                </div>
-            </div>
-        }
-    }
     const stockClasses = 'containerDetail color-yellow bold ';
     const buttonClass = 'bg-darker';
     const getButtonClass = 'glassy button flex3Column p-5 r-10 m-1 ' + buttonClass;
@@ -328,12 +240,12 @@ const ScoreCardGolf = ({
     const isDoubleBoagie = (score, par) => (score === (Number(par) + 2)) ? true : false;
     const getOuterCSS = (score, par) => {
         if (isEagle(score, par)) return 'completedSelector r-50-percent pb-20 pt-30';
-        if (isDoubleBoagie(score, par)) return 'brdr-light p-5 r-10';
+        if (isDoubleBoagie(score, par)) return 'brdr-lite p-5 r-10';
         return 'brdr-transparent r-10';
     }
     const getInnerCSS = (score, par) => {
-        if (isBoagie(score, par) && isDoubleBoagie(score, par)) return 'brdr-light r-5 font50 pt-12 pl-10 pr-10';
-        if (isBoagie(score, par)) return 'brdr-light r-5 font50 pt-12 pl-10 pr-10 mt-5 mb-5';
+        if (isBoagie(score, par) && isDoubleBoagie(score, par)) return 'brdr-lite r-5 font50 pt-12 pl-10 pr-10';
+        if (isBoagie(score, par)) return 'brdr-lite r-5 font50 pt-12 pl-10 pr-10 mt-5 mb-5';
         if (!isDoubleBoagie(score, par) && !isEagle(score, par)) return 'p-5 r-5 font50 m-10 mt-20';
         return 'p-5 r-5 font50 m-10';
     }
@@ -345,7 +257,7 @@ const ScoreCardGolf = ({
             newPlayers[playerIndex].golfFW[scoreIndex] = false;
         }
         Sounds.boop(3000, newPlayers[playerIndex].golfScores[scoreIndex]);
-        if (newPlayers != []) {
+        if (newPlayers.length !== 0) {
             setPlayers(newPlayers);
         }
         updateScores();
@@ -358,7 +270,7 @@ const ScoreCardGolf = ({
             newPlayers[playerIndex].golfGIR[scoreIndex] = false;
         }
         Sounds.boop(3000, newPlayers[playerIndex].golfScores[scoreIndex]);
-        if (newPlayers != []) {
+        if (newPlayers.length !== 0) {
             setPlayers(newPlayers);
         }
         updateScores();
@@ -367,23 +279,24 @@ const ScoreCardGolf = ({
         if (players[playerIndex] && !players[playerIndex].golfFW) {
             const newPlayers = [...players];
             newPlayers[playerIndex].golfFW = initGolfStats;
-            if (newPlayers != []) {
+            if (newPlayers.length !== 0) {
                 setPlayers(newPlayers);
             }
             updateScores();
         }
         const FW = (players[playerIndex]) ? players[playerIndex].golfFW[scoreIndex] || false : false;
+        const fwId = `fw-${playerIndex}-${scoreIndex}`;
         let checkBox = <input
-                            id='fw'
-                            name='fw'
+                            id={fwId}
+                            name={fwId}
                             className='regular-checkbox button glassy ml-5'
                             checked type='checkbox'
                             onChange={() => console.log(`fw`)}
                         />
         if (FW !== true) {
             checkBox = <input 
-                            id='fw'
-                            name='fw'
+                            id={fwId}
+                            name={fwId}
                             className='regular-checkbox button glassy ml-5' 
                             type='checkbox'
                         />
@@ -394,23 +307,24 @@ const ScoreCardGolf = ({
         if (players[playerIndex] && !players[playerIndex].golfGIR) {
             const newPlayers = [...players];
             newPlayers[playerIndex].golfGIR = initGolfStats;
-            if (newPlayers != []) {
+            if (newPlayers.length !== 0) {
                 setPlayers(newPlayers);
             }
             updateScores();
         }
         const GIR = (players[playerIndex]) ? (players[playerIndex].golfGIR[scoreIndex] || false) : false;
+        const girId = `gir-${playerIndex}-${scoreIndex}`;
         let checkBox = <input
-                            id='gir'
-                            name='gir'
+                            id={girId}
+                            name={girId}
                             className='regular-checkbox button glassy ml-5 mr-10'
                             checked type='checkbox'
                             onChange={() => console.log(`gir`)}
                         />
         if (GIR !== true) {
             checkBox = <input 
-                            id='gir'
-                            name='gir'
+                            id={girId}
+                            name={girId}
                             className='regular-checkbox button glassy ml-5 mr-10' 
                             type='checkbox'  
                         />
@@ -426,7 +340,7 @@ const ScoreCardGolf = ({
         newPlayers[playerIndex].golfPutts[scoreIndex] = selected;
         newPlayers[playerIndex].golfScore = newPlayers[playerIndex].golfScore + newSelectionDifference;
         Sounds.boop(3000, newPlayers[playerIndex].golfScores[scoreIndex]);
-        if (newPlayers != []) {
+        if (newPlayers.length !== 0) {
             setPlayers(newPlayers);
         }
         updateScores();
@@ -435,7 +349,7 @@ const ScoreCardGolf = ({
         if (players[playerIndex] && !players[playerIndex].golfPutts) {
             const newPlayers = [...players];
             newPlayers[playerIndex].golfPutts = initGolfPutts;
-            if (newPlayers != []) {
+            if (newPlayers.length !== 0) {
                 setPlayers(newPlayers);
             }
             updateScores();
@@ -480,25 +394,7 @@ const ScoreCardGolf = ({
 
     const currentPositionExists = () => (currentLongitude) ? true : false;
 
-    const item = () => {
-        return {
-            longitude: Number(currentLongitude),
-            latitude: Number(currentLatitude)
-        }
-    }
-    //alert(calculateDistance({}, item));
-    /*
-    const updateCurrentLocation = (longitude, latitude) => {
-        console.log(
-            `UPDATING CURRENT POSITION ======> longitude: ${longitude} latitude: ${latitude}`
-        );
-        setLongitude(longitude);
-        setLatitude(latitude);
-        setDistance(calculateDistance());
-    };
-    */
     const startDistance = () => {
-        setTracking(true);
         if (markedLongitude !== undefined) {
             console.log(`startDistance => distance: ${distance} markedLongitude: ${markedLongitude} markedLatitude: ${markedLatitude}`);
             let newDistance = (distance !== undefined) ? (distance + 1) : 0;
@@ -513,18 +409,6 @@ const ScoreCardGolf = ({
     const editGolfDistance = (hole) => {
         const newDistance = Number(prompt(`Enter distance for hole ${hole + 1}:`, course.holes[hole].distance));
         updateDistance(hole, newDistance);
-    }
-    const stopTracking = () => {
-        setTracking(false);
-    };
-    const getDistance = () => (distance > 1) ? `${distance.toFixed(0)} yd` : `${(Number(distance) * 3).toFixed(0)} ft`;
-    const checkObjectWithKey = (item, key) => {
-        // Check if the item is an object and not null
-        if (typeof item === 'object' && item !== null) {
-            // Check if the key exists in the object
-            return key in item;
-        }
-        return false;
     }
     const locationSelected = () => {
         const edit = window.confirm('Update coords?');

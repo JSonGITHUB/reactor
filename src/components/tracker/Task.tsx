@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import icons from '../site/icons';
-import getKey from '../utils/KeyGenerator';
 import getTotalTime from '../utils/getTotalTime';
 import initSession from './initSession';
 import { currentTime, currentDate } from '../utils/CurrentCalendar';
@@ -367,7 +366,7 @@ export const Task: React.FC<TaskProps> = ({
   };
 
   return (
-    <div key={getKey(`${task.description || ''}${taskIndex}`)} className=''>
+    <div key={`task-tsx-${projectIndex}-${taskIndex}-${String(task.description || 'task')}`} className=''>
       <div className=''>
         <div className='centerVertical'>
           <div className='containerDetail color-yellow bg-tinted p-20'>
@@ -426,9 +425,9 @@ export const Task: React.FC<TaskProps> = ({
           : <div className='containerDetail mt-5'>
               {
                 task.sessions.map((session, sessionIndex) => (
-                  <div className='' key={getKey(`${task.description || ''}${sessionIndex}`)}>
+                  <div className='' key={`task-tsx-session-${projectIndex}-${taskIndex}-${sessionIndex}`}>
                     <div>
-                      <div key={getKey(`${task.description || ''}${sessionIndex}${String(session.startDate).split(', ')[0]}`)}>
+                      <div key={`task-tsx-session-container-${projectIndex}-${taskIndex}-${sessionIndex}-${String(session.startDate).split(', ')[0]}`}>
                         <div className={`containerDetail ${(session.breakTime) ? '' : 'bg-lite'} ${(sessionIndex > 0) ? 'mt-5' : ''}`}>
                           <div className='containerDetail color-lite p-10 flexContainer centerVertical'>
                             <div className='flexColumn contentLeft'>

@@ -1,22 +1,29 @@
-import React, { useState, useRef } from 'react';
-import { useLogin } from './components/context/LoginContext';
+import Grocery from './components/utils/Grocery';
+import React, { useState } from 'react';
 import FormNotes from './components/forms/FormEssay';
 //import Reservation from './components/forms/FormReservation';
 //import SignUpDialog from './components/utils/SignUpDialog';
 import debounce from './components/utils/Debouncer';
+import Water from './components/utils/Water';
 import TradeView from './components/utils/TradeView';
-import Footer from './components/site/Footer';
+import Trade from './components/utils/Trade';
+import Crypto from './components/utils/Crypto';
 import Header from './components/site/Header';
+import SitewideLowerNav from './components/site/SitewideLowerNav';
 import Home from './components/Home';
-import NewTide from './components/waves/NewTide';
+
+import './assets/css/App.css';
 //import BowlBuilder from './components/BowlBuilder';
 import Sessions from './components/waves/Sessions';
 import Session from './components/waves/Session';
 import Waves from './components/waves/Waves';
+//import SurfDashboard from './components/waves/SurfDashboard';
 import Weather from './components/waves/Weather';
+import Dive from './components/waves/Dive';
 import Location from './components/waves/Location';
 import WindDirection from './components/waves/WindDirection';
 import Product from './components/shop/Product';
+import Cams from './components/waves/Cams';
 //import EyeExercises from './components/eye/EyeExercises';
 //import PDFReport from './components/eye/PDFReport';
 import SunTracker from './components/waves/SunTracker';
@@ -25,6 +32,8 @@ import StepManager from './components/StepManager';
 import Garden from './components/garden/Garden';
 import FishFinder from './components/fishing/FishFinder';
 import DebtCollector from './components/finance/DebtCollector';
+import WorkDay from './components/finance/WorkDay';
+import NaturalRX from './components/functional/NaturalRX';
 import Snippets from './components/utils/Snippets';
 import TideChart from './components/waves/tide/TideChart';
 import Buoys from './components/waves/SurfReports';
@@ -35,39 +44,53 @@ import Adder from './components/hooks/Adder';
 import Counter from './components/hooks/Counter';
 import Todos from './components/hooks/Todos';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-//import ScrollToTop from './components/utils/ScrollToTop';
+import ScrollToTop from './components/utils/ScrollToTop';
 import Photos from './components/utils/Photos';
 import Videos from './components/video/Videos';
 import Wiki from './components/wiki/Wiki';
 import Video from './components/video/Video';
 import ExchangeRates from './components/converter/ExchangeRates';
 import Assessments from './components/utils/Assessments';
+import Emergency from './components/utils/Emergency';
+import Camp from './components/utils/Camp';
+import EStation from './components/utils/EStation';
 import GallonsCalculator from './components/utils/GallonsCalculator';
 import Admin from './components/utils/Admin';
 //import AIDashboard from './components/utils/AIDashboard';
 import Fuel from './components/utils/Fuel';
+import Parks from './components/Parks/Parks';
+import Moon from './components/utils/Moon';
+import PhotoAssistant from './components/utils/PhotoAssistant';
+import AIPhotoAssistant from './components/AIPhotoAssistant/AIPhotoAssistant';
 import SoundBoard from './components/sound/SoundBoard';
 import TicTacToe from './components/games/tictactoe/TicTacToe';
 //import CrosswordPuzzle from './components/games/words/CrosswordPuzzle';
 import Currency from './components/converter/Currency';
 import Expenses from './components/expense/Expenses';
+import Interest from './components/finance/Interest';
+import Mortgage from './components/finance/Mortgage';
+import Pay from './components/finance/Pay';
 import Budget from './components/expense/Budget';
 import Pricing from './components/expense/Pricing';
 import Converter from './components/converter/Converter';
+import News from './components/news/News';
 import Tracker from './components/tracker/Tracker';
 import Expense529 from './components/tracker/Expense529';
 import Notes from './components/tracker/Notes';
 import Tasks from './components/tracker/Tasks';
 import Sets from './components/tracker/Sets';
-import Events from './components/tracker/Events';
+//import Events from './components/tracker/Events';
 import Charges from './components/tracker/Charges';
 import Links from './components/tracker/Links';
 import Cook from './components/tracker/Cook';
+import Ingredients from './components/tracker/Ingredients';
 import Train from './components/tracker/Train';
 import Journals from './components/tracker/Journals';
 import BusinessTax from './components/tracker/BusinessTax';
 import Scheduler from './components/tracker/Scheduler';
 import BlackJack from './components/games/Gamble/BlackJack';
+import Poker from './components/games/Poker';
+import Animation from './components/games/Gamble/Animation';
 import Checkers from './components/games/checkers/Checkers.jsx';
 import WheelOfFortune from './components/games/Gamble/WheelOfFortune';
 import Roulette from './components/games/Gamble/Roulette';
@@ -80,19 +103,20 @@ import Translator from './components/translator/Translator';
 import Accordion from './components/utils/Accordion';
 //import Weather from './components/weather/Weather';
 import Scores from './components/games/scorekeeper/Scores';
-import Calculator from './components/converter/Calculator';
 import Shop from './components/shop/Shop';
 import HomeManager from './components/Residential/HomeManager';
-import MusicPlayer from './components/music/Player';
-import history from './components/utils/history';
+import Music from './components/music/Music';
 import Fireworks from './components/legacy/Fireworks';
-import CountryContext from './components/context/CountryContext';
+import Watch from './components/video/Watch';
+import Pics from './components/pics/Pics';
+import Media from './components/video/Media';
 import { Provider } from 'react-redux';
 import { store } from './redux/store';
 import { VotingForm } from './components/VotingForm';
 import { MultiInputProvider } from './MultiInputContext';
 import { FocusManagerProvider } from './FocusManagerContext';
 import { MenuScreen } from './MenuScreen';
+//import { SoundProvider } from './components/context/SoundContext';
 
 //const MainApp = () => {
 const App = () => {
@@ -110,20 +134,10 @@ const App = () => {
     const company = 'KFA';
     //let path = initializeData('path', window.location.pathname);
     let path = window.location.pathname;
-    const componentId = path.replace('/', '').toLocaleLowerCase();
-    const currentComponent = componentId;
-    //console.log(`App => componentId: ${componentId}`);
-    const setMotion = () => setState({ isMotionOn: !state.isMotionOn });
     const setSignIn = () => {
         console.log(`sssetSignIn ======> ${!state.isSignedIn}`);
         setState({
             isSignedIn: !state.isSignedIn,
-        });
-    };
-    const setCountry = (countryInitials) => {
-        console.log(`setCountry => ${countryInitials}`);
-        setState({
-            country: countryInitials
         });
     };
     const widthChanged = () => (window.innerWidth !== state.width ? true : false);
@@ -156,16 +170,6 @@ const App = () => {
         },
     ];
 
-    const components = {
-        surflog: <Session />,
-        //guestlist: <SignUpDialog title='Guest List' message='Sign up' />,
-        //reservation: <Reservation />,
-        note: <FormNotes className='mt-40' />,
-        tempconverter: <Calculator />,
-        //bowlbuilder: <BowlBuilder />,
-        home: <Home />,
-    };
-
     window.addEventListener('resize', debounce(setIt, 250));
     path = `/${window.location.pathname.split('/')[2]}`
     localStorage.setItem('path', path)
@@ -188,11 +192,9 @@ const App = () => {
     // eslint-disable-next-line
     const { width, height, isMotionOn, isSignedIn } = state;
     //console.log(`App => state.isSignedIn: ${state.isSignedIn}`);
-    const targetElementRef = useRef(null);
 
     return (
-        //AppComponent();<ScrollToTop loc={window.location} />
-        <div className=''>
+       <div className=''>
             {/*
                 <h1 className='text-xl font-bold'>Welcome, {role}!</h1>
                 <button
@@ -212,7 +214,8 @@ const App = () => {
             >
                 <FocusManagerProvider>
                     <Provider store={store}>
-                        <Router basename={base} history={history}>
+                        <Router basename={base}>
+                            <ScrollToTop />
 
                             <div className='App'>
                                 <Switch>
@@ -249,6 +252,14 @@ const App = () => {
                                                 <Waves />
                                             )}
                                         />
+                                        {/*
+                                        <Route
+                                            path='/SurfDashboard'
+                                            render={(props) => (
+                                                <SurfDashboard />
+                                            )}
+                                        />
+                                        */}
                                         <Route
                                             path='/MenuScreen'
                                             render={(props) => (
@@ -259,6 +270,12 @@ const App = () => {
                                             path='/Weather'
                                             render={(props) => (
                                                 <Weather />
+                                            )}
+                                        />
+                                        <Route
+                                            path='/Dive'
+                                            render={(props) => (
+                                                <Dive coreMetricsOnly={props.location.search.includes('core=true')} />
                                             )}
                                         />
                                         <Route
@@ -277,11 +294,7 @@ const App = () => {
                                         />
                                         <Route
                                             path='/Water'
-                                            render={(props) => (
-                                                <div className='containerDetail bg-blue p-30 size30'>
-                                                    <WindDirection columns='2' setWind={() => console.log('setWind')} height='0px' collapse={() => console.log('collapse')} />
-                                                </div>
-                                            )}
+                                            render={(props) => <Water />}
                                         />
                                         <Route
                                             path='/air'
@@ -302,6 +315,14 @@ const App = () => {
                                             render={(props) => (
                                                 <div className='mt--50'>
                                                     <Product />
+                                                </div>
+                                            )}
+                                        />
+                                        <Route
+                                            path='/Cams'
+                                            render={(props) => (
+                                                <div className='mt--50'>
+                                                    <Cams />
                                                 </div>
                                             )}
                                         />
@@ -350,9 +371,21 @@ const App = () => {
                                             )}
                                         />
                                         <Route
-                                                path='/Collections'
+                                            path='/Collections'
                                             render={(props) => (
                                                 <DebtCollector />
+                                            )}
+                                        />
+                                        <Route
+                                            path='/WorkDay'
+                                            render={(props) => (
+                                                <WorkDay />
+                                            )}
+                                        />
+                                        <Route
+                                            path='/NaturalRX'
+                                            render={(props) => (
+                                                <NaturalRX />
                                             )}
                                         />
                                         <Route
@@ -390,19 +423,33 @@ const App = () => {
                                         <Route path='/Video' render={(props) => <Video />} />
                                         <Route path='/ExchangeRates' render={(props) => <ExchangeRates />} />
                                         <Route path='/Assessments' render={(props) => <Assessments />} />
+                                        <Route path='/Emergency' render={(props) => <Emergency />} />
+                                        <Route path='/Camp' render={(props) => <Camp />} />
+                                        <Route path='/EStation' render={(props) => <EStation />} />
                                         <Route path='/GallonsCalculator' render={(props) => <GallonsCalculator />} />
                                         <Route path='/Fuel' render={(props) => <Fuel />} />
+                                        <Route path='/Parks' render={(props) => <Parks />} />
+                                        <Route path='/Moon' render={(props) => <Moon standalone={true} />} />
+                                        {/*<Route path='/PhotoAssistant' render={(props) => <PhotoAssistant />}*/}
+                                        <Route path='/PhotoAssistant' render={(props) => <><PhotoAssistant /><AIPhotoAssistant /></>} />
                                         <Route path='/Sounds' render={(props) => <SoundBoard />} />
                                         <Route path='/TicTacToe' render={(props) => <TicTacToe />} />
                                         {/*<Route path='/CrosswordPuzzle' render={(props) => <CrosswordPuzzle />} />*/}
                                         <Route path='/Currency' render={(props) => <Currency />} />
                                         <Route path='/Expenses' render={(props) => <Expenses />} />
+                                        <Route path='/Interest' render={(props) => <Interest />} />
+                                        <Route path='/Mortgage' render={(props) => <Mortgage />} />
+                                        <Route path='/Pay' render={(props) => <Pay />} />
                                         <Route path='/Budget' render={(props) => <Budget />} />
                                         <Route path='/TradeView' render={(props) => <TradeView />} />
+                                        <Route path='/Crypto' render={(props) => <Crypto />} />
                                         <Route path='/Pricing' render={(props) => <Pricing />} />
                                         <Route path='/Converter' render={(props) => <Converter />} />
+                                        <Route path='/News' render={(props) => <News />} />
                                         <Route path='/Scheduler' render={(props) => <Scheduler />} />
                                         <Route path='/BlackJack' render={(props) => <BlackJack />} />
+                                        <Route path='/Poker' render={(props) => <Poker />} />
+                                        <Route path='/Animation' render={(props) => <Animation />} />
                                         <Route path='/Checkers' render={(props) => <Checkers />} />
                                         <Route path='/WheelOfFortune' render={(props) => <WheelOfFortune />} />
                                         <Route path='/Roulette' render={(props) => <Roulette />} />
@@ -411,14 +458,15 @@ const App = () => {
                                         <Route path='/Notes' render={(props) => <Notes />} />
                                         <Route path='/Tasks' render={(props) => <Tasks />} />
                                         <Route path='/Sets' render={(props) => <Sets />} />
-                                        <Route path='/Events' render={(props) => <Events />} />
+                                        {/*<Route path='/Events' render={(props) => <Events />} />*/}
                                         <Route path='/Charges' render={(props) => <Charges />} />
                                         <Route path='/Links' render={(props) => <Links />} />
                                         <Route path='/Cook' render={(props) => <Cook />} />
+                                        <Route path='/Ingredients' render={(props) => <Ingredients />} />
                                         <Route path='/Circuit' render={(props) => <Train />} />
                                         <Route path='/Journals' render={(props) => <Journals />} />
                                         <Route path='/BusinessTax' render={(props) => <BusinessTax />} />
-                                        <Route path='/Tide' render={(props) => <TideChart />} />
+                                        <Route path='/Tide' render={(props) => <TideChart standalone='true' />} />
                                         <Route path='/TrainingLog' render={(props) => <TrainingLog />} />
                                         <Route path='/Admin' render={(props) => <Admin />} />
                                         {/*<Route path='/AIDashboard' render={(props) => <AIDashboard />} />*/}
@@ -426,9 +474,13 @@ const App = () => {
                                         <Route path='/Translate' render={(props) => <Translator />} />
                                         <Route path='/Scores' render={(props) => <Scores />} />
                                         <Route path='/Shop' render={(props) => <Shop />} />
+                                        <Route path='/Grocery' render={(props) => <Grocery />} />
                                         <Route path='/Vote' render={(props) => <VotingForm />} />
                                         <Route path='/House' render={(props) => <HomeManager />} />
-                                        <Route path='/Music' render={(props) => <MusicPlayer />} />
+                                        <Route path='/Music' render={(props) => <Music />} />
+                                            <Route path='/Watch' render={(props) => <Watch />} />
+                                            <Route path='/Pics' render={(props) => <Pics />} />
+                                        <Route path='/Media' render={(props) => <Media />} />
                                         <Route
                                             path='/Accordion'
                                             render={(props) => <Accordion items={items} />}
@@ -437,8 +489,8 @@ const App = () => {
                                         <Route path='/Reducer' component={Reducer} />
                                     </Switch>
                                 </div>
-                                {
-                                /* 
+                                <SitewideLowerNav />
+                                {/*
                                     <Switch>
                                         <CountryContext.Provider value={state.country}>
                                             <Footer
@@ -450,8 +502,7 @@ const App = () => {
                                             />
                                         </CountryContext.Provider>
                                     </Switch>
-                                */
-                                }                
+                                */}                
                                 </div>
                         </Router>
                     </Provider>

@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
-import initializeData from './InitializeData';
+import React, { useContext } from 'react';
 import getKey from './KeyGenerator';
-import parsDefault from '../games/scorekeeper/parsDefault';
 import Selector from '../forms/FunctionalSelector';
 import { GolfContext } from '../context/GolfContext';
 
@@ -12,22 +10,10 @@ const ParDialog = ({
 
     const {
         golfPars,
-        setPars,
-        course,
-        setCourse,
-        updatePar,
-        updateDistance,
-        courses,
-        setCourses,
-        addCourse,
-        editCourse,
-        deleteCourse
+        setPars
     } = useContext(GolfContext);
 
     const parSelections = [1,2,3,4,5,6];
-    useEffect(() => {
-        setPars(initializeData('golfPars', null));
-    }, []);
     
     const handleSubmit = () => {
         console.log('ParDialog => handleSubmit')

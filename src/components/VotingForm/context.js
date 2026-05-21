@@ -1,5 +1,5 @@
 // src/components/VotingForm/context.js
-import React, { createContext, useContext } from 'react';
+import { createContext, useContext } from 'react';
 
 export const VotingFormContext = createContext(null);
 

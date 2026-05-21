@@ -8,7 +8,7 @@ const PlayerStandings = ({
     game
 }) => {
 
-    const [currentGame, setCurrentGame] = useState(game);
+    const [currentGame] = useState(game);
     const [standings, setStandings] = useState([]);
     const [dataset, setDataset] = useState();
 
@@ -22,7 +22,7 @@ const PlayerStandings = ({
     useEffect(() => {
         //console.log(`currentGame: ${currentGame}`);
         if (currentGame !== 'surf') {
-            const gameDataset = initializeData(`${game}Games`, []);
+            const gameDataset = initializeData(`${currentGame}Games`, []);
             //console.log(`gameDataset: ${JSON.stringify(gameDataset, null, 2)}`);
             setDataset(gameDataset);
         } else {
@@ -36,7 +36,7 @@ const PlayerStandings = ({
         if (dataset) {
             //console.log(`dataset: ${JSON.stringify(dataset, null, 2)}`);
             const playerWins = {};
-            if (dataset != []) {
+            if (dataset.length > 0) {
 
                 dataset.forEach((game) => {
                     //console.log(`game: ${JSON.stringify(game, null, 2)}`);
@@ -61,9 +61,6 @@ const PlayerStandings = ({
                             playerWins[winner.name] = 1;
                         }
                     }
-
-                    const sortedStandings = Object.entries(playerWins)
-                        .map(([name, wins]) => ({ name, wins }));
 
                 });
                 const sortedStandings = Object.entries(playerWins)

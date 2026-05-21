@@ -13,8 +13,6 @@ const StepsParent = ({
 }) => {
 
     const timerRef = useRef(null);
-    const intervalRef = useRef(null);
-
     const timerState = initializeData('timerState', {});
     const [steps, setSteps] = useState(initStepSchedules[0].steps);
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
@@ -103,11 +101,6 @@ const StepsParent = ({
         }
     };
     */
-    const pauseTimer = () => {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-        setIsRunning(false);
-    };
     /* 
     const startTimer = () => {
         if (intervalRef.current) return;
@@ -125,23 +118,6 @@ const StepsParent = ({
         }, 1000);
     };
      */
-    const calculateStepTimes = () => {
-        const now = Date.now(); 
-        let accumulatedTime = now;
-        const newSteps = [...steps];
-        return newSteps.map((step, index) => {
-            const startTime = index >= currentStepIndex ? accumulatedTime : null;
-            const endTime = index >= currentStepIndex ? startTime + step.duration * 1000 : null;
-            if (index >= currentStepIndex) {
-                accumulatedTime = endTime;
-            }
-            return {
-                ...step,
-                startTime,
-                endTime
-            };
-        });
-    }
     const updatedSteps = () => {
         const now = Date.now();
         const elapsedTime = steps
@@ -160,55 +136,6 @@ const StepsParent = ({
         });
     }
 
-    const updatedStepss = () => {
-        const now = Date.now();
-        let cumulativeTime = 0;
-        let newSteps = [];
-        if (validate(schedules) !== null) {
-            if ((!steps || steps.length === 0) && schedules.length > 0 && schedules[schedule].steps) {
-                newSteps = [...schedules[schedule].steps];
-            } else {
-                newSteps = [...steps];
-            }
-        }
-        newSteps = newSteps.map((step, index) => {
-            if (index < ((currentStepIndex >= 0) ? currentStepIndex : 0)) {
-                /* 
-                console.log(`2 - index: ${index} currentStepIndex: ${currentStepIndex}`);
-                const newStep = {
-                    ...step,
-                    stepIndex: index,
-                    startTime: null,
-                    endTime: null,
-                };
-                 */
-                const startTime = now + cumulativeTime;
-                cumulativeTime += step.timer * 1000;
-                const endTime = now + cumulativeTime;
-                console.log(`3 - step: ${step.step} index: ${index} currentStepIndex: ${currentStepIndex} startTime: ${formatTimestamp(startTime)} endTime: ${formatTimestamp(endTime)}`);
-                const newStep = {
-                    ...step,
-                    stepIndex: index,
-                    startTime: formatTimestamp(startTime),
-                    endTime: formatTimestamp(endTime),
-                };
-                return newStep;
-            } else {
-                const startTime = now + cumulativeTime;
-                cumulativeTime += step.timer * 1000;
-                const endTime = now + cumulativeTime;
-                console.log(`3 - step: ${step.step} index: ${index} currentStepIndex: ${currentStepIndex} startTime: ${formatTimestamp(startTime)} endTime: ${formatTimestamp(endTime)}`);
-                const newStep = {
-                    ...step,
-                    stepIndex: index,
-                    startTime: formatTimestamp(startTime),
-                    endTime: formatTimestamp(endTime),
-                };
-                return newStep;
-            }
-        });
-        return newSteps;
-    };
     const updateSteps = (stepIndex) => {
         if (validate(schedules) !== null) {
             if (!isRunning) return steps;
@@ -250,11 +177,6 @@ const StepsParent = ({
     const toggleTimer = () => {
         setIsRunning((prev) => !prev);
     };
-    const totalSeconds =
-        parseInt(newHours || 0) * 3600 +
-        parseInt(newMinutes || 0) * 60 +
-        parseInt(newSeconds || 0);
-
     const selectSchedule = (groupTitle, label, selected) => {
         if (selected === 'Add Schedule') {
             addSchedule();
@@ -317,7 +239,7 @@ const StepsParent = ({
         newSchedules[schedule].steps[currentStepIndex].note = newNote;
         console.log(`StepContext => note: ${newSchedules[schedule].steps[currentStepIndex].note}`);
         setSchedules(newSchedules);
-    }, [newNote]);
+    }, [newNote, schedules, schedule, currentStepIndex]);
 
     useEffect(() => {
         if (currentTimer === 0 && isRunning) {
@@ -332,10 +254,9 @@ const StepsParent = ({
             handleNextStep();
         }
         return () => clearTimeout(timerRef.current);
-    }, [isRunning, currentTimer]);
+    }, [isRunning, currentTimer]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
-        const savedState = timerState;
         const currentStep = initializeData('currentStepIndex', 0);
         
         const hasTitle = (array) => array.length > 0 && array[0].hasOwnProperty('title');
@@ -351,10 +272,8 @@ const StepsParent = ({
         setCurrentStepIndex((currentStep.currentStepIndex >= 0) ? currentStep.currentStepIndex : 0);
     }, []);
     useEffect(() => {
-        if (validate(schedules) !== null && (steps === undefined || steps[(currentStepIndex >= 0) ? currentStepIndex : 0].startTime !== null)) {
-            console.log(`StepTimer => 1 schedule: ${schedule} steps: ${JSON.stringify(schedules[schedule].steps[currentStepIndex], null, 2)}`);
-        } else {
-            localStorage.setItem('steps', JSON.stringify(updatedSteps()));
+        if (validate(steps) !== null) {
+            localStorage.setItem('steps', JSON.stringify(steps));
         }
     }, [steps]);
     useEffect(() => {
@@ -364,7 +283,7 @@ const StepsParent = ({
             setIsRunning(true);
             setSteps(steps);
         }
-    }, [currentStepIndex]);
+    }, [currentStepIndex]); // eslint-disable-line react-hooks/exhaustive-deps
     useEffect(() => {
         let cleanNames = [];
         if (scheduleNames === undefined || scheduleNames.length === 0) {
@@ -379,7 +298,7 @@ const StepsParent = ({
         if (validate(schedules) !== null && schedules.length > 0) {
             updateSteps((currentStepIndex >= 0) ? currentStepIndex : 0);
         }
-    }, [isRunning]);
+    }, [isRunning]); // eslint-disable-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (schedule < 0) {
             setSchedule(0);
@@ -393,7 +312,7 @@ const StepsParent = ({
                 setSteps(updatedSteps());
             }
         }
-    }, [schedule]);
+    }, [schedule]); // eslint-disable-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (validate(schedules) !== null && schedules.length > 0) {
             const newSchedules = [...schedules];
@@ -402,7 +321,6 @@ const StepsParent = ({
             if (cleanNames[0] !== undefined) {
                 setScheduleNames(cleanNames);
             }
-            const savedState = timerState;
             const currentStep = determineStepAndTimer();
             setSchedule((initializeData('schedule', 0) < 0) ? 0 : initializeData('schedule', 0));
 
@@ -413,7 +331,7 @@ const StepsParent = ({
         if (validate(schedules) !== null) {
             localStorage.setItem('schedules', JSON.stringify(schedules));
         }
-    }, [schedules]);
+    }, [schedules]); // eslint-disable-line react-hooks/exhaustive-deps
     /* 
     useEffect(() => {
         if ((currentStepIndex >= 0) && currentTimer !== undefined && steps !== undefined && steps.length > 0) {

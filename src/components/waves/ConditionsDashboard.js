@@ -12,8 +12,10 @@ import ConditionsSelectors from './ConditionsSelectors';
 import getDirection from './getDirection';
 import SunTracker from './SunTracker';
 import SwellDisplay from './SwellDisplay';
+import Cams from './Cams';
 import WaterTemp from './WaterTemp';
 import WindDirection from './WindDirection';
+import SurfDashboard from './SurfDashboard';
 //import BuoyReadingsChart from './BuoyReadingsChart';
 //import MarineDataChart from './MarineDataChart';
 //import MarineChart from './MarineChart';
@@ -23,30 +25,14 @@ const ConditionsDashboard = ({
     conditionsCollapse
 }) => {
 
+const BUOY_FETCH_WARNING_KEY = 'buoyFetchFallbackWarned';
+
 const {
         status,
         setStatus,
-        swellData,
-        setTide,
         setWind,
-        setWindStatus,
-        handleTideCheck,
-        handleTideSelection,
-        handleWindCheck,
-        handleSwellCheck,
         handleSwell1Selection,
         handleSwell2Selection,
-        handleSwell1LiveSelection,
-        handleSwell2LiveSelection,
-        handleSwell1Angle,
-        handleSwell2Angle,
-        handleSwell1Height,
-        handleSwell2Height,
-        handleSwell1Interval,
-        handleSwell2Interval,
-        handleStarSelection,
-        handleDistanceSelection,
-        pause
     } = useContext(OceanContext);
 
     const getLocalData = (localItem) => initializeData(localItem, 'false');
@@ -54,11 +40,33 @@ const {
     const [conditionCollapse, setConditionCollapse] = useState(collapseStateInit('conditionCollapse'));
     const [buoyCollapse, setBuoyCollapse] = useState(collapseStateInit('buoyCollapse'));
     const [buoyData, setBuoyData] = useState(buoysTemplateData);
-    const [localBuoyCollapse, setLocalBuoyCollapse] = useState(true);
-    const [range, setRange] = useState(0.05);
+    const [isBuoyFallbackActive, setIsBuoyFallbackActive] = useState(false);
+    const [range] = useState(0.05);
     const SURFLINE_BASE_URL = process.env.REACT_APP_SURFLINE_BASE_URL;
     const SURFLINE_TOKEN = process.env.REACT_APP_SURFLINE_TOKEN;
+    const hasValidSurflineConfig = Boolean(
+        SURFLINE_BASE_URL
+        && SURFLINE_TOKEN
+        && SURFLINE_TOKEN !== 'your_surfline_token_here'
+    );
     const localBuoyReadings = () => `${SURFLINE_BASE_URL}/bounds?north=${Number(localStorage.getItem('latitude')) - range}&south=${Number(localStorage.getItem('latitude')) + range}&east=${Number(localStorage.getItem('longitude')) + 1}&west=${Number(localStorage.getItem('longitude')) - 1}&accesstoken=${SURFLINE_TOKEN}`;
+    const getCachedBuoyData = () => initializeData('buoyData', buoysTemplateData);
+    const setBuoyDataSafely = (payload) => {
+        if (payload && Array.isArray(payload.data)) {
+            setBuoyData(payload);
+            localStorage.setItem('buoyData', JSON.stringify(payload));
+            setIsBuoyFallbackActive(false);
+            localStorage.removeItem(BUOY_FETCH_WARNING_KEY);
+            return true;
+        }
+        return false;
+    };
+    const warnBuoyFallbackOnce = () => {
+        setIsBuoyFallbackActive(true);
+        if (localStorage.getItem(BUOY_FETCH_WARNING_KEY) === 'true') return;
+        localStorage.setItem(BUOY_FETCH_WARNING_KEY, 'true');
+        console.warn('ConditionsDashboard => Using cached buoy data due to fetch issue.');
+    };
 
     //console.log(`ConditionsDashboard => status: ${JSON.stringify(status, null, 2)}`)
     const time = useCurrentTime();
@@ -69,19 +77,39 @@ const {
     useEffect(() => {
         localStorage.setItem('buoyCollapse', buoyCollapse);
     }, [buoyCollapse]);
-    useEffect(() => {
-        const localBuoyData = initializeData('buoyData', buoysTemplateData);     
-        fetch(localBuoyReadings())
-            .then(res => res.ok ? res.json() : Promise.reject())
-            .then(data => {
-                console.log(`ConditionsDashboard => fetch localBuoyReadings: ${JSON.stringify(data, null, 2)}`);
-                setBuoyData(data);
-                localStorage.setItem('buoyData', JSON.stringify(data));
+
+    const fetchAndSetBuoyData = (controller, isMountedRef) => {
+        if (!hasValidSurflineConfig) {
+            if (!isMountedRef.current) return;
+            const cached = getCachedBuoyData();
+            setBuoyData(cached);
+            warnBuoyFallbackOnce();
+            return;
+        }
+
+        fetch(localBuoyReadings(), { signal: controller.signal })
+            .then((res) => {
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+                return res.json();
             })
-            .catch(() => {
-                setBuoyData(localBuoyData);
+            .then((data) => {
+                if (!isMountedRef.current) return;
+                if (!setBuoyDataSafely(data)) {
+                    const cached = getCachedBuoyData();
+                    setBuoyData(cached);
+                    warnBuoyFallbackOnce();
+                }
+            })
+            .catch((error) => {
+                if (error?.name === 'AbortError' || !isMountedRef.current) return;
+                const cached = getCachedBuoyData();
+                setBuoyData(cached);
+                warnBuoyFallbackOnce();
             });
-    }, []);
+    };
+
     useEffect(() => {
         const swells = buoyData.data
                     .slice() // copy array to avoid mutating state
@@ -92,49 +120,107 @@ const {
                         return b.latestData.height - a.latestData.height;
                     })
                     .slice(0, 5)
-        if (swells[0] && swells[0].latestData) {
-            handleSwell1Selection(null, null, getDirection(swells[0].latestData.direction));
+        const nextSwell1Direction = swells[0] && swells[0].latestData
+            ? getDirection(swells[0].latestData.direction)
+            : null;
+        const nextSwell2Direction = swells[1] && swells[1].latestData
+            ? getDirection(swells[1].latestData.direction)
+            : null;
+        const hasStoredSwell1Direction = Boolean(localStorage.getItem('swell1Direction'));
+        const hasStoredSwell2Direction = Boolean(localStorage.getItem('swell2Direction'));
+
+        if (!hasStoredSwell1Direction && nextSwell1Direction && nextSwell1Direction !== status.swell1Direction) {
+            handleSwell1Selection(null, null, nextSwell1Direction);
         }
-        if (swells[1] && swells[1].latestData) {
-            handleSwell2Selection(null, null, getDirection(swells[1].latestData.direction));
+        if (!hasStoredSwell2Direction && nextSwell2Direction && nextSwell2Direction !== status.swell2Direction) {
+            handleSwell2Selection(null, null, nextSwell2Direction);
         }
-    }, [buoyData]);
+    }, [buoyData, status.swell1Direction, status.swell2Direction]); // eslint-disable-line react-hooks/exhaustive-deps
     useEffect(() => {
-        const localBuoyData = initializeData('buoyData', buoysTemplateData);
-        
-        fetch(localBuoyReadings())
-            .then(res => res.ok ? res.json() : Promise.reject())
-            .then(data => {
-                console.log(`ConditionsDashboard => fetch localBuoyReadings: ${JSON.stringify(data, null, 2)}`);
-                setBuoyData(data);
-                localStorage.setItem('buoyData', JSON.stringify(data));
-            })
-            .catch(() => {
-                setBuoyData(localBuoyData);
-            }); 
-            console.log(`ConditionsDashboard => range: ${range}`);
-    }, [range]);
+        const mountedRef = { current: true };
+        const controller = new AbortController();
+        fetchAndSetBuoyData(controller, mountedRef);
+
+        return () => {
+            mountedRef.current = false;
+            controller.abort();
+        };
+    }, [range]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const formatWindDirection = (windDirectionValue) => {
+        if (typeof windDirectionValue === 'string' && /[A-Za-z]/.test(windDirectionValue)) {
+            return windDirectionValue;
+        }
+
+        const directionDegrees = Number(windDirectionValue);
+        if (!Number.isFinite(directionDegrees)) {
+            return 'N';
+        }
+
+        const normalizedDegrees = ((directionDegrees % 360) + 360) % 360;
+        return getDirection(normalizedDegrees, 'windDirection');
+    };
+
+    const normalizeTemperature = (value, fallbackStorageKey) => {
+        const parsedValue = Number(value);
+        if (Number.isFinite(parsedValue)) {
+            return Math.round(parsedValue);
+        }
+
+        const fallbackValue = Number(initializeData(fallbackStorageKey, 0));
+        if (Number.isFinite(fallbackValue)) {
+            return Math.round(fallbackValue);
+        }
+
+        return 0;
+    };
+
+    const currentWaterTemp = normalizeTemperature(status?.waterTemp, 'waterTemp');
+    const currentAirTemp = normalizeTemperature(status?.airTemp, 'airTemp');
 
     const windHeader = () => <div>
-            {icons.wind} {status.windDirection} {status.windGusts}
+            {icons.wind} {formatWindDirection(status.windDirection)} {status.windGusts}
             <span className='size12'>
                 mph
             </span> 
-            {icons.water}{initializeData('waterTemp', 0)}°
+            {icons.water}{currentWaterTemp}°
             <span className='size12'>
                 F
             </span> 
-            {icons.temperature} {initializeData('airTemp', 0)}°
+            {icons.temperature} {currentAirTemp}°
             <span className='size12'>
                 F
             </span>
+            {
+                isBuoyFallbackActive
+                ? <span className='size15 ml-5 color-orange'>🤔</span>
+                    : null
+            }
         </div>
     
     const swellDisplay = () => <SwellDisplay
         time={time}
         //status={status}
         //setStatus={setStatus}
-    />
+    />;
+
+    // Cams dropdown state
+    const [camsCollapse, setCamsCollapse] = useState(true);
+    const camsDisplay = () => (
+        <div className='mt-5 mb-25'>
+            <div className='containerDetail size20 color-yellow bg-lite p-20 mb--20'>
+                <CollapseToggleButton
+                    title={'📹 Cams'}
+                    isCollapsed={camsCollapse}
+                    setCollapse={setCamsCollapse}
+                    align='left'
+                />
+            </div>
+            {
+                camsCollapse ? null : <Cams />
+            }
+        </div>
+    );
     return (
         <div className=''>
             {/*<BuoyReadingsChart lat={localStorage.getItem('latitude')} long={localStorage.getItem('longitude')} />*/}
@@ -200,7 +286,6 @@ const {
                 */
             }
             {(conditionsCollapse) ? null : swellDisplay()}
-            {tideDisplay('wide')}
             <div className='containerDetail size20 mt-5 mb-5 bold color-yellow bg-lite p-20'>
                 <CollapseToggleButton
                     title={''}
@@ -216,7 +301,7 @@ const {
                         <div className='containerBox bold color-yellow'>
                             WIND {icons.wind}
                         </div>
-                        <WindDirection columns='2' setWind={setWind} height='0px' collapse={conditionCollapse} />
+                        <WindDirection columns='2' setWind={setWind} height='0px' collapse={conditionCollapse} waterTemp={currentWaterTemp} airTemp={currentAirTemp} />
                     </div>
                     <div className='containerBox flex2Column'>
                         <div className='containerBox bold color-yellow'>
@@ -228,10 +313,12 @@ const {
                         <div className='containerBox bold color-yellow'>
                             AIR {icons.temperature}
                         </div>
-                        <AirTemp/>
+                        <AirTemp setStatus={setStatus} />
                     </div>
                 </div>
             </div>
+            {tideDisplay('wide')}
+            {camsDisplay()}
             <SunTracker />
             <div className='containerDetail size20 bold mb-5 color-yellow bg-lite p-20'>
                 <CollapseToggleButton

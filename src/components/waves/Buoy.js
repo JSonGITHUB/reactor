@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Loader from '../utils/Loader.js';
 
+const isLocalDev = typeof window !== 'undefined' && window.location?.hostname === 'localhost';
+const NDBC_BASE = isLocalDev ? '/api/ndbc' : 'https://www.ndbc.noaa.gov';
+
 const Buoy = ({isMotionOn}) => {
     
     const [buoy, setBuoy] = useState(null);
@@ -26,7 +29,7 @@ const Buoy = ({isMotionOn}) => {
         const getStartTime = `${year}${month}${date}%20${startHour}:00`;
         getCurrentTime = `${year}${month}${date}%20${hours}:${minutes}`;
         console.log(`Buoy   - getStartTime: ${getStartTime} => getEndTime: ${getEndTime}`)
-        const buoyuri = `https://www.ndbc.noaa.gov/data/latest_obs/latest_obs.txt`;
+        const buoyuri = `${NDBC_BASE}/data/latest_obs/latest_obs.txt`;
         //`https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=20200520%2018:24&end_date=20200520%2018:24&station=9410230&product=water_temperature&datum=mllw&units=english&time_zone=gmt&application=web_services&format=json`
         fetch(buoyuri)
             .then(response => console.log(`YEEEW!!!! -- ${validate(response)}`))
