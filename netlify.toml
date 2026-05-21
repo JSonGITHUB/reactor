@@ -1,4 +1,6 @@
 # example netlify.toml
+[functions]
+  directory = "netlify/functions"
 [build]
   command = "npm run build"
   functions = "netlify/functions"
