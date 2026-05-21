@@ -2,7 +2,7 @@ export async function fetchAIRecommendations(prompt) {
 
   const isProd = process.env.NODE_ENV === 'production';
   const apiUrl = isProd
-    ? 'https://keepfrothalive.netlify.app/netlify/functions/ai-recommendations'
+    ? 'https://keepfrothalive.netlify.app/.netlify/functions/ai-recommendations'
     : '/api/ai/recommendations'; // local proxy
 
   const response = await fetch(apiUrl, {
