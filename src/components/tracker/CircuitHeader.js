@@ -41,7 +41,7 @@ const CircuitHeader = ({
                         onClick={() => addGoal(header)}
                     >
                         <div className='flexContainer'>
-                            <div className='flex2Column text-outline-light size15'>
+                            <div className='flex2Column text-outline-lite size15'>
                                 {icons.plus}
                             </div>
                             <div className='flex2Column size30 ml-5'>

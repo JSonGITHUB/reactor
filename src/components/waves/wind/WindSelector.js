@@ -31,7 +31,12 @@ const WindSelector = ({
     const backgroundColorClass = (status.isWind === true) ? 'bg-veryLite fadeInFaded brdr-green' : 'bg-tinted fadeOutFaded';
     const windClass = () => `${backgroundColorClass} containerDetail flex2Column contentCenter mt-5 ml-5 mb-5`;
     const handleWindSelection = (groupTitle, label, selected) => {
-        setStatus(selected)
+        localStorage.setItem('windDirection', selected);
+        setStatus(prevState => ({
+            ...prevState,
+            pause: true,
+            windDirection: selected
+        }));
     }
 
     return (

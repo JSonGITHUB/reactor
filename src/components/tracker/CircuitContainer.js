@@ -22,10 +22,8 @@ const CircuitContainer = ({
         circuits,
         activeIndex,
         setActiveIndex,
-        jumpToActive,
         setVideoId,
-        setVideoActive,
-        dimensions
+        setVideoActive
     } = useContext(CircuitContext);
 
     const [active, setActive] = useState(false);
@@ -53,29 +51,29 @@ const CircuitContainer = ({
         const nextIndex = `chillindex${Number(index)}groupIndex${groupIndex}subgroupIndex${subgroupIndex}`;
         setActiveIndex(nextIndex);
         setVideoActive(false);
-        jumpToActive();
     }
     const triggerTimer = (index, groupIndex, subgroupIndex) => {
         const nextIndex = `sessionindex${Number(index + 1)}groupIndex${groupIndex}subgroupIndex${subgroupIndex}`;
         setActiveIndex(nextIndex);
-        jumpToActive();
     }
 
     const getCircuitPlayer = (index, goal) => <div>
         {
             (active && goal.link.includes('youtu'))
                 ? (goal.link.includes('youtu'))
-                    ? <iframe 
-                        title='videoPlayer' 
-                        width={dimensions.width} 
-                        height={dimensions.height} 
-                        frameBorder='0' 
-                        className='r-5' 
-                        allowFullScreen
-                        allow='autoplay; encrypted-media'
-                        src={`${videoSource}&autoplay=1&mute=1&playsinline=1`}
-                    >
-                    </iframe>
+                    ? <div className='width-100-percent' style={{ aspectRatio: '16 / 9' }}>
+                        <iframe
+                            title='videoPlayer'
+                            width='100%'
+                            height='100%'
+                            frameBorder='0'
+                            className='r-5 width-100-percent'
+                            allowFullScreen
+                            allow='autoplay; encrypted-media'
+                            src={`${videoSource}&autoplay=1&mute=1&playsinline=1`}
+                        >
+                        </iframe>
+                    </div>
                     : <div className='mt-20'>
                         <img className='width-100-percent button' src={goal.link} alt={goal.title} />
                     </div>

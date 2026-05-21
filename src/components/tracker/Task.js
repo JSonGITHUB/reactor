@@ -29,6 +29,14 @@ const Task = ({
     const [showStopModal, setShowStopModal] = useState(false);
     const activeIntervalsRef = useRef(new Set());
 
+    // Inline edit state for task description
+    const [editingDescription, setEditingDescription] = useState(false);
+    const [editedDescription, setEditedDescription] = useState(task.description || '');
+
+    // Inline edit state for session reason
+    const [editingSessionIndex, setEditingSessionIndex] = useState(null);
+    const [editedSessionReason, setEditedSessionReason] = useState('');
+
     const STOP_REASONS = [
         'Coffee',
         'Lunch',
@@ -457,6 +465,33 @@ const Task = ({
         setTasks(updatedTasks);
     };
 
+    const handleSaveDescription = () => {
+        if (editedDescription.trim() === '') return;
+        const updatedTasks = [...tasks];
+        updatedTasks[projectIndex].tasks[taskIndex].description = editedDescription.trim();
+        setTasks(updatedTasks);
+        setEditingDescription(false);
+    };
+
+    const handleCancelEditDescription = () => {
+        setEditedDescription(task.description || '');
+        setEditingDescription(false);
+    };
+
+    const handleSaveSessionReason = (sessionIndex) => {
+        if (editedSessionReason.trim() === '') return;
+        const updatedTasks = [...tasks];
+        updatedTasks[projectIndex].tasks[taskIndex].sessions[sessionIndex].reason = editedSessionReason.trim();
+        updatedTasks[projectIndex].tasks[taskIndex].sessions[sessionIndex].description = editedSessionReason.trim();
+        setTasks(updatedTasks);
+        setEditingSessionIndex(null);
+    };
+
+    const handleCancelEditSession = () => {
+        setEditedSessionReason('');
+        setEditingSessionIndex(null);
+    };
+
     const getTime = (date) => {
         const newDate = String(date).split(', ')[1].replace(' ', '');
         const timeArray = newDate.split(':');
@@ -465,17 +500,66 @@ const Task = ({
         const timeOfDay = timeArray[2].substring(2, 4);
         return `${hours}:${minutes}${timeOfDay}`
     }
+    const getTaskHeader = (task) => {
+        console.log('getTaskHeader => task:', task.description);
+        return <div className='flexContainer centerVertical'>
+                    <div className='flex2Column contentLeft'>
+                        {task.description || 'New Task'}
+                    </div>
+                    <div className='flex2Column contentRight'>
+                        <span
+                            className='button p-5 ml-5 mr-10 size12'
+                            title='Edit task'
+                            data-collapse-ignore='true'
+                            style={{ position: 'relative', zIndex: 3 }}
+                            onMouseDown={(event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                            }}
+                            onTouchStart={(event) => {
+                                event.stopPropagation();
+                            }}
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                setEditedDescription(task.description || '');
+                                setEditingDescription(true);
+                            }}
+                        >
+                            ✏️
+                        </span>
+                    </div>
+                </div>;
+    }
 
     return <div key={`task-${projectIndex}-${taskIndex}-${String(task?.description || 'task')}`} className=''>
         <div className=''>
             <div className='centerVertical'>
                 <div className='containerDetail color-yellow bg-tinted mt-5 p-10 size20'>
-                    <CollapseToggleButton
-                        title={`${task.description}`}
-                        isCollapsed={collapse}
-                        setCollapse={setCollapse}
-                        align='left'
-                    />
+                    {
+                        editingDescription
+                        ? <div className='flexContainer centerVertical'>
+                            <input
+                                className='flex1Column size20 color-yellow bg-dark p-5 r-5'
+                                style={{ border: '1px solid #0cf500', outline: 'none' }}
+                                type='text'
+                                value={editedDescription}
+                                onChange={(e) => setEditedDescription(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleSaveDescription();
+                                    if (e.key === 'Escape') handleCancelEditDescription();
+                                }}
+                                autoFocus
+                            />
+                            <span className='button p-5 ml-5 size25' onClick={handleSaveDescription}>✅</span>
+                            <span className='button p-5 ml-10 size25' onClick={handleCancelEditDescription}>❌</span>
+                        </div>
+                        : <CollapseToggleButton
+                            title={getTaskHeader(task)}
+                            isCollapsed={collapse}
+                            setCollapse={setCollapse}
+                            align='left'
+                        />
+                    }
                 </div>
             </div>
             <div className='containerDetail mt-5 flexContainer p-10 size15'>
@@ -514,7 +598,7 @@ const Task = ({
                     : <div
                         title='track'
                         className='containerDetail p-10 button flex2Column bg-lite button m-5'
-                                onClick={() => handleStartTask(projectIndex, taskIndex, (task.sessions.length - 1))}
+                        onClick={() => handleStartTask(projectIndex, taskIndex, (task.sessions.length - 1))}
                     >
                         {icons.track}
                     </div>
@@ -539,19 +623,72 @@ const Task = ({
                                 <div key={`task-session-container-${projectIndex}-${taskIndex}-${sessionIndex}-${String(session?.startDate || 'date')}`}>
                                     <div className={`containerDetail ${(session.breakTime)?'':'bg-lite'} ${(sessionIndex > 0) ? 'mt-5' : '' }`}>
                                         <div className='containerDetail color-lite p-10 flexContainer centerVertical'>
-                                            <div className='flexColumn contentLeft'>
-                                                <div className='color-lite size12'>{String(session.startDate).split(', ')[0]}</div>
-                                                <div className='color-yellow'>{session.reason || `Session ${sessionIndex + 1}`}</div>
+                                            <div className='flex2Column contentLeft'>
+                                                {
+                                                    editingSessionIndex !== sessionIndex
+                                                    ? <div className='color-lite size12'>{String(session.startDate).split(', ')[0]}</div>
+                                                    : null
+                                                }
+                                                {
+                                                    editingSessionIndex === sessionIndex
+                                                    ? <div className='flexContainer centerVertical mt-5'>
+                                                        <input
+                                                            className='flex1Column size20 color-yellow bg-dark p-5 r-5'
+                                                            style={{ border: '1px solid #0cf500', outline: 'none' }}
+                                                            type='text'
+                                                            value={editedSessionReason}
+                                                            onChange={(e) => setEditedSessionReason(e.target.value)}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter') handleSaveSessionReason(sessionIndex);
+                                                                if (e.key === 'Escape') handleCancelEditSession();
+                                                            }}
+                                                            autoFocus
+                                                        />
+                                                        <span 
+                                                            className='flexColumn button p-5 ml-5 size25' 
+                                                            onClick={() => handleSaveSessionReason(sessionIndex)}
+                                                        >
+                                                            ✅
+                                                        </span>
+                                                        <span 
+                                                            className='flexColumn button p-5 ml-5 size12' 
+                                                            onClick={handleCancelEditSession}
+                                                        >
+                                                            ❌
+                                                        </span>
+                                                    </div>
+                                                    : <div className='color-yellow flexContainer centerVertical contentLeft'>
+                                                        <span>
+                                                            {session.reason || `Session ${sessionIndex + 1}`}
+                                                        </span>
+                                                    </div>
+                                                }
                                             </div>
-                                            <div className='flex1Auto contentRight'>
-                                                <span
-                                                    title='delete session'
-                                                    className='containerDetail button bg-lite p-10'
-                                                    onClick={() => handleDeleteSession(projectIndex, taskIndex, sessionIndex)}
-                                                >
-                                                    {icons.delete}
-                                                </span>
-                                            </div>
+                                            {
+                                                editingSessionIndex !== sessionIndex
+                                                ? <React.Fragment>
+                                                        <div
+                                                            className='flexColumn containerDetail bg-lite button p-12 ml-5 size10'
+                                                            title='Edit session'
+                                                            onClick={() => {
+                                                                setEditedSessionReason(session.reason || session.description || '');
+                                                                setEditingSessionIndex(sessionIndex);
+                                                            }}
+                                                        >
+                                                            ✏️
+                                                        </div>
+                                                        <div className='flexColumncontentRight'>
+                                                            <span
+                                                                title='delete session'
+                                                                className='containerDetail button bg-lite ml-5 p-10'
+                                                                onClick={() => handleDeleteSession(projectIndex, taskIndex, sessionIndex)}
+                                                            >
+                                                                {icons.delete}
+                                                            </span>
+                                                        </div>
+                                                    </React.Fragment>
+                                                    : null
+                                            }
                                         </div>
                                         <div className='flexContainer p-10 size15'>
                                             <div className='flex2Column contentLeft color-lite'>

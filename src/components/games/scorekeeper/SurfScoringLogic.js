@@ -6,42 +6,32 @@ const SurfScoringLogic = ({
     completed,
     oneLine
 }) => {
+    // Defensive: fallback if heat is not valid
+    if (!Array.isArray(heat) || heat.length < 2 || !heat[index] || typeof heat[index].surfScore === 'undefined') {
+        return <div className="color-red">Score unavailable</div>;
+    }
 
     const playerId = index;
     const scoreDifference = () => {
         if (heat.length > 1) {
-            //console.log(`SurfScoringLogic => scoreDifference -> heat.length: ${heat.length}`);
-            //console.log(`SurfScoringLogic => scoreDifference -> players ${heat.map((player)=>player.name)}`);
-            //console.log(`SurfScoringLogic => scoreDifference -> players ${heat.map((player) => JSON.stringify(player,null,2))}`);
-            const newPlayerId = (playerId === 0) ? 0 : (playerId - 1);   
-            //const difference = Number((heat[newPlayerId].surfScore) - heat[(playerId === 0) ? 1 : (playerId)].surfScore);    
-            const player1 = heat[newPlayerId]?.surfScore; // Check if heat[newPlayerId] exists and has surfScore
-            //console.log(`SurfScoringLogic => scoreDifference -> player1: ${JSON.stringify(player1,null,2)}`);
-            const player2 = heat[(playerId === 0) ? 1 : playerId]?.surfScore; // Check if heat[playerId] exists and has surfScore
-            //console.log(`SurfScoringLogic => scoreDifference -> player2: ${JSON.stringify(player2, null, 2)}`);
+            const newPlayerId = (playerId === 0) ? 0 : (playerId - 1);
+            const player1 = heat[newPlayerId]?.surfScore;
+            const player2 = heat[(playerId === 0) ? 1 : playerId]?.surfScore;
             if (player1 !== undefined && player2 !== undefined) {
                 const difference = Number(player1 - player2);
-                //console.log(`Difference: ${difference}`);
-                //console.log(`SurfScoringLogic => scoreDifference: ${heat[newPlayerId].name} - ${difference}`);
                 return difference;
             } else {
-                console.error('Invalid player ID or missing surfScore.');
                 return 0;
             }
         } else {
             return 0;
         }
-                
     }
     const difference = (scoreDifference() < 0) ? (-1 * scoreDifference()) : scoreDifference();
     const winningScore = Number(heat[(playerId === 0) ? 0 : ((playerId < 3) ? (playerId - 1) : 1)]?.surfScore);
-    //console.log(`SurfScoringLogic => winningScore: ${winningScore}`);
-    //console.log(`SurfScoringLogic => player: ${heat[playerId]?.name} surfScores: ${heat[playerId]?.surfScores}`);
     const highestScoresIndices = (heat[playerId]) ? findTwoHighestIndices(heat[playerId].surfScores) : [];
     const losersHeighestScore = (heat[playerId]) ? heat[playerId].surfScores[highestScoresIndices[0]] : [];
-    //console.log(`SurfScoringLogic => losersHeighestScore: ${losersHeighestScore}`)
     const need = (winningScore - losersHeighestScore) + .01;
-    //console.log(`SurfScoringLogic => need: ${need}`)
     const winsBy = (oneLine === 'false')
         ? <div>
             <div>{`${(completed) ? 'Won' : 'Wins'} by`}</div>
@@ -57,7 +47,7 @@ const SurfScoringLogic = ({
                 <div>{need.toFixed(2)}</div>
             </div>
             : <div>{`${(completed) ? 'Needed' : 'Needs'}`} {need.toFixed(2)}</div>
-    
+
     if (playerId === 0) {
         return <div>
                     {winsBy}
@@ -84,6 +74,5 @@ const SurfScoringLogic = ({
                     </div>
                 }
             </div>
-
 }
 export default SurfScoringLogic;

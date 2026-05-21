@@ -410,7 +410,7 @@ const Expense529 = () => {
                             </label>
                             <label>
                                 <div className='containerBox flexContainer'>
-                                    <div className='containerBox flexColumn contenLeft'>
+                                    <div className='containerBox flexColumn contentLeft'>
                                         Share % (0–100)
                                     </div>
                                     <input

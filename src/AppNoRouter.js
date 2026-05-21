@@ -11,10 +11,12 @@ import BowlBuilder from './components/BowlBuilder';
 import Sessions from './components/waves/LogDirectoryNoRouter';
 import Session from './components/waves/Session';
 import Waves from './components/waves/Waves';
+//import SurfDashboard from './components/waves/SurfDashboard';
 import Weather from './components/waves/Weather';
 import Dive from './components/waves/Dive';
 import Location from './components/waves/Location';
 import WindDirection from './components/waves/WindDirection';
+import Cams from './components/waves/Cams';
 import Product from './components/shop/Product';
 //import EyeExercises from './components/eye/EyeExercises';
 //import PDFReport from './components/eye/PDFReport';
@@ -48,8 +50,11 @@ import Interest from './components/finance/Interest';
 import Pay from './components/finance/Pay';
 import Budget from './components/utils/Budget';
 import TradeView from './components/utils/TradeView';
+import Trade from './components/utils/Trade';
+import Crypto from './components/utils/Crypto'; 
 import Pricing from './components/utils/Pricing';
 import Converter from './components/utils/Converter';
+import News from './components/utils/News';
 import Tracker from './components/tracker/Tracker';
 import Expense529 from './components/tracker/Expense529';
 import Notes from './components/tracker/Notes';
@@ -146,6 +151,11 @@ export default ({ props }) => {
                             distance='10' 
                         />
                     </Route>
+                    {/*
+                    <Route path='/SurfDashboard'>
+                        <SurfDashboard />
+                    </Route>
+                    */}
                     <Route path='/MenuScreen'>
                         <MenuScreen />
                     </Route>
@@ -159,9 +169,6 @@ export default ({ props }) => {
                         <Location mode='display' />
                     </Route>
                     <Route path='/Wind'>
-                        <WindDirection />
-                    </Route>
-                    <Route path='/Water'>
                         <WindDirection />
                     </Route>
                     <Route path='/Air'>
@@ -179,11 +186,13 @@ export default ({ props }) => {
                     <Route path='/GuestList'><SignUpDialog /></Route>
                     <Route path='/Session'><Session logId={logId} /></Route>
                     <Route path='/SunTracker'><SunTracker /></Route>
+                    <Route path='/Water'><Water /></Route>
                     {/*
                     <Route path='/EyeExercises'><EyeExercises /></Route>
                     <Route path='/PDFReport'><PDFReport /></Route>
                     */}
                     <Route path='/Product'><Product /></Route>
+                    <Route path='/Cams'><Cams /></Route>
                     <Route path='/Waves'>
                         <Waves 
                             {...props} 
@@ -245,8 +254,11 @@ export default ({ props }) => {
                     <Route path='/Pay'><Pay /></Route>
                     <Route path='/Budget'><Budget /></Route>
                     <Route path='/TradeView'><TradeView /></Route>
+                    <Route path='/Trade'><Trade /></Route>
+                    <Route path='/Crypto'><Crypto /></Route>
                     <Route path='/Pricing'><Pricing /></Route>
                     <Route path='/Converter'><Converter /></Route>
+                    <Route path='/News'><News /></Route>
                     <Route path='/Tracker'><Tracker /></Route>
                     <Route path='/529'><Expense529 /></Route>
                     <Route path='/Notes'><Notes /></Route>
@@ -268,7 +280,7 @@ export default ({ props }) => {
                     <Route path='/Checkers'><Checkers /></Route>
                     <Route path='/WheelOfFortune'><WheelOfFortune /></Route>
                     <Route path='/Roulette'><Roulette /></Route>
-                    <Route path='/Tide'><TideChart /></Route>
+                    <Route path='/Tide'><TideChart standalone='true' /></Route>
                     <Route path='/TrainingLog'><TrainingLog /></Route>
                     <Route path='/Admin'><Admin /></Route>
                     {/*<Route path='/AIDashboard'><AIDashboard /></Route>*/}

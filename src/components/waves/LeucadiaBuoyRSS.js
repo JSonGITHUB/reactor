@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import fetchTimer from '../utils/FetchTimer';
 
+const isLocalDev = typeof window !== 'undefined' && window.location?.hostname === 'localhost';
+const NDBC_BASE = isLocalDev ? '/api/ndbc' : 'https://www.ndbc.noaa.gov';
+
 const LeucadiaBuoyRSS = () => {
     /*
     const templateData = `<?xml version="1.0"?>
@@ -70,7 +73,7 @@ const LeucadiaBuoyRSS = () => {
     useEffect(() => {
         const fetchRssFeed = async () => {
             try {
-                const response = await fetch('https://www.ndbc.noaa.gov/data/latest_obs/46274.rss');
+                const response = await fetch(`${NDBC_BASE}/data/latest_obs/46274.rss`);
                 const xmlText = await response.text();
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(xmlText, 'application/xml');

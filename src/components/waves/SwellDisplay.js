@@ -42,7 +42,12 @@ const SwellDisplay = ({
         localStorage.setItem('swellCollapse', swellCollapse);
     }, [swellCollapse]);
 
-    const swellHeader = () => <div>{icons.wave} Swell {Number(getSwellHeight()).toFixed(0)}<span className='size12'>ft</span> {getDirection(getSwellDirection(), 'swellDirection')} {getSwellDirection()} {Number(getSwellInterval()).toFixed(0)}<span className='size12'>sec</span></div>
+    const swellHeader = () => <div>
+                                {icons.wave} Swell {Number(getWaveHeight()).toFixed(0)}
+                                <span className='size12 mr-5'>ft</span>
+                                {getDirection(getWaveDirection(), 'swellDirection')} {getWaveDirection()} {Number(getWaveInterval()).toFixed(0)}
+                                <span className='size12'>sec</span>
+                            </div>;
     return (
         <div>
             {

@@ -9,6 +9,7 @@ import {
     YAxis,
 } from 'recharts';
 import getMatchIcon from './GetMatchIcon';
+import fetchCurrentWaterTemp from './waterTempService';
 
 const NOAA_BASE = '/api/prod/datagetter';
 const NOAA_STATION_ID = '9410230';
@@ -400,7 +401,10 @@ const Dive = ({ coreMetricsOnly = false }) => {
 
             const [visibilityResult, waterResult, windResult, swellResult, beachStatusResult] = await Promise.allSettled([
                 fetchVisibilityPayload(),
-                fetchNoaaProduct('water_temperature'),
+                fetchCurrentWaterTemp({
+                    noaaStationId: NOAA_STATION_ID,
+                    ndbcStationId: NDBC_SWELL_STATION_ID,
+                }),
                 fetchNoaaProduct('wind'),
                 fetchNdbcStationData(NDBC_SWELL_STATION_ID),
                 fetchSdBeachStatus(),
@@ -415,11 +419,7 @@ const Dive = ({ coreMetricsOnly = false }) => {
                     ? 'SD Beach visibility API endpoint unavailable (resource not found)'
                     : 'No public numeric visibility feed available';
 
-            const latestWaterNoaa = waterResult.status === 'fulfilled'
-                ? getNoaaDataRows(waterResult.value).slice(-1)[0]
-                : null;
-            const parsedWaterTempNoaa = parseNumeric(latestWaterNoaa?.v);
-            const parsedWaterTimestampNoaa = parseNoaaTimestamp(latestWaterNoaa?.t);
+            const currentWaterReading = waterResult.status === 'fulfilled' ? waterResult.value : null;
 
             const latestWindNoaa = windResult.status === 'fulfilled'
                 ? getNoaaDataRows(windResult.value).slice(-1)[0]
@@ -434,8 +434,6 @@ const Dive = ({ coreMetricsOnly = false }) => {
                 ? parseNdbcRealtimeRows(swellResult.value)
                 : [];
             const latestNdbcRow = ndbcRows.length ? ndbcRows[ndbcRows.length - 1] : null;
-            const fallbackWaterFromBuoy = latestNdbcRow?.waterTempF ?? null;
-            const fallbackWaterTimeFromBuoy = latestNdbcRow?.timestamp ?? null;
             const swellFeet = latestNdbcRow?.swellFeet ?? null;
             const swellTimestamp = latestNdbcRow?.timestamp ?? null;
 
@@ -443,8 +441,11 @@ const Dive = ({ coreMetricsOnly = false }) => {
                 ? extractBeachStatus(beachStatusResult.value)
                 : null;
 
-            const resolvedWaterValue = parsedWaterTempNoaa ?? fallbackWaterFromBuoy;
-            const resolvedWaterTimestamp = parsedWaterTimestampNoaa ?? fallbackWaterTimeFromBuoy;
+            const resolvedWaterValue = Number.isFinite(currentWaterReading?.valueF)
+                ? currentWaterReading.valueF
+                : null;
+            const resolvedWaterTimestamp = currentWaterReading?.timestamp ?? null;
+            const resolvedWaterSource = currentWaterReading?.source || null;
 
             const dataSourcesFailed = [visibilityResult, waterResult, windResult, swellResult, beachStatusResult].some((item) => item.status === 'rejected');
 
@@ -459,6 +460,7 @@ const Dive = ({ coreMetricsOnly = false }) => {
                         : {
                             value: resolvedWaterValue,
                             timestamp: resolvedWaterTimestamp,
+                            source: resolvedWaterSource,
                         }
                 );
                 setWind(
@@ -645,6 +647,13 @@ const Dive = ({ coreMetricsOnly = false }) => {
                                         <div className='containerDetail bg-lite mb-5 p-10'>
                                             <span className='color-yellow'>Water temperature:</span> {waterTemp ? `${waterTemp.value.toFixed(1)} °F` : 'N/A'}
                                         </div>
+                                        {
+                                            waterTemp?.source
+                                                ? <div className='containerDetail bg-lite mb-5 p-10'>
+                                                    <span className='color-yellow'>Water source:</span> {waterTemp.source}
+                                                </div>
+                                                : null
+                                        }
                                         {
                                             showCoreOnly
                                                 ? null

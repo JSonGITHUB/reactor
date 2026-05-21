@@ -684,7 +684,7 @@ const DoseContent = () => {
                     : null
                 }
                 </div>
-                <div className={`z1 bt-0 r-10 width-100-percent m-1 mb-5`}>
+                <div className={`z1 bt-10 r-10 width-50-percent ml-5`}>
                     <div className='containerDetail button p-10 color-yellow size20 bg-green ml-5 width--20 mt-5' onClick={handleResetTimeline}>
                         Reset Timeline
                     </div>

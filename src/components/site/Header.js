@@ -13,6 +13,7 @@ import NavItemsMeta from './NavItemsMeta';
 import WordExploder from './WordExploder';
 import icons from './icons';
 import Sounds from '../sound/Sounds';
+import { fetchOpenMeteoJson, roundCoord } from '../../utils/openMeteoClient';
 
 const DOSE_ALARM_WINDOW_MS = 60000;
 const HOUSE_FOCUS_TASK_KEY = 'houseFocusTaskKey';
@@ -23,6 +24,8 @@ const HEADER_NOTICE_AUTO_MS = 5000;
 const WEATHER_REFRESH_MS = 10 * 60 * 1000;
 const TRAINING_STATUS_EVENT = 'trainingTimerStatusChanged';
 const SCORES_STATUS_EVENT = 'scoresRecordedGamesChanged';
+const RECENT_COMPONENTS_KEY = 'headerRecentComponents';
+const RECENT_COMPONENTS_MAX = 10;
 
 const WEATHER_CODE_LABEL = {
     0: 'Clear sky',
@@ -261,6 +264,7 @@ const getTrainingStatus = () => {
 };
 
 const TrainingNoticeLabel = memo(({ goalLabel, initialElapsedSeconds }) => {
+    
     const [elapsedSeconds, setElapsedSeconds] = useState(() => Math.max(0, Number(initialElapsedSeconds) || 0));
 
     useEffect(() => {
@@ -275,7 +279,10 @@ const TrainingNoticeLabel = memo(({ goalLabel, initialElapsedSeconds }) => {
     }, []);
 
     const fullLabel = `${goalLabel} ${formatElapsed(elapsedSeconds)}`;
-    return truncateLabel(fullLabel);
+    return <div>
+                <div>{truncateLabel(fullLabel).split(' ')[0]}</div>
+                <div className='mt--10'>{truncateLabel(fullLabel).split(' ')[1]}</div>
+            </div>;
 }, (previousProps, nextProps) => (
     previousProps.goalLabel === nextProps.goalLabel
     && previousProps.initialElapsedSeconds === nextProps.initialElapsedSeconds
@@ -312,6 +319,7 @@ const DaylightNoticeLabel = memo(({ sunsetTimeMs, errorMessage }) => {
 ));
 
 const TodosTimerNoticeLabel = memo(({ nameLine, timerMode, baseSeconds, startTimeMs }) => {
+    // Always call hooks first
     const [, setTick] = useState(0);
     const fallbackStartMsRef = useRef(Date.now());
 
@@ -330,6 +338,11 @@ const TodosTimerNoticeLabel = memo(({ nameLine, timerMode, baseSeconds, startTim
         return () => clearInterval(interval);
     }, []);
 
+    // If timerMode is empty, just show the summary line (no timer)
+    if (!timerMode) {
+        return <div className='lh-10'><div>{nameLine}</div></div>;
+    }
+
     const effectiveStartTimeMs = startTimeMs > 0 ? startTimeMs : fallbackStartMsRef.current;
     const elapsedFromStart = (effectiveStartTimeMs > 0)
         ? Math.max(0, Math.floor((Date.now() - effectiveStartTimeMs) / 1000))
@@ -337,11 +350,11 @@ const TodosTimerNoticeLabel = memo(({ nameLine, timerMode, baseSeconds, startTim
     const seconds = timerMode === 'countdown'
         ? Math.max(0, Number(baseSeconds || 0) - elapsedFromStart)
         : Math.max(0, Number(baseSeconds || 0) + elapsedFromStart);
-    const modeLabel = timerMode === 'countdown' ? 'Countdown' : 'Timer';
 
-    return <div>
+    // Only show label and time
+    return <div className='lh-10'>
         <div>{nameLine}</div>
-        <div>{`${modeLabel} ${formatElapsed(seconds)}`}</div>
+        <div>{formatElapsed(seconds)}</div>
     </div>;
 }, (previousProps, nextProps) => (
     previousProps.nameLine === nextProps.nameLine
@@ -381,14 +394,14 @@ const HeaderNoticeRow = memo(({
 }) => (
     <div
         title={title}
-        className='contentLeft button'
+        className='contentCenter button'
         style={headerNoticeRowStyle}
         onClick={onClick}
     >
-        <div className='flexColumn copyright mr-5'>
+        <div className='size20'>
             {icon}
         </div>
-        <div className='flex2Column pl-5 copyright' style={(isScore || isTask || isTodosTimer || isWorkDay || isCircuit) ? scoreHeaderLabelStyle : headerLabelStyle}>
+        <div className='ml-2 size10' style={(isScore || isTask || isTodosTimer || isWorkDay || isCircuit) ? scoreHeaderLabelStyle : headerLabelStyle}>
             {
                 isTraining
                     ? <TrainingNoticeLabel
@@ -396,38 +409,163 @@ const HeaderNoticeRow = memo(({
                         initialElapsedSeconds={trainingInitialElapsedSeconds}
                     />
                     : isScore
-                        ? <div>
+                        ? <div className='lh-10 contentLeft'>
                             <div>{scoreDateLine}</div>
-                            <div>{scoreMatchupLine}</div>
+                            <div>{scoreMatchupLine.split(' ')[0]}</div>
+                            <div>{scoreMatchupLine.split(' ')[1]}</div>
                         </div>
-                    : isTask
-                        ? <div>
-                            <div>{taskProjectLine}</div>
-                            <div>{taskNameLine}</div>
+                        : isTask
+                            ? <div className='lh-10'>
+                                <div>{taskProjectLine}</div>
+                                <div>{taskNameLine}</div>
+                            </div>
+                            : isTodosTimer
+                                ? <TodosTimerNoticeLabel
+                                    nameLine={todosTimerNameLine}
+                                    timerMode={todosTimerMode}
+                                    baseSeconds={todosTimerBaseSeconds}
+                                    startTimeMs={todosTimerStartTimeMs}
+                                />
+                                : isWorkDay
+                                    ? <div className='lh-10'>
+                                        <div>{workDayTargetLine}</div>
+                                        <div>{workDayProgressLine}</div>
+                                    </div>
+                                    : isCircuit
+                                        ? <div className='lh-10'>
+                                            <div>{circuitNameLine}</div>
+                                            <div>{circuitExerciseLine}</div>
+                                        </div>
+                                        : isDaylight
+                                            ? <DaylightNoticeLabel
+                                                sunsetTimeMs={daylightSunsetTimeMs}
+                                                errorMessage={daylightErrorMessage}
+                                            />
+                                            : <div className='lh-10 contentLeft'>
+                                                {
+                                                    label
+                                                        .split(' ')
+                                                        .reduce((chunks, _word, index, words) => {
+                                                            if (index % 2 === 0) {
+                                                                chunks.push(words.slice(index, index + 2).join(' '));
+                                                            }
+                                                            return chunks;
+                                                        }, [])
+                                                        .map((chunk, index) => <div key={index}>
+                                                            {chunk}
+                                                        </div>)
+                                                }
+                                            </div>
+            }
+        </div>
+    </div>
+), (previousProps, nextProps) => (
+    previousProps.title === nextProps.title
+    && previousProps.icon === nextProps.icon
+    && previousProps.label === nextProps.label
+    && previousProps.onClick === nextProps.onClick
+    && previousProps.isTraining === nextProps.isTraining
+    && previousProps.isScore === nextProps.isScore
+    && previousProps.isTask === nextProps.isTask
+    && previousProps.isTodosTimer === nextProps.isTodosTimer
+    && previousProps.isWorkDay === nextProps.isWorkDay
+    && previousProps.isCircuit === nextProps.isCircuit
+    && previousProps.isDaylight === nextProps.isDaylight
+    && previousProps.scoreDateLine === nextProps.scoreDateLine
+    && previousProps.scoreMatchupLine === nextProps.scoreMatchupLine
+    && previousProps.taskProjectLine === nextProps.taskProjectLine
+    && previousProps.taskNameLine === nextProps.taskNameLine
+    && previousProps.todosTimerNameLine === nextProps.todosTimerNameLine
+    && previousProps.todosTimerMode === nextProps.todosTimerMode
+    && previousProps.todosTimerBaseSeconds === nextProps.todosTimerBaseSeconds
+    && previousProps.todosTimerStartTimeMs === nextProps.todosTimerStartTimeMs
+    && previousProps.workDayTargetLine === nextProps.workDayTargetLine
+    && previousProps.workDayProgressLine === nextProps.workDayProgressLine
+    && previousProps.circuitNameLine === nextProps.circuitNameLine
+    && previousProps.circuitExerciseLine === nextProps.circuitExerciseLine
+    && previousProps.trainingGoalLabel === nextProps.trainingGoalLabel
+    && previousProps.trainingInitialElapsedSeconds === nextProps.trainingInitialElapsedSeconds
+    && previousProps.daylightSunsetTimeMs === nextProps.daylightSunsetTimeMs
+    && previousProps.daylightErrorMessage === nextProps.daylightErrorMessage
+));
+const DashboardItem = memo(({
+    title,
+    icon,
+    label,
+    onClick,
+    isTraining,
+    isScore,
+    isTask,
+    isTodosTimer,
+    isWorkDay,
+    isCircuit,
+    isDaylight,
+    scoreDateLine,
+    scoreMatchupLine,
+    taskProjectLine,
+    taskNameLine,
+    todosTimerNameLine,
+    todosTimerMode,
+    todosTimerBaseSeconds,
+    todosTimerStartTimeMs,
+    workDayTargetLine,
+    workDayProgressLine,
+    circuitNameLine,
+    circuitExerciseLine,
+    trainingGoalLabel,
+    trainingInitialElapsedSeconds,
+    daylightSunsetTimeMs,
+    daylightErrorMessage
+}) => (
+    <div
+        title={title}
+        className='button containerDetail p-10 mt-10 bg-lite'
+        onClick={onClick}
+    >
+        <div className='size40 mt-10 logo'>
+            {icon}
+        </div>
+        <div className='size12 text-outline-dark contentCenter color-yellow' style={{ minWidth: 0 }}>
+            {
+                isTraining
+                    ? <TrainingNoticeLabel
+                        goalLabel={trainingGoalLabel}
+                        initialElapsedSeconds={trainingInitialElapsedSeconds}
+                    />
+                    : isScore
+                        ? <div className='lh-10'>
+                            <div>{scoreDateLine}</div>
+                            <div>{scoreMatchupLine.split(' ')[0]}</div>
+                            <div>{scoreMatchupLine.split(' ')[1]}</div>
                         </div>
-                    : isTodosTimer
-                        ? <TodosTimerNoticeLabel
-                            nameLine={todosTimerNameLine}
-                            timerMode={todosTimerMode}
-                            baseSeconds={todosTimerBaseSeconds}
-                            startTimeMs={todosTimerStartTimeMs}
-                        />
-                    : isWorkDay
-                        ? <div>
-                            <div>{workDayTargetLine}</div>
-                            <div>{workDayProgressLine}</div>
-                        </div>
-                    : isCircuit
-                        ? <div>
-                            <div>{circuitNameLine}</div>
-                            <div>{circuitExerciseLine}</div>
-                        </div>
-                    : isDaylight
-                        ? <DaylightNoticeLabel
-                            sunsetTimeMs={daylightSunsetTimeMs}
-                            errorMessage={daylightErrorMessage}
-                        />
-                    : label
+                        : isTask
+                            ? <div className='lh-10'>
+                                <div>{taskProjectLine}</div>
+                                <div>{taskNameLine}</div>
+                            </div>
+                            : isTodosTimer
+                                ? <TodosTimerNoticeLabel
+                                    nameLine={todosTimerNameLine}
+                                    timerMode={todosTimerMode}
+                                    baseSeconds={todosTimerBaseSeconds}
+                                    startTimeMs={todosTimerStartTimeMs}
+                                />
+                                : isWorkDay
+                                    ? <div className='lh-10'>
+                                        <div>{workDayTargetLine}</div>
+                                        <div>{workDayProgressLine}</div>
+                                    </div>
+                                    : isCircuit
+                                        ? <div className='lh-10'>
+                                            <div>{circuitNameLine}</div>
+                                            <div>{circuitExerciseLine}</div>
+                                        </div>
+                                        : isDaylight
+                                            ? <DaylightNoticeLabel
+                                                sunsetTimeMs={daylightSunsetTimeMs}
+                                                errorMessage={daylightErrorMessage}
+                                            />
+                                            : <div className='lh-10'>{label}</div>
             }
         </div>
     </div>
@@ -462,6 +600,25 @@ const HeaderNoticeRow = memo(({
 ));
 
 const getDoseKey = (dose) => `${dose.medicationId}-${new Date(dose.time).getTime()}`;
+
+const parseRecentComponents = () => {
+    try {
+        const stored = JSON.parse(localStorage.getItem(RECENT_COMPONENTS_KEY));
+        if (!Array.isArray(stored)) return [];
+
+        return stored
+            .map((item) => String(item || '').trim())
+            .filter((item) => item && item.toLowerCase() !== 'home')
+            .slice(0, RECENT_COMPONENTS_MAX);
+    } catch (error) {
+        return [];
+    }
+};
+
+const getComponentFromPathname = (pathname) => {
+    const segment = String(pathname || '').split('/').filter(Boolean).pop() || '';
+    return decodeURIComponent(segment).trim();
+};
 
 const getDoseStatus = () => {
     const now = new Date();
@@ -773,7 +930,7 @@ const parseTodosTracking = () => {
 
 const getTodosTimerNotices = () => {
     const todos = parseTodosTracking();
-    return todos
+    const runningTimers = todos
         .filter((todo) => todo && todo.activated === true && (todo.type === 'timer' || todo.type === 'track') && !todo.completed)
         .map((todo, index) => ({
             index,
@@ -804,6 +961,23 @@ const getTodosTimerNotices = () => {
                 todosTimerStartTimeMs: Math.max(0, startTime)
             };
         });
+
+    if (runningTimers.length > 0) {
+        return runningTimers;
+    }
+
+    // If no running timers, show a summary notice
+    const incompleteCount = todos.filter((todo) => todo && !todo.completed).length;
+    return [
+        {
+            key: 'todos-summary',
+            fullLabel: `${incompleteCount} Todos incomplete`,
+            todosTimerNameLine: `${incompleteCount} Todos incomplete`,
+            todosTimerMode: '',
+            todosTimerBaseSeconds: 0,
+            todosTimerStartTimeMs: 0
+        }
+    ];
 };
 
 const parseCircuitTracking = () => {
@@ -865,14 +1039,15 @@ const getShopNoticeStatus = () => {
     try {
         const stored = JSON.parse(localStorage.getItem('vueTodos'));
         const todos = Array.isArray(stored) ? stored : [];
-        const cartCount = todos.reduce((count, todo) => {
-            if (todo?.cart === true) return count + 1;
+        // Count items where selected=true and cart=false
+        const selectedCount = todos.reduce((count, todo) => {
+            if (todo?.select === true && todo?.cart !== true) return count + 1;
             return count;
         }, 0);
 
-        const fullLabel = `${cartCount}`;
+        const fullLabel = `${selectedCount}`;
         return {
-            count: cartCount,
+            count: selectedCount,
             fullLabel,
             label: truncateLabel(fullLabel)
         };
@@ -917,8 +1092,8 @@ const getFuelServiceNoticeStatus = () => {
         return { hasAlert: false, count: 0, fullLabel: '', label: '' };
     }
 
-    const dueItems = serviceDefs
-        .map((definition) => {
+    const overdueItems = serviceDefs
+        .map((definition, idx) => {
             const key = definition?.key;
             const label = String(definition?.label || '').trim();
             const interval = toNumberOrNaN(definition?.interval);
@@ -929,20 +1104,19 @@ const getFuelServiceNoticeStatus = () => {
             return { key, label, remaining };
         })
         .filter(Boolean)
-        .filter((item) => item.remaining < 100)
+        .filter((item) => item.remaining < 0)
         .sort((left, right) => left.remaining - right.remaining);
 
-    if (dueItems.length < 1) {
+    if (overdueItems.length < 1) {
         return { hasAlert: false, count: 0, fullLabel: '', label: '' };
     }
 
-    const primary = dueItems[0];
-    const suffix = dueItems.length > 1 ? ` +${dueItems.length - 1}` : '';
-    const fullLabel = `${primary.label} ${primary.remaining} miles${suffix}`;
-
+    // Compose a label listing all overdue items
+    const fullLabel = overdueItems.map(item => `${item.label}`).join(', ');
+            
     return {
         hasAlert: true,
-        count: dueItems.length,
+        count: overdueItems.length,
         fullLabel,
         label: truncateLabel(fullLabel)
     };
@@ -1046,6 +1220,8 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
     const initialize = () => setInitialized(true);
     const [notifications] = useState(NavItems);
     const [notificationCollapse, setNoticationCollapse] = useState(true);
+    const [showNoticeDashboard, setShowNoticeDashboard] = useState(true);
+    const [recentComponents, setRecentComponents] = useState(() => parseRecentComponents());
     const [doseStatus, setDoseStatus] = useState(() => getDoseStatus());
     const [houseStatus, setHouseStatus] = useState(() => getHouseStatus());
     const [trainingStatus, setTrainingStatus] = useState(() => getTrainingStatus());
@@ -1072,7 +1248,19 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
     const noticeListRef = useRef(null);
     const noticeInteractionTimeoutRef = useRef(null);
     const [isNoticeInteracting, setIsNoticeInteracting] = useState(false);
-    const goHome = () => window.location.pathname = '/reactor/Home';
+    const collapseDashboards = useCallback(() => {
+        setNoticationCollapse(true);
+        setShowNoticeDashboard(true);
+    }, []);
+    const goHome = useCallback(() => {
+        collapseDashboards();
+        setMenuOpen(false);
+        window.location.pathname = '/reactor/Home';
+    }, [collapseDashboards]);
+    const handleHomeSelection = useCallback(() => {
+        collapseDashboards();
+        setMenuOpen(false);
+    }, [collapseDashboards]);
     const toggleMenu = () => setMenuOpen(prev => !prev);
     const displayMenu = (event) => {
         toggleMenu();
@@ -1084,36 +1272,39 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
         setMenuOpen(false);
     }
     const menuClick = (event) => (event.target.nodeName === 'SPAN') ? goHome() : displayMenu();
-    const logoButton = (label) => <Link key={getKey('link')} to='Home'><div className='navButton button logoButton'>{label}</div></Link>;
+    const logoButton = (label) => <Link key={getKey('link')} to='Home' onClick={handleHomeSelection}><div className='navButton button logoButton ml-5 mr--5'>{label}</div></Link>;
     const closeButton = <button title='close' className='bg-tinted navButton menuPad' onClick={menuClick}>
-                            <img src={close} alt='close menu' />
-                        </button>;
+        <img src={close} alt='close menu' />
+    </button>;
     const burgerButton = <button title='open menu' className='bg-tinted navButton menuPad mt-2 mb-10 pb-5 pl-10 pr-10 mr-20 r-10' onClick={menuClick}>
-                            <h2 className='hamburger'>
-                                <CgMenuGridO alt='open menu' />
-                            </h2>
-                        </button>;
+        <h2 className='hamburger'>
+            <CgMenuGridO alt='open menu' />
+        </h2>
+    </button>;
     const mobileLogo = <TextColorizer class='navBranding mt-7' text={company} />;
     const closedClasses = (initialized) ? navClassesClose : navClassesClosed;
     const navClasses = (menuOpen) ? navClassesOpen : closedClasses;
     const getMenuButton = (menuOpen) ? closeButton : burgerButton;
     const path = window.location.pathname.toLocaleLowerCase();
-    const isHomePage = (path === '/reactor/home') ? true : false;
-    const homepageHeader = <div className='mt-70 containerBox waveBackground bg-dark pt-200 width-100-20 animated-background'>
-        <div className='o-0'>
-            <Loader isMotionOn={isMotionOn} />
+    const isHomePage = useMemo(() => (path === '/reactor/home'), [path]);
+    const homepageHeader = useMemo(() => (
+        <div className='mt-70 containerBox waveBackground bg-dark pt-200 width-100-20 animated-background'>
+            <div className='o-0'>
+                <Loader isMotionOn={isMotionOn} />
+            </div>
+            <div className='absolute width-100-percent l-0 mt--10 faded'>
+                <WordExploder />
+            </div>
+            <TextColorizer class='bigHeader shadow' text={company} />
         </div>
-        <div className='absolute width-100-percent l-0 mt--10 faded'>
-            <WordExploder />
-        </div>
-        <TextColorizer class='bigHeader shadow' text={company} />
-    </div>;
-    const Branding = () => {
-        if (isHomePage === true) { return homepageHeader }
-        return <div className='mt-88'></div>
-    };
+    ), [isMotionOn, company]);
     const backgroundClass = (isMotionOn) ? 'rgb-stripe' : 'rgb-stripeStopped';
-    const Background = () => <div className={backgroundClass}></div>;
+
+    useEffect(() => {
+        if (menuOpen) {
+            setNoticationCollapse(true);
+        }
+    }, [menuOpen]);
 
     useEffect(() => {
         const syncDoseStatus = () => setDoseStatus(getDoseStatus());
@@ -1308,13 +1499,17 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
                 async (position) => {
                     try {
                         if (!isMounted) return;
-                        const { latitude, longitude } = position.coords;
-                        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=sunrise,sunset&timezone=auto`);
+                        const latitude = roundCoord(position.coords.latitude, 3);
+                        const longitude = roundCoord(position.coords.longitude, 3);
+                        const data = await fetchOpenMeteoJson(
+                            `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=sunrise,sunset&timezone=auto`,
+                            {
+                                cacheKey: `header:sun:${latitude}:${longitude}`,
+                                ttlMs: 30 * 60 * 1000,
+                                allowStaleOnError: true
+                            }
+                        );
                         if (!isMounted) return;
-                        if (!response.ok) {
-                            throw new Error('Failed to fetch sunrise/sunset');
-                        }
-                        const data = await response.json();
                         const sunsetValue = data?.daily?.sunset?.[0];
                         const sunsetDate = sunsetValue ? new Date(sunsetValue) : null;
 
@@ -1371,11 +1566,15 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
                 async (position) => {
                     try {
                         if (!isMounted) return;
-                        const { latitude, longitude } = position.coords;
+                        const latitude = roundCoord(position.coords.latitude, 3);
+                        const longitude = roundCoord(position.coords.longitude, 3);
                         const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&timezone=auto`;
-                        const response = await fetch(url);
+                        const data = await fetchOpenMeteoJson(url, {
+                            cacheKey: `header:weather:${latitude}:${longitude}`,
+                            ttlMs: 10 * 60 * 1000,
+                            allowStaleOnError: true
+                        });
                         if (!isMounted) return;
-                        const data = await response.json();
                         const current = data?.current_weather;
 
                         if (!current) {
@@ -1480,6 +1679,65 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
             localStorage.setItem('game', gameName);
         }
         window.location = '/reactor/Scores';
+    }, []);
+
+    const openComponent = useCallback((componentName) => {
+        const safeComponent = String(componentName || '').trim();
+        if (!safeComponent || safeComponent.toLowerCase() === 'home') return;
+        window.location = `/reactor/${safeComponent}`;
+    }, []);
+
+    const currentComponent = getComponentFromPathname(window.location.pathname);
+
+    const lastComponent = useMemo(() => {
+        return recentComponents.find((item) => item.toLowerCase() !== currentComponent.toLowerCase()) || '';
+    }, [recentComponents, currentComponent]);
+
+    const goToLastComponent = useCallback(() => {
+        if (lastComponent) {
+            openComponent(lastComponent);
+            return;
+        }
+        if (window.history.length > 1) {
+            window.history.back();
+        }
+    }, [lastComponent, openComponent]);
+
+    const clearRecentComponents = useCallback(() => {
+        localStorage.removeItem(RECENT_COMPONENTS_KEY);
+        setRecentComponents([]);
+    }, []);
+
+    useEffect(() => {
+        const activeComponent = getComponentFromPathname(window.location.pathname);
+        if (!activeComponent || activeComponent.toLowerCase() === 'home') {
+            return;
+        }
+
+        setRecentComponents((previous) => {
+            const updated = [
+                activeComponent,
+                ...previous.filter((item) => item.toLowerCase() !== activeComponent.toLowerCase() && item.toLowerCase() !== 'home')
+            ].slice(0, RECENT_COMPONENTS_MAX);
+            localStorage.setItem(RECENT_COMPONENTS_KEY, JSON.stringify(updated));
+            return updated;
+        });
+    }, []);
+
+    useEffect(() => {
+        const syncRecentComponents = () => setRecentComponents(parseRecentComponents());
+        const onStorage = (event) => {
+            if (!event.key || event.key === RECENT_COMPONENTS_KEY) {
+                syncRecentComponents();
+            }
+        };
+
+        window.addEventListener('storage', onStorage);
+        window.addEventListener('focus', syncRecentComponents);
+        return () => {
+            window.removeEventListener('storage', onStorage);
+            window.removeEventListener('focus', syncRecentComponents);
+        };
     }, []);
 
     const headerNotices = useMemo(() => {
@@ -1675,6 +1933,83 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
         return notices;
     }, [doseStatus, houseStatus, openCircuit, openDoseWithFocus, openHouseWithFocus, openFuel, openScheduler, openShop, openScoresWithGame, openTasks, openTodos, openWorkDay, openTrainingLog, openWeather, openWaves, scoreNotices, trainingStatus, primaryWavesStatus, secondaryWavesStatus, windNoticeStatus, schedulerStatus, tasksStatus, workDayStatus, todosTimerNotices, circuitExerciseStatus, shopNoticeStatus, fuelServiceNoticeStatus, sunsetTimeMs, daylightError, nextLowTideStatus, nextHighTideStatus, weatherStatus]);
 
+    const renderHeaderNotice = useCallback((notice) => (
+        <HeaderNoticeRow
+            key={notice.key}
+            title={notice.title}
+            icon={notice.icon}
+            label={notice.label}
+            onClick={notice.onClick}
+            isTraining={notice.isTraining}
+            isScore={notice.isScore}
+            isTask={notice.isTask}
+            isTodosTimer={notice.isTodosTimer}
+            isWorkDay={notice.isWorkDay}
+            isCircuit={notice.isCircuit}
+            isDaylight={notice.isDaylight}
+            scoreDateLine={notice.scoreDateLine}
+            scoreMatchupLine={notice.scoreMatchupLine}
+            taskProjectLine={notice.taskProjectLine}
+            taskNameLine={notice.taskNameLine}
+            todosTimerNameLine={notice.todosTimerNameLine}
+            todosTimerMode={notice.todosTimerMode}
+            todosTimerBaseSeconds={notice.todosTimerBaseSeconds}
+            todosTimerStartTimeMs={notice.todosTimerStartTimeMs}
+            workDayTargetLine={notice.workDayTargetLine}
+            workDayProgressLine={notice.workDayProgressLine}
+            circuitNameLine={notice.circuitNameLine}
+            circuitExerciseLine={notice.circuitExerciseLine}
+            trainingGoalLabel={notice.trainingGoalLabel}
+            trainingInitialElapsedSeconds={notice.trainingInitialElapsedSeconds}
+            daylightSunsetTimeMs={notice.daylightSunsetTimeMs}
+            daylightErrorMessage={notice.daylightErrorMessage}
+        />
+    ), []);
+
+    const renderDashboardItem = useCallback((notice) => (
+        <DashboardItem
+            key={notice.key}
+            title={notice.title}
+            icon={notice.icon}
+            label={notice.label}
+            onClick={notice.onClick}
+            isTraining={notice.isTraining}
+            isScore={notice.isScore}
+            isTask={notice.isTask}
+            isTodosTimer={notice.isTodosTimer}
+            isWorkDay={notice.isWorkDay}
+            isCircuit={notice.isCircuit}
+            isDaylight={notice.isDaylight}
+            scoreDateLine={notice.scoreDateLine}
+            scoreMatchupLine={notice.scoreMatchupLine}
+            taskProjectLine={notice.taskProjectLine}
+            taskNameLine={notice.taskNameLine}
+            todosTimerNameLine={notice.todosTimerNameLine}
+            todosTimerMode={notice.todosTimerMode}
+            todosTimerBaseSeconds={notice.todosTimerBaseSeconds}
+            todosTimerStartTimeMs={notice.todosTimerStartTimeMs}
+            workDayTargetLine={notice.workDayTargetLine}
+            workDayProgressLine={notice.workDayProgressLine}
+            circuitNameLine={notice.circuitNameLine}
+            circuitExerciseLine={notice.circuitExerciseLine}
+            trainingGoalLabel={notice.trainingGoalLabel}
+            trainingInitialElapsedSeconds={notice.trainingInitialElapsedSeconds}
+            daylightSunsetTimeMs={notice.daylightSunsetTimeMs}
+            daylightErrorMessage={notice.daylightErrorMessage}
+        />
+    ), []);
+
+    const renderRecentComponentItem = useCallback((componentName) => {
+        const iconKey = String(componentName || '').toLowerCase();
+        return <DashboardItem
+            key={`recent-${componentName}`}
+            title={`Open ${componentName}`}
+            icon={icons[iconKey] || '🧭'}
+            label={truncateLabel(componentName, 18)}
+            onClick={() => openComponent(componentName)}
+        />;
+    }, [openComponent]);
+
     const beginNoticeInteraction = () => {
         setIsNoticeInteracting(true);
         if (noticeInteractionTimeoutRef.current) {
@@ -1703,7 +2038,6 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
     useEffect(() => {
         const list = noticeListRef.current;
         if (!list || headerNotices.length < 2) return;
-
         const interval = setInterval(() => {
             if (isNoticeInteracting) return;
             const itemHeight = list.clientHeight || HEADER_NOTICE_HEIGHT;
@@ -1727,130 +2061,98 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
         </div>
     </div>
     const hamburgerClosed = <div>
-        <div className='flexContainer width-100-percent'>
-            <div className='flex2Column contentLeft'>
-                {logoButton(mobileLogo)}
-            </div>
-            <div className='flexColumn flexContainer'>
-                <div className='flexColumn'>
-                    <div
-                        className={`color-dark r-5 p-5 button mb-10 mr-20`}
-                        title='Share this link'
-                        onClick={() => {
-                            navigator.clipboard.writeText(window.location.href);
-                        }}
-                    >
-                        🔗
-                    </div>
-                </div>
-                <div className='flexColumn centerVertical ml-5 mr-5 w-100'>
-                    {
-                        /*
-                        <div
-                            title='dose status'
-                            className={`containerDetail p-5 contentCenter ${alarmActive ? 'bg-red color-yellow' : 'bg-lite color-lite'}`}
-                        >
-                            {alarmActive ? `${icons.alarmOn} Dose time` : `${icons.dose} Dose status`}
-                        </div>
-                        */
-                    }
-                    
-                    <div
-                        ref={noticeListRef}
-                        className='mt--10'
-                        style={{
-                            height: `${HEADER_NOTICE_HEIGHT}px`,
-                            overflowY: 'auto',
-                            scrollSnapType: 'y mandatory',
-                            overscrollBehavior: 'contain'
-                        }}
-                        onScroll={() => {
-                            beginNoticeInteraction();
-                            endNoticeInteraction(1500);
-                        }}
-                        onMouseEnter={beginNoticeInteraction}
-                        onMouseLeave={() => endNoticeInteraction(0)}
-                        onTouchStart={beginNoticeInteraction}
-                        onTouchEnd={() => endNoticeInteraction(1500)}
-                    >
-                        {
-                            headerNotices.map((notice) => (
-                                <HeaderNoticeRow
-                                    key={notice.key}
-                                    title={notice.title}
-                                    icon={notice.icon}
-                                    label={notice.label}
-                                    onClick={notice.onClick}
-                                    isTraining={notice.isTraining}
-                                    isScore={notice.isScore}
-                                    isTask={notice.isTask}
-                                    isTodosTimer={notice.isTodosTimer}
-                                    isWorkDay={notice.isWorkDay}
-                                    isCircuit={notice.isCircuit}
-                                    isDaylight={notice.isDaylight}
-                                    scoreDateLine={notice.scoreDateLine}
-                                    scoreMatchupLine={notice.scoreMatchupLine}
-                                    taskProjectLine={notice.taskProjectLine}
-                                    taskNameLine={notice.taskNameLine}
-                                    todosTimerNameLine={notice.todosTimerNameLine}
-                                    todosTimerMode={notice.todosTimerMode}
-                                    todosTimerBaseSeconds={notice.todosTimerBaseSeconds}
-                                    todosTimerStartTimeMs={notice.todosTimerStartTimeMs}
-                                    workDayTargetLine={notice.workDayTargetLine}
-                                    workDayProgressLine={notice.workDayProgressLine}
-                                    circuitNameLine={notice.circuitNameLine}
-                                    circuitExerciseLine={notice.circuitExerciseLine}
-                                    trainingGoalLabel={notice.trainingGoalLabel}
-                                    trainingInitialElapsedSeconds={notice.trainingInitialElapsedSeconds}
-                                    daylightSunsetTimeMs={notice.daylightSunsetTimeMs}
-                                    daylightErrorMessage={notice.daylightErrorMessage}
-                                />
-                            ))
-                        }
-                    </div>
-                    {
-                        /*
-                        (doseStatus.duePending.length > 0)
-                            ? <select
-                                className='containerDetail p-5 bg-dark color-lite mt-5 width-100-percent'
-                                title='confirm dose taken'
-                                value={doseAction}
-                                onChange={(event) => {
-                                    const selected = event.target.value;
-                                    setDoseAction(selected);
-                                    confirmDoseTaken(selected);
-                                }}
-                            >
-                                <option value=''>Confirm dose taken…</option>
-                                {doseStatus.duePending.slice(0, 8).map((dose) => (
-                                    <option key={getDoseKey(dose)} value={getDoseKey(dose)}>
-                                        {formatDoseLabel(dose)}
-                                    </option>
-                                ))}
-                            </select>
-                            : <div className='containerDetail p-5 color-yellow size15'>No dose due</div>
-                                */
-                            }
-                </div>
-                <div title='notifications' className='flexColumn button pb-5 centerVertical w-50' onClick={() => setNoticationCollapse(prev => !prev)}>
-                    👀
-                    <span className='copyright'>
-                        {notifications.length}
-                    </span>
-                </div>
-                <div className='flexColumn contentRight'>
-                    {burgerButton}
-                </div>
-            </div>
-        </div>
-        {
-        /* 
-            <div className='t-collapse t-50 lowerBorder width-100-percent scroll bg-black'>
-                <Menu closeMenu={closeMenu} />
-            </div> 
-        */
-        }
-    </div>
+                                <div className='flexContainer width-100-percent'>
+                                    <div className='flexColumn contentLeft'>
+                                        <div className='mt--20 ml--20 mr--5'>{logoButton(mobileLogo)}</div>
+                                    </div>
+                                    <div className='flexColumn flexContainer width-80-percent'>
+                                        <div className='flexColumn'>
+                                            <div
+                                                className={`color-dark r-5 p-5 button mb-10 mr-20`}
+                                                title='Share this link'
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(window.location.href);
+                                                }}
+                                            >
+                                                🔗
+                                            </div>
+                                        </div>
+                                        <div className='flexColumn centerVertical w-150'>
+                                            {
+                                                /*
+                                                <div
+                                                    title='dose status'
+                                                    className={`containerDetail p-5 contentCenter ${alarmActive ? 'bg-red color-yellow' : 'bg-lite color-lite'}`}
+                                                >
+                                                    {alarmActive ? `${icons.alarmOn} Dose time` : `${icons.dose} Dose status`}
+                                                </div>
+                                                */
+                                            }
+                                            <div
+                                                ref={noticeListRef}
+                                                className='mt--10 ml--10'
+                                                style={{
+                                                    height: `${HEADER_NOTICE_HEIGHT}px`,
+                                                    overflowY: 'auto',
+                                                    scrollSnapType: 'y mandatory',
+                                                    overscrollBehavior: 'contain'
+                                                }}
+                                                onScroll={() => {
+                                                    beginNoticeInteraction();
+                                                    endNoticeInteraction(1500);
+                                                }}
+                                                onMouseEnter={beginNoticeInteraction}
+                                                onMouseLeave={() => endNoticeInteraction(0)}
+                                                onTouchStart={beginNoticeInteraction}
+                                                onTouchEnd={() => endNoticeInteraction(1500)}
+                                            >
+                                                {
+                                                    headerNotices.map(renderHeaderNotice)
+                                                }
+                                            </div>
+                                            {
+                                                /*
+                                                (doseStatus.duePending.length > 0)
+                                                    ? <select
+                                                        className='containerDetail p-5 bg-dark color-lite mt-5 width-100-percent'
+                                                        title='confirm dose taken'
+                                                        value={doseAction}
+                                                        onChange={(event) => {
+                                                            const selected = event.target.value;
+                                                            setDoseAction(selected);
+                                                            confirmDoseTaken(selected);
+                                                        }}
+                                                    >
+                                                        <option value=''>Confirm dose taken…</option>
+                                                        {doseStatus.duePending.slice(0, 8).map((dose) => (
+                                                            <option key={getDoseKey(dose)} value={getDoseKey(dose)}>
+                                                                {formatDoseLabel(dose)}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                    : <div className='containerDetail p-5 color-yellow size15'>No dose due</div>
+                                                        */
+                                            }
+                                        </div>
+                                        <div title='notifications' className='flexColumn button pb-5 centerVertical w-50' onClick={() => setNoticationCollapse(prev => !prev)}>
+                                            👀
+                                            <span className='copyright'>
+                                                {notifications.length}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className='flexColumn contentRight'>
+                                        {burgerButton}
+                                    </div>
+                                </div>
+                                {
+                                    /* 
+                                        <div className='t-collapse t-50 lowerBorder width-100-percent scroll bg-black'>
+                                            <Menu closeMenu={closeMenu} />
+                                        </div> 
+                                    */
+                                }
+                            </div>
     const hamburgerNav = (menuOpen === true) ? hamburgerOpen : hamburgerClosed;
     const getApp = (label) => {
         const menus = JSON.parse(localStorage.getItem('menus'));
@@ -1874,54 +2176,139 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
             <div className={navClasses}>
                 {hamburgerNav}
             </div>
-            <Background />
+            <div className={backgroundClass}></div>
             <div className='flexContainer header width-100-percent'>
                 <div className='flex3Column bg-green' />
                 <div className='flex3Column bg-yellow'></div>
                 <div className='flex3Column bg-red' />
             </div>
-            <Branding />
+            {isHomePage ? homepageHeader : <div className='mt-88'></div>}
             {
                 (notificationCollapse)
-                ? null
-                    : <div className='t-0 fixed mt-50 containerDetail p-10 mt--20 width--20 flexContainer bg-dark z1 h-scroll'>
-                        <input
-                            id='header-app-search'
-                            name='header-app-search'
-                            className='color-lite bg-dark'
-                            type='text'
-                            placeholder={'Find an app...'}
-                            value={typeof appSearch === 'string' ? appSearch : ''}
-                            onChange={(e) => setAppSearch(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    e.preventDefault();
-                                }
-                            }}
-                        />
-                        {
-                            notifications
-                                .filter(notification => {
-                                    if (!appSearch) return true;
+                    ? null
+                    : <div className='t-0 fixed mt-50 containerDetail height-100-percent p-10 mt--20 width--20 dashboard'>
 
-                                    const lowerSearch = appSearch.toLowerCase();
-                                    const categoryTerms = NavItemsMeta[notification] || [];
+                        <div className='flexContainer h-scroll'>
+                            <input
+                                id='header-app-search'
+                                name='header-app-search'
+                                className='color-lite bg-dark'
+                                type='text'
+                                placeholder={'Find an app...'}
+                                value={typeof appSearch === 'string' ? appSearch : ''}
+                                onChange={(e) => setAppSearch(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                    }
+                                }}
+                            />
+                            {
+                                notifications
+                                    .filter(notification => {
+                                        if (!appSearch) return true;
 
-                                    return categoryTerms.some(term =>
-                                        term.toLowerCase().includes(lowerSearch)
-                                    );
-                                })
-                                .map(notification => (
-                                    <div
-                                        title={notification}
-                                        onClick={() => getApp(notification)}
-                                        key={getKey(notification)}
-                                        className="containerBox flexColumn"
+                                        const lowerSearch = appSearch.toLowerCase();
+                                        const categoryTerms = NavItemsMeta[notification] || [];
+
+                                        return categoryTerms.some(term =>
+                                            term.toLowerCase().includes(lowerSearch)
+                                        );
+                                    })
+                                    .map(notification => (
+                                        <div
+                                            title={notification}
+                                            onClick={() => getApp(notification)}
+                                            key={getKey(notification)}
+                                            className='containerBox flexColumn'
+                                        >
+                                            {icons[notification.toLowerCase()]}
+                                        </div>
+                                    ))
+                            }
+                        </div>
+                        <div className='containerDetail width-100-percent mb-10 p-10 bg-lite'>
+                            <div className='flexContainer mb-5'>
+                                <div className='flex2Column color-yellow contentLeft'>
+                                    Notice Dashboard
+                                </div>
+                                <div
+                                    className='flexColumn button contentRight color-yellow'
+                                    onClick={() => setShowNoticeDashboard((previous) => !previous)}
+                                    title={showNoticeDashboard ? 'Hide dashboard' : 'Show dashboard'}
+                                >
+                                    {showNoticeDashboard ? 'Hide' : 'Show'}
+                                </div>
+                            </div>
+                            {
+                                showNoticeDashboard
+                                    ? <div
+                                        className='containerDetail bg-dark mt-10'
+                                        style={{
+                                            maxHeight: '300px',
+                                            overflowY: 'auto',
+                                            display: 'grid',
+                                            gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+                                            gap: '8px'
+                                        }}
                                     >
-                                        {icons[notification.toLowerCase()]}
+                                        {headerNotices.map(renderDashboardItem)}
                                     </div>
-                            ))
-                        }
+                                    : null
+                            }
+                        </div>
+                        <div className='containerDetail width-100-percent mb-10 bg-lite'>
+                            <div className='containerDetail size20 pt-20 pb-20 pl-10 color-yellow contentLeft'>
+                                Recent Activity
+                            </div>
+                            <div className='flexContainer mb-5'>
+                                <div className='flex2Column color-yellow'>
+                                    <div
+                                        className='containerDetail bg-dark p-20 button color-yellow'
+                                        onClick={goToLastComponent}
+                                        title={lastComponent ? `Go back to ${lastComponent}` : 'Go back'}
+                                    >
+                                        {
+                                            lastComponent
+                                                ? <div>
+                                                    Back to
+                                                    <span className='ml-10'>
+                                                        {icons[lastComponent.toLocaleLowerCase()]}
+                                                    </span>
+                                                </div>
+                                                : 'Back'}
+                                    </div>
+                                </div>
+                                <div className='flex2Column'>
+                                    <div
+                                        className='containerDetail ml-5 bg-dark pt-20 pb-20 button color-yellow'
+                                        onClick={clearRecentComponents}
+                                        title='Clear recent components history'
+                                    >
+                                        Clear Activity
+                                        <span className='ml-10'>
+                                            {icons.delete}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                className='containerDetail bg-dark mt-10'
+                                style={{
+                                    maxHeight: '220px',
+                                    overflowY: 'auto',
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+                                    gap: '8px'
+                                }}
+                            >
+                                {
+                                    recentComponents.length > 0
+                                        ? recentComponents.map(renderRecentComponentItem)
+                                        : <div className='containerDetail p-10 color-lite' style={{ gridColumn: '1 / -1' }}>No recent components yet.</div>
+                                }
+                            </div>
+                        </div>
                     </div>
             }
         </div>

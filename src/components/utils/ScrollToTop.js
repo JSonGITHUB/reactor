@@ -1,24 +1,16 @@
-import React, { useEffect } from "react";
-import { withRouter } from "react-router-dom";
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
-const ScrollToTop = ({ loc }) => {
-    useEffect((loc) => {
-        if (window.location.pathname !== loc.location) {
-            //console.log(`ScrollToTop =>\nlocation: ${loc.pathname}`);
-            window.scrollTo(0, 0);
-        }    		
-    },[loc.location, loc.pathname]);
+const ScrollToTop = () => {
+    const { pathname } = useLocation();
 
-    const resetScroll = () => {
-        const body = document.body; // For Safari
-        const html = document.documentElement; // Chrome, Firefox, IE and Opera places the overflow at the html level, unless else is specified. Therefore, we use the documentElement property for these browsers
-        body.scrollLeft = 0;
-        body.scrollTop = 0;
-        html.scrollLeft = 0;
-        html.scrollTop = 0;
-    }
-    resetScroll();
-    return <span></span>
-}
+    useEffect(() => {
+        window.scrollTo(0, 0);
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+    }, [pathname]);
 
-export default withRouter(ScrollToTop)
+    return null;
+};
+
+export default ScrollToTop;

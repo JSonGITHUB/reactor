@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { persistAssistantPhoto, getAssistantPhotoBlob, removeAssistantPhoto, isAssistantPhotoDbAvailable } from '../utils/assistantPhotoDb';
 import icons from '../site/icons';
 import EditableTextField from '../utils/EditableTextField';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
@@ -8,6 +9,75 @@ import GoalDialog from '../utils/GoalDialog';
 // Utility functions
 const ifUndefinedString = (value) => (validate(value) === null) ? 'empty...' : value;
 const ifUndefinedArray = (value) => (validate(value) === null) ? [] : value;
+const isVideoDbAvailable = () => typeof indexedDB !== 'undefined';
+
+const JOURNAL_VIDEO_DB_NAME = 'kfa-journal-video-db';
+const JOURNAL_VIDEO_DB_VERSION = 1;
+const JOURNAL_VIDEO_STORE_NAME = 'journal-videos';
+
+const openJournalVideoDb = () => new Promise((resolve, reject) => {
+    if (!isVideoDbAvailable()) {
+        reject(new Error('IndexedDB is not available in this browser context.'));
+        return;
+    }
+
+    const request = indexedDB.open(JOURNAL_VIDEO_DB_NAME, JOURNAL_VIDEO_DB_VERSION);
+
+    request.onupgradeneeded = () => {
+        const db = request.result;
+        if (!db.objectStoreNames.contains(JOURNAL_VIDEO_STORE_NAME)) {
+            db.createObjectStore(JOURNAL_VIDEO_STORE_NAME, { keyPath: 'id' });
+        }
+    };
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error('Failed to open journal video database.'));
+});
+
+const persistJournalVideoBlob = async (record) => {
+    const db = await openJournalVideoDb();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(JOURNAL_VIDEO_STORE_NAME, 'readwrite');
+        const store = transaction.objectStore(JOURNAL_VIDEO_STORE_NAME);
+        const request = store.put(record);
+
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error || new Error('Failed to persist journal video.'));
+        transaction.onerror = () => reject(transaction.error || new Error('Journal video transaction failed.'));
+        transaction.onabort = () => reject(transaction.error || new Error('Journal video transaction aborted.'));
+        transaction.oncomplete = () => db.close();
+    });
+};
+
+const getJournalVideoBlob = async (id) => {
+    const db = await openJournalVideoDb();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(JOURNAL_VIDEO_STORE_NAME, 'readonly');
+        const store = transaction.objectStore(JOURNAL_VIDEO_STORE_NAME);
+        const request = store.get(id);
+
+        request.onsuccess = () => resolve(request.result?.blob || null);
+        request.onerror = () => reject(request.error || new Error('Failed to read journal video.'));
+        transaction.onerror = () => reject(transaction.error || new Error('Journal video read transaction failed.'));
+        transaction.onabort = () => reject(transaction.error || new Error('Journal video read transaction aborted.'));
+        transaction.oncomplete = () => db.close();
+    });
+};
+
+const removeJournalVideoBlob = async (id) => {
+    const db = await openJournalVideoDb();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(JOURNAL_VIDEO_STORE_NAME, 'readwrite');
+        const store = transaction.objectStore(JOURNAL_VIDEO_STORE_NAME);
+        const request = store.delete(id);
+
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error || new Error('Failed to remove journal video.'));
+        transaction.onerror = () => reject(transaction.error || new Error('Journal video delete transaction failed.'));
+        transaction.onabort = () => reject(transaction.error || new Error('Journal video delete transaction aborted.'));
+        transaction.oncomplete = () => db.close();
+    });
+};
 
 const Journal = ({
     journals,
@@ -33,6 +103,20 @@ const Journal = ({
     const [editCategory, setEditCategory] = useState();
     const [editIndex, setEditIndex] = useState();
     const [selectedGoal, setSelectedGoal] = useState();
+    const [entryImages, setEntryImages] = useState([]);
+    const [entryVideos, setEntryVideos] = useState([]);
+    const [expandedImage, setExpandedImage] = useState(null);
+    const [expandedVideo, setExpandedVideo] = useState(null);
+    const [isImageEditMode, setIsImageEditMode] = useState(false);
+    const [isVideoEditMode, setIsVideoEditMode] = useState(false);
+    const [isImageRowCollapsed, setIsImageRowCollapsed] = useState(true);
+    const [isVideoRowCollapsed, setIsVideoRowCollapsed] = useState(true);
+    const [isPhotoDbAvailable, setIsPhotoDbAvailable] = useState(true);
+    const [isVideoDbAvail, setIsVideoDbAvail] = useState(true);
+    const imageFileInputRef = useRef(null);
+    const videoFileInputRef = useRef(null);
+    const entryImagesRef = useRef([]);
+    const entryVideosRef = useRef([]);
 
     const templateJournal = {
         description: 'Empty...',
@@ -41,6 +125,8 @@ const Journal = ({
         todaysGoals: [],
         futureGoals: [],
         gratefulFor: 'Empty...',
+        entryImages: [],
+        entryVideos: [],
         isCollapsed: false
     };
 
@@ -60,6 +146,217 @@ const Journal = ({
                 return null;
             })
             .filter(Boolean);
+    };
+
+    const buildImageId = ({ name, size, lastModified, webkitRelativePath, relativePath }) => {
+        const path = String(webkitRelativePath || relativePath || '').replace(/\\/g, '/');
+        return `${path || name}-${size}-${lastModified}`;
+    };
+
+    const buildVideoId = ({ name, size, lastModified, webkitRelativePath, relativePath }) => {
+        const path = String(webkitRelativePath || relativePath || '').replace(/\\/g, '/');
+        return `${path || name}-${size}-${lastModified}`;
+    };
+
+    const isImageLikeFile = (file) => {
+        const mime = String(file?.type || '').toLowerCase();
+        if (mime.startsWith('image/')) return true;
+        return /\.(jpg|jpeg|png|gif|webp|bmp|svg|heic|heif)$/i.test(String(file?.name || ''));
+    };
+
+    const isVideoLikeFile = (file) => {
+        const mime = String(file?.type || '').toLowerCase();
+        if (mime.startsWith('video/')) return true;
+        return /\.(mp4|m4v|mov|webm|ogv|avi|mkv|3gp|3g2)$/i.test(String(file?.name || ''));
+    };
+
+    const formatBytes = (bytes) => {
+        if (!Number.isFinite(bytes) || bytes <= 0) return '--';
+        const units = ['B', 'KB', 'MB', 'GB'];
+        let value = bytes;
+        let unitIndex = 0;
+        while (value >= 1024 && unitIndex < units.length - 1) {
+            value /= 1024;
+            unitIndex += 1;
+        }
+        return `${value.toFixed(value >= 10 ? 0 : 1)} ${units[unitIndex]}`;
+    };
+
+    const toMediaMeta = (item) => ({
+        id: item.id,
+        name: item.name,
+        size: item.size,
+        type: item.type,
+        lastModified: item.lastModified,
+    });
+
+    const mergeMediaMeta = (...lists) => {
+        const merged = [];
+        const seen = new Set();
+        lists.forEach((list) => {
+            if (!Array.isArray(list)) return;
+            list.forEach((item) => {
+                if (!item || !item.id || seen.has(item.id)) return;
+                seen.add(item.id);
+                merged.push(item);
+            });
+        });
+        return merged;
+    };
+
+    const selectedJournalPrimary = journals?.[journalGroupIndex]?.journal?.[journalIndex];
+    const selectedJournalMirror = journals?.[journalGroupIndex]?.journals?.[journalIndex];
+
+    // Memoize image IDs to provide stable dependency for useEffect
+    const imageIdsDep = useMemo(() => {
+        const primary = journal?.entryImages?.map(i => i?.id) || [];
+        const mirrorPrimary = selectedJournalPrimary?.entryImages?.map(i => i?.id) || [];
+        const mirrorMirror = selectedJournalMirror?.entryImages?.map(i => i?.id) || [];
+        return `${primary.join('|')}|${mirrorPrimary.join('|')}|${mirrorMirror.join('|')}`;
+    }, [journal?.entryImages, selectedJournalPrimary?.entryImages, selectedJournalMirror?.entryImages]);
+
+    // Memoize video IDs to provide stable dependency for useEffect
+    const videoIdsDep = useMemo(() => {
+        const primary = journal?.entryVideos?.map(v => v?.id) || [];
+        const mirrorPrimary = selectedJournalPrimary?.entryVideos?.map(v => v?.id) || [];
+        const mirrorMirror = selectedJournalMirror?.entryVideos?.map(v => v?.id) || [];
+        return `${primary.join('|')}|${mirrorPrimary.join('|')}|${mirrorMirror.join('|')}`;
+    }, [journal?.entryVideos, selectedJournalPrimary?.entryVideos, selectedJournalMirror?.entryVideos]);
+
+    const updateJournalMedia = (field, value) => {
+        const newJournals = [...journals];
+        if (!newJournals[journalGroupIndex]) {
+            return;
+        }
+
+        if (Array.isArray(newJournals[journalGroupIndex].journal) && newJournals[journalGroupIndex].journal[journalIndex]) {
+            newJournals[journalGroupIndex].journal[journalIndex][field] = value;
+        }
+
+        if (Array.isArray(newJournals[journalGroupIndex].journals) && newJournals[journalGroupIndex].journals[journalIndex]) {
+            newJournals[journalGroupIndex].journals[journalIndex][field] = value;
+        }
+
+        setJournals(newJournals);
+    };
+
+    const addEntryImages = async (fileList) => {
+        const files = Array.from(fileList || []).filter(isImageLikeFile);
+        if (files.length === 0) return;
+
+        const prev = Array.isArray(entryImagesRef.current) ? entryImagesRef.current : [];
+        const existing = new Set(prev.map((img) => img.id));
+        const next = [...prev];
+
+        files.forEach((file) => {
+            const id = buildImageId(file);
+            if (existing.has(id)) return;
+            const image = {
+                id,
+                name: file.name,
+                size: file.size,
+                type: file.type,
+                lastModified: file.lastModified,
+                url: URL.createObjectURL(file),
+                blob: file,
+            };
+            next.push(image);
+            if (isPhotoDbAvailable) {
+                persistAssistantPhoto(id, file).catch((error) => {
+                    console.error('Unable to persist journal image:', error);
+                });
+            }
+        });
+
+        entryImagesRef.current = next;
+        setEntryImages(next);
+        updateJournalMedia('entryImages', next.map(toMediaMeta));
+    };
+
+    const removeEntryImage = (id) => {
+        const prev = Array.isArray(entryImagesRef.current) ? entryImagesRef.current : [];
+        const removed = prev.find((img) => img.id === id);
+        const next = prev.filter((img) => img.id !== id);
+
+        if (removed?.url) URL.revokeObjectURL(removed.url);
+        if (expandedImage?.id === id) setExpandedImage(null);
+
+        entryImagesRef.current = next;
+        setEntryImages(next);
+        updateJournalMedia('entryImages', next.map(toMediaMeta));
+
+        if (isPhotoDbAvailable) {
+            removeAssistantPhoto(id).catch((error) => {
+                console.error('Unable to remove journal image:', error);
+            });
+        }
+    };
+
+    const toggleImageRow = () => {
+        setIsImageRowCollapsed((prev) => !prev);
+    };
+
+    const toggleVideoRow = () => {
+        setIsVideoRowCollapsed((prev) => !prev);
+    };
+
+    const addEntryVideos = (fileList) => {
+        const files = Array.from(fileList || []).filter(isVideoLikeFile);
+        if (files.length === 0) return;
+
+        const prev = Array.isArray(entryVideosRef.current) ? entryVideosRef.current : [];
+        const existing = new Set(prev.map((vid) => vid.id));
+        const next = [...prev];
+
+        files.forEach((file) => {
+            const id = buildVideoId(file);
+            if (existing.has(id)) return;
+            const video = {
+                id,
+                name: file.name,
+                size: file.size,
+                type: file.type,
+                lastModified: file.lastModified,
+                url: URL.createObjectURL(file),
+            };
+            next.push(video);
+
+            if (isVideoDbAvail) {
+                persistJournalVideoBlob({
+                    id: video.id,
+                    name: video.name,
+                    size: video.size,
+                    type: video.type,
+                    lastModified: video.lastModified,
+                    blob: file,
+                }).catch((error) => {
+                    console.error('Unable to persist journal video:', error);
+                });
+            }
+        });
+
+        entryVideosRef.current = next;
+        setEntryVideos(next);
+        updateJournalMedia('entryVideos', next.map(toMediaMeta));
+    };
+
+    const removeEntryVideo = (id) => {
+        const prev = Array.isArray(entryVideosRef.current) ? entryVideosRef.current : [];
+        const removed = prev.find((vid) => vid.id === id);
+        const next = prev.filter((vid) => vid.id !== id);
+
+        if (removed?.url) URL.revokeObjectURL(removed.url);
+        if (expandedVideo?.id === id) setExpandedVideo(null);
+
+        entryVideosRef.current = next;
+        setEntryVideos(next);
+        updateJournalMedia('entryVideos', next.map(toMediaMeta));
+
+        if (isVideoDbAvail) {
+            removeJournalVideoBlob(id).catch((error) => {
+                console.error('Unable to remove journal video:', error);
+            });
+        }
     };
 
     // Ensure journal fields are initialized
@@ -109,8 +406,211 @@ const Journal = ({
             selectedNewJournal.gratefulFor = '';
             dataUpdated = true;
         }
+        if (!Array.isArray(selectedNewJournal.entryImages)) {
+            selectedNewJournal.entryImages = [];
+            dataUpdated = true;
+        }
+        if (!Array.isArray(selectedNewJournal.entryVideos)) {
+            selectedNewJournal.entryVideos = [];
+            dataUpdated = true;
+        }
         if (dataUpdated) setJournals(newJournals);
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        setIsPhotoDbAvailable(isAssistantPhotoDbAvailable());
+        setIsVideoDbAvail(isVideoDbAvailable());
+    }, []);
+
+    useEffect(() => {
+        entryImagesRef.current = entryImages;
+    }, [entryImages]);
+
+    useEffect(() => {
+        entryVideosRef.current = entryVideos;
+    }, [entryVideos]);
+
+    useEffect(() => {
+        let active = true;
+        const restoreImages = async () => {
+            const raw = mergeMediaMeta(
+                journal?.entryImages,
+                selectedJournalPrimary?.entryImages,
+                selectedJournalMirror?.entryImages,
+            );
+            if (raw.length === 0) {
+                entryImagesRef.current.forEach((img) => {
+                    if (img?.url) URL.revokeObjectURL(img.url);
+                });
+                if (entryImagesRef.current.length > 0) {
+                    entryImagesRef.current = [];
+                    setEntryImages([]);
+                }
+                return;
+            }
+            if (!isAssistantPhotoDbAvailable()) {
+                entryImagesRef.current.forEach((img) => {
+                    if (img?.url) URL.revokeObjectURL(img.url);
+                });
+                if (entryImagesRef.current.length > 0) {
+                    entryImagesRef.current = [];
+                    setEntryImages([]);
+                }
+                return;
+            }
+
+            const currentById = new Map(
+                (entryImagesRef.current || []).map((img) => [img.id, img])
+            );
+            const restored = [];
+            const createdUrls = [];
+            for (const image of raw) {
+                const existing = currentById.get(image.id);
+                if (existing?.url) {
+                    restored.push({
+                        ...image,
+                        url: existing.url,
+                    });
+                    continue;
+                }
+                try {
+                    const blob = await getAssistantPhotoBlob(image.id);
+                    if (!blob) continue;
+                    const url = URL.createObjectURL(blob);
+                    createdUrls.push(url);
+                    restored.push({
+                        ...image,
+                        url,
+                    });
+                } catch (error) {
+                    console.error('Unable to restore journal image:', error);
+                }
+            }
+
+            if (!active) {
+                createdUrls.forEach((url) => URL.revokeObjectURL(url));
+                return;
+            }
+
+            const reusedUrls = new Set(restored.map((img) => img.url));
+            entryImagesRef.current.forEach((img) => {
+                if (img?.url && !reusedUrls.has(img.url)) {
+                    URL.revokeObjectURL(img.url);
+                }
+            });
+
+            // Only update state if IDs changed to prevent infinite loop
+            const currentIds = (entryImagesRef.current || []).map(img => img.id).join(',');
+            const newIds = restored.map(img => img.id).join(',');
+            if (currentIds !== newIds) {
+                entryImagesRef.current = restored;
+                setEntryImages(restored);
+            }
+        };
+
+        restoreImages();
+
+        return () => {
+            active = false;
+        };
+    }, [imageIdsDep]);
+
+    useEffect(() => {
+        let active = true;
+        const restoreVideos = async () => {
+            const raw = mergeMediaMeta(
+                journal?.entryVideos,
+                selectedJournalPrimary?.entryVideos,
+                selectedJournalMirror?.entryVideos,
+            );
+            if (raw.length === 0) {
+                entryVideosRef.current.forEach((vid) => {
+                    if (vid?.url) URL.revokeObjectURL(vid.url);
+                });
+                if (entryVideosRef.current.length > 0) {
+                    entryVideosRef.current = [];
+                    setEntryVideos([]);
+                }
+                return;
+            }
+            if (!isVideoDbAvailable()) {
+                entryVideosRef.current.forEach((vid) => {
+                    if (vid?.url) URL.revokeObjectURL(vid.url);
+                });
+                if (entryVideosRef.current.length > 0) {
+                    entryVideosRef.current = [];
+                    setEntryVideos([]);
+                }
+                return;
+            }
+
+            const currentById = new Map(
+                (entryVideosRef.current || []).map((vid) => [vid.id, vid])
+            );
+            const restored = [];
+            const createdUrls = [];
+            for (const video of raw) {
+                const existing = currentById.get(video.id);
+                if (existing?.url) {
+                    restored.push({
+                        ...video,
+                        url: existing.url,
+                    });
+                    continue;
+                }
+                try {
+                    const blob = await getJournalVideoBlob(video.id);
+                    if (!blob) continue;
+                    const url = URL.createObjectURL(blob);
+                    createdUrls.push(url);
+                    restored.push({
+                        ...video,
+                        url,
+                    });
+                } catch (error) {
+                    console.error('Unable to restore journal video:', error);
+                }
+            }
+
+            if (!active) {
+                createdUrls.forEach((url) => URL.revokeObjectURL(url));
+                return;
+            }
+
+            const reusedUrls = new Set(restored.map((vid) => vid.url));
+            entryVideosRef.current.forEach((vid) => {
+                if (vid?.url && !reusedUrls.has(vid.url)) {
+                    URL.revokeObjectURL(vid.url);
+                }
+            });
+
+            // Only update state if IDs changed to prevent infinite loop
+            const currentIds = (entryVideosRef.current || []).map(vid => vid.id).join(',');
+            const newIds = restored.map(vid => vid.id).join(',');
+            if (currentIds !== newIds) {
+                entryVideosRef.current = restored;
+                setEntryVideos(restored);
+            }
+        };
+
+        restoreVideos();
+
+        return () => {
+            active = false;
+        };
+    }, [videoIdsDep]);
+
+    useEffect(() => {
+        return () => {
+            entryImagesRef.current.forEach((img) => {
+                if (img?.url) URL.revokeObjectURL(img.url);
+            });
+            entryVideosRef.current.forEach((vid) => {
+                if (vid?.url) URL.revokeObjectURL(vid.url);
+            });
+        };
+    }, []);
+
     useEffect(() => {
         if (journals !== undefined && journals.length > 0) {
             localStorage.setItem('journalTracking', JSON.stringify(journals));
@@ -380,7 +880,7 @@ const Journal = ({
                                 value={editedJournalTitle !== null ? editedJournalTitle : journal.description}
                                 placeholder={journal.description}
                             />
-                            : <div className='containerDetail bg-lite centerVertical p-10 bold'>
+                            : <div className='containerDetail bg-lite color-yellow centerVertical p-10 bold'>
                                 <CollapseToggleButton
                                     title={journal.description}
                                     isCollapsed={isCollapsed}
@@ -415,6 +915,342 @@ const Journal = ({
             </div>
             {!isCollapsed && (
                 <div>
+                    <div className='containerDetail m-5 bg-dark'>
+                        {!isPhotoDbAvailable && (
+                            <div className='pa-alert pa-alert-warning mb-10'>
+                                Image persistence is unavailable in this browser context. Images can still be added for this session.
+                            </div>
+                        )}
+                        <div className='containerDetail flexContainer'>
+                            <label 
+                                className='containerDetail flexColumn bg-yellow button bg-lite color-dark size12 p-10'
+                            >                           
+                                ➕📷
+                                <input
+                                    ref={imageFileInputRef}
+                                    type='file'
+                                    accept='image/*'
+                                    multiple
+                                    style={{ display: 'none' }}
+                                    onChange={(e) => {
+                                        addEntryImages(e.target.files);
+                                        e.target.value = '';
+                                    }}
+                                />
+                            </label>
+                            {entryImages.length > 0 && (
+                                <div className='flex2Column ml-5 flexContainer' style={{ alignItems: 'center', gap: 8 }}>
+                                    <div
+                                        className='containerDetail button bg-lite color-yellow p-10 size12'
+                                        onClick={() => setIsImageEditMode((prev) => !prev)}
+                                        title={isImageEditMode ? 'Hide remove buttons' : 'Show remove buttons'}
+                                        style={{ fontWeight: 600, minWidth: 48, textAlign: 'center' }}
+                                    >
+                                        ✏️
+                                    </div>
+                                    <div
+                                        className='containerDetail button bg-lite color-yellow p-10 size12'
+                                        onClick={() => toggleImageRow()}
+                                        title='Toggle between wrapped grid and single-row horizontal scrolling'
+                                        style={{ fontWeight: 600, letterSpacing: 0.5, maxWidth: 180 }}
+                                    >
+                                        {(isImageRowCollapsed ?? true) ? 'Expand Grid' : 'Collapse to Row'}
+                                    </div>
+                                    {expandedImage && (
+                                        <div
+                                            className='containerDetail button bg-lite color-yellow p-8 size12'
+                                            onClick={() => setExpandedImage(null)}
+                                            title='Close expanded image'
+                                            style={{ marginLeft: 'auto', minWidth: 90, textAlign: 'center', fontWeight: 600 }}
+                                        >
+                                            Close ✕
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                        <div className='color-soft size12 ml-10'>
+                            {entryImages.length > 0 ? `${entryImages.length} image${entryImages.length > 1 ? 's' : ''}` : 'No images attached yet.'}
+                        </div>
+                        {entryImages.length > 0 && (
+                            <div>
+                                
+                                {expandedImage && (() => {
+                                    const expandedIndex = entryImages.findIndex((img) => img.id === expandedImage.id);
+                                    const canGoPrev = expandedIndex > 0;
+                                    const canGoNext = expandedIndex < entryImages.length - 1;
+
+                                    return (
+                                        <div className='containerDetail bg-dark mb-10' style={{ position: 'relative' }}>
+                                            <div
+                                                className='button p-10 size20 color-soft'
+                                                onClick={() => canGoPrev && setExpandedImage(entryImages[expandedIndex - 1])}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: 0,
+                                                    bottom: 0,
+                                                    left: 8,
+                                                    width: 44,
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    zIndex: 2,
+                                                    opacity: canGoPrev ? 1 : 0.3,
+                                                    pointerEvents: canGoPrev ? 'auto' : 'none',
+                                                }}
+                                                title='Previous'
+                                            >
+                                                ◀
+                                            </div>
+                                            <div
+                                                className='button p-10 size20 color-soft'
+                                                onClick={() => canGoNext && setExpandedImage(entryImages[expandedIndex + 1])}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: 0,
+                                                    bottom: 0,
+                                                    right: 8,
+                                                    width: 44,
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    zIndex: 2,
+                                                    opacity: canGoNext ? 1 : 0.3,
+                                                    pointerEvents: canGoNext ? 'auto' : 'none',
+                                                }}
+                                                title='Next'
+                                            >
+                                                ▶
+                                            </div>
+                                            <img
+                                                src={expandedImage.url}
+                                                alt={expandedImage.name}
+                                                style={{
+                                                    width: 'calc(100% - 96px)',
+                                                    maxWidth: 960,
+                                                    height: 'auto',
+                                                    margin: '0 auto',
+                                                    display: 'block',
+                                                    borderRadius: 4,
+                                                }}
+                                            />
+                                            <div className='color-soft size12 p-5 contentCenter'>
+                                                {expandedImage.name} ({expandedIndex + 1} / {entryImages.length})
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
+                                <div
+                                    className='flexContainer mt--15'
+                                    style={{
+                                        flexWrap: (isImageRowCollapsed ?? true) ? 'nowrap' : 'wrap',
+                                        gap: 8,
+                                        overflowX: (isImageRowCollapsed ?? true) ? 'auto' : 'visible',
+                                        overflowY: 'hidden',
+                                        paddingBottom: (isImageRowCollapsed ?? true) ? 6 : 0,
+                                    }}
+                                >
+                                    {entryImages.map((img) => (
+                                        <div key={img.id} style={{ position: 'relative', width: 64, height: 64, flex: '0 0 auto' }}>
+                                            <img
+                                                src={img.url}
+                                                alt={img.name}
+                                                title={`${img.name} (${formatBytes(img.size || 0)})`}
+                                                onClick={() => {
+                                                    setExpandedImage(expandedImage?.id === img.id ? null : img);
+                                                }}
+                                                style={{
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    objectFit: 'cover',
+                                                    borderRadius: 4,
+                                                    display: 'block',
+                                                    cursor: 'pointer',
+                                                    border: expandedImage?.id === img.id ? '2px solid #0f0' : '2px solid transparent'
+                                                }}
+                                            />
+                                            {isImageEditMode && (
+                                                <div
+                                                    className='button'
+                                                    onClick={() => removeEntryImage(img.id)}
+                                                    title='Remove image'
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: 2,
+                                                        right: 2,
+                                                        background: 'rgba(0,0,0,0.65)',
+                                                        color: '#fff',
+                                                        borderRadius: '50%',
+                                                        width: 20,
+                                                        height: 20,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        fontSize: 12,
+                                                        lineHeight: 1,
+                                                    }}
+                                                >
+                                                    ✕
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className='containerDetail m-5 bg-dark'>
+                        {!isVideoDbAvail && (
+                            <div className='pa-alert pa-alert-warning mb-10'>
+                                Video persistence is unavailable in this browser context. Videos can still be added for this session.
+                            </div>
+                        )}
+                        <div className='containerDetail flexContainer'>
+                            <label 
+                                className='containerDetail flexColumn bg-yellow button bg-lite color-dark size12 p-10'
+                            >      
+                                ➕🎥
+                                <input
+                                    ref={videoFileInputRef}
+                                    type='file'
+                                    accept='video/*'
+                                    multiple
+                                    style={{ display: 'none' }}
+                                    onChange={(e) => {
+                                        addEntryVideos(e.target.files);
+                                        e.target.value = '';
+                                    }}
+                                />
+                            </label>
+                            {entryVideos.length > 0 && (
+                                <div className='flex2Column ml-5 flexContainer' style={{ alignItems: 'center', gap: 8 }}>
+                                    <div
+                                        className='containerDetail button bg-lite color-yellow p-10 size12'
+                                        onClick={() => setIsVideoEditMode((prev) => !prev)}
+                                        title={isVideoEditMode ? 'Hide remove buttons' : 'Show remove buttons'}
+                                        style={{ fontWeight: 600, minWidth: 48, textAlign: 'center' }}
+                                    >
+                                        ✏️
+                                    </div>
+                                    <div
+                                        className='containerDetail button bg-lite color-yellow p-10 size12'
+                                        onClick={() => toggleVideoRow()}
+                                        title='Toggle between wrapped grid and single-row horizontal scrolling'
+                                        style={{ fontWeight: 600, letterSpacing: 0.5, maxWidth: 180 }}
+                                    >
+                                        {(isVideoRowCollapsed ?? true) ? 'Expand Grid' : 'Collapse to Row'}
+                                    </div>
+                                    {expandedVideo && (
+                                        <div
+                                            className='containerDetail button bg-lite color-yellow p-8 size12'
+                                            onClick={() => setExpandedVideo(null)}
+                                            title='Close expanded video'
+                                            style={{ marginLeft: 'auto', minWidth: 90, textAlign: 'center', fontWeight: 600 }}
+                                        >
+                                            Close ✕
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                        <div className='color-soft size12 ml-10'>
+                            {entryVideos.length > 0 ? `${entryVideos.length} video${entryVideos.length > 1 ? 's' : ''}` : 'No videos attached yet.'}
+                        </div>
+                        {entryVideos.length > 0 && (
+                            <div>
+                                {expandedVideo && (() => {
+                                    const expandedIndex = entryVideos.findIndex((vid) => vid.id === expandedVideo.id);
+                                    const canGoPrev = expandedIndex > 0;
+                                    const canGoNext = expandedIndex < entryVideos.length - 1;
+
+                                    return (
+                                        <div className='containerDetail bg-dark mb-10' style={{ position: 'relative' }}>
+                                            <div
+                                                className='button p-10 size20 color-soft'
+                                                onClick={() => canGoPrev && setExpandedVideo(entryVideos[expandedIndex - 1])}
+                                                style={{ position: 'absolute', top: 0, bottom: 0, left: 8, width: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2, opacity: canGoPrev ? 1 : 0.3, pointerEvents: canGoPrev ? 'auto' : 'none' }}
+                                                title='Previous'
+                                            >
+                                                ◀
+                                            </div>
+                                            <div
+                                                className='button p-10 size20 color-soft'
+                                                onClick={() => canGoNext && setExpandedVideo(entryVideos[expandedIndex + 1])}
+                                                style={{ position: 'absolute', top: 0, bottom: 0, right: 8, width: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2, opacity: canGoNext ? 1 : 0.3, pointerEvents: canGoNext ? 'auto' : 'none' }}
+                                                title='Next'
+                                            >
+                                                ▶
+                                            </div>
+                                            <video
+                                                src={expandedVideo.url}
+                                                controls
+                                                style={{ width: 'calc(100% - 96px)', maxWidth: 960, height: 'auto', margin: '0 auto', display: 'block', borderRadius: 4 }}
+                                            />
+                                            <div className='color-soft size12 p-5 contentCenter'>
+                                                {expandedVideo.name} ({expandedIndex + 1} / {entryVideos.length})
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
+                                <div
+                                    className='flexContainer mt-5'
+                                    style={{
+                                        flexWrap: (isVideoRowCollapsed ?? true) ? 'nowrap' : 'wrap',
+                                        gap: 8,
+                                        overflowX: (isVideoRowCollapsed ?? true) ? 'auto' : 'visible',
+                                        overflowY: 'hidden',
+                                        paddingBottom: (isVideoRowCollapsed ?? true) ? 6 : 0,
+                                    }}
+                                >
+                                    {entryVideos.map((vid) => (
+                                        <div key={vid.id} style={{ position: 'relative', width: 64, height: 64, flex: '0 0 auto' }}>
+                                            <video
+                                                src={vid.url}
+                                                title={`${vid.name} (${formatBytes(vid.size)})`}
+                                                onClick={() => setExpandedVideo(expandedVideo?.id === vid.id ? null : vid)}
+                                                style={{
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    objectFit: 'cover',
+                                                    borderRadius: 4,
+                                                    display: 'block',
+                                                    cursor: 'pointer',
+                                                    border: expandedVideo?.id === vid.id ? '2px solid #0f0' : '2px solid transparent'
+                                                }}
+                                                muted
+                                            />
+                                            {isVideoEditMode && (
+                                                <div
+                                                    className='button'
+                                                    onClick={() => removeEntryVideo(vid.id)}
+                                                    title='Remove video'
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: 2,
+                                                        right: 2,
+                                                        background: 'rgba(0,0,0,0.65)',
+                                                        color: '#fff',
+                                                        borderRadius: '50%',
+                                                        width: 20,
+                                                        height: 20,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        fontSize: 12,
+                                                        lineHeight: 1,
+                                                    }}
+                                                >
+                                                    ✕
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
                     <EditableTextField
                         title='Journal:'
                         data={journal.journal}

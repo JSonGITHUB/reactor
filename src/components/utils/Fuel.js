@@ -14,10 +14,27 @@ import initializeData from './InitializeData.js';
 
 const Fuel = () => {
 
+    // State for toggling the location dropdown (OR SELECT)
+    const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+    
     const {
         snapshot,
         requestLocation
     } = useLocationData({ autoRequest: false });
+
+    // --- Multi-vehicle state ---
+    const [vehicles, setVehicles] = useState(() => {
+        const stored = initializeData('fuelVehicles', null);
+        if (Array.isArray(stored) && stored.length > 0) return stored;
+        return [{ id: 'default', name: 'My Vehicle' }];
+    });
+    const [selectedVehicleId, setSelectedVehicleId] = useState(() => {
+        return initializeData('fuelSelectedVehicle', 'default');
+    });
+    const [vehicleDialogOpen, setVehicleDialogOpen] = useState(false);
+    const [newVehicleName, setNewVehicleName] = useState('');
+
+    const selectedVehicle = vehicles.find(v => v.id === selectedVehicleId) || vehicles[0];
 
     const lastOdometer = () => Number(initializeData('odometer', 0));
     const lastOilChange = () => Number(initializeData('oilChange', 0));
@@ -25,8 +42,9 @@ const Fuel = () => {
     const lastGallons = () => Number(initializeData('gallons', 0));
     const lastUSDPerGallon = () => Number(initializeData('usdPerGallon', 0));
     const [totalUSD, setTotalUSD] = useState(0);
-    const [location, setLocation] = useState(lastLocation());
+    const [location, setLocation] = useState('');
     const [odometer, setOdometer] = useState(lastOdometer());
+    const [prevOdometer, setPrevOdometer] = useState(null);
     const [oilChange, setOilChange] = useState(lastOilChange());
     const [exchangeRate, setExchangeRate] = useState(0);
     const [pricePerLiter, setPricePerLiter] = useState(0);
@@ -64,10 +82,16 @@ const Fuel = () => {
     const [categoryDialogIndex, setCategoryDialogIndex] = useState(null);
     const [categoryDialogNewName, setCategoryDialogNewName] = useState('');
     const [categoryDialogNewIcon, setCategoryDialogNewIcon] = useState('🏷️');
+    const [editingCategory, setEditingCategory] = useState(null); // {key, icon, name}
     const [locationCategories, setCategories] = useState({});
     const [locationsCategorySort, setLocationsCategorySort] = useState();
     const [editLocationDialog, setEditLocationDialog] = useState(false);
     const [editLocationIndex, setEditLocationIndex] = useState(null);
+    const [insertStopDialogOpen, setInsertStopDialogOpen] = useState(false);
+    const [insertBeforeIndex, setInsertBeforeIndex] = useState(null);
+    const [insertMode, setInsertMode] = useState(false);
+    const [entryDate, setEntryDate] = useState('');
+    const [entryTime, setEntryTime] = useState('');
     const [interiorCollapse] = useState(true);
     const [interior, setInterior] = useState();
     const [washCollapse] = useState(true);
@@ -81,6 +105,11 @@ const Fuel = () => {
     const [otherCollapse] = useState(true);
     const [other, setOther] = useState();
     const [serviceCollapse, setServiceCollapse] = useState(true);
+    const [homeLocation, setHomeLocationState] = useState(() => localStorage.getItem('fuelHomeLocation') || '');
+    const [homeLatitude, setHomeLatitudeState] = useState(() => localStorage.getItem('fuelHomeLatitude') || '');
+    const [homeLongitude, setHomeLongitudeState] = useState(() => localStorage.getItem('fuelHomeLongitude') || '');
+    const [homeFormVisible, setHomeFormVisible] = useState(false);
+    const [cleanDataPreview, setCleanDataPreview] = useState(null);
     // Dynamic service configuration and state
     const [serviceDefs, setServiceDefs] = useState(); // [{ key, label, interval }]
     const [serviceState, setServiceState] = useState({}); // { [key]: { collapse: boolean, value: number|null } }
@@ -179,6 +208,7 @@ const Fuel = () => {
         'End': '🔴',
         'Shopping': '🛒',
         'Beach': '🏖️',
+        'Friend': '👋🏽',
         'Hike': '🥾',
         'Bike': '🚴‍♂️',
         'Surf': '🏄‍♂️',
@@ -200,6 +230,28 @@ const Fuel = () => {
         'Parking': '🅿️',
         'Toll': '🚧',
     };
+    // Persist vehicles
+    useEffect(() => {
+        localStorage.setItem('fuelVehicles', JSON.stringify(vehicles));
+    }, [vehicles]);
+    useEffect(() => {
+        const selectedLoc = getLocations.find(
+            loc => (loc.location || loc.name) === location
+        );
+        if (selectedLoc && selectedLoc.category) {
+            handleCategorySelect(selectedLoc.category);
+        }
+    }, [location]);
+    
+    useEffect(() => {
+        localStorage.setItem('fuelSelectedVehicle', selectedVehicleId);
+    }, [selectedVehicleId]);
+
+    // Trips filtered to selected vehicle (for per-vehicle sections)
+    const vehicleTrips = useMemo(() => {
+        return trips.filter(t => (t.vehicleId || 'default') === selectedVehicleId);
+    }, [trips, selectedVehicleId]);
+
     useEffect(() => {
         //console.log(`Fuel => trips: ${JSON.stringify(trips, null, 2)}`);
         localStorage.setItem('TripFuelTracker', JSON.stringify(trips));
@@ -361,8 +413,17 @@ const Fuel = () => {
     }, [locationCategories]);
 
     useEffect(() => {
+        if (!formCollapse) {
+            setCategory('Gas');
+        } else {
+            setPrevOdometer(null);
+        }
+    }, [formCollapse]);
+
+    useEffect(() => {
         if (editLocationDialog && editLocationIndex !== null && trips[editLocationIndex]) {
             const trip = trips[editLocationIndex];
+            const parsed = parseTripTimeToInputs(trip.time);
             setLocation(trip.location || '');
             setOdometer(trip.odometer || '');
             setGuageStart(trip.guageStart || '');
@@ -375,6 +436,8 @@ const Fuel = () => {
             setCostFee(trip.costFee || 0);
             setRating(trip.rating || 0);
             setTotalUSD(trip.totalUSD || 0);
+            setEntryDate(parsed.date);
+            setEntryTime(parsed.time);
         }
     }, [editLocationDialog, editLocationIndex, trips]);
     /*
@@ -394,6 +457,93 @@ const Fuel = () => {
         }
         return tripData;
     }
+
+    const parseTripTimeToInputs = (timeString) => {
+        const asDate = new Date(timeString);
+        if (!Number.isNaN(asDate.getTime())) {
+            const yyyy = asDate.getFullYear();
+            const mm = String(asDate.getMonth() + 1).padStart(2, '0');
+            const dd = String(asDate.getDate()).padStart(2, '0');
+            const hh = String(asDate.getHours()).padStart(2, '0');
+            const min = String(asDate.getMinutes()).padStart(2, '0');
+            return { date: `${yyyy}-${mm}-${dd}`, time: `${hh}:${min}` };
+        }
+
+        const [datePartRaw, timePartRaw] = String(timeString || '').split(', ');
+        if (!datePartRaw || !timePartRaw) {
+            return { date: '', time: '' };
+        }
+
+        const [monthRaw, dayRaw, yearRaw] = datePartRaw.split('/');
+        const month = Number(monthRaw);
+        const day = Number(dayRaw);
+        const year = Number(yearRaw);
+        if (!month || !day || !year) {
+            return { date: '', time: '' };
+        }
+
+        const timePieces = timePartRaw.split(' ');
+        const clockPart = timePieces[0] || '12:00';
+        const ampm = (timePieces[1] || '').toUpperCase();
+        const [hourRaw, minuteRaw] = clockPart.split(':');
+        let hour24 = Number(hourRaw);
+        const minute = Number(String(minuteRaw || '').slice(0, 2));
+        if (!Number.isFinite(hour24) || !Number.isFinite(minute)) {
+            return { date: '', time: '' };
+        }
+        if (ampm === 'PM' && hour24 < 12) {
+            hour24 += 12;
+        }
+        if (ampm === 'AM' && hour24 === 12) {
+            hour24 = 0;
+        }
+
+        return {
+            date: `${String(year).padStart(4, '0')}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
+            time: `${String(hour24).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
+        };
+    };
+
+    const buildTripTimeFromInputs = () => {
+        const fallbackTrip = (editLocationIndex !== null && trips[editLocationIndex]) ? trips[editLocationIndex] : null;
+        const fallbackParsed = parseTripTimeToInputs(fallbackTrip?.time || '');
+        const effectiveDate = entryDate || fallbackParsed.date;
+        const effectiveTime = entryTime || fallbackParsed.time;
+
+        if (!effectiveDate || !effectiveTime) {
+            return currentDate();
+        }
+        const [yearRaw, monthRaw, dayRaw] = String(effectiveDate).split('-');
+        const [hourRaw, minuteRaw] = String(effectiveTime).split(':');
+        const year = Number(yearRaw);
+        const month = Number(monthRaw);
+        const day = Number(dayRaw);
+        const hour24 = Number(hourRaw);
+        const minute = Number(minuteRaw);
+
+        if (!year || !month || !day || !Number.isFinite(hour24) || !Number.isFinite(minute)) {
+            return currentDate();
+        }
+
+        const ampm = hour24 >= 12 ? 'PM' : 'AM';
+        const hour12 = hour24 % 12 === 0 ? 12 : hour24 % 12;
+        return `${month}/${day}/${year}, ${hour12}:${String(minute).padStart(2, '0')} ${ampm}`;
+    };
+
+    const resetInsertMode = () => {
+        setInsertMode(false);
+        setInsertBeforeIndex(null);
+        setEntryDate('');
+        setEntryTime('');
+    };
+
+    const openInsertStopDialog = () => {
+        if (!vehicleTrips.length) {
+            window.alert('No stops available to insert before. Add at least one stop first.');
+            return;
+        }
+        setInsertStopDialogOpen(true);
+    };
     const deleteLocation = (index) => {
         const newTrips = [...trips];
         const deleteConfirmed = window.confirm(`Do you want to delete ${newTrips[index].location}?`);
@@ -545,23 +695,68 @@ const Fuel = () => {
                     <div className='containerDetail p-20 contentLeft color-yellow mt-5 srcoll'>
                         <div style={{
                             display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
                             gap: '10px',
                             marginBottom: '20px'
                         }}>
                             {categoryOptions.map((cat) => (
-                                <button
-                                    key={cat}
-                                    onClick={() => handleCategorySelect(cat)}
-                                    className='containerDetail p-10 contentCenter button bg-lite'
-                                >
-                                    <div style={{ fontSize: '24px', marginBottom: '4px' }}>
-                                        {locationCategories[cat]}
-                                    </div>
-                                    <div style={{ fontSize: '12px' }}>{cat}</div>
-                                </button>
+                                <div key={cat} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <button
+                                        onClick={() => handleCategorySelect(cat)}
+                                        className='containerDetail p-10 contentCenter button bg-lite'
+                                        style={{ flex: 1 }}
+                                    >
+                                        <div style={{ fontSize: '24px', marginBottom: '4px' }}>
+                                            {locationCategories[cat]}
+                                        </div>
+                                        <div style={{ fontSize: '12px' }}>{cat}</div>
+                                    </button>
+                                    <button
+                                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18 }}
+                                        title='Edit category'
+                                        onClick={() => setEditingCategory({ key: cat, icon: locationCategories[cat], name: cat })}
+                                    >✏️</button>
+                                </div>
                             ))}
                         </div>
+
+                        {editingCategory && (
+                            <div style={{ margin: '10px 0', padding: 10, background: '#222', borderRadius: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <input
+                                    type='text'
+                                    value={editingCategory.icon}
+                                    onChange={e => setEditingCategory({ ...editingCategory, icon: e.target.value })}
+                                    maxLength={2}
+                                    style={{ width: 50, fontSize: 22, textAlign: 'center', marginRight: 8 }}
+                                />
+                                <input
+                                    type='text'
+                                    value={editingCategory.name}
+                                    onChange={e => setEditingCategory({ ...editingCategory, name: e.target.value })}
+                                    style={{ flex: 1, fontSize: 16, marginRight: 8 }}
+                                />
+                                <button
+                                    style={{ background: '#4caf50', color: 'white', border: 'none', borderRadius: 4, padding: '6px 12px', fontWeight: 'bold', marginRight: 4 }}
+                                    onClick={() => {
+                                        // Remove old key if name changed
+                                        setCategories(prev => {
+                                            const next = { ...prev };
+                                            if (editingCategory.key !== editingCategory.name) {
+                                                delete next[editingCategory.key];
+                                            }
+                                            next[editingCategory.name] = editingCategory.icon;
+                                            localStorage.setItem('locationCategories', JSON.stringify(next));
+                                            return next;
+                                        });
+                                        setEditingCategory(null);
+                                    }}
+                                >Save</button>
+                                <button
+                                    style={{ background: '#f44336', color: 'white', border: 'none', borderRadius: 4, padding: '6px 12px', fontWeight: 'bold' }}
+                                    onClick={() => setEditingCategory(null)}
+                                >Cancel</button>
+                            </div>
+                        )}
 
                         <div style={{
                             borderTop: '1px solid #ddd',
@@ -632,6 +827,7 @@ const Fuel = () => {
                             setCategoryDialogIndex(null);
                             setCategoryDialogNewName('');
                             setCategoryDialogNewIcon('🏷️');
+                            setEditingCategory(null);
                         }}
                         style={{
                             width: '100%',
@@ -659,7 +855,22 @@ const Fuel = () => {
             return null;
         }
 
-        const trip = trips[editLocationIndex];
+        let trip = trips[editLocationIndex];
+        // If editing a non-Gas entry, clear gas-specific fields for the form
+        if (trip && trip.category !== 'Gas') {
+            trip = {
+                ...trip,
+                guageStart: '',
+                guageEnd: '',
+                gallons: '',
+                usdPerGallon: '',
+                totalUSD: '',
+                pricePerGallon: '',
+                pricePerLiter: '',
+                exchangeRate: '',
+                oilChange: ''
+            };
+        }
 
         return (
             <div className='modal-overlay' style={{
@@ -842,13 +1053,22 @@ const Fuel = () => {
                             </label>
 
                             <label className='flexContainer mb-5'>
-                                <span className='flexColumn contentRight color-yellow w-170 pr-10'>Time:</span>
+                                <span className='flexColumn contentRight color-yellow w-170 pr-10'>Date:</span>
                                 <input
                                     className='flexColumn inputField color-lite size15 w-300'
                                     type='date'
-                                    value={trip.time || ''}
-                                    disabled
+                                    value={entryDate}
+                                    onChange={(e) => setEntryDate(e.target.value)}
+                                />
+                            </label>
 
+                            <label className='flexContainer mb-5'>
+                                <span className='flexColumn contentRight color-yellow w-170 pr-10'>Time:</span>
+                                <input
+                                    className='flexColumn inputField color-lite size15 w-300'
+                                    type='time'
+                                    value={entryTime}
+                                    onChange={(e) => setEntryTime(e.target.value)}
                                 />
                             </label>
                         </div>
@@ -865,6 +1085,85 @@ const Fuel = () => {
                         <button
                             className='containerDetail p-20 button bg-red flex2Column size20 color-lite'
                             onClick={() => setEditLocationDialog(false)}
+                            style={{ cursor: 'pointer', border: 'none', borderRadius: '4px' }}
+                        >
+                            ❌ Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    const startInsertBeforeStop = (targetIndex) => {
+        if (targetIndex === null || !trips[targetIndex]) {
+            return;
+        }
+        const trip = trips[targetIndex];
+        const parsed = parseTripTimeToInputs(trip.time);
+        setLocation(trip.location || '');
+        setCategory(trip.category || '');
+        setOdometer(trip.odometer || '');
+        setGuageStart(trip.guageStart || '');
+        setGuageEnd(trip.guageEnd || '');
+        setGallonsPurchased(trip.gallons || '');
+        setPricePerGallon(trip.usdPerGallon || '');
+        setCostFee(trip.costFee || 0);
+        setRating(trip.rating || 0);
+        setLatitude(trip.latitude || '');
+        setLongitude(trip.longitude || '');
+        setTotalUSD(trip.totalUSD || 0);
+        setEntryDate(parsed.date);
+        setEntryTime(parsed.time);
+        setInsertBeforeIndex(targetIndex);
+        setInsertMode(true);
+        setInsertStopDialogOpen(false);
+        setFormCollapse(false);
+    };
+
+    const renderInsertStopDialog = () => {
+        if (!insertStopDialogOpen) return null;
+
+        const sortedTrips = [...vehicleTrips].reverse();
+
+        return (
+            <div className='modal-overlay' style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 1000
+            }}>
+                <div className='containerDetail contentLeft p-20 maxHeight75percent bg-dark' style={{ width: '90%', maxWidth: '700px' }}>
+                    <div className='containerDetail p-20 color-yellow bg-lite size25 mb-10'>
+                        Select Stop to Insert Before
+                    </div>
+                    <div className='containerDetail p-10 scroll' style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+                        {sortedTrips.map((trip) => {
+                            const originalIndex = trips.indexOf(trip);
+                            return (
+                                <div
+                                    key={getKey(`insert-target-${originalIndex}`)}
+                                    className='containerDetail bg-lite mt-5 button p-15'
+                                    onClick={() => startInsertBeforeStop(originalIndex)}
+                                >
+                                    <div className='color-yellow size20'>#{originalIndex + 1} {trip.location}</div>
+                                    <div className='color-lite size15 mt-5'>
+                                        {trip.time} | Odometer: {trip.odometer} | {(trip.category || 'No Category')}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    <div className='containerDetail p-10 flexContainer mt-10'>
+                        <button
+                            className='containerDetail p-20 button bg-red flex2Column size20 color-lite'
+                            onClick={() => setInsertStopDialogOpen(false)}
                             style={{ cursor: 'pointer', border: 'none', borderRadius: '4px' }}
                         >
                             ❌ Cancel
@@ -1035,6 +1334,114 @@ const Fuel = () => {
         return sorted.map((stop, idx) => ({ ...stop, rank: idx + 1 }));
     }, [trips, locationsSortMode, locationsCategorySort, calculateDistanceToStop]);
 
+    const commitHomeLocation = () => {
+        if (!location) {
+            window.alert('No location set. Use the GPS button or type a location.');
+            return;
+        }
+        localStorage.setItem('fuelHomeLocation', location);
+        localStorage.setItem('fuelHomeLatitude', latitude || '');
+        localStorage.setItem('fuelHomeLongitude', longitude || '');
+        setHomeLocationState(location);
+        setHomeLatitudeState(latitude || '');
+        setHomeLongitudeState(longitude || '');
+        setHomeFormVisible(false);
+    };
+
+    const recordTripDirect = (loc, lat, lng, cat, odometerOverride) => {
+        const lastIndex = (trips.length - 1);
+        const lastDate = getDate(lastIndex);
+        const lastVehicleStop = vehicleTrips.length ? vehicleTrips[vehicleTrips.length - 1] : null;
+        const effectiveOdometer = (odometerOverride !== undefined)
+            ? odometerOverride
+            : (cat === 'Start')
+                ? (lastVehicleStop?.odometer ?? odometer)
+                : odometer;
+        const time = currentDate();
+        const newDate = `${time.split(', ')[0].split('/')[0]}/${time.split(', ')[0].split('/')[1]}`;
+        const newDistance = (cat === 'Start')
+            ? 0
+            : ((lastDate === newDate) ? (Number(effectiveOdometer) - lastOdometer()) : 0);
+        const newTrip = {
+            vehicleId: selectedVehicleId,
+            location: loc,
+            odometer: effectiveOdometer,
+            rating: rating,
+            category: cat,
+            costFee: 0,
+            time: time,
+            latitude: lat,
+            longitude: lng,
+            distance: newDistance
+        };
+        localStorage.setItem('distance', newDistance);
+        localStorage.setItem('location', loc);
+        localStorage.setItem('category', cat);
+        const newTrips = [...trips, newTrip];
+        setTrips(newTrips);
+        setFormCollapse(true);
+    };
+
+    const handleTripAction = (isStart) => {
+        if (!homeLocation) {
+            window.alert('Please set a Home location in Maintenance & Settings first.');
+            return;
+        }
+        const confirmed = window.confirm(
+            `${isStart ? 'Start trip' : 'End trip'} at home?\n\n📍 ${homeLocation}`
+        );
+        if (confirmed) {
+            if (isStart) {
+                const lastVehicleStop = vehicleTrips.length ? vehicleTrips[vehicleTrips.length - 1] : null;
+                const defaultOdo = lastVehicleStop?.odometer ?? odometer ?? '';
+                const input = window.prompt('Enter current odometer reading:', defaultOdo);
+                if (input === null) return;
+                const parsedOdo = parseInt(input, 10);
+                if (isNaN(parsedOdo) || parsedOdo < 0) {
+                    window.alert('Invalid odometer reading.');
+                    return;
+                }
+                setOdometer(parsedOdo);
+                recordTripDirect(homeLocation, homeLatitude, homeLongitude, 'Start', parsedOdo);
+            } else {
+                const lastVehicleStop = vehicleTrips.length ? vehicleTrips[vehicleTrips.length - 1] : null;
+                let defaultOdo = lastVehicleStop?.odometer ?? odometer ?? '';
+                if (
+                    lastVehicleStop &&
+                    lastVehicleStop.latitude &&
+                    lastVehicleStop.longitude &&
+                    lastVehicleStop.odometer &&
+                    homeLatitude &&
+                    homeLongitude
+                ) {
+                    const toRad = (v) => (v * Math.PI) / 180;
+                    const R = 3958.8;
+                    const lat1 = Number(lastVehicleStop.latitude);
+                    const lon1 = Number(lastVehicleStop.longitude);
+                    const lat2 = Number(homeLatitude);
+                    const lon2 = Number(homeLongitude);
+                    const dLat = toRad(lat2 - lat1);
+                    const dLon = toRad(lon2 - lon1);
+                    const a = Math.sin(dLat / 2) ** 2 +
+                        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+                    const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                    defaultOdo = (Number(lastVehicleStop.odometer) + dist).toFixed(0);
+                }
+                const input = window.prompt('Enter current odometer reading:', defaultOdo);
+                if (input === null) return;
+                const parsedOdo = parseInt(input, 10);
+                if (isNaN(parsedOdo) || parsedOdo < 0) {
+                    window.alert('Invalid odometer reading.');
+                    return;
+                }
+                setOdometer(parsedOdo);
+                recordTripDirect(homeLocation, homeLatitude, homeLongitude, 'End', parsedOdo);
+            }
+        } else {
+            setFormCollapse(false);
+        }
+    };
+
     const calculateAndRecord = () => {
 
         const lastIndex = (trips.length - 1);
@@ -1047,39 +1454,130 @@ const Fuel = () => {
         const newUsdPerGallon = usdPerGallon.toFixed(2) || 0;
         const totalUSD = (currency === 'USD') ? (gallonsPurchased * pricePerGallon) : (gallons * usdPerGallon);
         const newTotalUSD = totalUSD.toFixed(2);
-        const time = currentDate();
+        const time = buildTripTimeFromInputs();
         const newDate = `${time.split(', ')[0].split('/')[0]}/${time.split(', ')[0].split('/')[1]}`;
         const newDistance = (lastDate === newDate) ? (Number(odometer) - lastOdometer()) : 0;
+
+        // Only set allowed fields for non-Gas categories
+        let newTrip;
+        if (category !== 'Gas') {
+            newTrip = {
+                vehicleId: selectedVehicleId,
+                location: location,
+                odometer: odometer,
+                rating: rating,
+                category: category,
+                costFee: costFee,
+                time: time,
+                latitude: latitude,
+                longitude: longitude,
+                distance: newDistance
+            };
+            // Clear gas-specific localStorage fields
+            localStorage.removeItem('gallons');
+            localStorage.removeItem('usdPerGallon');
+            localStorage.removeItem('guageStart');
+            localStorage.removeItem('guageEnd');
+            localStorage.removeItem('pricePerGallon');
+            localStorage.removeItem('pricePerLiter');
+            localStorage.removeItem('exchangeRate');
+            localStorage.removeItem('oilChange');
+        } else {
+            newTrip = {
+                vehicleId: selectedVehicleId,
+                location: location,
+                odometer: odometer,
+                rating: rating,
+                category: category,
+                costFee: costFee,
+                guageStart: (guageStart === '') ? 0 : guageStart,
+                guageEnd: (guageEnd === '') ? 0 : guageEnd,
+                time: time,
+                latitude: latitude,
+                longitude: longitude,
+                distance: newDistance,
+                gallons: newGallons,
+                usdPerGallon: newUsdPerGallon,
+                totalUSD: newTotalUSD
+            };
+            localStorage.setItem('gallons', newGallons);
+            localStorage.setItem('usdPerGallon', newUsdPerGallon);
+            localStorage.setItem('guageStart', guageStart);
+            localStorage.setItem('guageEnd', guageEnd);
+            localStorage.setItem('pricePerGallon', pricePerGallon);
+            localStorage.setItem('pricePerLiter', pricePerLiter);
+            localStorage.setItem('exchangeRate', exchangeRate);
+            localStorage.setItem('oilChange', oilChange);
+        }
         localStorage.setItem('distance', newDistance);
         localStorage.setItem('odometer', odometer);
-        localStorage.setItem('oilChange', oilChange);
         localStorage.setItem('location', location);
-        localStorage.setItem('gallons', newGallons);
-        localStorage.setItem('usdPerGallon', newUsdPerGallon);
         localStorage.setItem('rating', rating);
         localStorage.setItem('category', category);
         localStorage.setItem('costFee', costFee);
-        //console.log(`Fuel => calculateAndRecord => guageStart: ${guageStart} guageEnd: ${guageEnd}`);
-        const newTrip = {
-            location: location,
-            odometer: odometer,
-            rating: rating,
-            category: category,
-            costFee: costFee,
-            guageStart: (guageStart === '') ? 0 : guageStart,
-            guageEnd: (guageEnd === '') ? 0 : guageEnd,
-            time: time,
-            latitude: latitude,
-            longitude: longitude,
-            distance: newDistance,
-            gallons: newGallons,
-            usdPerGallon: newUsdPerGallon,
-            totalUSD: newTotalUSD
-        }
         const newTrips = [...trips, newTrip];
-        //console.log(`Fuel => calculateAndRecord => newTrips: ${JSON.stringify(newTrips, null, 2)}`);
         setTrips(newTrips);
+        resetInsertMode();
         setFormCollapse(true)
+    };
+
+    const insertAndRecord = () => {
+        if (insertBeforeIndex === null || !trips[insertBeforeIndex]) {
+            window.alert('Select a stop to insert before first.');
+            return;
+        }
+
+        const pricePerLiterUSD = pricePerLiter / exchangeRate;
+        const gallons = litersPurchased * 0.264172;
+        const newGallons = (currency === 'USD') ? gallonsPurchased : gallons.toFixed(1);
+
+        const usdPerGallon = (currency === 'USD') ? Number(pricePerGallon) : Number(pricePerLiterUSD * 3.78541);
+        const newUsdPerGallon = usdPerGallon.toFixed(2) || 0;
+        const totalUSDValue = (currency === 'USD') ? (gallonsPurchased * pricePerGallon) : (gallons * usdPerGallon);
+        const newTotalUSD = totalUSDValue.toFixed(2);
+        const time = buildTripTimeFromInputs();
+        const vehicleIdForInsert = trips[insertBeforeIndex].vehicleId || selectedVehicleId;
+
+        let insertedTrip;
+        if (category !== 'Gas') {
+            insertedTrip = {
+                vehicleId: vehicleIdForInsert,
+                location,
+                odometer,
+                rating,
+                category,
+                costFee,
+                time,
+                latitude,
+                longitude,
+                distance: 0
+            };
+        } else {
+            insertedTrip = {
+                vehicleId: vehicleIdForInsert,
+                location,
+                odometer,
+                rating,
+                category,
+                costFee,
+                guageStart: (guageStart === '') ? 0 : guageStart,
+                guageEnd: (guageEnd === '') ? 0 : guageEnd,
+                time,
+                latitude,
+                longitude,
+                distance: 0,
+                gallons: newGallons,
+                usdPerGallon: newUsdPerGallon,
+                totalUSD: newTotalUSD
+            };
+        }
+
+        const updatedTrips = [...trips];
+        updatedTrips.splice(insertBeforeIndex, 0, insertedTrip);
+        const tripsUpdate = recalculateDistances(updatedTrips);
+        setTrips(tripsUpdate);
+        resetInsertMode();
+        setFormCollapse(true);
     };
     const updateLocation = () => {
 
@@ -1091,35 +1589,67 @@ const Fuel = () => {
         const newUsdPerGallon = usdPerGallon.toFixed(2) || 0;
         const totalUSD = (currency === 'USD') ? (gallonsPurchased * pricePerGallon) : (gallons * usdPerGallon);
         const newTotalUSD = totalUSD.toFixed(2);
-        const time = currentDate();
+        const time = buildTripTimeFromInputs();
         const previousTripOdometer = (editLocationIndex > 0) ? Number(trips[editLocationIndex - 1].odometer) : 0;
         const newDistance = (editLocationIndex > 0) ? (Number(odometer) - previousTripOdometer) : 0;
+
+        let updateTrip;
+        const existingVehicleId = (editLocationIndex !== null && trips[editLocationIndex]) ? (trips[editLocationIndex].vehicleId || 'default') : selectedVehicleId;
+        if (category !== 'Gas') {
+            updateTrip = {
+                vehicleId: existingVehicleId,
+                location: location,
+                odometer: odometer,
+                rating: rating,
+                category: category,
+                costFee: costFee,
+                time: time,
+                latitude: latitude,
+                longitude: longitude,
+                distance: newDistance
+            };
+            // Clear gas-specific localStorage fields
+            localStorage.removeItem('gallons');
+            localStorage.removeItem('usdPerGallon');
+            localStorage.removeItem('guageStart');
+            localStorage.removeItem('guageEnd');
+            localStorage.removeItem('pricePerGallon');
+            localStorage.removeItem('pricePerLiter');
+            localStorage.removeItem('exchangeRate');
+            localStorage.removeItem('oilChange');
+        } else {
+            updateTrip = {
+                vehicleId: existingVehicleId,
+                location: location,
+                odometer: odometer,
+                rating: rating,
+                category: category,
+                costFee: costFee,
+                guageStart: (guageStart === '') ? 0 : guageStart,
+                guageEnd: (guageEnd === '') ? 0 : guageEnd,
+                time: time,
+                latitude: latitude,
+                longitude: longitude,
+                distance: newDistance,
+                gallons: newGallons,
+                usdPerGallon: newUsdPerGallon,
+                totalUSD: newTotalUSD
+            };
+            localStorage.setItem('gallons', newGallons);
+            localStorage.setItem('usdPerGallon', newUsdPerGallon);
+            localStorage.setItem('guageStart', guageStart);
+            localStorage.setItem('guageEnd', guageEnd);
+            localStorage.setItem('pricePerGallon', pricePerGallon);
+            localStorage.setItem('pricePerLiter', pricePerLiter);
+            localStorage.setItem('exchangeRate', exchangeRate);
+            localStorage.setItem('oilChange', oilChange);
+        }
         localStorage.setItem('distance', newDistance);
         localStorage.setItem('odometer', odometer);
-        localStorage.setItem('oilChange', oilChange);
         localStorage.setItem('location', location);
-        localStorage.setItem('gallons', newGallons);
-        localStorage.setItem('usdPerGallon', newUsdPerGallon);
         localStorage.setItem('rating', rating);
         localStorage.setItem('category', category);
         localStorage.setItem('costFee', costFee);
-        //console.log(`Fuel => calculateAndRecord => guageStart: ${guageStart} guageEnd: ${guageEnd}`);
-        const updateTrip = {
-            location: location,
-            odometer: odometer,
-            rating: rating,
-            category: category,
-            costFee: costFee,
-            guageStart: (guageStart === '') ? 0 : guageStart,
-            guageEnd: (guageEnd === '') ? 0 : guageEnd,
-            time: time,
-            latitude: latitude,
-            longitude: longitude,
-            distance: newDistance,
-            gallons: newGallons,
-            usdPerGallon: newUsdPerGallon,
-            totalUSD: newTotalUSD
-        }
         const newTrips = [...trips];
         newTrips[editLocationIndex] = updateTrip;
         setTrips(newTrips);
@@ -1201,7 +1731,10 @@ const Fuel = () => {
         const endIndex = getSameDayEndIndex(targetDate);
         const totalGallons = trips
             .slice(startIndex, endIndex + 1)
-            .reduce((accumulator, trip) => accumulator + parseFloat(Number(trip.gallons)), 0);
+            .reduce((accumulator, trip) => {
+                const gallons = Number(trip?.gallons);
+                return accumulator + (Number.isFinite(gallons) ? gallons : 0);
+            }, 0);
 
         return totalGallons.toFixed(1);
     }
@@ -1222,7 +1755,10 @@ const Fuel = () => {
         const endIndex = getSameDayEndIndex(targetDate);
         const totalUSD = trips
             .slice(startIndex, endIndex + 1)
-            .reduce((accumulator, trip) => accumulator + parseFloat(trip.totalUSD), 0);
+            .reduce((accumulator, trip) => {
+                const usd = Number(trip?.totalUSD);
+                return accumulator + (Number.isFinite(usd) ? usd : 0);
+            }, 0);
 
         return totalUSD.toFixed(2);
     };
@@ -1386,9 +1922,30 @@ const Fuel = () => {
         );
         setLongitude(longitude);
         setLatitude(latitude + .000001);
-        // Immediately reverse geocode using provided coordinates
-        //console.log(`Fuel => Requesting location data with provided coordinates...`);
         requestLocation({ latitude, longitude });
+        // Auto-fill odometer based on distance from last stop
+        const lastVehicleStop = vehicleTrips.length ? vehicleTrips[vehicleTrips.length - 1] : null;
+        if (
+            lastVehicleStop &&
+            lastVehicleStop.latitude &&
+            lastVehicleStop.longitude &&
+            lastVehicleStop.odometer
+        ) {
+            const toRad = (v) => (v * Math.PI) / 180;
+            const R = 3958.8;
+            const lat1 = Number(lastVehicleStop.latitude);
+            const lon1 = Number(lastVehicleStop.longitude);
+            const lat2 = latitude;
+            const lon2 = longitude;
+            const dLat = toRad(lat2 - lat1);
+            const dLon = toRad(lon2 - lon1);
+            const a = Math.sin(dLat / 2) ** 2 +
+                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+            const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const newOdo = (Number(lastVehicleStop.odometer) + dist).toFixed(0);
+            setPrevOdometer(odometer);
+            setOdometer(newOdo);
+        }
     };
     const findClosestBelowOrEqual = (arr, target) => {
         const filtered = arr.filter(num => num <= target);
@@ -1491,14 +2048,559 @@ const Fuel = () => {
         const display = `${hours}:${minutes} ${half}`;
         return display;
     }
+
+    const buildCleanedTripDataPreview = () => {
+        if (!Array.isArray(trips) || trips.length === 0) return null;
+
+        const toDayKey = (trip) => {
+            const parsed = new Date(trip?.time);
+            if (!Number.isNaN(parsed.getTime())) {
+                const y = parsed.getFullYear();
+                const m = String(parsed.getMonth() + 1).padStart(2, '0');
+                const d = String(parsed.getDate()).padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
+            const datePart = String(trip?.time || '').split(',')[0].trim();
+            return datePart || 'unknown-day';
+        };
+
+        const shiftedTime = (rawTime, deltaMinutes) => {
+            const parsed = new Date(rawTime);
+            if (Number.isNaN(parsed.getTime())) return rawTime || currentDate();
+            const next = new Date(parsed.getTime() + (deltaMinutes * 60 * 1000));
+            return next.toLocaleString();
+        };
+
+        const normalizeTripWithFixCount = (trip) => {
+            const normalized = { ...trip };
+            let fixes = 0;
+            if ((normalized.category || '') === 'Gas') {
+                const startVal = Number(normalized.guageStart);
+                const endVal = Number(normalized.guageEnd);
+                const gallonsVal = Number(normalized.gallons);
+                const usdPerGallonVal = Number(normalized.usdPerGallon);
+                const totalUSDVal = Number(normalized.totalUSD);
+
+                const safeStart = Number.isFinite(startVal) ? startVal : 0;
+                const safeEnd = Number.isFinite(endVal) ? endVal : 0;
+                const safeGallons = Number.isFinite(gallonsVal) ? gallonsVal : 0;
+                const safeUsdPerGallon = Number.isFinite(usdPerGallonVal) ? usdPerGallonVal : 0;
+                const safeTotalUSD = Number.isFinite(totalUSDVal) ? totalUSDVal : 0;
+
+                if (safeStart !== startVal) fixes += 1;
+                if (safeEnd !== endVal) fixes += 1;
+                if (safeGallons !== gallonsVal) fixes += 1;
+                if (safeUsdPerGallon !== usdPerGallonVal) fixes += 1;
+                if (safeTotalUSD !== totalUSDVal) fixes += 1;
+
+                normalized.guageStart = safeStart;
+                normalized.guageEnd = safeEnd;
+                normalized.gallons = safeGallons;
+                normalized.usdPerGallon = safeUsdPerGallon;
+                normalized.totalUSD = safeTotalUSD;
+            }
+            return { normalized, fixes };
+        };
+
+        const originalTrips = trips.map((trip) => ({ ...trip }));
+        let gaugeFixes = 0;
+        const normalizedTrips = trips.map((trip) => {
+            const out = normalizeTripWithFixCount(trip);
+            gaugeFixes += out.fixes;
+            return out.normalized;
+        });
+
+        const insertionPreview = [];
+        let segment = [];
+        let currentSegmentKey = null;
+        let segmentOrdinal = 0;
+
+        const flushSegment = () => {
+            if (!segment.length) return;
+            const first = segment[0];
+            const last = segment[segment.length - 1];
+            const dayKey = toDayKey(first);
+            const vehicleLabel = first.vehicleId || 'default';
+            const segmentToken = `${vehicleLabel}::${dayKey}::${segmentOrdinal}`;
+
+            if ((first.category || '') !== 'Start') {
+                insertionPreview.push({
+                    id: `${segmentToken}::Start`,
+                    segmentToken,
+                    type: 'Start',
+                    day: dayKey,
+                    vehicleId: vehicleLabel,
+                    anchorLocation: first.location || 'Trip Start',
+                    anchorLatitude: first.latitude ?? '',
+                    anchorLongitude: first.longitude ?? '',
+                    anchorOdometer: first.odometer ?? 0,
+                    anchorTime: first.time,
+                    locationMode: homeLocation ? 'home' : 'anchor',
+                    checked: true,
+                });
+            }
+
+            if ((last.category || '') !== 'End') {
+                insertionPreview.push({
+                    id: `${segmentToken}::End`,
+                    segmentToken,
+                    type: 'End',
+                    day: dayKey,
+                    vehicleId: vehicleLabel,
+                    anchorLocation: last.location || 'Trip End',
+                    anchorLatitude: last.latitude ?? '',
+                    anchorLongitude: last.longitude ?? '',
+                    anchorOdometer: last.odometer ?? 0,
+                    anchorTime: last.time,
+                    locationMode: homeLocation ? 'home' : 'anchor',
+                    checked: true,
+                });
+            }
+            segmentOrdinal += 1;
+        };
+
+        normalizedTrips.forEach((trip) => {
+            const key = `${trip.vehicleId || 'default'}::${toDayKey(trip)}`;
+            if (currentSegmentKey === null || key === currentSegmentKey) {
+                currentSegmentKey = key;
+                segment.push(trip);
+                return;
+            }
+            flushSegment();
+            segment = [trip];
+            currentSegmentKey = key;
+        });
+        flushSegment();
+
+        const recomputeFromPreview = (previewState) => {
+            const sourceTrips = previewState.includeGaugeFixes
+                ? previewState.normalizedTrips
+                : previewState.originalTrips;
+            const selectedById = new Map(previewState.insertionPreview.map(item => [item.id, item.checked]));
+            const buildBoundaryStopFromItem = (item) => {
+                const useHome = item.locationMode === 'home' && !!homeLocation;
+                return {
+                    vehicleId: item.vehicleId || 'default',
+                    location: useHome
+                        ? homeLocation
+                        : (item.anchorLocation || (item.type === 'Start' ? 'Trip Start' : 'Trip End')),
+                    odometer: item.anchorOdometer ?? 0,
+                    rating: 0,
+                    category: item.type,
+                    costFee: 0,
+                    time: shiftedTime(item.anchorTime, item.type === 'Start' ? -1 : 1),
+                    latitude: useHome ? (homeLatitude ?? '') : (item.anchorLatitude ?? ''),
+                    longitude: useHome ? (homeLongitude ?? '') : (item.anchorLongitude ?? ''),
+                    distance: 0
+                };
+            };
+            const insertionBySegment = previewState.insertionPreview.reduce((acc, item) => {
+                if (!acc[item.segmentToken]) acc[item.segmentToken] = {};
+                acc[item.segmentToken][item.type] = item;
+                return acc;
+            }, {});
+
+            const cleaned = [];
+            let localSegment = [];
+            let localCurrentKey = null;
+            let localOrdinal = 0;
+
+            const flushLocalSegment = () => {
+                if (!localSegment.length) return;
+                const first = localSegment[0];
+                const dayKey = toDayKey(first);
+                const vehicleLabel = first.vehicleId || 'default';
+                const token = `${vehicleLabel}::${dayKey}::${localOrdinal}`;
+                const ins = insertionBySegment[token] || {};
+
+                if (ins.Start && selectedById.get(ins.Start.id)) {
+                    cleaned.push(buildBoundaryStopFromItem(ins.Start));
+                }
+                cleaned.push(...localSegment);
+                if (ins.End && selectedById.get(ins.End.id)) {
+                    cleaned.push(buildBoundaryStopFromItem(ins.End));
+                }
+                localOrdinal += 1;
+            };
+
+            sourceTrips.forEach((trip) => {
+                const key = `${trip.vehicleId || 'default'}::${toDayKey(trip)}`;
+                if (localCurrentKey === null || key === localCurrentKey) {
+                    localCurrentKey = key;
+                    localSegment.push({ ...trip });
+                    return;
+                }
+                flushLocalSegment();
+                localSegment = [{ ...trip }];
+                localCurrentKey = key;
+            });
+            flushLocalSegment();
+
+            const insertedStarts = previewState.insertionPreview.filter(item => item.type === 'Start' && item.checked).length;
+            const insertedEnds = previewState.insertionPreview.filter(item => item.type === 'End' && item.checked).length;
+            const activeGaugeFixes = previewState.includeGaugeFixes ? previewState.gaugeFixes : 0;
+
+            return {
+                recalculated: recalculateDistances(cleaned),
+                insertedStarts,
+                insertedEnds,
+                activeGaugeFixes
+            };
+        };
+
+        const basePreview = {
+            originalTrips,
+            normalizedTrips,
+            gaugeFixes,
+            includeGaugeFixes: true,
+            insertionPreview
+        };
+
+        return {
+            ...basePreview,
+            ...recomputeFromPreview(basePreview)
+        };
+    };
+
+    const openCleanDataPreview = () => {
+        const preview = buildCleanedTripDataPreview();
+        if (!preview) {
+            window.alert('No trip data to clean.');
+            return;
+        }
+        setCleanDataPreview(preview);
+    };
+
+    const refreshCleanDataPreview = (previewState) => {
+        const toDayKey = (trip) => {
+            const parsed = new Date(trip?.time);
+            if (!Number.isNaN(parsed.getTime())) {
+                const y = parsed.getFullYear();
+                const m = String(parsed.getMonth() + 1).padStart(2, '0');
+                const d = String(parsed.getDate()).padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
+            const datePart = String(trip?.time || '').split(',')[0].trim();
+            return datePart || 'unknown-day';
+        };
+
+        const shiftedTime = (rawTime, deltaMinutes) => {
+            const parsed = new Date(rawTime);
+            if (Number.isNaN(parsed.getTime())) return rawTime || currentDate();
+            const next = new Date(parsed.getTime() + (deltaMinutes * 60 * 1000));
+            return next.toLocaleString();
+        };
+
+        const sourceTrips = previewState.includeGaugeFixes
+            ? previewState.normalizedTrips
+            : previewState.originalTrips;
+        const selectedById = new Map(previewState.insertionPreview.map(item => [item.id, item.checked]));
+        const buildBoundaryStopFromItem = (item) => {
+            const useHome = item.locationMode === 'home' && !!homeLocation;
+            return {
+                vehicleId: item.vehicleId || 'default',
+                location: useHome
+                    ? homeLocation
+                    : (item.anchorLocation || (item.type === 'Start' ? 'Trip Start' : 'Trip End')),
+                odometer: item.anchorOdometer ?? 0,
+                rating: 0,
+                category: item.type,
+                costFee: 0,
+                time: shiftedTime(item.anchorTime, item.type === 'Start' ? -1 : 1),
+                latitude: useHome ? (homeLatitude ?? '') : (item.anchorLatitude ?? ''),
+                longitude: useHome ? (homeLongitude ?? '') : (item.anchorLongitude ?? ''),
+                distance: 0
+            };
+        };
+        const insertionBySegment = previewState.insertionPreview.reduce((acc, item) => {
+            if (!acc[item.segmentToken]) acc[item.segmentToken] = {};
+            acc[item.segmentToken][item.type] = item;
+            return acc;
+        }, {});
+
+        const cleaned = [];
+        let localSegment = [];
+        let localCurrentKey = null;
+        let localOrdinal = 0;
+
+        const flushLocalSegment = () => {
+            if (!localSegment.length) return;
+            const first = localSegment[0];
+            const dayKey = toDayKey(first);
+            const vehicleLabel = first.vehicleId || 'default';
+            const token = `${vehicleLabel}::${dayKey}::${localOrdinal}`;
+            const ins = insertionBySegment[token] || {};
+
+            if (ins.Start && selectedById.get(ins.Start.id)) {
+                cleaned.push(buildBoundaryStopFromItem(ins.Start));
+            }
+            cleaned.push(...localSegment);
+            if (ins.End && selectedById.get(ins.End.id)) {
+                cleaned.push(buildBoundaryStopFromItem(ins.End));
+            }
+            localOrdinal += 1;
+        };
+
+        sourceTrips.forEach((trip) => {
+            const key = `${trip.vehicleId || 'default'}::${toDayKey(trip)}`;
+            if (localCurrentKey === null || key === localCurrentKey) {
+                localCurrentKey = key;
+                localSegment.push({ ...trip });
+                return;
+            }
+            flushLocalSegment();
+            localSegment = [{ ...trip }];
+            localCurrentKey = key;
+        });
+        flushLocalSegment();
+
+        const insertedStarts = previewState.insertionPreview.filter(item => item.type === 'Start' && item.checked).length;
+        const insertedEnds = previewState.insertionPreview.filter(item => item.type === 'End' && item.checked).length;
+        const activeGaugeFixes = previewState.includeGaugeFixes ? previewState.gaugeFixes : 0;
+
+        return {
+            ...previewState,
+            recalculated: recalculateDistances(cleaned),
+            insertedStarts,
+            insertedEnds,
+            activeGaugeFixes
+        };
+    };
+
+    const toggleCleanDataGaugeFixes = () => {
+        if (!cleanDataPreview) return;
+        const next = {
+            ...cleanDataPreview,
+            includeGaugeFixes: !cleanDataPreview.includeGaugeFixes
+        };
+        setCleanDataPreview(refreshCleanDataPreview(next));
+    };
+
+    const toggleCleanDataInsertion = (id) => {
+        if (!cleanDataPreview) return;
+        const next = {
+            ...cleanDataPreview,
+            insertionPreview: cleanDataPreview.insertionPreview.map(item => (
+                item.id === id ? { ...item, checked: !item.checked } : item
+            ))
+        };
+        setCleanDataPreview(refreshCleanDataPreview(next));
+    };
+
+    const setCleanDataInsertionLocationMode = (id, locationMode) => {
+        if (!cleanDataPreview) return;
+        const next = {
+            ...cleanDataPreview,
+            insertionPreview: cleanDataPreview.insertionPreview.map(item => (
+                item.id === id ? { ...item, locationMode } : item
+            ))
+        };
+        setCleanDataPreview(refreshCleanDataPreview(next));
+    };
+
+    const toggleSelectAllCleanDataItems = () => {
+        if (!cleanDataPreview) return;
+        const allInsertionsChecked = cleanDataPreview.insertionPreview.every(item => item.checked);
+        const allSelected = cleanDataPreview.includeGaugeFixes && allInsertionsChecked;
+        const targetState = !allSelected;
+
+        const next = {
+            ...cleanDataPreview,
+            includeGaugeFixes: targetState,
+            insertionPreview: cleanDataPreview.insertionPreview.map(item => ({
+                ...item,
+                checked: targetState
+            }))
+        };
+
+        setCleanDataPreview(refreshCleanDataPreview(next));
+    };
+
+    const applyCleanData = () => {
+        if (!cleanDataPreview) return;
+        setTrips(cleanDataPreview.recalculated);
+        const { insertedStarts, insertedEnds, activeGaugeFixes } = cleanDataPreview;
+        setCleanDataPreview(null);
+        window.alert(`Clean complete. Added ${insertedStarts} Start and ${insertedEnds} End stops. Fixed ${activeGaugeFixes} invalid fuel values.`);
+    };
+
+    const renderCleanDataPreviewDialog = () => {
+        if (!cleanDataPreview) return null;
+        const { insertedStarts, insertedEnds, activeGaugeFixes, gaugeFixes, insertionPreview, includeGaugeFixes } = cleanDataPreview;
+        const allInsertionsChecked = insertionPreview.every(item => item.checked);
+        const allSelected = includeGaugeFixes && allInsertionsChecked;
+
+        return (
+            <div className='modal-overlay' style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 1000
+            }}>
+                <div className='containerDetail p-20 maxHeight75percent bg-dark' style={{ width: '92%', maxWidth: '760px' }}>
+                    <div className='containerDetail p-20 contentLeft color-yellow bg-lite width--5 size25 mb-10'>
+                        Preview Clean Data Changes
+                    </div>
+
+                    <div className='containerDetail p-10 bg-lite mb-10'>
+                        <div
+                            className='containerDetail bg-green color-lite button p-10 contentLeft'
+                            onClick={toggleSelectAllCleanDataItems}
+                        >
+                            {allSelected ? '☑️ Deselect All' : '✅ Select All'}
+                        </div>
+                    </div>
+
+                    <div className='containerDetail p-10 color-lite bg-lite contentLeft mb-5'>
+                        <label className='containerDetail button color-lite contentLeft'>
+                            <input
+                                type='checkbox'
+                                checked={includeGaugeFixes}
+                                onChange={toggleCleanDataGaugeFixes}
+                                className=''
+                            />
+                            Fix invalid fuel fields 
+                            <span className='color-yellow ml-5'>
+                                ({gaugeFixes} possible, {activeGaugeFixes} selected)
+                            </span>
+                        </label>
+                        <div className='containerDetail mt--5'>🟢 Start stops to add: <span className='color-yellow'>{insertedStarts}</span></div>
+                        <div className='containerDetail mt--10'>🔴 End stops to add: <span className='color-yellow'>{insertedEnds}</span></div>
+                    </div>
+
+                    <div className='containerDetail scroll bg-lite p-10' style={{ maxHeight: '45vh' }}>
+                        {
+                            insertionPreview.length === 0
+                                ? <div className='color-lite'>No Start/End insertions needed.</div>
+                                : insertionPreview.map((item, idx) => (
+                                    <div key={idx} className='containerDetail p-10 mb-5 bg-dark color-lite contentLeft'>
+                                        <label className='button'>
+                                            <input
+                                                type='checkbox'
+                                                checked={item.checked}
+                                                onChange={() => toggleCleanDataInsertion(item.id)}
+                                                className='mr-10'
+                                            />
+                                        </label>
+                                        <span className='color-yellow mr-10'>{item.type === 'Start' ? '🟢' : '🔴'} {item.type}</span>
+                                        <span className='mr-10'>Vehicle: {item.vehicleId} | Day: {item.day}</span>
+                                        <select
+                                            className='containerDetail color-lite p-5'
+                                            value={item.locationMode}
+                                            onChange={(e) => setCleanDataInsertionLocationMode(item.id, e.target.value)}
+                                        >
+                                            <option value='home' disabled={!homeLocation}>🏡 Home{homeLocation ? '' : ' (not set)'}</option>
+                                            <option value='anchor'>📍 Near stop</option>
+                                        </select>
+                                        <span className='ml-10 color-yellow'>
+                                            {item.locationMode === 'home' && homeLocation ? `Using: ${homeLocation}` : `Using: ${item.anchorLocation}`}
+                                        </span>
+                                    </div>
+                                ))
+                        }
+                    </div>
+
+                    <div className='containerDetail flexContainer mt-10'>
+                        <div
+                            className='containerDetail p-20 button bg-green flex2Column mr-5 size20 color-lite contentCenter'
+                            onClick={applyCleanData}
+                        >
+                            ✅ Apply Changes
+                        </div>
+                        <div
+                            className='containerDetail p-20 button bg-red flex2Column size20 color-lite contentCenter'
+                            onClick={() => setCleanDataPreview(null)}
+                        >
+                            ❌ Cancel
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     const locationEntry = () => <div>
         <div className='containerDetail mt-5 size20'>
+            {
+                insertMode
+                    ? <div className='containerDetail bg-green color-yellow p-10 mb-5'>
+                        Insert mode: this stop will be inserted before #{insertBeforeIndex + 1}.
+                    </div>
+                    : null
+            }
+            <div className='containerDetail mb-5 mt-5' style={{ overflowX: 'auto', whiteSpace: 'nowrap' }}>
+                {Object.keys(locationCategories || {}).map((cat) => (
+                    <span
+                        key={cat}
+                        title={cat}
+                        onClick={() => handleCategorySelect(cat)}
+                        className='button'
+                        style={{
+                            display: 'inline-block',
+                            fontSize: '28px',
+                            padding: '6px 10px',
+                            borderRadius: '8px',
+                            marginRight: '4px',
+                            background: category === cat ? '#2e7d32' : 'transparent',
+                            border: category === cat ? '2px solid #66bb6a' : '2px solid transparent',
+                        }}
+                    >
+                        {locationCategories[cat]}
+                    </span>
+                ))}
+            </div>
             <div className='containerDetail mb-5 mt-5'>
                 <Geolocator
                     currentPositionExists='false'
                     returnCurrentPosition={updateCurrentLocation}
                 />
             </div>
+            {
+                insertMode
+                    ? <>
+                        <label className='flexContainer containerDetail mt-5'>
+                            <div className='columnRightAlign flex2Column'>
+                                <span className='inputText'>
+                                    Date:
+                                </span>
+                            </div>
+                            <div className='columnLeftAlign flex2Column'>
+                                <input
+                                    className='inputField'
+                                    id='entryDate'
+                                    name='entryDate'
+                                    type='date'
+                                    value={entryDate}
+                                    onChange={(e) => setEntryDate(e.target.value)}
+                                />
+                            </div>
+                        </label>
+                        <label className='flexContainer containerDetail mt-5'>
+                            <div className='columnRightAlign flex2Column'>
+                                <span className='inputText'>
+                                    Time:
+                                </span>
+                            </div>
+                            <div className='columnLeftAlign flex2Column'>
+                                <input
+                                    className='inputField'
+                                    id='entryTime'
+                                    name='entryTime'
+                                    type='time'
+                                    value={entryTime}
+                                    onChange={(e) => setEntryTime(e.target.value)}
+                                />
+                            </div>
+                        </label>
+                    </>
+                    : null
+            }
             <label className='flexContainer containerDetail mt-5'>
                 <div className='columnRightAlign flex2Column'>
                     <span className='inputText'>
@@ -1514,8 +2616,88 @@ const Fuel = () => {
                         value={location}
                         onChange={(e) => setLocation(e.target.value)}
                     />
+                    {/* Secondary selector for location by distance, only after clicking OR SELECT */}
                 </div>
             </label>
+            <div
+                className='containerDetail p-10 size15 color-dark bg-yellow mt-5'
+                style={{fontWeight:'bold',textAlign:'center'}}
+            >
+                OR SELECT LOCATION
+            </div>
+            <div className=''>
+                {
+                    Array.isArray(getLocations) && getLocations.length > 0 ? (
+                        <select
+                            className='containerDetail p-10 m-10 width--20 color-lite'
+                            value={location}
+                            onChange={e => {
+                                const selectedValue = e.target.value;
+                                setLocation(selectedValue);
+                            }}
+                        >
+                            <option value=''>Select location by distance...</option>
+                            {getLocations
+                                .slice()
+                                .sort((a, b) => {
+                                    // Prefer distanceFromCurrent if available, else 0
+                                    const da = typeof a.distanceFromCurrent === 'number' ? a.distanceFromCurrent : 0;
+                                    const db = typeof b.distanceFromCurrent === 'number' ? b.distanceFromCurrent : 0;
+                                    return da - db;
+                                })
+                                .map((loc, idx) => (
+                                    <option key={loc.id || idx} value={loc.location || loc.name}>
+                                        {(loc.location || loc.name) + (typeof loc.distanceFromCurrent === 'number' ? ` (${loc.distanceFromCurrent.toFixed(1)} mi)` : '')}
+                                    </option>
+                                ))}
+                        </select>
+                    ) : (
+                        <div className='color-lite size15 mt-5 mb-5'>No locations available to select.</div>
+                    )
+                }
+            </div>
+            {
+                insertMode
+                    ? <>
+                        <label className='flexContainer containerDetail mt-5'>
+                            <div className='columnRightAlign flex2Column'>
+                                <span className='inputText'>
+                                    Latitude:
+                                </span>
+                            </div>
+                            <div className='columnLeftAlign flex2Column'>
+                                <input
+                                    className='inputField'
+                                    id='latitude'
+                                    name='latitude'
+                                    type='number'
+                                    step='0.000001'
+                                    value={latitude}
+                                    onChange={(e) => setLatitude(e.target.value)}
+                                />
+                            </div>
+                        </label>
+                        <label className='flexContainer containerDetail mt-5'>
+                            <div className='columnRightAlign flex2Column'>
+                                <span className='inputText'>
+                                    Longitude:
+                                </span>
+                            </div>
+                            <div className='columnLeftAlign flex2Column'>
+                                <input
+                                    className='inputField'
+                                    id='longitude'
+                                    name='longitude'
+                                    type='number'
+                                    step='0.000001'
+                                    value={longitude}
+                                    onChange={(e) => setLongitude(e.target.value)}
+                                />
+                            </div>
+                        </label>
+                    </>
+                    : null
+            }
             <label className='flexContainer containerDetail mt-5'>
                 <div className='columnRightAlign flex2Column'>
                     <span className='inputText'>
@@ -1552,10 +2734,18 @@ const Fuel = () => {
                         name='odometer'
                         type='number'
                         value={odometer}
-                        onChange={(e) => setOdometer(e.target.value)}
+                        onChange={(e) => { setOdometer(e.target.value); setPrevOdometer(null); }}
                     />
                 </div>
             </label>
+            {prevOdometer !== null && (
+                <div
+                    className='containerDetail button bg-dkRed color-lite p-10 size15 contentCenter mt-5 brdr-red'
+                    onClick={() => { setOdometer(prevOdometer); setPrevOdometer(null); }}
+                >
+                    Added {(Number(odometer) - Number(prevOdometer)).toFixed(0)} miles ← Undo auto-fill
+                </div>
+            )}
 
             {category === 'Gas' ? (
                 <>
@@ -1668,13 +2858,22 @@ const Fuel = () => {
         <div className='containerDetail flexContainer mt-5'>
             <div
                 className='containerDetail bg-green p-20 flex2Column size20 button color-lite m-5'
-                onClick={calculateAndRecord}
+                onClick={insertMode ? insertAndRecord : calculateAndRecord}
             >
-                ➕ Add
+                {insertMode ? '𑑝 Insert' : '➕ Add'}
             </div>
             <div
                 className='containerDetail bg-green p-20 flex2Column size20 button color-lite m-5'
-                onClick={() => setFormCollapse(true)}
+                onClick={openInsertStopDialog}
+            >
+                <span className='color-dark'>𑑝</span> Insert
+            </div>
+            <div
+                className='containerDetail bg-green p-20 flex2Column size20 button color-lite m-5'
+                onClick={() => {
+                    resetInsertMode();
+                    setFormCollapse(true);
+                }}
             >
                 Cancel
             </div>
@@ -1682,12 +2881,14 @@ const Fuel = () => {
     </div>
 
     const displayLog = () => {
-        const sortedTrips = [...trips].reverse();
+        const sortedTrips = [...vehicleTrips].reverse();
         //console.log(`Fuel => displayLog => sortedTrips: ${JSON.stringify(sortedTrips, null, 2)}`);
         return <div className='mt-5 ml-5 mr-5 scroll height-400'>
             {
                 sortedTrips.map((trip, index) => {
-                    const originalIndex = trips.length - 1 - index;
+                    const originalIndex = trips.indexOf(trip);
+                    const isFuelStop = trip.category === 'Gas' && Number(trip.gallons) > 0;
+                    const hideFuelDetails = trip.category === 'Start' || trip.category === 'End';
                     return <div className='' key={getKey(`trip${originalIndex}`)}>
                         {getTotalsDisplay(originalIndex, trip, 'daily')}
                         {(originalIndex>1) && getTotalsDisplay(originalIndex, trip, 'trip')}
@@ -1702,7 +2903,7 @@ const Fuel = () => {
                                             {originalIndex + 1}. {trip.location}
                                             <br />
                                             <div className='contentLeft size15 color-lite mt-10'>
-                                                📅 {`${trip.time.split(', ')[0].split('/')[0]}/${trip.time.split(', ')[0].split('/')[1]}`} - {`${(trip && trip !== "'") ? getTripTime(trip) : null}`}
+                                                📅 {`${trip.time.split(', ')[0].split('/')[0]}/${trip.time.split(', ')[0].split('/')[1]}/${trip.time.split(', ')[0].split('/')[2]}`} - {`${(trip && trip !== "'") ? getTripTime(trip) : null}`}
                                             </div>
                                             <div className='contentLeft size15 color-lite mt-5'>
                                                 ⏱️ {getTripHours((sortedTrips.length - index) - 1) || 'Trip Start'}
@@ -1735,7 +2936,7 @@ const Fuel = () => {
                                 </div>
                                 <div className='mt-5'>
                                     {
-                                        (trip.gallons < 1)
+                                        (!isFuelStop)
                                             ? null
                                             : <div>
                                                 <div className='flexContainer mb-5 '>
@@ -1786,7 +2987,9 @@ const Fuel = () => {
                                                 </div>
                                         }
                                         {
-                                            (trip.gallons < 1)
+                                            hideFuelDetails
+                                                ? null
+                                                : ((trip.gallons < 1)
                                                 ? <div className='containerDetail flex3Column mr-5 bg-dkRed'>
                                                     <div className='containerDetail color-lite bold size20' onClick={() => editGallons(originalIndex, trip.gallons)}>➕⛽️</div>
                                                     <div
@@ -1799,25 +3002,36 @@ const Fuel = () => {
                                                     </div>
                                                 </div>
                                                 : <div className='containerDetail flex3Column mr-5 bg-dkRed'>
+                                                    {(() => {
+                                                        const startGauge = Number(trip.guageStart);
+                                                        const endGauge = Number(trip.guageEnd);
+                                                        const validStart = Number.isFinite(startGauge) ? startGauge : 0;
+                                                        const validEnd = Number.isFinite(endGauge) ? endGauge : 0;
+                                                        const fillDelta = validEnd - validStart;
+                                                        return (
+                                                            <>
                                                     <div className='containerDetail color-lite bold size20'>
                                                         <span className='size12'>
                                                             <span className='ml-2' onClick={() => editGuageStart(originalIndex, trip.guageStart)}>
-                                                                {trip.guageStart}
+                                                                {validStart}
                                                             </span>%
                                                         </span>
                                                         ⛽️
                                                         <span className='size12'>
                                                             <span className='ml-2' onClick={() => editGuageEnd(originalIndex, trip.guageEnd)}>
-                                                                {trip.guageEnd}
+                                                                {validEnd}
                                                             </span>%
                                                         </span>
                                                     </div>
                                                     <div
                                                         className='color-lite bold size12 p-5'
                                                     >
-                                                        <span className='size12'>fill: {trip.guageEnd - trip.guageStart}%</span>
+                                                        <span className='size12'>fill: {fillDelta}%</span>
                                                     </div>
-                                                </div>
+                                                            </>
+                                                        );
+                                                    })()}
+                                                </div>)
                                         }
                                         <div
                                             className='containerDetail flex3Column bg-blue'
@@ -1836,7 +3050,7 @@ const Fuel = () => {
                             </div>
                             {/* 
                                 <div className='contentLeft bold size20 p-5 ml-10 mb-5' onClick={() => editDate(originalIndex)}>
-                                    {`${trip.time.split(', ')[0].split('/')[0]}/${trip.time.split(', ')[0].split('/')[1]}`} - {`${(trip && trip !== "'") ? getTripTime(trip) : null}`}
+                                    {`${trip.time.split(', ')[0].split('/')[0]}/${trip.time.split(', ')[0].split('/')[1]}/${trip.time.split(', ')[0].split('/')[2]}`} - {`${(trip && trip !== "'") ? getTripTime(trip) : null}`}
                                 </div> 
                                 */}
 
@@ -1848,8 +3062,8 @@ const Fuel = () => {
     }
 
     const chartData = useMemo(() => {
-        if (!Array.isArray(trips)) return [];
-        const rawData = trips.map((trip, idx) => {
+        if (!Array.isArray(vehicleTrips)) return [];
+        const rawData = vehicleTrips.map((trip, idx) => {
             const distance = Number(trip.distance) || 0;
             const gallons = Number(trip.gallons) || 0;
             const cost = Number(trip.totalUSD) || 0;
@@ -1861,8 +3075,8 @@ const Fuel = () => {
                 // Find last Gas stop
                 let lastGasOdometer = null;
                 for (let i = idx - 1; i >= 0; i--) {
-                    if (trips[i].category === 'Gas') {
-                        lastGasOdometer = Number(trips[i].odometer) || 0;
+                    if (vehicleTrips[i].category === 'Gas') {
+                        lastGasOdometer = Number(vehicleTrips[i].odometer) || 0;
                         break;
                     }
                 }
@@ -1878,7 +3092,7 @@ const Fuel = () => {
             const pricePerGallon = gallons > 0 ? Number((cost / gallons).toFixed(2)) : null;
 
             // Get previous label
-            const previousTrip = idx > 0 ? trips[idx - 1] : null;
+            const previousTrip = idx > 0 ? vehicleTrips[idx - 1] : null;
             const previousLabel = previousTrip ? `${idx}. ${previousTrip.location || 'Stop'}` : null;
 
             return {
@@ -1899,11 +3113,11 @@ const Fuel = () => {
         });
         const filtered = filterChartData(rawData);
         return filtered.filter(item => item.gallons > 0);
-    }, [trips, filterChartData]);
+    }, [vehicleTrips, filterChartData]);
 
     const distanceData = useMemo(() => {
-        if (!Array.isArray(trips)) return [];
-        const rawData = trips.map((trip, idx) => {
+        if (!Array.isArray(vehicleTrips)) return [];
+        const rawData = vehicleTrips.map((trip, idx) => {
             const distance = Number(trip.distance) || 0;
             const gallons = Number(trip.gallons) || 0;
             const cost = Number(trip.totalUSD) || 0;
@@ -1912,7 +3126,7 @@ const Fuel = () => {
             const pricePerGallon = gallons > 0 ? Number((cost / gallons).toFixed(2)) : null;
 
             // Get previous label
-            const previousTrip = idx > 0 ? trips[idx - 1] : null;
+            const previousTrip = idx > 0 ? vehicleTrips[idx - 1] : null;
             const previousLabel = previousTrip ? `${idx}. ${previousTrip.location || 'Stop'}` : null;
 
             return {
@@ -1940,7 +3154,7 @@ const Fuel = () => {
             id: newIdx + 1,
             label: `${newIdx + 1}. ${item.label.split('. ')[1] || 'Stop'}`,
         }));
-    }, [trips, filterChartData]);
+    }, [vehicleTrips, filterChartData]);
 
     const getDistanceSinceLastFuel = (index) => {
         if (index < 0 || index >= trips.length) return 0;
@@ -1963,14 +3177,14 @@ const Fuel = () => {
     };
 
     const milesBetweenFuelingData = useMemo(() => {
-        if (!Array.isArray(trips)) return [];
-        const gasTrips = trips.filter(trip => trip.category === 'Gas');
+        if (!Array.isArray(vehicleTrips)) return [];
+        const gasTrips = vehicleTrips.filter(trip => trip.category === 'Gas');
         const rawData = gasTrips.map((trip, idx) => {
             const odometerVal = Number(trip.odometer) || 0;
             const gallons = Number(trip.gallons) || 0;
 
             // In full history, compute baseline from previous Gas or Start
-            const tripIdx = trips.indexOf(trip);
+            const tripIdx = vehicleTrips.indexOf(trip);
             let previousLabel = null;
             let baselineOdometer = null;
             let baselineIdx = -1;
@@ -1978,9 +3192,9 @@ const Fuel = () => {
             if (tripIdx > 0) {
                 let foundPrevGas = false;
                 for (let i = tripIdx - 1; i >= 0; i--) {
-                    if (trips[i].category === 'Gas') {
-                        baselineOdometer = Number(trips[i].odometer) || 0;
-                        previousLabel = `${idx}. ${trips[i].location || 'Stop'}`;
+                    if (vehicleTrips[i].category === 'Gas') {
+                        baselineOdometer = Number(vehicleTrips[i].odometer) || 0;
+                        previousLabel = `${idx}. ${vehicleTrips[i].location || 'Stop'}`;
                         baselineIdx = i;
                         foundPrevGas = true;
                         break;
@@ -1990,9 +3204,9 @@ const Fuel = () => {
                 // Fallback: use prior 'Start' if no previous Gas found
                 if (!foundPrevGas) {
                     for (let i = tripIdx - 1; i >= 0; i--) {
-                        if (trips[i].category === 'Start') {
-                            baselineOdometer = Number(trips[i].odometer) || 0;
-                            previousLabel = `${idx}. ${trips[i].location || 'Start'}`;
+                        if (vehicleTrips[i].category === 'Start') {
+                            baselineOdometer = Number(vehicleTrips[i].odometer) || 0;
+                            previousLabel = `${idx}. ${vehicleTrips[i].location || 'Start'}`;
                             baselineIdx = i;
                             break;
                         }
@@ -2012,13 +3226,13 @@ const Fuel = () => {
 
                 // If segment exceeds 300 miles, use next End as the segment end
                 if (defaultDistance > 300 && baselineIdx >= 0) {
-                    for (let j = baselineIdx + 1; j < trips.length; j++) {
-                        if (trips[j].category === 'End') {
-                            const endOdo = Number(trips[j].odometer) || 0;
+                    for (let j = baselineIdx + 1; j < vehicleTrips.length; j++) {
+                        if (vehicleTrips[j].category === 'End') {
+                            const endOdo = Number(vehicleTrips[j].odometer) || 0;
                             distanceSinceLastFuel = Math.max(0, endOdo - baselineOdometer);
-                            displayLabel = `${idx + 1}. ${trips[j].location || 'End'}`;
-                            lat = trips[j].latitude;
-                            lon = trips[j].longitude;
+                            displayLabel = `${idx + 1}. ${vehicleTrips[j].location || 'End'}`;
+                            lat = vehicleTrips[j].latitude;
+                            lon = vehicleTrips[j].longitude;
                             break;
                         }
                     }
@@ -2044,7 +3258,7 @@ const Fuel = () => {
             id: newIdx + 1,
             label: `${newIdx + 1}. ${item.label.split('. ')[1] || 'Stop'}`,
         }));
-    }, [trips, filterChartData]);
+    }, [vehicleTrips, filterChartData]);
 
     const renderChartFilters = () => (
         <div className='containerDetail bg-lite mt-5 contentLeft pl-10 pr-10 pb-10'>
@@ -2232,7 +3446,7 @@ const Fuel = () => {
                         }
                     </div>
                     <div className='containerDetail bg-lite mt-10 p-5' style={{ color: '#4fc3f7' }}>
-                        {payload[0]?.payload?.distance}<span className='copyright color-yellow ml-5'>miles</span>
+                        {payload[0]?.payload?.distance}<span className='copyright color-yellow'>miles</span>
                         {/*getDistanceSinceLastFuel(Number(currentLabel.split('.')[0]) - 1)}<span className='copyright color-yellow ml-5'>miles since fueled</span>*/}
                     </div>
                 </div>
@@ -2309,7 +3523,7 @@ const Fuel = () => {
             <div className='containerDetail bg-lite mt-5'>
                 <div className='containerDetail bg-lite p-10 '>
                     <CollapseToggleButton
-                        title={<span className='color-yellow size20'>📈 Fuel Charts</span>}
+                        title={<div className='color-yellow size20 ml--5'><span className='containerDetail size20 color-yellow mr-10 pt-5 pb-5 pl-15 pr-15'>📈</span>Fuel Charts</div>}
                         isCollapsed={graphCollapse}
                         setCollapse={setGraphCollapse}
                         align='left'
@@ -2525,7 +3739,7 @@ const Fuel = () => {
     const serviceDisplay = (header, collapse, setCollapse, value, setChange, interval, idx) => <div className=''>
                 <div className='containerDetail bg-lite'>
                     <CollapseToggleButton
-                        title={<div className='flexContainer color-yellow size20'><div className='flex2Column'>{header}</div><div className='flex2Column contentRight'>{(toNum(value) + toNum(interval) - toNum(odometer))} miles</div></div>}
+                        title={<div className='flexContainer color-yellow size20'><div className='flex2Column'>{header}</div><div className='flex2Column contentRight'>{(toNum(value) + toNum(interval) - toNum(odometer))}<span className='copyright mr-5'>miles</span></div></div>}
                         isCollapsed={collapse}
                         setCollapse={setCollapse}
                         align='left'
@@ -2630,6 +3844,91 @@ const Fuel = () => {
                     </div>
                 </div>
             </div>
+            {/* Vehicle Selector */}
+            <div className='containerDetail flexContainer bg-lite mb-5'>
+                    <div className='flex2Column contentLeft'>
+                        <select
+                            value={selectedVehicleId}
+                            onChange={(e) => setSelectedVehicleId(e.target.value)}
+                            className='containerDetail size15 color-lite p-10 size15 width-100-percent mb-5'
+                        >
+                            {vehicles.map(v => (
+                                <option key={v.id} value={v.id}>{v.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className='flexColumn contentRight'>
+                        <div
+                            className='button bg-green color-lite p-10 r-5 size15 ml-10'
+                            onClick={() => setVehicleDialogOpen(true)}
+                        >
+                            🚗 Manage
+                        </div>
+                    </div>
+            </div>
+            {/* Vehicle Management Dialog */}
+            {vehicleDialogOpen && (
+                <div className='containerDetail bg-lite p-10 mb-5 brdr-yellow'>
+                    <div className='containerDetail color-yellow size15 mb-5 bold p-10 contentLeft'>Manage Vehicles</div>
+                    {vehicles.map(v => (
+                        <div key={v.id} className='containerDetail flexContainer bg-lite p-5 mb-5'>
+                            <div className='flex2Column contentLeft color-lite size15 p-5'>
+                                🚗 {v.name}
+                            </div>
+                            <div className='flexColumn contentRight'>
+                                {vehicles.length > 1 && (
+                                    <div
+                                        className='button bg-dkRed color-lite p-5 r-5 size12'
+                                        onClick={() => {
+                                            if (window.confirm(`Remove "${v.name}" and all its trips?`)) {
+                                                const updated = vehicles.filter(veh => veh.id !== v.id);
+                                                setVehicles(updated);
+                                                if (selectedVehicleId === v.id) {
+                                                    setSelectedVehicleId(updated[0].id);
+                                                }
+                                                setTrips(prev => prev.filter(t => (t.vehicleId || 'default') !== v.id));
+                                            }
+                                        }}
+                                    >
+                                        🗑️ Remove
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                    <div className='flexContainer mt-5'>
+                        <div className='flex2Column'>
+                            <input
+                                type='text'
+                                value={newVehicleName}
+                                onChange={(e) => setNewVehicleName(e.target.value)}
+                                placeholder='New vehicle name'
+                                className='containerDetail color-lite p-10 width-100-percent'
+                            />
+                        </div>
+                        <div className='flexColumn'>
+                            <div
+                                className='ml-5 button bg-green color-lite p-10 r-5 size15'
+                                onClick={() => {
+                                    if (newVehicleName.trim()) {
+                                        const newId = `vehicle-${Date.now()}`;
+                                        setVehicles(prev => [...prev, { id: newId, name: newVehicleName.trim() }]);
+                                        setNewVehicleName('');
+                                    }
+                                }}
+                            >
+                                ➕ Add
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        className='containerDetail button bg-dkGreen color-lite p-10 mt-5 r-5 size15'
+                        onClick={() => setVehicleDialogOpen(false)}
+                    >
+                        Done
+                    </div>
+                </div>
+            )}
             {
                 (categoryDialogOpen)
                     ? renderCategoryDialog()
@@ -2640,10 +3939,35 @@ const Fuel = () => {
                     ? renderEditDialog()
                     : null
             }
-            <div className='containerDetail bg-lite'>
-                <div className={`containerDetail bg-lite pl-5 pt-5 pb-5 color-yellow button size20 contentLeft`}>
+            {
+                (insertStopDialogOpen)
+                    ? renderInsertStopDialog()
+                    : null
+            }
+            {
+                (cleanDataPreview)
+                    ? renderCleanDataPreviewDialog()
+                    : null
+            }
+            <div className='containerDetail bg-lite contentLeft'>
+                {(() => {
+                    const lastVehicleTrip = vehicleTrips.length ? vehicleTrips[vehicleTrips.length - 1] : null;
+                    const tripIsActive = lastVehicleTrip?.category === 'Start';
+                    return (
+                        <div
+                            className={`containerDetail pt-20 pb-20 pl-10 pr-20 button width-100-percent color-yellow size20 mb-5 ${tripIsActive ? 'bg-dkRed' : 'bg-dkGreen'}`}
+                            onClick={() => handleTripAction(!tripIsActive)}
+                        >
+                            <span className='containerDetail size20 color-yellow bg-dkGreen brdr-green mt-10 mb-10 mr-10 pl-10 pr-10'>
+                                {tripIsActive ? `🏁` : `🚦`}
+                            </span>
+                            {tripIsActive ? `End Trip` : `Start Trip`}
+                        </div>
+                    );
+                })()}
+                <div className={`containerDetail bg-lite pt-5 pb-5 color-yellow button size20 contentLeft`}>
                     <CollapseToggleButton
-                        title={<span className='color-yellow size20'>Add Stop</span>}
+                        title={<div className='color-yellow size20 ml--5'><span className='containerDetail size20 color-yellow bg-dkGreen brdr-green mr-10 pt-5 pb-5 pl-15 pr-15'>+</span>Add Stop</div>}
                         isCollapsed={formCollapse}
                         setCollapse={setFormCollapse}
                         align='left'
@@ -2656,17 +3980,64 @@ const Fuel = () => {
                 }
             </div>
             <div className={`containerDetail bg-lite mb-5 mt-5`}>
-                <div className={`containerDetail bg-lite pl-5 pt-5 pb-5 color-yellow button size20 contentLeft`}>
+                <div className={`containerDetail bg-lite pt-5 pb-5 color-yellow button size20 contentLeft`}>
                     <CollapseToggleButton
-                        title={<span className='color-yellow'>Service / Maintenance</span>}
+                        title={<div className='color-yellow size20 ml--5'><span className='containerDetail size20 color-yellow mr-10 pt-5 pb-5 pl-15 pr-15'>🧰</span>Maintenance &amp; Settings</div>}
                         isCollapsed={serviceCollapse}
                         setCollapse={setServiceCollapse}
                         align='left'
                     />
                 </div>
                 {(!serviceCollapse) && (
+                    <div>
+                        <div
+                            className='containerDetail mb-5 p-10 button bg-green width-100-percent color-lite size20 mt-5 contentLeft'
+                            onClick={() => setHomeFormVisible(v => !v)}
+                        >
+                            🏡 Set Home {homeLocation ? `(${homeLocation})` : ''}
+                        </div>
+                        {homeFormVisible && (
+                            <div className='containerDetail bg-lite p-10 mb-5'>
+                                <div className='containerDetail mb-5'>
+                                    <Geolocator
+                                        currentPositionExists='false'
+                                        returnCurrentPosition={updateCurrentLocation}
+                                    />
+                                </div>
+                                <label className='flexContainer containerDetail mt-5'>
+                                    <div className='columnRightAlign flex2Column'>
+                                        <span className='inputText'>Location:</span>
+                                    </div>
+                                    <div className='columnLeftAlign flex2Column'>
+                                        <input
+                                            className='inputField'
+                                            type='text'
+                                            value={location}
+                                            onChange={(e) => setLocation(e.target.value)}
+                                        />
+                                    </div>
+                                </label>
+                                <div className='flexContainer mt-5'>
+                                    <div
+                                        className='containerDetail bg-green p-10 flex2Column size20 button color-lite m-5'
+                                        onClick={commitHomeLocation}
+                                    >
+                                        💾 Save as Home
+                                    </div>
+                                    <div
+                                        className='containerDetail bg-dkRed p-10 flex2Column size20 button color-lite m-5'
+                                        onClick={() => setHomeFormVisible(false)}
+                                    >
+                                        Cancel
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+                {(!serviceCollapse) && (
                     <div
-                        className='containerDetail mb-5 p-10 button bg-green width-100-percent color-lite size20 mt-5'
+                        className='containerDetail mb-5 p-20 button bg-green width-100-percent color-lite size20 mt-5 contentLeft'
                         onClick={addService}
                     >
                         ➕ Add Service
@@ -2675,7 +4046,7 @@ const Fuel = () => {
                 {
                     (!serviceCollapse)
                     ? computedServices.map((service, idx) => (
-                        <div key={(serviceDefs && serviceDefs[idx] && serviceDefs[idx].key) || idx} className='containerDetail mb-5 mt-5'>
+                        <div key={(serviceDefs && serviceDefs[idx] && serviceDefs[idx].key) || idx} className={`containerDetail mb-5 mt-5 ${((toNum(service[3]) + toNum(service[5]) - toNum(odometer))<0) ? 'brdr-red bg-dkRed' : ''}`}>
                             {serviceDisplay(service[0], service[1], service[2], service[3], service[4], service[5], idx)}
                         </div>
                     ))
@@ -2685,7 +4056,23 @@ const Fuel = () => {
             <div className='containerDetail mt-5 bg-lite p-5'>
                 <div className='containerDetail p-10 bg-lite'>
                     <CollapseToggleButton
-                        title={<span className='color-yellow size20'>Trip Log</span>}
+                        title={
+                            <div className='color-yellow size20 ml--5 flexContainer'>
+                                <div className='flex2Column contentLeft'>
+                                    <span className='containerDetail size20 color-yellow mr-10 pt-5 pb-5 pl-15 pr-15'>
+                                        🛣️
+                                    </span>
+                                    Trip Log
+                                </div>
+                                <div className='flexColumn contentRight'>
+                                    <div
+                                        className='containerDetail mt--10 mb--10 mr-10 color-lite button p-10 contentLeft bg-green'
+                                        onClick={openCleanDataPreview}
+                                    >
+                                        🧹 Clean Data
+                                    </div>
+                                </div>
+                            </div>}
                         isCollapsed={logCollapse}
                         setCollapse={setLogCollapse}
                         align='left'
@@ -2700,7 +4087,7 @@ const Fuel = () => {
             <div className='containerDetail bg-lite mt-5'>
                 <div className='containerDetail bg-lite p-10'>
                     <CollapseToggleButton
-                        title={<span className='color-yellow size20'>Gas Prices</span>}
+                        title={<div className='color-yellow size20 ml--5'><span className='containerDetail size20 color-yellow mr-10 pt-5 pb-5 pl-15 pr-15'>⛽</span>Gas Prices</div>}
                         isCollapsed={pricesCollapse}
                         setCollapse={setPricesCollapse}
                         align='left'
@@ -2721,21 +4108,32 @@ const Fuel = () => {
                                     <option value='distance'>Distance</option>
                                 </select>
                             </div>
-                            <div className='containerDetail p-10 scrollHeight250'>
+                            <div className='containerDetail scrollHeight250'>
                                 {getBestFuelDeals.map((stop, idx) => (
-                                    <div key={idx} className='containerDetail mb-5 color-lite contentLeft pt-10 pb-10 pl-20 pr-10'>
+                                    <div key={idx} className='containerDetail mb-5 color-lite contentLeft'>
                                         <div
                                             title='map'
-                                            className='button'
+                                            className='containerDetail bg-lite button flexContainer p-10'
                                             onClick={() => window.location = `https://www.google.com/maps?q=${stop.latitude},${stop.longitude}`}
                                         >
-                                            🌎 {stop.location}
+                                            <div className='flex2Column'>
+                                                <div>
+                                                    🌎 {stop.location}
+                                                </div>
+                                                <div className='color-yellow mt--5 copyright ml-15'>
+                                                    {stop.time.split(',')[0]}
+                                                </div>
+                                            </div>
+                                            <div className='color-yellow flexColumn size20'>
+                                                ⛽ ${stop.usdPerGallon}/gal
+                                            </div>
                                         </div>
-                                        <div className='color-yellow'>
-                                            {stop.distanceFromCurrent} miles away
-                                        </div>
-                                        <div className='color-yellow'>
-                                            ${stop.usdPerGallon}/gal
+                                        <div className='flexContainer'>
+                                            <div className='flex2Column contentLeft color-yellow m-10'>
+                                            </div>
+                                            <div className='flex2Column contentRight color-yellow mt-5 pl-10 mb-5 mr-10'>
+                                                🛣️ {stop.distanceFromCurrent} <span className='copyright'>miles</span>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -2746,7 +4144,7 @@ const Fuel = () => {
             <div className='containerDetail bg-lite mt-5'>
                 <div className='containerDetail bg-lite p-10'>
                     <CollapseToggleButton
-                        title={<span className='color-yellow size20'>Locations</span>}
+                        title={<div className='color-yellow size20 ml--5'><span className='containerDetail size20 color-yellow mr-10 pt-5 pb-5 pl-15 pr-15'>📍</span>Locations</div>}
                         isCollapsed={locationsCollapse}
                         setCollapse={setLocationsCollapse}
                         align='left'
@@ -2780,47 +4178,51 @@ const Fuel = () => {
                                     </select>
                                     : null
                             }
-                            <div className='containerDetail p-10 scrollHeight250'>
+                            <div className='containerDetail scrollHeight250'>
                                 {getLocations.map((stop, idx) => (
-                                    <div key={idx} className='containerDetail flexContainer mb-5 color-lite pt-10 pb-10 pl-20 pr-10'>
-                                        <div className='flex2Column contentLeft'>
+                                    <div key={idx} className='containerDetail mb-5 color-lite mb-5'>
+                                        <div className='contentLeft'>
                                             <div
                                                 title='map'
-                                                className='button'
+                                                className='flexContainer containerDetail bg-lite button p-10'
                                                 onClick={() => editEntry(stop)}
                                             >
-                                                {locationCategories[stop.category]} {stop.location}
+                                                <div className='flex2Column'>
+                                                    {locationCategories[stop.category]} {stop.location}
+                                                </div>
+                                                <div
+                                                    className='flexColumn button'
+                                                    onClick={() => window.location = `https://www.google.com/maps?q=${stop.latitude},${stop.longitude}`}
+                                                >
+                                                    🌎
+                                                </div>
                                             </div>
-                                            <div className='color-yellow'>
-                                                {stop.distanceFromCurrent} miles away
+                                            <div className='flexContainer'>
+                                                <div className='flex4Column color-yellow pl-10 pt-10 mb-5'>
+                                                    {stop.distanceFromCurrent}<span className='copyright'>miles</span>
+                                                </div>
+                                                {
+                                                    (stop.usdPerGallon > 0)
+                                                        ? <div className='flex4Column color-yellow pt-10'>
+                                                            ${stop.usdPerGallon}/gal
+                                                        </div>
+                                                        : null
+                                                }
+                                                {
+                                                    (stop.costFee > 0)
+                                                        ? <div className='flex4Column color-yellow pt-10'>
+                                                            ${stop.costFee}
+                                                        </div>
+                                                        : null
+                                                }
+                                                {
+                                                    (stop.rating > 0)
+                                                        ? <div className='flex4Column color-yellow contentRight pt-10 pr-10'>
+                                                            {'⭐'.repeat(stop.rating)}
+                                                        </div>
+                                                        : null
+                                                }
                                             </div>
-                                            {
-                                                (stop.usdPerGallon > 0)
-                                                    ? <div className='color-yellow'>
-                                                        ${stop.usdPerGallon}/gal
-                                                    </div>
-                                                    : null
-                                            }
-                                            {
-                                                (stop.costFee > 0)
-                                                    ? <div className='color-yellow'>
-                                                        ${stop.costFee}
-                                                    </div>
-                                                    : null
-                                            }
-                                            {
-                                                (stop.rating > 0)
-                                                    ? <div className='color-yellow'>
-                                                        {'⭐'.repeat(stop.rating)}
-                                                    </div>
-                                                    : null
-                                            }
-                                        </div>
-                                        <div
-                                            className='flexColumn p-10 button'
-                                            onClick={() => window.location = `https://www.google.com/maps?q=${stop.latitude},${stop.longitude}`}
-                                        >
-                                            🌎
                                         </div>
                                     </div>
                                 ))}

@@ -7,7 +7,9 @@ const GardenItem = ({
     index,
     setModalData,
     crops,
-    setCrops
+    setCrops,
+    onEditItem,
+    onDeleteCustom
 }) => {
     const [collapsed, setCollapsed] = useState(true);
     const planted = !!crops[item.index].planted;
@@ -93,6 +95,30 @@ const GardenItem = ({
                 setCollapse={setCollapsed}
                 align='left'
             />
+            {
+                !collapsed
+                    ? <div className='containerBox flexContainer bg-lite mb-5'>
+                        <button
+                            type='button'
+                            className='containerBox bg-dkYellow color-dark mr-5'
+                            onClick={() => onEditItem && onEditItem(item)}
+                        >
+                            ✏️ Edit Item
+                        </button>
+                        {
+                            item.isCustom
+                                ? <button
+                                    type='button'
+                                    className='containerBox bg-red color-yellow'
+                                    onClick={() => onDeleteCustom && onDeleteCustom(item)}
+                                >
+                                    🗑 Delete Custom
+                                </button>
+                                : null
+                        }
+                    </div>
+                    : null
+            }
             {
                 (goodMonth) 
                 ? <div className='containerBox columnLeftAlign' title={determineHarvestDate(item)}>{icons.garden} ✂️ {determineHarvestDate(item)}</div> 

@@ -26,10 +26,10 @@ const EntryCard = ({ entry, onOpenLocation }) => {
                     {mode === 'photo' ? <CameraIcon /> : <VideoIcon />}
                     <span className='bold'>{subject || 'Untitled'}</span>
                 </div>
-                <div className='size14 color-light'>
+                <div className='size14 color-lite'>
                     {formatDateTime(timestamp)}
                 </div>
-                <div className='size14 color-light mt-5'>
+                <div className='size14 color-lite mt-5'>
                     {settings && Object.keys(settings).length > 0
                         ? Object.entries(settings).map(([key, value]) => (
                             <span key={key} className='mr-10'>

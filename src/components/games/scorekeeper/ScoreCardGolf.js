@@ -240,12 +240,12 @@ const ScoreCardGolf = ({
     const isDoubleBoagie = (score, par) => (score === (Number(par) + 2)) ? true : false;
     const getOuterCSS = (score, par) => {
         if (isEagle(score, par)) return 'completedSelector r-50-percent pb-20 pt-30';
-        if (isDoubleBoagie(score, par)) return 'brdr-light p-5 r-10';
+        if (isDoubleBoagie(score, par)) return 'brdr-lite p-5 r-10';
         return 'brdr-transparent r-10';
     }
     const getInnerCSS = (score, par) => {
-        if (isBoagie(score, par) && isDoubleBoagie(score, par)) return 'brdr-light r-5 font50 pt-12 pl-10 pr-10';
-        if (isBoagie(score, par)) return 'brdr-light r-5 font50 pt-12 pl-10 pr-10 mt-5 mb-5';
+        if (isBoagie(score, par) && isDoubleBoagie(score, par)) return 'brdr-lite r-5 font50 pt-12 pl-10 pr-10';
+        if (isBoagie(score, par)) return 'brdr-lite r-5 font50 pt-12 pl-10 pr-10 mt-5 mb-5';
         if (!isDoubleBoagie(score, par) && !isEagle(score, par)) return 'p-5 r-5 font50 m-10 mt-20';
         return 'p-5 r-5 font50 m-10';
     }

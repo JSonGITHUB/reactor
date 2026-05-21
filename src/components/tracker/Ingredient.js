@@ -12,8 +12,12 @@ const Ingredient = ({
     // Initialize checkbox from context on mount
     useEffect(() => {
         const savedStatus = getIngredientStatus(ingredient);
+        console.log(`Ingredient "${ingredient}" checkbox savedStatus:`, savedStatus);
         setCheck(savedStatus);
     }, [ingredient, getIngredientStatus]);
+    useEffect(() => {
+        console.log(`Ingredient "${ingredient}" checkbox status:`, check);
+    }, [check]);
     const playSound = () => {
         if (typeof Sounds.playSoftBell === 'function') {
             Sounds.playSoftBell();

@@ -9,9 +9,21 @@ import initializeData from '../utils/InitializeData';
 import icons from '../site/icons';
 
 const Journals = () => {
+    const normalizeJournalGroups = (groups) => {
+        if (!Array.isArray(groups)) return [];
+
+        return groups.map((group) => ({
+            ...group,
+            display: group?.display !== false,
+            journals: Array.isArray(group?.journals) ? group.journals : Array.isArray(group?.journal) ? group.journal : [],
+            journal: Array.isArray(group?.journal) ? group.journal : Array.isArray(group?.journals) ? group.journals : [],
+            isCollapsed: Boolean(group?.isCollapsed),
+        }));
+    };
+
     const [projects] = useState(() => initializeData('projects', initProjects));
-    const [journals, setJournals] = useState(() => initializeData('journalTracking', initJournalTracking));
-    const [, setFilteredJournals] = useState(() => initializeData('journalTracking', initJournalTracking));
+    const [journals, setJournals] = useState(() => normalizeJournalGroups(initializeData('journalTracking', initJournalTracking)));
+    const [, setFilteredJournals] = useState(() => normalizeJournalGroups(initializeData('journalTracking', initJournalTracking)));
     const [tracking] = useState('journals');
     const [newProjectDescription, setNewProjectDescription] = useState('');
     const [currentGoalsCollapse, setCurrentGoalsCollapse] = useState(true);
@@ -26,11 +38,9 @@ const Journals = () => {
         localStorage.setItem('projects', JSON.stringify(projects));
     }, [projects]);
     useEffect(() => {
-        
         if (journals[0] !== undefined) {
-            localStorage.setItem('journalTracking', JSON.stringify(journals));
+            localStorage.setItem('journalTracking', JSON.stringify(normalizeJournalGroups(journals)));
         }
-        
     }, [journals]);
     useEffect(() => {
         localStorage.setItem('tracking', tracking);
@@ -40,7 +50,7 @@ const Journals = () => {
     useEffect(() => {
         if (!newProjectDescription) return;
         const searchTerm = newProjectDescription.toLowerCase();
-        const newFilteredJournals = journals.map(journalGroup => {
+        const newFilteredJournals = normalizeJournalGroups(journals).map(journalGroup => {
             if (journalGroup) {
                 let groupMatch = (journalGroup?.title) ? journalGroup?.title.toLowerCase().includes(searchTerm) : journalGroup?.description.toLowerCase().includes(searchTerm);
                 let journalsMatch = false;
@@ -93,9 +103,10 @@ const Journals = () => {
             journal: [],
             journals: [],
             totalTime: 0,
-            isCollapsed: false
+            isCollapsed: false,
+            display: true,
         };
-        setJournals(prev => [...prev, newJournalGroup]);
+        setJournals(prev => normalizeJournalGroups([...prev, newJournalGroup]));
         setNewProjectDescription('');
     };
 
@@ -104,7 +115,7 @@ const Journals = () => {
         const newJournals = [...journals];
         const goal = newJournals[journalGroupIndex].journal[journalIndex][category][goalIndex];
         goal.completed = !goal.completed;
-        setJournals(newJournals);
+        setJournals(normalizeJournalGroups(newJournals));
     };
 
     // Render goal lists

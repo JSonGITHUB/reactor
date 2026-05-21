@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import icons from '../site/icons';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
+import { fetchOpenMeteoJson, roundCoord } from '../../utils/openMeteoClient';
 
 const SunTracker = () => {
     const [currentTime, setCurrentTime] = useState(new Date());
@@ -23,16 +24,19 @@ const SunTracker = () => {
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 if (!isMounted) return;
-                const { latitude, longitude } = position.coords;
+                const latitude = roundCoord(position.coords.latitude, 3);
+                const longitude = roundCoord(position.coords.longitude, 3);
 
                 // Fetch sunrise/sunset times
-                fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=sunrise,sunset&timezone=auto`, { signal: controller.signal })
-                    .then((res) => {
-                        if (!res.ok) {
-                            throw new Error('Failed to fetch sunrise/sunset');
-                        }
-                        return res.json();
-                    })
+                fetchOpenMeteoJson(
+                    `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=sunrise,sunset&timezone=auto`,
+                    {
+                        cacheKey: `sun:${latitude}:${longitude}`,
+                        ttlMs: 30 * 60 * 1000,
+                        allowStaleOnError: true,
+                        fetchOptions: { signal: controller.signal }
+                    }
+                )
                     .then((data) => {
                         if (!isMounted) return;
                         const sunriseTime = new Date(data.daily.sunrise[0]);

@@ -16,6 +16,11 @@ body {
     right:23px;
     position: absolute;
 }
+.closeSettings {
+    top: 25px;
+    right: 25px;
+    position: absolute;
+}
 .cart {
     right:25px;
     top:14px;
@@ -198,7 +203,6 @@ body {
     bottom:0px;
     padding: 10px;
     width: 100%;
-    background-color: #333333;
     height: auto;
 }
 @media screen and (min-width: 1000px) {

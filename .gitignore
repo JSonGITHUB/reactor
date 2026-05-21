@@ -36,3 +36,5 @@ Thumbs.db
 # Backups
 *-backup*/
 *.tar.gz
+# Local Netlify folder
+.netlify

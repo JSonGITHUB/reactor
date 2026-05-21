@@ -14,7 +14,9 @@ const WindDirection = ({
     columns, 
     setWind,
     height,
-    collapse
+    collapse,
+    waterTemp,
+    airTemp
 }) => {
 
     const setWindRef = useRef(setWind);
@@ -187,12 +189,12 @@ const WindDirection = ({
 
     const display = () => {
         
-        const waterTemp = initializeData('waterTemp', '80');
-        const airTemp = initializeData('airTemp', '90');
+        const displayWaterTemp = waterTemp ?? initializeData('waterTemp', '80');
+        const displayAirTemp = airTemp ?? initializeData('airTemp', '90');
 
         if (collapse) {
             return <div>
-                    {icons.wind} {status.direction} {Number(status.gusts).toFixed(0)}mph {icons.water}{waterTemp}°F {icons.temperature} {airTemp}°F
+                    {icons.wind} {status.direction} {Number(status.gusts).toFixed(0)}mph {icons.water}{displayWaterTemp}°F {icons.temperature} {displayAirTemp}°F
                 </div>
         }
         return <div className='r-10 p-10 white'>

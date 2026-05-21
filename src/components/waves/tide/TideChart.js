@@ -7,25 +7,34 @@ import moment from 'moment';
 import Spline from 'cubic-spline';
 import getKey from '../../utils/KeyGenerator';
 import Moon from '../../utils/Moon';
+import { getNearestTideStation } from '../api';
 
-const TideChart = () => {
+const TideChart = ({
+    standalone,
+    lat,
+    lon
+}) => {
 
     const [tideNow, setTideNow] = useState(null);
     const [tideChart, setTideChart] = useState(null);
     const [tideData, setTideData] = useState(null);
     const [currentTide, setCurrentTide] = useState([0, 'up']);
+    const [stationName, setStationName] = useState('');
     const time = useCurrentTime();
     const startTime = time[0].startTime;
     const endTime = time[0].endTime;
     const tideStartTime = time[0].tideStartTime;
     const tideEndTime = time[0].tideEndTime;
 
+    const hiloStation = useMemo(() => getNearestTideStation(lat || 32.87, lon || -117.26), [lat, lon]);
+    const waterLevelStation = useMemo(() => getNearestTideStation(lat || 32.87, lon || -117.26), [lat, lon]);
+
     const tideNowLink = useMemo(() => (
-        `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${tideStartTime}&end_date=${tideEndTime}&station=9410660&product=water_level&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`
-    ), [tideStartTime, tideEndTime]);
+        `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${tideStartTime}&end_date=${tideEndTime}&station=${waterLevelStation.id}&product=water_level&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`
+    ), [tideStartTime, tideEndTime, waterLevelStation.id]);
     const significantTides = useMemo(() => (
-        `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=NOS.COOPS.TAC.WL&begin_date=${startTime}&end_date=${endTime}&datum=MLLW&station=9410230&time_zone=lst_ldt&units=english&interval=hilo&format=json`
-    ), [startTime, endTime]);
+        `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=NOS.COOPS.TAC.WL&begin_date=${startTime}&end_date=${endTime}&datum=MLLW&station=${hiloStation.id}&time_zone=lst_ldt&units=english&interval=hilo&format=json`
+    ), [startTime, endTime, hiloStation.id]);
     
     console.log(`TideChart => time: ${JSON.stringify(time, null, 2)}`);
     console.log(`TideChart => startTime: ${startTime} endTime: ${endTime}`);
@@ -80,6 +89,9 @@ const TideChart = () => {
                 };
                 setTideNow(data);
                 setTideChart(shortIntervalData);
+                if (data.metadata?.name) {
+                    setStationName(data.metadata.name);
+                }
                 localStorage.setItem('tideNow', JSON.stringify({ data, timestamp: new Date().getTime() }));
                 localStorage.setItem('tideChart', JSON.stringify({ shortIntervalData, timestamp: new Date().getTime() }));
             } catch (error) {
@@ -92,6 +104,7 @@ const TideChart = () => {
 
     useEffect(() => {
         localStorage.setItem('currentTide', currentTide[0]);
+        localStorage.setItem('currentTideDirection', currentTide[1]);
     }, [currentTide]);
 
     const convertTo12HourTime = (militaryTime) => {
@@ -174,11 +187,15 @@ const TideChart = () => {
             {
                 (tideChart && tideData && tideNow)
                 ? <div className='containerDetail p-5 bg-lite r-10 size20'>
-                    <div className='containerDetail p-20 bg-lite r-10 contentLeft color-yellow'>
-                        Current Tide: {(currentTide[1] === 'up') ? icons.collapse : icons.expand} {currentTide[0].toFixed(1)}ft.
-                    </div>
+                    {
+                        (standalone === 'true')
+                        ? <div className='containerDetail p-20 bg-lite r-10 contentLeft color-yellow'>
+                            Current Tide: {(localStorage.getItem('currentTideDirection') === 'UP') ? icons.expand : icons.collapse} {currentTide[0].toFixed(1)}<span className='size12'>ft</span>
+                        </div>
+                        : null
+                    }
                     <div className='containerDetail mt-5 mb-5 bg-tintedMedium'>
-                        <TideGraph tideChart={tideChart} />
+                        <TideGraph tideChart={tideChart} stationName={stationName || hiloStation.name} />
                     </div>
                     <div className='containerDetail'>
                     {

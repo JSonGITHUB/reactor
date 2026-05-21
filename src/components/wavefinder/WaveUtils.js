@@ -1,14 +1,11 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
 import icons from '../site/icons';
 import validate from '../utils/validate';
-import initializeData from '../utils/InitializeData';
 import { OceanContext } from '../context/OceanContext';
 import { WavesContext } from '../context/WavesContext';
 
 const WaveUtils = ({
-    item,
-    /*state,*/
-    logLocation
+    item
 }) => {
 
     const {
@@ -17,7 +14,6 @@ const WaveUtils = ({
 
     const {
         locations,
-        setLocations,
         handleResetLocations,
         handleEditToggle,
         edit,
@@ -25,37 +21,100 @@ const WaveUtils = ({
     } = useContext(WavesContext);
 
     const [displayData, setDisplayData] = useState(false);
-    const [dialog, setDialog] = useState();
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [editDialogTarget, setEditDialogTarget] = useState(null);
+    const [draftValues, setDraftValues] = useState({
+        swell: '',
+        wind: '',
+        tide: ''
+    });
+    const [editingValue, setEditingValue] = useState(null);
+    const activeInputRef = useRef(null);
+    const activeDialogIndex = editDialogTarget
+        ? locations.findIndex(location =>
+            location.name === editDialogTarget.name
+            && location.latitude === editDialogTarget.latitude
+            && location.longitude === editDialogTarget.longitude
+        )
+        : -1;
+
+    useEffect(() => {
+        if (editingValue) {
+            activeInputRef.current?.focus();
+        }
+    }, [editingValue]);
 
     const toggleExport = () => {
         setDisplayData(prev => !prev);
     }
     const deleteWave = (props) => {
-        console.log(`deleteWave => locations: ${JSON.stringify(locations, null, 2)}`);
-        const waveLocations = [...locations];
-
-        const filterOutSelected = () => {
-            if (!Array.isArray(waveLocations)) {
-                throw new Error("must be an array of objects");
-            }
-
-            return waveLocations.filter(location =>
-                !(typeof location.name === "string" && location.name === props.name)
-            );
+        const filtered = locations.filter(location =>
+            !(typeof location.name === 'string' && location.name === props.name)
+        );
+        updateLocations(filtered);
+    }
+    const updateLocationValues = (index, key, nextValues) => {
+        const newLocations = [...locations];
+        newLocations[index] = {
+            ...newLocations[index],
+            [key]: nextValues
+        };
+        updateLocations(newLocations);
+    };
+    const beginAddValue = (key) => {
+        setEditingValue({ key, valueIndex: null });
+        setDraftValues(prev => ({
+            ...prev,
+            [key]: ''
+        }));
+    };
+    const beginEditValue = (key, valueIndex, value) => {
+        setEditingValue({ key, valueIndex });
+        setDraftValues(prev => ({
+            ...prev,
+            [key]: value
+        }));
+    };
+    const cancelValueEdit = (key) => {
+        setEditingValue(prev => (prev && prev.key === key) ? null : prev);
+        setDraftValues(prev => ({
+            ...prev,
+            [key]: ''
+        }));
+    };
+    const commitValueChange = (index, key) => {
+        const nextValue = String(draftValues[key] || '').trim();
+        if (!nextValue) {
+            cancelValueEdit(key);
+            return;
         }
 
-        //console.log(`deleteWave => locations: ${locations.length} waveLocations: ${filterOutSelected().length}`);
-        //waveLocations.splice(index-1, 1);
-        setLocations(filterOutSelected());
-        updateLocations(filterOutSelected());
-    }
-    const addASwell = (index) => {
-        const newLocations = [...locations];
-        const newSwell = prompt(`Enter swell ${newLocations[index].swell.length+1}: `,'');
-        console.log(`newSwell: ${newSwell}`);
-        newLocations[index].swell.push(newSwell);
-        setLocations(newLocations);
-    }
+        const nextValues = [...locations[index][key]];
+
+        if (editingValue && editingValue.key === key && editingValue.valueIndex !== null) {
+            nextValues[editingValue.valueIndex] = nextValue;
+        } else {
+            nextValues.push(nextValue);
+        }
+
+        updateLocationValues(index, key, nextValues);
+        cancelValueEdit(key);
+    };
+    const handleDraftValueChange = (key, value) => {
+        setDraftValues(prev => ({
+            ...prev,
+            [key]: value
+        }));
+    };
+    const handleDraftValueKeyDown = (event, index, key) => {
+        if (event.key === 'Enter') {
+            commitValueChange(index, key);
+        }
+
+        if (event.key === 'Escape') {
+            cancelValueEdit(key);
+        }
+    };
     const removeItemByIndex = (array, index) => {
         if (index >= 0 && index < array.length) {
             array.splice(index, 1);
@@ -64,200 +123,203 @@ const WaveUtils = ({
         }
     };
     const deleteASwell = (index, swellId) => {
-        const newLocations = [...locations];
-        const newSwell = [...newLocations[index].swell];
-        removeItemByIndex(newSwell, swellId);
-        console.log(`WaveUtils => deleteASwell => newSwell: ${JSON.stringify(newSwell, null, 2)}`);
-        newLocations[index].swell = newSwell;
-        setLocations(newLocations);
-    }
-    const editASwell = (index, swellId) => {
-        const newLocations = [...locations];
-        const newSwell = [...newLocations[index].swell];
-        const updateSwell = prompt(`Swell ${Number(swellId)+1}: `, newSwell[swellId]);
-        newSwell[swellId] = updateSwell;
-        console.log(`WaveUtils => editASwell => newSwell: ${JSON.stringify(newSwell, null, 2)}`);
-        newLocations[index].swell = newSwell;
-        setLocations(newLocations);
-    }
-    const addATide = (index) => {
-        const newLocations = [...locations];
-        const newTide = prompt(`Enter tide ${newLocations[index].tide.length + 1}: `, '');
-        console.log(`newTide: ${newTide}`);
-        newLocations[index].tide.push(newTide);
-        setLocations(newLocations);
-    }
-    const editATide = (index, tideId) => {
-        const newLocations = [...locations];
-        const newTide = [...newLocations[index].tide];
-        const updateTide = prompt(`Tide ${Number(tideId)+1}: `, newTide[tideId]);
-        newTide[tideId] = updateTide;
-        console.log(`WaveUtils => editATide => newTide: ${JSON.stringify(newTide, null, 2)}`);
-        newLocations[index].tide = newTide;
-        setLocations(newLocations);
+        const next = [...locations[index].swell];
+        removeItemByIndex(next, swellId);
+        updateLocationValues(index, 'swell', next);
     }
     const deleteATide = (index, tideId) => {
-        const newLocations = [...locations];
-        const newTide = [...newLocations[index].tide];
-        removeItemByIndex(newTide, tideId);
-        console.log(`WaveUtils => deleteATide => newTide: ${JSON.stringify(newTide, null, 2)}`);
-        newLocations[index].tide = newTide;
-        setLocations(newLocations);
-    }
-    const addAWind = (index) => {
-        const newLocations = [...locations];
-        const newWind = prompt(`Enter wind ${newLocations[index].wind.length + 1}: `, '');
-        console.log(`newWind: ${newWind}`);
-        newLocations[index].wind.push(newWind);
-        setLocations(newLocations);
+        const next = [...locations[index].tide];
+        removeItemByIndex(next, tideId);
+        updateLocationValues(index, 'tide', next);
     }
     const deleteAWind = (index, windId) => {
-        const newLocations = [...locations];
-        const newWind = [...newLocations[index].wind];
-        removeItemByIndex(newWind, windId);
-        console.log(`WaveUtils => deleteAWind => newWind: ${JSON.stringify(newWind, null, 2)}`);
-        newLocations[index].wind = newWind;
-        setLocations(newLocations);
+        const next = [...locations[index].wind];
+        removeItemByIndex(next, windId);
+        updateLocationValues(index, 'wind', next);
     }
-    const editAWind = (index, windId) => {
-        const newLocations = [...locations];
-        const newWind = [...newLocations[index].wind];
-        const updateWind = prompt(`Wind ${Number(windId)+1}: `, newWind[windId]);
-        newWind[windId] = updateWind;
-        console.log(`WaveUtils => editAWind => newWind: ${JSON.stringify(newWind, null, 2)}`);
-        newLocations[index].wind = newWind;
-        setLocations(newLocations);
-    }
-    const displayEditDialog = (location, index) => {
-        const editDialog = <div className='containerBox'>
-            <div className='containerBox'>
+    // Cam input state for edit dialog
+    const [camInput, setCamInput] = useState('');
+    const openEditDialog = (index) => {
+        const selectedLocation = locations[index];
+        if (!selectedLocation) {
+            return;
+        }
+
+        setCamInput(selectedLocation.cam || '');
+        setEditDialogTarget({
+            name: selectedLocation.name,
+            latitude: selectedLocation.latitude,
+            longitude: selectedLocation.longitude
+        });
+        setIsEditDialogOpen(true);
+    };
+    const closeEditDialog = () => {
+        setIsEditDialogOpen(false);
+        setEditDialogTarget(null);
+        setEditingValue(null);
+        setDraftValues({
+            swell: '',
+            wind: '',
+            tide: ''
+        });
+    };
+    const handleCamInputChange = (e) => {
+        setCamInput(e.target.value);
+    };
+    const commitCamChange = () => {
+        if (activeDialogIndex !== -1 && (locations[activeDialogIndex].cam || '') !== camInput) {
+            const newLocations = [...locations];
+            newLocations[activeDialogIndex] = {
+                ...newLocations[activeDialogIndex],
+                cam: camInput
+            };
+            updateLocations(newLocations);
+        }
+    };
+    const handleCamInputKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            commitCamChange();
+            e.target.blur();
+        }
+    };
+    const renderValueEditor = (index, key, label) => {
+        const isEditingKey = editingValue && editingValue.key === key;
+
+        return (
+            <div className='containerDetail p-10 m-5 size15 color-lite'>
+                <div className='containerDetail p-10 m-5 size15 color-yellow button' onClick={() => beginAddValue(key)}>
+                    {label} <span className='text-outline-lite'>{icons.plus}</span>
+                </div>
+                {
+                    isEditingKey
+                        ? <div className='containerDetail p-10 m-5 size15 color-lite'>
+                            <input
+                                ref={activeInputRef}
+                                type='text'
+                                className='containerDetail p-10 m-5 size15 color-lite p-5 m-5'
+                                value={draftValues[key]}
+                                onChange={(event) => handleDraftValueChange(key, event.target.value)}
+                                onKeyDown={(event) => handleDraftValueKeyDown(event, index, key)}
+                                placeholder={`Enter ${label.toLowerCase()}...`}
+                            />
+                            <div className='flexContainer containerDetail'>
+                                <div className='containerDetail flex2Column button mr-5 bg-green p-10' onClick={() => commitValueChange(index, key)}>
+                                    Save
+                                </div>
+                                <div className='containerDetail flex2Column button bg-red p-10' onClick={() => cancelValueEdit(key)}>
+                                    Cancel
+                                </div>
+                            </div>
+                        </div>
+                        : null
+                }
+                {
+                    locations[index][key].map((value, valueIndex) => {
+                        const isEditingThisValue = isEditingKey && editingValue.valueIndex === valueIndex;
+
+                        return <div key={`${key}-${value}-${valueIndex}`} className='containerDetail p-10 m-5 size15 color-lite flexContainer button'>
+                            <div
+                                className='flex2Column columnLeftAlign'
+                                title={`edit ${value}`}
+                                onClick={() => beginEditValue(key, valueIndex, value)}
+                            >
+                                {isEditingThisValue ? `${value} (editing)` : value}
+                            </div>
+                            <div
+                                title='delete'
+                                className='flex1Column columnRightAlign'
+                                onClick={() => {
+                                    if (key === 'swell') {
+                                        deleteASwell(index, valueIndex);
+                                    } else if (key === 'wind') {
+                                        deleteAWind(index, valueIndex);
+                                    } else {
+                                        deleteATide(index, valueIndex);
+                                    }
+                                }}
+                            >
+                                {icons.delete}
+                            </div>
+                        </div>;
+                    })
+                }
+            </div>
+        );
+    };
+    const renderEditDialog = (_, index) => (
+        <div className='containerDetail p-10 m-5 size20 color-lite'>
+            <div className='containerDetail p-10 m-5 size15 color-yellow'>
                 {locations[index].name}
             </div>
-            <div className='containerBox'>
+            <div className='containerDetail p-10 m-5 size15 color-lite'>
                 {locations[index].longitude}
             </div>
-            <div className='containerBox'>
+            <div className='containerDetail p-10 m-5 size15 color-lite'>
                 {locations[index].latitude}
             </div>
-            <div className='containerBox'>
-                <div className='containerBox color-yellow button' onClick={() => addASwell(index)}>
-                    SWELL <span className='text-outline-light'>{icons.plus}</span>
-                </div>
-                {locations[index].swell.map((s, swellIndex) => <div className='containerBox flexContainer button'>
-                    <div 
-                        className='flex2Column columnLeftAlign'
-                        title={`edit ${s}`}
-                        onClick={() => editASwell(index, swellIndex)}
-                    >
-                        {s}
-                    </div>
-                    <div 
-                        title='delete' 
-                        className='flex1Column columnRightAlign'
-                        onClick={() => deleteASwell(index, swellIndex)}
-                    >
-                        {icons.delete}
-                    </div>
-                </div>
-                )}
+            <div className='containerDetail p-10 m-5 size15 color-lite'>
+                <label className='color-yellow bold'>Cam Link:</label>
+                <input
+                    type='text'
+                    className='containerDetail p-10 m-5 size15 color-lite p-5 m-5'
+                    value={camInput}
+                    onChange={handleCamInputChange}
+                    onBlur={commitCamChange}
+                    onKeyDown={handleCamInputKeyDown}
+                    placeholder='Add or edit cam link...'
+                    style={{ width: '100%' }}
+                />
             </div>
-            <div className='containerBox'>
-                <div className='containerBox color-yellow button' onClick={() => addAWind(index)}>
-                    WIND <span className='text-outline-light'>{icons.plus}</span>
-                </div>
-                {locations[index].wind.map((w,windIndex) => <div className='containerBox flexContainer button'>
-                        <div
-                            className='flex2Column columnLeftAlign'
-                            title={`edit ${w}`}
-                            onClick={() => editAWind(index, windIndex)}
-                        >
-                            {w}
-                        </div>
-                        <div
-                            title='delete'
-                            className='flex1Column columnRightAlign'
-                            onClick={() => deleteAWind(index, windIndex)}
-                        >
-                            {icons.delete}
-                        </div>
-                    </div>
-                )}
-            </div>
-            <div className='containerBox'>
-                <div className='containerBox color-yellow button' onClick={() => addATide(index)}>
-                    TIDE <span className='text-outline-light'>{icons.plus}</span>
-                </div>
-                {locations[index].tide.map((t,tideIndex) => <div className='containerBox flexContainer button'>
-                    <div
-                        className='flex2Column columnLeftAlign'
-                        title={`edit ${t}`}
-                        onClick={() => editATide(index, tideIndex)}
-                    >
-                        {t}
-                    </div>
-                    <div
-                        title='delete'
-                        className='flex1Column columnRightAlign'
-                        onClick={() => deleteATide(index, tideIndex)}
-                    >
-                        {icons.delete}
-                    </div>
-                </div>
-                )}
-            </div>
+            {renderValueEditor(index, 'swell', 'SWELL')}
+            {renderValueEditor(index, 'wind', 'WIND')}
+            {renderValueEditor(index, 'tide', 'TIDE')}
         </div>
-        setDialog(editDialog);
-    }
+    );
 
     const editWave = (props) => {
-
-        console.log(`editWave =>\nprops: ${JSON.stringify(props, null, 2)}`);
-        const waveLocations = [...locations];
         if (props.name === 'button') {
-            handleEditToggle()
+            handleEditToggle();
         } else if (props.name === 'edit') {
-            console.log(`edit a wave => item: ${JSON.stringify(item, null, 2)}`);
-            console.log(`edit a wave => waveLocations: ${JSON.stringify(waveLocations, null, 2)}`);
-            let index = 0;
-            const result = waveLocations.find(obj => {
-                if (obj.name === item.name) {
-                    console.log(`editWave => obj.name: ${obj.name}`)
+            if (isEditDialogOpen) {
+                closeEditDialog();
+            } else {
+                const index = locations.findIndex(obj =>
+                    obj.name === item.name
+                    && obj.latitude === item.latitude
+                    && obj.longitude === item.longitude
+                );
+                if (index !== -1) {
+                    openEditDialog(index);
                 }
-                index++
-                return obj.name === item.name
-            })
-            console.log(`index: ${index} result: ${JSON.stringify(result, null, 2)}`)
-            //editWaveSave(result, index-1);
-            displayEditDialog(result, index - 1);
+            }
         }
     }
 
-    const localEdit = initializeData('edit', 'false');
-    const menu = <div className='containerBox'>
+    const menu = <div className='containerDetail p-10 m-5 size15 color-lite'>
         {
-            ((localEdit === 'true') && (displayData === false))
-                ? <div className='buttonLite button' onClick={() => handleEditToggle()}>
-                    {(localEdit === 'true') ? 'Save' : 'Edit Waves'}
+            (edit && (displayData === false))
+                ? <div className='buttonLite button' onClick={() => { handleEditToggle(); closeEditDialog(); }}>
+                    {edit ? 'Save' : 'Edit Waves'}
                 </div>
                 : null
         }
         {
-            ((localEdit === 'true') && (displayData === false))
+            (edit && (displayData === false))
                 ? <div className='buttonLite button' onClick={() => toggleExport()}>
                     Display Location Data
                 </div>
                 : null
         }
         {
-            ((localEdit === 'true') && (displayData === true))
+            (edit && (displayData === true))
                 ? <div className='buttonLite button' onClick={() => toggleExport()}>
                     Close Location Data
                 </div>
                 : null
         }
         {
-            ((localEdit === 'true') && (displayData === true))
-                ? <div className='containerBox'>
+            (edit && (displayData === true))
+                ? <div className='containerDetail p-10 m-5 size15 color-lite'>
                     <textarea
                         rows='10'
                         cols={window.innerWidth / 15}
@@ -268,16 +330,23 @@ const WaveUtils = ({
                 : null
         }
         {
-            (localEdit === 'true')
+            edit
                 ? <div className='buttonLite button' onClick={() => handleResetLocations()}>
                     RESET LOCATIONS
                 </div>
                 : null
         }
+        {
+            edit
+                ? <div className='buttonLite button' onClick={() => { localStorage.setItem('edit', 'false'); closeEditDialog(); handleEditToggle(); }}>
+                    Cancel
+                </div>
+                : null
+        }
     </div>;
-    const itemContainer = <div className='containerBox'>
-        {dialog}
-        <div className='flexContainer containerBox'>
+    const itemContainer = <div className='containerDetail p-10 m-5 size15 color-lite'>
+        {isEditDialogOpen && activeDialogIndex !== -1 && renderEditDialog(locations[activeDialogIndex], activeDialogIndex)}
+        <div className='flexContainer containerDetail p-10 m-5 size15 color-lite'>
             <div className='flex2Column button bold bg-dark color-lite r-10 m-10 contentCenter p-10 size25' onClick={() => editWave({ 'name': 'edit' })}>
                 {icons.edit}
             </div>

@@ -6,6 +6,7 @@ import tideIcon from '../../assets/images/tide.png';
 import validate from '../utils/validate';
 import TideChart from './tide/TideChart';
 import initializeData from '../utils/InitializeData';
+import { getNearestTideStation } from './api';
 
 const TideDisplay = ({
     display,
@@ -13,7 +14,9 @@ const TideDisplay = ({
     tideTable,
     getTide,
     getTideTime,
-    getTideHeight
+    getTideHeight,
+    lat,
+    lon
 }) => {
 
     const getLocalData = (localItem) => initializeData(localItem, null);
@@ -21,6 +24,8 @@ const TideDisplay = ({
     const [tideCollapse, setTideCollapse] = useState(collapseStateInit('tideCollapse'));
     const [tideNow, setTideNow] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [currentTide, setCurrentTide] = useState();
+    const [currentTideDirection, setCurrentTideDirection] = useState();
     const [status, setStatus] = useState({
         tide: '',
         tideDirection: initializeData('tideDirection', '?'),
@@ -31,7 +36,13 @@ const TideDisplay = ({
     const time = useCurrentTime();
     const startTime = time[0].startTime;
     const endTime = time[0].endTime;
-    const tideNowLink = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${startTime}&end_date=${endTime}&station=9410660&product=water_level&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
+    const waterLevelStation = getNearestTideStation(lat || 32.87, lon || -117.26);
+    const tideNowLink = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${startTime}&end_date=${endTime}&station=${waterLevelStation.id}&product=water_level&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`;
+
+    useEffect(() => {
+        setCurrentTide(localStorage.getItem('currentTide') ? JSON.parse(localStorage.getItem('currentTide')) : [0]);
+        setCurrentTideDirection(localStorage.getItem('currentTideDirection') ? localStorage.getItem('currentTideDirection') : 'up');
+    }, []);
 
     const getDownArrow = () => {
         return <div className='containerDetail bg-white ht-65 mt--10 mb-10 pt-23 size40'>
@@ -90,17 +101,22 @@ const TideDisplay = ({
             waterLevel = Number(tideNow.data[tideNow.data.length - 1].v).toFixed(1);
             waterLevelTime = Number(tideNow.data[tideNow.data.length - 1].t).toFixed(1);
         }
+        console.log(`TideDisplay => getCurrentWaterLevel => height: ${waterLevel}, waterLevelTime: ${waterLevelTime}`);
         localStorage.setItem('height', waterLevel);
         localStorage.setItem('heightTime', waterLevelTime)
 
         return [waterLevel, waterLevelTime];
     }
 
-    const getCurrentTide = () => (getCurrentWaterLevel()[0] > 4) ? 'high' : (getCurrentWaterLevel()[0] < 2) ? 'low' : 'medium';
+    const getCurrentTide = () => (currentTide > 4) ? 'high' : (currentTide < 2) ? 'low' : 'medium';
 
     const heightInit = () => getLocalData('height') ? getLocalData('height') : '';
-    const tideHeader = () => <div>Tide {Number(heightInit()).toFixed(1)}<span className='size12'>ft</span> {getCurrentTide()}</div>
-
+    //const tideHeader = () => <div>Tide {Number(heightInit()).toFixed(1)}<span className='size12'>ft</span> {getCurrentTide()}</div>
+    
+    const tideHeader = () => {
+        const value = (currentTide && typeof currentTide === 'number' && isFinite(currentTide)) ? currentTide.toFixed(1) : '--';
+        return <div>Tide {(currentTideDirection && currentTideDirection === 'UP') ? icons.collapse : icons.expand} {value}<span className='size12'>ft</span> {getCurrentTide()}</div>;
+    }
     useEffect(() => {
         localStorage.setItem('tideCollapse', tideCollapse);
     }, [tideCollapse]);
@@ -108,18 +124,23 @@ const TideDisplay = ({
     useEffect(() => {
         
         if (tideNow !== null) {
-            const tide = getCurrentTide();
-            localStorage.setItem('tide', tide);
             if (tideNow.data) {
-                const tideDirection = getClosestValue(tideNow.data)[1].toUpperCase();
-                localStorage.setItem('tideDirection', tideDirection)
+                const [level, direction] = getClosestValue(tideNow.data);
+                setCurrentTide(level);
+                setCurrentTideDirection(direction.toUpperCase());
+                const tideDirection = direction.toUpperCase();
+                const tide = (level > 4) ? 'high' : (level < 2) ? 'low' : 'medium';
+                localStorage.setItem('tide', tide);
+                localStorage.setItem('tideDirection', tideDirection);
+                localStorage.setItem('currentTide', JSON.stringify(level));
+                localStorage.setItem('currentTideDirection', direction.toUpperCase());
                 setStatus(prevState => ({
                     ...prevState,
                     tide: tide,
                     predictions: tideNow.data,
                     tideDirection: tideDirection,
                     updated: true
-                }))
+                }));
             }
         }
 
@@ -194,7 +215,7 @@ const TideDisplay = ({
     const getTideDisplay = () => {
 
         const getNextLowTideIndex = () => {
-            const predictions = tides.predictions;
+            const predictions = (tides && Array.isArray(tides.predictions)) ? tides.predictions : [];
             const currentTime = new Date();
 
             let closestIndex = -1;
@@ -214,7 +235,7 @@ const TideDisplay = ({
             return closestIndex;
         };
 
-        const predictions = tides.predictions;
+        const predictions = (tides && Array.isArray(tides.predictions)) ? tides.predictions : [];
         const datesArray = predictions.map((tide) => tide.t);
         const now = new Date();
         const low = datesArray[getNextLowTideIndex()];
@@ -226,10 +247,11 @@ const TideDisplay = ({
             const hours = Math.floor(ms / (1000 * 60 * 60));
             return { hours, minutes, seconds };
         }
-        const untilNextLow = (predictions) ? `${millisecondsToTime(timeDifferenceLow)['hours']} hours and ${millisecondsToTime(timeDifferenceLow)['minutes']} minutes` : 'OOPS!';
+        const untilNextLow = (predictions.length > 0) ? `${millisecondsToTime(timeDifferenceLow)['hours']} hours and ${millisecondsToTime(timeDifferenceLow)['minutes']} minutes` : 'OOPS!';
 
         const getHeight = () => {
             const height = getCurrentWaterLevel()[0];
+            console.log(`TideDisplay => getHeight => height: ${height}`);
             localStorage.setItem('height', height);
             return <div className=''>
                 <div className='bold pb-10 mt--10'>{/*levelDisplay*/}{getCurrentTide()}</div>
@@ -240,7 +262,7 @@ const TideDisplay = ({
 
             return <div className='flexContainer bold color-oceanblue'>
                 <div className='flex2Column p-10'>
-                    {getTideArrows()}<span className='ml-10'>{getCurrentWaterLevel()[0]}</span> ft.
+                    {getTideArrows()}<span className='ml-10'>{currentTide.toFixed(1)}</span><span className='size12'>ft</span>
                 </div>
                 <div className='flex2Column p-10'>
                     {getCurrentTide().toLocaleUpperCase()}
@@ -289,11 +311,7 @@ const TideDisplay = ({
                         <div className='pb-10 pt-15 mt--94'>{getTideDirection()}</div>
                         <div className='pt-10'>{getHeight()}</div>
                     </div>
-                : (display !== 'narrow' && !tideCollapse)
-                    ? <div className='containerDetail mb-10 contentCenter'>
-                            {(tideNow.nextTideIndex === -1) ? getHeight() : getTideDetails()}
-                        </div>
-                    : <div></div>
+                : <div></div>
             }
             {
                 (display === 'star' || display === 'narrow')
@@ -323,7 +341,11 @@ const TideDisplay = ({
                         ? null
                         : (tideCollapse)
                             ? null
-                            : <TideChart />
+                            : <TideChart 
+                                standalone='false'
+                                lat={lat}
+                                lon={lon}
+                            />
                 /*<div className='mt-10 p-10 r-10 bg-tinted'>
                         {tideTable()}
                     </div>

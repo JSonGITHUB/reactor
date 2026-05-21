@@ -13,6 +13,20 @@ const monthsList = [
     'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
+const emptyNewCrop = {
+    name: '',
+    icon: '🌱',
+    months: '',
+    harvest: '',
+    companions: '',
+    soil: '',
+    watering: '',
+    fertilizer: '',
+    pests: '',
+    care: '',
+    sun_exposure: 'Full sun'
+};
+
 const Garden = () => {
 
     const [crops, setCrops] = useState();
@@ -31,6 +45,22 @@ const Garden = () => {
     const [fertilizerCollapse, setFertilizerCollapse] = useState(true);
     const [feedingCollapse, setFeedingCollapse] = useState(true);
     const [planted, setPlanted] = useState(initializeData('planted', false));
+    const [addItemCollapse, setAddItemCollapse] = useState(true);
+    const [newCrop, setNewCrop] = useState(emptyNewCrop);
+    const [addItemFeedback, setAddItemFeedback] = useState('');
+    const [editingCropIndex, setEditingCropIndex] = useState(null);
+
+    useEffect(() => {
+        if (!addItemFeedback) {
+            return;
+        }
+
+        const timeoutId = setTimeout(() => {
+            setAddItemFeedback('');
+        }, 1800);
+
+        return () => clearTimeout(timeoutId);
+    }, [addItemFeedback]);
 
     useEffect(() => {
         localStorage.setItem('planted', planted);
@@ -175,6 +205,131 @@ const Garden = () => {
     const truncateString = (str) => {
         return str.length > 20 ? str.slice(0, 20) + '...' : str;
     }
+
+    const updateNewCropField = (field, value) => {
+        setNewCrop((previous) => ({ ...previous, [field]: value }));
+    };
+
+    const reindexCrops = (cropList) => {
+        return cropList.map((crop, index) => ({
+            ...crop,
+            index
+        }));
+    };
+
+    const toFormCrop = (crop) => ({
+        name: crop?.name || '',
+        icon: crop?.icon || '🌱',
+        months: Array.isArray(crop?.months) ? crop.months.join(', ') : '',
+        harvest: crop?.harvest || '',
+        companions: Array.isArray(crop?.companions) ? crop.companions.join(', ') : '',
+        soil: crop?.soil || '',
+        watering: crop?.watering || '',
+        fertilizer: crop?.fertilizer || '',
+        pests: crop?.pests || '',
+        care: crop?.care || '',
+        sun_exposure: crop?.sun_exposure || 'Full sun'
+    });
+
+    const beginEditCrop = (crop) => {
+        setEditingCropIndex(crop.index);
+        setNewCrop(toFormCrop(crop));
+        setAddItemCollapse(false);
+        setAddItemFeedback(`Editing ${crop.name}`);
+    };
+
+    const deleteCustomCrop = (crop) => {
+        if (!crop?.isCustom) {
+            setAddItemFeedback('Only custom items can be deleted here');
+            return;
+        }
+
+        const cropList = Array.isArray(crops) ? crops : [];
+        const updated = reindexCrops(cropList.filter((item) => item.index !== crop.index));
+        setCrops(updated);
+
+        if (editingCropIndex === crop.index) {
+            setEditingCropIndex(null);
+            setNewCrop(emptyNewCrop);
+        }
+
+        setAddItemFeedback(`${crop.name} deleted`);
+    };
+
+    const addGardenItem = (event) => {
+        event.preventDefault();
+
+        const cropName = String(newCrop.name || '').trim();
+        if (!cropName) {
+            setAddItemFeedback('Name is required');
+            return;
+        }
+
+        const cropList = Array.isArray(crops) ? crops : [];
+        const duplicateName = cropList.some((crop) => {
+            const matchesName = String(crop?.name || '').toLowerCase() === cropName.toLowerCase();
+            const isCurrentEditingItem = editingCropIndex !== null && crop.index === editingCropIndex;
+            return matchesName && !isCurrentEditingItem;
+        });
+        if (duplicateName) {
+            setAddItemFeedback('That crop already exists');
+            return;
+        }
+
+        const monthValues = String(newCrop.months || '')
+            .split(',')
+            .map((value) => value.trim())
+            .filter(Boolean)
+            .map((value) => value.charAt(0).toUpperCase() + value.slice(1).toLowerCase())
+            .filter((value) => monthsList.includes(value));
+
+        const companionValues = String(newCrop.companions || '')
+            .split(',')
+            .map((value) => value.trim())
+            .filter(Boolean);
+
+        const createdCrop = {
+            name: cropName,
+            icon: String(newCrop.icon || '🌱').trim() || '🌱',
+            months: monthValues,
+            harvest: String(newCrop.harvest || '').trim() || 'N/A',
+            companions: companionValues,
+            soil: String(newCrop.soil || '').trim() || 'N/A',
+            watering: String(newCrop.watering || '').trim() || 'N/A',
+            fertilizer: String(newCrop.fertilizer || '').trim() || 'N/A',
+            pests: String(newCrop.pests || '').trim() || 'N/A',
+            care: String(newCrop.care || '').trim() || 'N/A',
+            sun_exposure: String(newCrop.sun_exposure || 'Full sun').trim() || 'Full sun',
+            index: cropList.length,
+            id: `custom-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+            isCustom: true,
+            planted: false
+        };
+
+        if (editingCropIndex !== null) {
+            const updatedCrops = reindexCrops(cropList.map((crop) => {
+                if (crop.index !== editingCropIndex) {
+                    return crop;
+                }
+                return {
+                    ...crop,
+                    ...createdCrop,
+                    id: crop.id || createdCrop.id,
+                    isCustom: Boolean(crop.isCustom),
+                    planted: crop.planted
+                };
+            }));
+            setCrops(updatedCrops);
+            setAddItemFeedback(`${cropName} updated`);
+        } else {
+            setCrops(reindexCrops([...cropList, createdCrop]));
+            setAddItemFeedback(`${cropName} added`);
+        }
+
+        setNewCrop(emptyNewCrop);
+        setEditingCropIndex(null);
+        setAddItemCollapse(true);
+    };
       
     return (
         <div className='mt--30'>
@@ -182,7 +337,7 @@ const Garden = () => {
                 <span className='m-5'>{icons.garden}</span> Garden
             </div>
             <div className='containerDetail bg-lite m-5'>
-                <div className={`containerBox color-yellow bold bg-lite`}>
+                <div className={`containerDetail size20 color-yellow  color-yellow bold bg-lite`}>
                     <CollapseToggleButton
                         title='Fertilizers'
                         isCollapsed={fertilizerCollapse}
@@ -193,11 +348,11 @@ const Garden = () => {
                 {
                     (fertilizerCollapse)
                     ? null
-                    : <div className='containerBox'>
+                    : <div className='containerDetail size20 color-yellow ht-200'>
                         {
                             (!currentFertilizers)
                             ? null
-                            : currentFertilizers.map((item, index) => <div className='containerBox color-neogreen columnLeftAlign button'>
+                            : currentFertilizers.map((item, index) => <div className='containerDetail size20 color-yellow  color-neogreen columnLeftAlign button m-2 mb-5 p-15'>
                                     {getFertilizerCheckBox(item, index)} {item}
                                 </div>
                             )
@@ -206,7 +361,7 @@ const Garden = () => {
                 }
             </div>
             <div className='containerDetail bg-lite m-5'>
-                <div className={`containerBox color-yellow bold bg-lite`}>
+                <div className={`containerDetail size20 color-yellow  color-yellow bold bg-lite`}>
                     <CollapseToggleButton
                         title='Feeding Plan'
                         isCollapsed={feedingCollapse}
@@ -217,7 +372,7 @@ const Garden = () => {
                 {
                     (feedingCollapse)
                     ? null
-                    : <div className='containerBox'>
+                    : <div className='containerDetail size20 color-yellow '>
                         {
                             feedingPlans?.map((plan, index) => (
                                 <FeedingPlan 
@@ -231,9 +386,114 @@ const Garden = () => {
 
                 }
             </div>
+            <div className='containerDetail bg-lite m-5'>
+                <div className={`containerDetail size20 color-yellow  color-yellow bold bg-lite`}>
+                    <CollapseToggleButton
+                        title='Add Garden Item'
+                        isCollapsed={addItemCollapse}
+                        setCollapse={setAddItemCollapse}
+                        align='left'
+                    />
+                </div>
+                {
+                    addItemCollapse
+                        ? null
+                        : <form className='containerDetail size20 color-yellow  contentLeft' onSubmit={addGardenItem}>
+                            <input
+                                className='containerDetail size20 color-yellow  mb-5 width-100-percent'
+                                placeholder='Name (required)'
+                                value={newCrop.name}
+                                onChange={(event) => updateNewCropField('name', event.target.value)}
+                            />
+                            <input
+                                className='containerDetail size20 color-yellow  mb-5 width-100-percent'
+                                placeholder='Icon (example: 🌱)'
+                                value={newCrop.icon}
+                                onChange={(event) => updateNewCropField('icon', event.target.value)}
+                            />
+                            <input
+                                className='containerDetail size20 color-yellow  mb-5 width-100-percent'
+                                placeholder='Planting months (comma-separated, e.g. March, April, May)'
+                                value={newCrop.months}
+                                onChange={(event) => updateNewCropField('months', event.target.value)}
+                            />
+                            <input
+                                className='containerDetail size20 color-yellow  mb-5 width-100-percent'
+                                placeholder='Harvest (e.g. 70-90 days)'
+                                value={newCrop.harvest}
+                                onChange={(event) => updateNewCropField('harvest', event.target.value)}
+                            />
+                            <input
+                                className='containerDetail size20 color-yellow  mb-5 width-100-percent'
+                                placeholder='Companion plants (comma-separated)'
+                                value={newCrop.companions}
+                                onChange={(event) => updateNewCropField('companions', event.target.value)}
+                            />
+                            <input
+                                className='containerDetail size20 color-yellow  mb-5 width-100-percent'
+                                placeholder='Soil details'
+                                value={newCrop.soil}
+                                onChange={(event) => updateNewCropField('soil', event.target.value)}
+                            />
+                            <input
+                                className='containerDetail size20 color-yellow  mb-5 width-100-percent'
+                                placeholder='Watering guidance'
+                                value={newCrop.watering}
+                                onChange={(event) => updateNewCropField('watering', event.target.value)}
+                            />
+                            <input
+                                className='containerDetail size20 color-yellow  mb-5 width-100-percent'
+                                placeholder='Fertilizer guidance'
+                                value={newCrop.fertilizer}
+                                onChange={(event) => updateNewCropField('fertilizer', event.target.value)}
+                            />
+                            <input
+                                className='containerDetail size20 color-yellow  mb-5 width-100-percent'
+                                placeholder='Pest control notes'
+                                value={newCrop.pests}
+                                onChange={(event) => updateNewCropField('pests', event.target.value)}
+                            />
+                            <textarea
+                                className='containerDetail size20 color-yellow  width-100-percent'
+                                placeholder='Care notes'
+                                rows={3}
+                                value={newCrop.care}
+                                onChange={(event) => updateNewCropField('care', event.target.value)}
+                            />
+                            <select
+                                className='containerDetail size20 color-yellow  mb-10 width-100-percent'
+                                value={newCrop.sun_exposure}
+                                onChange={(event) => updateNewCropField('sun_exposure', event.target.value)}
+                            >
+                                <option value='Full sun'>🌞 Full sun</option>
+                                <option value='Partial shade'>🌤️ Partial shade</option>
+                            </select>
+                            <div className='flexContainer contentCenter'>
+                                <div type='submit' className='flex2Column p-10 containerDetail size20 color-yellow  bg-green color-yellow mr-5 button'>
+                                    {editingCropIndex === null ? 'Add Item' : 'Update Item'}
+                                </div>
+                                <div
+                                    type='button'
+                                    className='flex2Column p-10 containerDetail size20 color-yellow  bg-red color-yellow button'
+                                    onClick={() => {
+                                        setNewCrop(emptyNewCrop);
+                                        setEditingCropIndex(null);
+                                    }}
+                                >
+                                    {editingCropIndex === null ? 'Reset' : 'Cancel Edit'}
+                                </div>
+                            </div>
+                        </form>
+                }
+                {
+                    addItemFeedback
+                        ? <div className='containerDetail size20 color-yellow  color-neogreen'>{addItemFeedback}</div>
+                        : null
+                }
+            </div>
             {/* Controls */}
             <div className='containerDetail bg-lite m-5'>
-                <div className={`containerBox color-yellow bold bg-lite`}>
+                <div className={`containerDetail size20 color-yellow  color-yellow bold bg-lite`}>
                     <CollapseToggleButton
                         title='Apply Filters'
                         isCollapsed={collapsed}
@@ -244,16 +504,16 @@ const Garden = () => {
                     {
                         (collapsed)
                             ? null
-                            : <div className='containerBox flex gap-4'>
+                            : <div className='containerDetail size20 color-yellow  flex gap-4'>
                                 <input
                                     type='text'
                                     placeholder='🔍 Search vegetable...'
-                                    className='containerBox'
+                                    className='containerDetail size20 color-yellow p-10 width--5 mt-10'
                                     value={search}
                                     onChange={e => setSearch(e.target.value)}
                                 />
                                 <select
-                                    className='containerBox'
+                                    className='containerDetail size20 color-yellow p-10 width--5 mt-10'
                                     value={selectedMonth}
                                     onChange={e => setSelectedMonth(e.target.value)}
                                 >
@@ -263,7 +523,7 @@ const Garden = () => {
                                     ))}
                                 </select>
                                 <select
-                                    className='containerBox'
+                                    className='containerDetail size20 color-yellow p-10 width--5 mt-10'
                                     value={selectedSoil}
                                     onChange={e => setSelectedSoil(e.target.value)}
                                 >
@@ -273,7 +533,7 @@ const Garden = () => {
                                     )))}
                                 </select>
                                 <select
-                                    className='containerBox'
+                                    className='containerDetail size20 color-yellow p-10 width--5 mt-10'
                                     value={selectedFertilizer}
                                     onChange={e => setSelectedFertilizer(e.target.value)}
                                 >
@@ -283,13 +543,13 @@ const Garden = () => {
                                     )))}
                                 </select>
                                 <button
-                                    className='containerBox'
+                                    className='containerDetail contentLeft size20 color-yellow p-10 width--5 ml--5 mt-10'
                                     onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
                                 >
                                     {sortOrder === 'asc' ? '🔼 A-Z' : '🔽 Z-A'}
                                 </button>
                                 <select
-                                    className='containerBox'
+                                    className='containerDetail size20 color-yellow p-10 width--5 mt-10'
                                     value={sun||'All Sun'}
                                     onChange={e => setSun(e.target.value)}
                                 >
@@ -305,7 +565,7 @@ const Garden = () => {
                                             )}
                                 </select>
                                 <select
-                                    className='containerBox'
+                                    className='containerDetail size20 color-yellow p-10 width--5 mt-10'
                                     value={planted}
                                     onChange={e => setPlanted((e.target.value === 'true') ? true : (e.target.value === 'false') ? false : null)}
                                 >
@@ -334,6 +594,8 @@ const Garden = () => {
                                 setModalData={setModalData}
                                 crops={crops}
                                 setCrops={setCrops}
+                                onEditItem={beginEditCrop}
+                                onDeleteCustom={deleteCustomCrop}
                             />
                         </React.Fragment>
                     ))

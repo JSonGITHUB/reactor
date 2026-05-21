@@ -1,3 +1,4 @@
+import './processShim';
 import React from 'react';
 import ReactDOM from 'react-dom';
 //import './assets/css/index.css';
@@ -10,7 +11,7 @@ import App from './App';
 //import reducers from './reducers/BlogReducers.js';
 //import reducers from './reducers/SitewideReducers.js';
 import * as serviceWorker from './webWorkers/serviceWorker';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { HashRouter as Router } from 'react-router-dom';
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const store = createStore(

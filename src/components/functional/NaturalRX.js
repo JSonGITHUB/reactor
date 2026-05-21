@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import CollapseToggleButton from '../utils/CollapseToggleButton';
 
 const DATASET_STORAGE_KEY = 'naturalRxDataset';
 
@@ -11,6 +12,12 @@ const SEARCH_TYPES = [
     { value: 'organ', label: 'Organ' },
     { value: 'healthFunction', label: 'Function' }
 ];
+
+// Dynamically collect all categories from DATASET
+const getAllCategories = (dataset) => {
+    const cats = dataset.map(item => item.category).filter(Boolean);
+    return Array.from(new Set(cats)).sort();
+};
 
 const SYNONYMS = {
     lethargic: ['fatigue', 'low energy', 'tired'],
@@ -108,13 +115,11 @@ const rxFunctionIcons = {
     energy: '⚡️',
     metabolic: '🔥',
     circulation: '🫀',
-    antioxidant: '🫐',
-    glucose: '🩸',
+    antioxidant: '🫐', 
     microbiome: '🦠',
-    cardiovascular: '❤️',
-    detox: '🧽',
-    mood: '🙂'
-};
+    cardiovascular: '❤️',            
+    detox: '🧽',                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                               };
 
 const normalizeTag = (value) => String(value || '').trim().toLowerCase();
 
@@ -164,6 +169,39 @@ const getSuggestedPreparation = (name) => {
     return 'Suggested prep: pair with balanced meals.';
 };
 
+
+// Merge two food objects by name, combining arrays and preferring new evidenceNote/preparation if present
+const mergeFoodObjects = (base, update) => {
+    const mergeArray = (a, b) => Array.from(new Set([...(a || []), ...(b || [])]));
+    return {
+        ...base,
+        ...update,
+        supports: mergeArray(base.supports, update.supports),
+        deficiencySupport: mergeArray(base.deficiencySupport, update.deficiencySupport),
+        nutrients: mergeArray(base.nutrients, update.nutrients),
+        organs: mergeArray(base.organs, update.organs),
+        healthFunctions: mergeArray(base.healthFunctions, update.healthFunctions),
+        aliases: mergeArray(base.aliases, update.aliases),
+        cautions: mergeArray(base.cautions, update.cautions),
+        evidenceNote: (update.evidenceNote && update.evidenceNote.trim()) || base.evidenceNote,
+        preparation: (update.preparation && update.preparation.trim()) || base.preparation
+    };
+};
+
+// Merge persistent (localStorage) and new DATASET entries by name
+const mergeDatasets = (persistent, fresh) => {
+    const byName = (arr) => Object.fromEntries((arr || []).map(item => [item.name.toLowerCase(), item]));
+    const persistentMap = byName(persistent);
+    const freshMap = byName(fresh);
+    const allNames = Array.from(new Set([...Object.keys(persistentMap), ...Object.keys(freshMap)]));
+    return allNames.map(name => {
+        if (persistentMap[name] && freshMap[name]) {
+            return mergeFoodObjects(freshMap[name], persistentMap[name]);
+        }
+        return persistentMap[name] || freshMap[name];
+    });
+};
+
 const withPreparation = (items) =>
     (Array.isArray(items) ? items : []).map((item) => ({
         ...item,
@@ -199,6 +237,323 @@ const getTagIcon = (value, iconMap, fallback = '•') => {
 };
 
 const DATASET = [
+                        {
+                            name: 'Asparagus',
+                            category: 'vegetable',
+                            supports: ['digestive health', 'detox support', 'heart health', 'immune support'],
+                            deficiencySupport: ['fiber', 'folate', 'vitamin K', 'vitamin C'],
+                            nutrients: ['fiber', 'folate', 'vitamin K', 'vitamin C', 'antioxidants'],
+                            organs: ['gut', 'liver', 'heart'],
+                            healthFunctions: ['digestive support', 'detox support', 'cardiovascular support', 'immune support'],
+                            aliases: [],
+                            evidenceNote: 'Asparagus is rich in fiber, folate, vitamin K, and antioxidants. Supports digestion, detoxification, heart, and immune health.',
+                            cautions: ['May cause urine odor in some individuals.']
+                        },
+                    {
+                        name: 'Fig',
+                        category: 'fruit',
+                        supports: ['digestive health', 'blood sugar support', 'bone health', 'energy support'],
+                        deficiencySupport: ['fiber', 'calcium', 'potassium', 'magnesium'],
+                        nutrients: ['fiber', 'calcium', 'potassium', 'magnesium', 'antioxidants'],
+                        organs: ['gut', 'bones', 'heart'],
+                        healthFunctions: ['digestive support', 'metabolic health', 'bone support'],
+                        aliases: ['figs'],
+                        evidenceNote: 'Figs are rich in fiber, calcium, potassium, and magnesium. They support digestion, blood sugar, bone, and heart health.',
+                        cautions: ['May cause digestive upset if eaten in excess.']
+                    },
+                {
+                    name: 'Black Beans',
+                    category: 'legume',
+                    supports: ['blood sugar support', 'heart health', 'digestive health', 'energy support'],
+                    deficiencySupport: ['fiber', 'protein', 'iron', 'magnesium', 'folate'],
+                    nutrients: ['fiber', 'protein', 'iron', 'magnesium', 'folate', 'antioxidants'],
+                    organs: ['heart', 'gut', 'blood'],
+                    healthFunctions: ['metabolic health', 'digestive support', 'cardiovascular support'],
+                    aliases: [],
+                    evidenceNote: 'Black beans are rich in fiber, protein, iron, magnesium, and folate. They support blood sugar, heart, and digestive health.',
+                    cautions: ['May cause bloating in sensitive individuals.']
+                },
+            {
+                name: 'Green Tea',
+                category: 'beverage',
+                supports: ['antioxidant support', 'energy boost', 'metabolic health', 'brain support', 'cholesterol support'],
+                deficiencySupport: ['antioxidants', 'polyphenols'],
+                nutrients: ['catechins', 'EGCG', 'polyphenols', 'antioxidants'],
+                organs: ['brain', 'heart', 'liver'],
+                healthFunctions: ['antioxidant support', 'cognitive support', 'metabolic health'],
+                aliases: [],
+                evidenceNote: 'Green tea is rich in catechins (EGCG) and polyphenols, supporting antioxidant defenses, metabolism, and brain health.',
+                cautions: ['Contains caffeine; may affect sleep or sensitive individuals.']
+            },
+        // SUPERFOODS
+        {
+            name: 'Chlorella',
+            category: 'superfood',
+            supports: ['removes heavy metals', 'detoxes radiation', 'boosts immunity'],
+            deficiencySupport: ['vitamins', 'minerals'],
+            nutrients: ['chlorophyll', 'vitamins', 'minerals'],
+            organs: ['liver', 'immune system'],
+            healthFunctions: ['detox support', 'immune support'],
+            aliases: [],
+            evidenceNote: 'Chlorella is rich in vitamins and minerals, helps remove heavy metals, detoxifies radiation, and boosts immunity.',
+            cautions: []
+        },
+        {
+            name: 'Chia Seeds',
+            category: 'seed',
+            supports: ['lowers blood pressure'],
+            deficiencySupport: ['fiber', 'omega-3', 'antioxidants', 'vitamins', 'minerals'],
+            nutrients: ['fiber', 'omega-3', 'antioxidants', 'vitamins', 'minerals'],
+            organs: ['heart', 'gut'],
+            healthFunctions: ['metabolic health', 'digestive support', 'cardiovascular support'],
+            aliases: [],
+            evidenceNote: 'Chia seeds are high in fiber, omega-3, antioxidants, vitamins, and minerals. They help lower blood pressure.',
+            cautions: []
+        },
+        // Cacao already exists, merge new data
+        {
+            name: 'Cacao',
+            category: 'seed',
+            supports: ['mood booster', 'iron rich'],
+            deficiencySupport: ['magnesium', 'fiber', 'iron', 'antioxidants'],
+            nutrients: ['flavanols', 'magnesium', 'fiber', 'iron', 'antioxidants'],
+            organs: ['brain', 'gut', 'immune system'],
+            healthFunctions: ['mood support', 'antioxidant support'],
+            aliases: ['cocoa'],
+            evidenceNote: 'Cacao is rich in magnesium, fiber, iron, and antioxidants. It supports mood and is iron rich.',
+            cautions: ['Can contain caffeine-like compounds in sensitive people.']
+        },
+        {
+            name: 'Goji Berries',
+            category: 'fruit',
+            supports: ['energy boost', 'fights depression', 'regulates blood sugar'],
+            deficiencySupport: ['antioxidants', 'vitamins'],
+            nutrients: ['antioxidants', 'vitamins'],
+            organs: ['brain', 'blood'],
+            healthFunctions: ['energy support', 'mood support', 'metabolic health'],
+            aliases: [],
+            evidenceNote: 'Goji berries are high in antioxidants and vitamins, boost energy, fight depression, and help regulate blood sugar.',
+            cautions: []
+        },
+        {
+            name: 'Red Cabbage',
+            category: 'vegetable',
+            supports: ['gut support'],
+            deficiencySupport: ['inulin', 'prebiotic fiber'],
+            nutrients: ['inulin', 'prebiotic fiber'],
+            organs: ['gut'],
+            healthFunctions: ['digestive support'],
+            aliases: [],
+            evidenceNote: 'Red cabbage contains inulin and prebiotic fiber for gut support.',
+            cautions: []
+        },
+        {
+            name: 'Spirulina',
+            category: 'superfood',
+            supports: ['lowers blood pressure', 'boost immunity', 'anti viral'],
+            deficiencySupport: ['vitamins', 'minerals'],
+            nutrients: ['vitamins', 'minerals'],
+            organs: ['immune system', 'heart'],
+            healthFunctions: ['immune support', 'cardiovascular support'],
+            aliases: [],
+            evidenceNote: 'Spirulina is rich in vitamins and minerals, lowers blood pressure, boosts immunity, and is anti-viral.',
+            cautions: []
+        },
+        {
+            name: 'Flaxseed',
+            category: 'seed',
+            supports: ['digestive health', 'lowers cholesterol'],
+            deficiencySupport: ['omega-3', 'fiber', 'antioxidants'],
+            nutrients: ['omega-3', 'fiber', 'antioxidants'],
+            organs: ['gut', 'heart'],
+            healthFunctions: ['digestive support', 'cardiovascular support'],
+            aliases: [],
+            evidenceNote: 'Flaxseed is high in omega-3, fiber, and antioxidants. Supports digestion and lowers cholesterol.',
+            cautions: []
+        },
+        // Cinnamon already exists, merge new data
+        {
+            name: 'Cinnamon',
+            category: 'spice',
+            supports: ['improves insulin sensitivity', 'reduces sugar spikes', 'anti inflammatory', 'antioxidant rich'],
+            deficiencySupport: [],
+            nutrients: ['polyphenols', 'antioxidants'],
+            organs: ['pancreas', 'metabolic system'],
+            healthFunctions: ['glucose support', 'anti-inflammatory', 'antioxidant support'],
+            aliases: [],
+            evidenceNote: 'Cinnamon improves insulin sensitivity, reduces sugar spikes, is anti-inflammatory and antioxidant rich.',
+            cautions: ['High doses may not be appropriate with diabetes meds or liver concerns.']
+        },
+        {
+            name: 'Ashwagandha',
+            category: 'herb',
+            supports: ['reduces stress', 'supports adrenal health', 'hormone balance', 'better sleep'],
+            deficiencySupport: [],
+            nutrients: [],
+            organs: ['adrenal', 'brain'],
+            healthFunctions: ['stress resilience', 'hormone support', 'sleep support'],
+            aliases: [],
+            evidenceNote: 'Ashwagandha reduces stress, supports adrenal health, hormone balance, and better sleep.',
+            cautions: []
+        },
+        {
+            name: 'Fennel Seeds',
+            category: 'seed',
+            supports: ['reduces bloating', 'eases digestion', 'freshens breath', 'gut soothing'],
+            deficiencySupport: [],
+            nutrients: [],
+            organs: ['gut'],
+            healthFunctions: ['digestive support'],
+            aliases: [],
+            evidenceNote: 'Fennel seeds reduce bloating, ease digestion, freshen breath, and soothe the gut.',
+            cautions: []
+        },
+        {
+            name: 'Camu Camu',
+            category: 'fruit',
+            supports: ['immune system booster', 'support skin collagen', 'antioxidant powerhouse'],
+            deficiencySupport: ['vitamin c'],
+            nutrients: ['vitamin c'],
+            organs: ['immune system', 'skin'],
+            healthFunctions: ['immune support', 'antioxidant support'],
+            aliases: [],
+            evidenceNote: 'Camu Camu is extremely high in vitamin C (3000%), boosts immunity, supports skin collagen, and is an antioxidant powerhouse.',
+            cautions: []
+        },
+        {
+            name: 'Black Seed',
+            category: 'seed',
+            supports: ['powerful anti-inflammatory', 'supports immune system', 'helps balance blood sugar', 'supports respiratory health'],
+            deficiencySupport: [],
+            nutrients: [],
+            organs: ['immune system', 'respiratory system'],
+            healthFunctions: ['immune support', 'anti-inflammatory', 'respiratory support'],
+            aliases: ['nigella sativa'],
+            evidenceNote: 'Black seed (nigella sativa) is a powerful anti-inflammatory, supports immunity, blood sugar, and respiratory health.',
+            cautions: []
+        },
+        // Pumpkin Seeds already exist, merge new data
+        {
+            name: 'Pumpkin Seeds',
+            category: 'seed',
+            supports: ['supports digestion', 'reduces bloating and gas', 'improves nutrient absorption', 'regulates blood sugar', 'antioxidants'],
+            deficiencySupport: ['magnesium', 'zinc'],
+            nutrients: ['magnesium', 'zinc', 'antioxidants'],
+            organs: ['muscles', 'immune system', 'gut'],
+            healthFunctions: ['electrolyte support', 'immune support', 'digestive support', 'metabolic health'],
+            aliases: ['pepitas'],
+            evidenceNote: 'Pumpkin seeds support digestion, reduce bloating and gas, improve nutrient absorption, regulate blood sugar, and are rich in antioxidants.',
+            cautions: []
+        },
+        {
+            name: 'Raw Brussel Sprouts',
+            category: 'vegetable',
+            supports: ['detox activation'],
+            deficiencySupport: ['sulforaphane'],
+            nutrients: ['sulforaphane'],
+            organs: ['liver'],
+            healthFunctions: ['detox support'],
+            aliases: ['brussel sprouts'],
+            evidenceNote: 'Raw brussel sprouts are a source of sulforaphane for detox activation.',
+            cautions: []
+        },
+        {
+            name: 'Nettle Seed',
+            category: 'seed',
+            supports: ['improves mood', 'nerves support', 'brain support'],
+            deficiencySupport: ['magnesium', 'zinc'],
+            nutrients: ['magnesium', 'zinc'],
+            organs: ['nerves', 'brain'],
+            healthFunctions: ['mood support', 'nervous system support', 'cognitive support'],
+            aliases: [],
+            evidenceNote: 'Nettle seed provides magnesium and zinc, supports mood, nerves, and brain.',
+            cautions: []
+        },
+        {
+            name: 'Moringa',
+            category: 'superfood',
+            supports: ['support blood sugar', 'anti-inflammatory'],
+            deficiencySupport: ['plant protein', 'iron', 'calcium'],
+            nutrients: ['plant protein', 'iron', 'calcium'],
+            organs: ['blood'],
+            healthFunctions: ['metabolic health', 'anti-inflammatory'],
+            aliases: [],
+            evidenceNote: 'Moringa is a source of plant protein, iron, and calcium. Supports blood sugar and is anti-inflammatory.',
+            cautions: []
+        },
+        // Turmeric already exists, merge new data
+        {
+            name: 'Turmeric',
+            category: 'spice',
+            supports: ['anti-inflammatory', 'liver support', 'joint support', 'anti-oxidants', 'digestion support', 'immune support'],
+            deficiencySupport: [],
+            nutrients: ['curcumin', 'antioxidants'],
+            organs: ['joints', 'liver', 'immune system'],
+            healthFunctions: ['recovery', 'anti-inflammatory', 'immune support', 'digestion support'],
+            aliases: ['curcuma'],
+            evidenceNote: 'Turmeric is anti-inflammatory, supports liver and joint health, is rich in antioxidants, and aids digestion and immunity.',
+            cautions: ['May interact with blood-thinner medications.']
+        },
+        {
+            name: 'Hemp Seeds',
+            category: 'seed',
+            supports: ['brain support', 'heart support', 'hormone support', 'easy to digest'],
+            deficiencySupport: ['protein', 'omega-3', 'omega-9'],
+            nutrients: ['protein', 'omega-3', 'omega-9'],
+            organs: ['brain', 'heart'],
+            healthFunctions: ['cognitive support', 'cardiovascular support', 'hormone support'],
+            aliases: [],
+            evidenceNote: 'Hemp seeds provide protein, omega-3, and omega-9. Support brain, heart, and hormone health, and are easy to digest.',
+            cautions: []
+        },
+        {
+            name: 'Bee Pollen',
+            category: 'superfood',
+            supports: ['stamina boost', 'energy boost', 'immune support', 'allergy support'],
+            deficiencySupport: ['multi vitamin', 'enzymes'],
+            nutrients: ['multi vitamin', 'enzymes'],
+            organs: ['immune system'],
+            healthFunctions: ['energy support', 'immune support'],
+            aliases: [],
+            evidenceNote: 'Bee pollen is a multi-vitamin, boosts stamina, energy, immunity, and provides enzymes and allergy support.',
+            cautions: []
+        },
+        {
+            name: 'Maca Root',
+            category: 'root',
+            supports: ['hormone support', 'adrenal support', 'libido support', 'energy boost', 'stress resilience'],
+            deficiencySupport: [],
+            nutrients: [],
+            organs: ['adrenal', 'brain'],
+            healthFunctions: ['hormone support', 'energy support', 'stress resilience'],
+            aliases: ['maca'],
+            evidenceNote: 'Maca root supports hormones, adrenals, libido, energy, and stress resilience.',
+            cautions: []
+        },
+        {
+            name: 'Black Sesame Seeds',
+            category: 'seed',
+            supports: ['hair support', 'skin support', 'liver support', 'kidney support', 'digestive support'],
+            deficiencySupport: ['minerals', 'calcium', 'iron'],
+            nutrients: ['minerals', 'calcium', 'iron'],
+            organs: ['hair', 'skin', 'liver', 'kidneys', 'gut'],
+            healthFunctions: ['digestive support', 'skin support', 'liver support'],
+            aliases: [],
+            evidenceNote: 'Black sesame seeds are rich in minerals, calcium, and iron. Support hair, skin, liver, kidney, and digestion.',
+            cautions: []
+        },
+        {
+            name: 'Rosemary',
+            category: 'herb',
+            supports: ['brain support', 'memory', 'circulation support', 'vein support', 'anti-inflammatory', 'long-life'],
+            deficiencySupport: [],
+            nutrients: [],
+            organs: ['brain', 'veins'],
+            healthFunctions: ['cognitive support', 'circulation', 'anti-inflammatory'],
+            aliases: [],
+            evidenceNote: 'Rosemary supports brain, memory, circulation, veins, is anti-inflammatory, and associated with longevity.',
+            cautions: []
+        },
     {
         name: 'Turmeric',
         category: 'spice',
@@ -224,15 +579,27 @@ const DATASET = [
         cautions: ['Tree-nut allergy risk.']
     },
     {
+        name: 'Chia Seeds',
+        category: 'seed',
+        supports: ['brain fog', 'digestion', 'cholesterol'],
+        deficiencySupport: ['vitamin c'],
+        nutrients: Array.from(new Set(['omega-3 ala', 'fiber', 'protein', 'calcium'])),
+        organs: ['brain', 'bones', 'gut'],
+        healthFunctions: ['digestion', 'recovery'],
+        aliases: [],
+        evidenceNote: 'Contains bromelain and vitamin C for digestion and recovery support. Pineapple is rich in vitamin C and bromelain, which may aid digestion and recovery.',
+        cautions: []
+    },
+    {
         name: 'Pineapple',
         category: 'fruit',
         supports: ['brain fog', 'bone support', 'digestion'],
         deficiencySupport: ['vitamin c'],
-        nutrients: ['vitamin c', 'manganese'],
+        nutrients: Array.from(new Set(['vitamin c', 'manganese', 'bromelain'])),
         organs: ['brain', 'bones', 'gut'],
         healthFunctions: ['digestion', 'recovery'],
         aliases: [],
-        evidenceNote: 'Contains bromelain and vitamin C for digestion and recovery support.',
+        evidenceNote: 'Contains bromelain and vitamin C for digestion and recovery support. Pineapple is rich in vitamin C and bromelain, which may aid digestion and recovery.',
         cautions: []
     },
     {
@@ -240,11 +607,11 @@ const DATASET = [
         category: 'protein',
         supports: ['low energy', 'lethargic', 'fatigue'],
         deficiencySupport: ['b12', 'choline'],
-        nutrients: ['protein', 'b12', 'choline'],
+        nutrients: Array.from(new Set(['protein', 'b12', 'choline', 'vitamin D', 'selenium'])),
         organs: ['brain', 'muscles'],
         healthFunctions: ['energy', 'metabolic health'],
         aliases: [],
-        evidenceNote: 'High-quality protein and choline may support steady energy and focus.',
+        evidenceNote: 'High-quality protein and choline may support steady energy and focus. Eggs are a source of vitamin D and selenium, supporting immune and metabolic health.',
         cautions: ['Egg allergy possible.']
     },
     {
@@ -252,11 +619,11 @@ const DATASET = [
         category: 'grain',
         supports: ['cholesterol', 'blood sugar support', 'constipation'],
         deficiencySupport: ['fiber'],
-        nutrients: ['beta-glucan fiber'],
+        nutrients: Array.from(new Set(['beta-glucan fiber', 'iron', 'magnesium'])),
         organs: ['heart', 'gut'],
         healthFunctions: ['metabolic health', 'digestive support'],
         aliases: ['oatmeal'],
-        evidenceNote: 'Soluble fiber may support healthy cholesterol and glucose response.',
+        evidenceNote: 'Soluble fiber may support healthy cholesterol and glucose response. Oats provide iron and magnesium for metabolic and cardiovascular support.',
         cautions: []
     },
     {
@@ -372,11 +739,11 @@ const DATASET = [
         category: 'nut',
         supports: ['heart health', 'brain support'],
         deficiencySupport: ['omega-3'],
-        nutrients: ['omega-3 ala', 'polyphenols'],
+        nutrients: Array.from(new Set(['omega-3 ala', 'polyphenols', 'vitamin E', 'magnesium'])),
         organs: ['heart', 'brain'],
         healthFunctions: ['cardiovascular support', 'cognitive support'],
         aliases: [],
-        evidenceNote: 'Plant omega-3 fats may support heart and brain health.',
+        evidenceNote: 'Plant omega-3 fats may support heart and brain health. Walnuts are also a source of vitamin E and magnesium for brain and heart support.',
         cautions: ['Tree-nut allergy risk.']
     },
     {
@@ -552,12 +919,36 @@ const DATASET = [
         category: 'vegetable',
         supports: ['anemia support', 'fatigue', 'muscle cramps'],
         deficiencySupport: ['iron', 'magnesium', 'folate'],
-        nutrients: ['iron', 'folate', 'magnesium'],
+        nutrients: Array.from(new Set(['iron', 'folate', 'magnesium', 'vitamin K', 'vitamin C'])),
         organs: ['blood', 'muscles'],
         healthFunctions: ['oxygen transport support'],
         aliases: [],
-        evidenceNote: 'Provides iron and folate for red blood cell and energy support.',
+        evidenceNote: 'Provides iron and folate for red blood cell and energy support. Spinach is also rich in vitamin K and vitamin C, supporting blood and immune health.',
         cautions: ['May require pairing with vitamin C foods for better iron absorption.']
+    },
+    {
+        name: 'Salmon',
+        category: 'protein',
+        supports: ['heart health', 'brain support', 'inflammation'],
+        deficiencySupport: ['omega-3', 'vitamin D'],
+        nutrients: ['omega-3 EPA/DHA', 'protein', 'vitamin D', 'selenium', 'B12'],
+        organs: ['heart', 'brain', 'joints'],
+        healthFunctions: ['cardiovascular support', 'cognitive support', 'anti-inflammatory'],
+        aliases: [],
+        evidenceNote: 'Salmon is a rich source of omega-3 fatty acids (EPA/DHA) and vitamin D, supporting heart, brain, and joint health.',
+        cautions: ['May contain trace mercury; choose wild-caught when possible.']
+    },
+    {
+        name: 'Chickpeas',
+        category: 'legume',
+        supports: ['blood sugar support', 'digestive support', 'satiety'],
+        deficiencySupport: ['fiber', 'protein', 'iron'],
+        nutrients: ['fiber', 'protein', 'iron', 'folate', 'manganese'],
+        organs: ['gut', 'blood'],
+        healthFunctions: ['metabolic health', 'digestive support'],
+        aliases: ['garbanzo beans'],
+        evidenceNote: 'Chickpeas provide fiber, protein, and iron, supporting blood sugar, digestion, and satiety.',
+        cautions: ['May cause bloating in sensitive individuals.']
     },
     {
         name: 'Lentils',
@@ -622,14 +1013,25 @@ const DATASET = [
 ];
 
 const NaturalRX = () => {
+    const [mergePrompt, setMergePrompt] = useState(false);
+    const [categoryFilter, setCategoryFilter] = useState('');
     const [dataset, setDataset] = useState(() => {
         if (!canUseLocalStorage()) {
             return withPreparation(DATASET);
         }
         try {
             const saved = JSON.parse(window.localStorage.getItem(DATASET_STORAGE_KEY));
-            const source = Array.isArray(saved) && saved.length > 0 ? saved : DATASET;
-            return withPreparation(source);
+            if (Array.isArray(saved) && saved.length > 0) {
+                // If persistent data differs from DATASET, prompt user to merge
+                const merged = mergeDatasets(saved, DATASET);
+                // If merged differs from saved, prompt merge
+                const needsMerge = JSON.stringify(merged) !== JSON.stringify(saved);
+                if (needsMerge) {
+                    setMergePrompt(true);
+                }
+                return withPreparation(saved);
+            }
+            return withPreparation(DATASET);
         } catch (error) {
             return withPreparation(DATASET);
         }
@@ -640,6 +1042,23 @@ const NaturalRX = () => {
     const [editingName, setEditingName] = useState('');
     const [formOpen, setFormOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
+    const [collapsedByFood, setCollapsedByFood] = useState({});
+
+    const isFoodCollapsed = (name) => {
+        const value = collapsedByFood[name];
+        return typeof value === 'boolean' ? value : true;
+    };
+
+    const setFoodCollapsed = (name) => (updater) => {
+        setCollapsedByFood((prev) => {
+            const current = typeof prev[name] === 'boolean' ? prev[name] : true;
+            const next = typeof updater === 'function' ? updater(current) : Boolean(updater);
+            return {
+                ...prev,
+                [name]: next
+            };
+        });
+    };
 
     const persistDataset = (nextDataset) => {
         const hydrated = withPreparation(nextDataset);
@@ -649,6 +1068,21 @@ const NaturalRX = () => {
             window.localStorage.setItem(DATASET_STORAGE_KEY, JSON.stringify(hydrated));
         } catch (error) {
             // no-op; fallback remains in-memory DATASET copy
+        }
+    };
+
+    // UI handler to merge persistent and new DATASET
+    const handleMergeDatasets = () => {
+        if (!canUseLocalStorage()) return;
+        try {
+            const saved = JSON.parse(window.localStorage.getItem(DATASET_STORAGE_KEY));
+            const merged = mergeDatasets(saved, DATASET);
+            persistDataset(merged);
+            setMergePrompt(false);
+        } catch (error) {
+            // fallback: just use DATASET
+            persistDataset(DATASET);
+            setMergePrompt(false);
         }
     };
 
@@ -763,7 +1197,12 @@ const NaturalRX = () => {
             ];
         };
 
-        const scored = dataset.map((food) => {
+        let filtered = dataset;
+        if (categoryFilter) {
+            filtered = filtered.filter((food) => food.category === categoryFilter);
+        }
+
+        const scored = filtered.map((food) => {
             if (!shouldSearch) {
                 return {
                     ...food,
@@ -824,14 +1263,40 @@ const NaturalRX = () => {
                 }
                 return left.name.localeCompare(right.name);
             });
-    }, [dataset, expandedQueryTerms, normalizedQuery, searchType]);
+    }, [dataset, expandedQueryTerms, normalizedQuery, searchType, categoryFilter]);
 
     return (
         <div className='containerDetail mt--30'>
+            {mergePrompt && (
+                <div className='containerDetail p-10 bg-yellow color-red mb-5'>
+                    <div className='mb-5'>
+                        <b>New food/nutrient data is available.</b> Merge your saved data with the latest updates?
+                    </div>
+                    <button className='containerDetail button p-10 bg-green color-lite mr-5' onClick={handleMergeDatasets}>
+                        Merge & Update
+                    </button>
+                    <button className='containerDetail button p-10 bg-lite color-lite' onClick={() => setMergePrompt(false)}>
+                        Dismiss
+                    </button>
+                </div>
+            )}
             <div className='containerDetail p-20 bg-lite color-lite size30 mb-5 contentLeft'>
                 🌿 NaturalRX
             </div>
             <div className='containerDetail bg-lite mb-5'>
+                <div className='containerDetail p-10 mb-5 contentLeft'>
+                    <label className='mr-10 color-yellow'>Filter by Category:</label>
+                    <select
+                        className='containerDetail p-10 width--5 color-lite mb-5'
+                        value={categoryFilter}
+                        onChange={e => setCategoryFilter(e.target.value)}
+                    >
+                        <option value=''>All</option>
+                        {getAllCategories(dataset).map((cat) => (
+                            <option key={cat} value={cat}>{cat.charAt(0).toUpperCase() + cat.slice(1)}</option>
+                        ))}
+                    </select>
+                </div>
                 <div className='containerDetail p-10 color-yellow mb-5 contentLeft'>
                     Search by symptom, benefit, deficiency, organ, health function, or food.
                 </div>
@@ -929,17 +1394,53 @@ const NaturalRX = () => {
                 ) : (
                     <div className='containerDetail'>
                         <div className='scroll ht-400'>
-                            {results.map((food) => (
+                            {results.map((food) => {
+                                const isCollapsed = isFoodCollapsed(food.name);
+                                return (
                                 <div key={food.name} className='containerDetail bg-lite color-lite mb-5'>
-                                <div className='containerDetail flexContainer p-15 bg-lite'>
-                                    <div className='flex2Column contentLeft size25 color-yellow'>
-                                        {food.name}
+                                <div className='containerDetail bg-lite color-yellow size25'>
+                                    <div className='containerDetail'>
+                                        <CollapseToggleButton
+                                            title={food.name}
+                                            isCollapsed={isCollapsed}
+                                            setCollapse={setFoodCollapsed(food.name)}
+                                            align='left'
+                                        />
                                     </div>
-                                    <div className='flex2Column contentRight color-lite'>
-                                        <span className='mr-5'>{getTagIcon(food.category, rxCategoryIcons, '🥗')}</span>
-                                        {food.category}
+                                    <div className='contentRight color-lite p-10'>
+                                        {
+                                            isCollapsed
+                                                ? <div className='flexContainer size15'>
+                                                    <div className='flex2Column contentLeft pl-10'>
+                                                        {(food.supports || []).slice(0, 4).map((item, idx) => (
+                                                            <span key={`${food.name}-header-sup-${item}-${idx}`} className='mr-5'>
+                                                                {getTagIcon(item, rxSymptomIcons, '🌿')}
+                                                            </span>
+                                                        ))}
+                                                        {(food.organs || []).slice(0, 4).map((item, idx) => (
+                                                            <span key={`${food.name}-header-org-${item}-${idx}`} className='mr-5'>
+                                                                {getTagIcon(item, rxOrganIcons, '🫀')}
+                                                            </span>
+                                                        ))}
+                                                        {(food.healthFunctions || []).slice(0, 4).map((item, idx) => (
+                                                            <span key={`${food.name}-header-fx-${item}-${idx}`} className='mr-5'>
+                                                                {getTagIcon(item, rxFunctionIcons, '🧭')}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                    <div className='flexColumn contentRight pr-10'>
+                                                        {getTagIcon(food.category, rxCategoryIcons, '🥗')}
+                                                    </div>
+                                                </div>
+                                                : <span title={food.category} className='mr-5 size15 pr-5'>{getTagIcon(food.category, rxCategoryIcons, '🥗')}</span>
+                                                
+                                        }
                                     </div>
                                 </div>
+                                {
+                                    isCollapsed
+                                        ? null
+                                        : <div>
                                 {
                                     isEditMode && (
                                         <div className='containerDetail p-10 contentRight'>
@@ -1003,8 +1504,8 @@ const NaturalRX = () => {
                                             (food.organs || []).length === 0
                                                 ? ' —'
                                                 : <div className='mt-5 flexContainer width-100-percent'>
-                                                    {(food.organs || []).map((item) => (
-                                                        <span key={`${food.name}-org-${item}`} className='containerDetail inlineBlock mr-5 mb-5 p-10 bg-lite color-lite'>
+                                                    {(food.organs || []).map((item, idx) => (
+                                                        <span key={`${food.name}-org-${item}-${idx}`} className='containerDetail inlineBlock mr-5 mb-5 p-10 bg-lite color-lite'>
                                                             <span className='mr-5'>{getTagIcon(item, rxOrganIcons, '🫀')}</span>
                                                             {item}
                                                         </span>
@@ -1058,7 +1559,10 @@ const NaturalRX = () => {
                                     )}
                                 </div>
                                 </div>
-                            ))}
+                                }
+                                </div>
+                                );
+                            })}
                         </div>
                     </div>
                 )}

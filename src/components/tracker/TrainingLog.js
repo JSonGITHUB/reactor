@@ -470,7 +470,7 @@ const TrainingLog = () => {
                         </div>
                         <div className='containerBox'>
                             <div className='flexContainer'>
-                                <div className='flex2Column containerBox p-20 button text-outline-light bg-dkGreen' onClick={() => addGoal()}>
+                                <div className='flex2Column containerBox p-20 button text-outline-lite bg-dkGreen' onClick={() => addGoal()}>
                                     {icons.plus}
                                 </div>
                                 <div className='flex2Column containerBox button p-20 bg-dkRed' onClick={() => toggleAdmin()}>

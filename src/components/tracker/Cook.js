@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import AddProjectInterface from './AddProjectInterface';
 import TrackRecipe from './TrackRecipe';
+import CookMenu from './CookMenu';
 import initProjects from './initProjects';
 import mobileRecipeTracking from './data_mobile';
 import initializeData from '../utils/InitializeData';
@@ -12,7 +12,7 @@ const Cook = () => {
     const [projects] = useState(initializeData('projects', initProjects));
     const [initialized, setInitialized] = useState(false);
     const [isCollapsed] = useState();
-    const [newProjectDescription, setNewProjectDescription] = useState('');
+    //const [newProjectDescription, setNewProjectDescription] = useState('');
     const [recipes, setRecipes] = useState(initializeData('recipeTracking', mobileRecipeTracking));
     const targetElementRef = useRef(null);
 
@@ -22,9 +22,11 @@ const Cook = () => {
             //targetElementRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
     };
+    /*
     const refreshPage = () => {
         window.location.reload();
     };
+    */
     const getIngredients = () => {
         const newIngredients = [];
         recipes.forEach((recipeGroup) => {
@@ -161,11 +163,13 @@ const Cook = () => {
 
     useEffect(() => {
         if (recipes === null) setRecipes(mobileRecipeTracking);
+        /*
         if (tracking === 'recipes') {
             setTimeout(() => {
                 setNewProjectDescription('');
             }, 1000);
         }
+        */
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
@@ -186,7 +190,7 @@ const Cook = () => {
         }
     }, [isCollapsed]); // eslint-disable-line react-hooks/exhaustive-deps
 
-
+    /*
     useEffect(() => {
         if (newProjectDescription !== undefined) {
             const searchTerm = newProjectDescription.toLowerCase() || '';
@@ -237,7 +241,7 @@ const Cook = () => {
             } 
         }
     }, [newProjectDescription]); // eslint-disable-line react-hooks/exhaustive-deps
-
+    
     const addProject = () => {
         if (!newProjectDescription || newProjectDescription.trim() === '') {
             alert('Please enter a category name');
@@ -259,27 +263,32 @@ const Cook = () => {
             refreshPage();
         }, 100);
     };
-
+    */
     return <div className='mt--30'>
         <div className='containerDetail color-dark bg-yellow m-5 p-20 size30 contentLeft'>
             <span className='size40 m-5'>🧑‍🍳</span> Cooking
         </div>
-        <div className=''>
-            {
-                (tracking !== '')
-                ? <AddProjectInterface
-                    newProjectDescription={newProjectDescription}
-                    setNewProjectDescription={setNewProjectDescription}
-                    addProject={addProject}
-                    tracking={tracking}
-                />
-                : <React.Fragment></React.Fragment>
-            }
-        </div>
+        {
+            /*
+            <div className=''>
+                {
+                    (tracking !== '')
+                    ? <AddProjectInterface
+                        newProjectDescription={newProjectDescription}
+                        setNewProjectDescription={setNewProjectDescription}
+                        addProject={addProject}
+                        tracking={tracking}
+                    />
+                    : <React.Fragment></React.Fragment>
+                }
+            </div>
+            */
+        }
         <div className=''>
             {
                 (tracking === 'recipes')
                     ? <KitchenInventoryProvider>
+                        <CookMenu recipes={recipes} />
                         <IngredientParent targetElementRef={targetElementRef}>
                             <TrackRecipe
                                 targetElementRef={targetElementRef}

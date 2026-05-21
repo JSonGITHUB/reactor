@@ -940,7 +940,7 @@ const PlayerScores = () => {
 
                 <div
                     title='add/edit score'
-                    className={`containerDetail ht-65 p-20 m-1 brdr-light contentCenter bold bg-dark size30 ${getClasses}`}
+                    className={`containerDetail ht-65 p-20 m-1 brdr-lite contentCenter bold bg-dark size30 ${getClasses}`}
                     onClick={() => getSurfScore(waveId, playerId, score)}
                 >
                     {score}
@@ -966,7 +966,7 @@ const PlayerScores = () => {
         const surfingScores = (player, index) => {
             const heat = players.filter(player => player[game]);
             return <div className='button scrollSnapTop' key={getKey(`${index}${(player.player || player.name)}`)}>
-                <div className={`flexContainer ht-50 r-10 ml-10 mr-10 mb--5 color-dark text-outline-light bg-${jerseyColors[Number(players[index].surfJerseyColor)] || jerseyColors[0]}`} key={getKey(`${index}${(player.player || player.name)}`)}>
+                <div className={`flexContainer ht-50 r-10 ml-10 mr-10 mb--5 color-dark text-outline-lite bg-${jerseyColors[Number(players[index].surfJerseyColor)] || jerseyColors[0]}`} key={getKey(`${index}${(player.player || player.name)}`)}>
                     <div className={`flex2Column contentLeft r-10-lft m-0 w-75 p-10`}>
                         <div className='bold'>
                             <span className='size25 mt--10'>
@@ -999,12 +999,16 @@ const PlayerScores = () => {
                         <div className='size40 bold'>{scoreTotal(index, players)}</div>
                         <div className='mt-10 bold'>
                             {/*rankStatus(player, index)*/}
-                            <SurfScoringLogic
-                                heat={heat}
-                                index={index}
-                                completed={false}
-                                oneLine='true'
-                            />
+                            {Array.isArray(heat) && heat.length > 1 && typeof heat[index]?.surfScore !== 'undefined' ? (
+                                <SurfScoringLogic
+                                    heat={heat}
+                                    index={index}
+                                    completed={false}
+                                    oneLine='true'
+                                />
+                            ) : (
+                                <div className="color-red">Score unavailable</div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -1205,12 +1209,10 @@ const PlayerScores = () => {
             />
         </div>
         <div>
-            <div className='containerDetail bg-lite m-5 p-20 color-yellow size20 contentLeft'>
+            <div className='containerDetail flexContainer bg-lite m-5 p-20 color-yellow size20 contentLeft'>
                 {/*icons[game.replace(' ','')]} {game.charAt(0).toUpperCase() + game.slice(1)*/}
-                Scores
-            </div>
-            <div className='containerBox bg-lite'>
-                <div className='mr-10'>
+                <div className='flexColumn pr-15 pt-15 pb-15'>Scores</div>
+                <div className='ml-10 flexColumn contentRight'>
                     <Selector
                         groupTitle='game'
                         label='game selector'
@@ -1222,75 +1224,69 @@ const PlayerScores = () => {
                         width={(isCurrentGame('darts') || isCurrentGame('dominos')) ? '98%' : '100%'}
                     />
                 </div>
-                <div className='mr-10'>
+                <div className='flex2Column ml-5'>
                     {
                         (isCurrentGame('surf'))
-                            ? <div className='flexContainer'>
-                                <div className='containerDetail m-5 p-10 flexColumn'>
-                                    Location: 
-                                </div>
-                                <div className='flex2Column contentLeft'>
-                                    <Selector
-                                        groupTitle='wave'
-                                        label='wave selector'
-                                        items={locations}
-                                        selected={currentWave}
-                                        onChange={selectWave}
-                                        fontSize='25'
-                                        padding='10px'
-                                        width='100%'
-                                    />
+                            ? <div className=''>
+                                <div className='flexContainer'>
+                                    <div className='flex3Column contentLeft'>
+                                        <Selector
+                                            groupTitle='winner'
+                                            label='winner selector'
+                                            items={(isCurrentGame('dominos')) ? dominoWinners : ((isCurrentGame('surf')) ? heatLengths : winners)}
+                                            selected={(isCurrentGame('surf')) ? heatLength : winner}
+                                            onChange={selectWinner}
+                                            fontSize='25'
+                                            padding='10px'
+                                            width='100%'
+                                        />
+                                    </div>
                                 </div>
                             </div>
                             : null
-
                     }
                     {
                         (isCurrentGame('darts'))
-                        ? <React.Fragment></React.Fragment>
-                        : (isCurrentGame('golf'))
-                            ? <Selector
-                                groupTitle='course'
-                                label='course selector'
-                                items={addItemToArray(courseNames, editButton, addButton, deleteButton)}
-                                selected={course?.name || courses[0].name}
-                                onChange={selectCourse}
-                                fontSize='25'
-                                padding='10px'
-                                width='100%'
-                            />
-                            : (isCurrentGame('surf'))
-                                    ? <div className='flexContainer'>
-                                        <div className='containerDetail m-5 p-10 flexColumn'>
-                                            Heat Duration (minutes):
-                                        </div>
-                                        <div className='flex3Column contentLeft'>
-                                            <Selector
-                                                groupTitle='winner'
-                                                label='winner selector'
-                                                items={(isCurrentGame('dominos')) ? dominoWinners : ((isCurrentGame('surf')) ? heatLengths : winners)}
-                                                selected={(isCurrentGame('surf')) ? heatLength : winner}
-                                                onChange={selectWinner}
-                                                fontSize='25'
-                                                padding='10px'
-                                                width='100%'
-                                            />
-                                        </div>
-                                    </div>
-                                : <Selector
-                                    groupTitle='winner'
-                                    label='winner selector'
-                                    items={(isCurrentGame('dominos')) ? dominoWinners : ((isCurrentGame('surf')) ? heatLengths : winners)}
-                                    selected={(isCurrentGame('surf')) ? heatLength : winner}
-                                    onChange={selectWinner}
+                            ? <React.Fragment></React.Fragment>
+                            : (isCurrentGame('golf'))
+                                ? <Selector
+                                    groupTitle='course'
+                                    label='course selector'
+                                    items={addItemToArray(courseNames, editButton, addButton, deleteButton)}
+                                    selected={course?.name || courses[0].name}
+                                    onChange={selectCourse}
                                     fontSize='25'
                                     padding='10px'
                                     width='100%'
                                 />
+                                : (isCurrentGame('surf'))
+                                    ? null
+                                    : <Selector
+                                        groupTitle='winner'
+                                        label='winner selector'
+                                        items={(isCurrentGame('dominos')) ? dominoWinners : ((isCurrentGame('surf')) ? heatLengths : winners)}
+                                        selected={(isCurrentGame('surf')) ? heatLength : winner}
+                                        onChange={selectWinner}
+                                        fontSize='25'
+                                        padding='10px'
+                                        width='100%'
+                                    />
                     }
                 </div>
             </div>
-            {(isCurrentGame('surf')) ?
+            {(isCurrentGame('surf')) ? <div>
+                <div className='mt--5 ml-5 width--10'>
+                    <Selector
+                        groupTitle='wave'
+                        label='wave selector'
+                        items={locations}
+                        selected={currentWave}
+                        onChange={selectWave}
+                        fontSize='25'
+                        padding='10px'
+                        width='100%'
+                    />
+                </div>
                 <SurfScores
                     heatLength={heatLength}
                     time={time}
@@ -1303,6 +1299,7 @@ const PlayerScores = () => {
                     setPriorityCollapse={setPriorityCollapse}
                     getSurfScore={getSurfScore}
                 ></SurfScores>
+                </div>
                 :
                 <React.Fragment></React.Fragment>
             }

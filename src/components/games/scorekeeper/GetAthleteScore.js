@@ -16,9 +16,13 @@ const GetAthleteScore = ({
         players
     } = useContext(PlayerContext);
     */
-    const highestScores = [];
     const athletes = (heat.scores === undefined) ? heat : heat.scores;
-    //console.log(`GetAthleteScore => heat: ${JSON.stringify(heat, null, 2)}`);
+    // Defensive: fallback if athletes is not valid
+    if (!Array.isArray(athletes) || athletes.length < 2 || !athletes[index] || typeof athletes[index].surfScore === 'undefined') {
+        return <div className="color-red">Score unavailable</div>;
+    }
+
+    const highestScores = [];
     athletes.forEach((player) => {
         const surfScores = [...player.surfScores];
         const highestScore = Math.max(...surfScores.map(score => Number(score)));
@@ -28,7 +32,6 @@ const GetAthleteScore = ({
     const heatHighestScore = Math.max(...highestScores.map(score => Number(score)));
     const playerIndex = [];
     let i = 0;
-    //console.log(`heat: ${JSON.stringify(heat, null, 2)}`);
     athletes.forEach((player) => {
         const surfScores = [...player.surfScores];
         if (surfScores.includes(heatHighestScore)) {

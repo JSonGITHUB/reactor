@@ -90,19 +90,19 @@ const Currency = () => {
                     : <div className='containerDetail bg-lite mt-5 size20'>
                         <div 
                             title={`${isToUsd ? 'Convert to USD' : 'Convert from USD'}`}
-                            className='button bg-green size25 timerBox p-30 bold color-lite' 
+                            className='button bg-green size25 timerBox p-30 bold color-yellow' 
                             onClick={handleConversionDirection}
                         >
                             {isToUsd ? 'Convert to USD' : 'Convert from USD'}
                         </div>
                         <div className='containerDetail mt-5'>
                             <label className='flexContainer containerDetail bg-lite'>
-                                <div className='containerDetail p-15 flexColumn contentRight'>
-                                    <span className='inputText'>
+                                <div className='flexColumn contentRight'>
+                                    <span className='inputText ml-10 color-yellow'>
                                         {!isToUsd ? 'To:' : 'From:'}
                                     </span>
                                 </div>
-                                <div className='flex1Column columnLeftAlign width-50-percent'>
+                                <div className='flexColumn columnLeftAlign'>
                                     <select className='inputSelect' value={selectedCurrency} onChange={handleCurrencyChange}>
                                         <option value="MXN">Mexican Peso ({Number(exchangeRates.MXN).toFixed(3)})</option>
                                         <option value="DOP">Dominican Peso ({Number(exchangeRates.DOP).toFixed(3)})</option>
@@ -114,7 +114,7 @@ const Currency = () => {
                                 </div>
                             </label>
                             <label className='flexContainer containerDetail bg-lite mt-5'>
-                                <div className='containerDetail p-15 flexColumn columnRightAlign inputText'>
+                                <div className='color-yellow flexColumn columnRightAlign inputText p-10'>
                                     {isToUsd ? `${currencyConverting()}: $` : 'US Dollars: $'}
                                 </div>
                                 <div className='flex2Column columnLeftAlign width-50-percent'>
@@ -131,7 +131,7 @@ const Currency = () => {
                         </div>
                         <div
                             title='convert'
-                            className='button p-30 r-10 mt-5 size25 bg-green bold color-lite'
+                            className='button p-30 r-10 mt-5 size25 bg-green bold color-yellow'
                             onClick={handleConversion}
                         >
                             Convert

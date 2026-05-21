@@ -43,10 +43,12 @@ const BuoysDisplay = () => {
         return menuItems;
     }
 
-    return <div className='mt--30'>
+    return <div className=''>
+                {/*
                 <div className='containerDetail color-yellow bg-lite p-20 size20 contentLeft'>
                     <span className='size30 m-5'>🌊</span> Buoys
                 </div>
+                */}
                 <div className='containerDetail bg-tintedMedium h-scroll'>
                     {menu()}
                 </div>

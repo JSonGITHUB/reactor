@@ -41,7 +41,7 @@ const AddProjectInterface = ({
             />
             <div
                 title='add project' 
-                className='containerDetail bold bg-lite color-light size25 button mt-10 p-20 bg-green' 
+                className='containerDetail bold bg-lite color-lite size25 button mt-10 p-20 bg-green' 
                 onClick={addProject}
             >
                 <div className='flexContainer width50px ml-auto mr-auto size30'>

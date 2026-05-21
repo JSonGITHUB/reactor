@@ -263,6 +263,57 @@ const WorkDay = () => {
         }));
     };
 
+    const editDay = (weekId, dayId) => {
+        const newHours = prompt('Edit total worked hours:', '');
+        if (newHours === null) return;
+        
+        const parsedHours = parseNumber(newHours, -1);
+        if (parsedHours < 0) {
+            alert('Please enter a valid number');
+            return;
+        }
+
+        setWorkWeeks(prev => prev.map((week) => {
+            if (week.id !== weekId) {
+                return week;
+            }
+            return {
+                ...week,
+                days: (week.days || []).map((day) => {
+                    if (day.id !== dayId) return day;
+                    
+                    const totalSeconds = parsedHours * 3600;
+                    const dayOvertimeHours = Math.max(0, parsedHours - parseNumber(day.dayHoursTarget));
+                    
+                    return {
+                        ...day,
+                        totalWorkedSeconds: totalSeconds,
+                        totalWorkedHours: parsedHours,
+                        overtimeHours: dayOvertimeHours,
+                        overtimeDollars: dayOvertimeHours * parseNumber(day.rate) * OVERTIME_MULTIPLIER,
+                        totalDollars: parsedHours * parseNumber(day.rate)
+                    };
+                })
+            };
+        }));
+    };
+
+    const deleteDay = (weekId, dayId) => {
+        if (!window.confirm('Are you sure you want to delete this day?')) {
+            return;
+        }
+
+        setWorkWeeks(prev => prev.map((week) => {
+            if (week.id !== weekId) {
+                return week;
+            }
+            return {
+                ...week,
+                days: (week.days || []).filter((day) => day.id !== dayId)
+            };
+        }));
+    };
+
     const getWeekTotals = (week) => {
         const totals = (week.days || []).reduce((accumulator, day) => {
             accumulator.totalHours += parseNumber(day.totalWorkedHours);
@@ -279,7 +330,7 @@ const WorkDay = () => {
                 💼 WorkDay
             </div>
             <div className='containerDetail contentLeft bg-green button p-20 size20 color-yellow mt-5 mb-5 width-100-percent' onClick={openWeekPrompt}>
-                <span className='text-outline-light'>➕</span> Work Week
+                <span className='text-outline-lite'>➕</span> Work Week
             </div>
             {showWeekPrompt && (
                 <div className='containerDetail bg-lite color-yellow mb-5'>
@@ -605,6 +656,22 @@ const WorkDay = () => {
                                                                             {parseNumber(day.overtimeHours).toFixed(2)}
                                                                         </div>
                                                                     </div>
+                                                                    <div className='containerDetail flexContainer mt-5 p-10'>
+                                                                        <div 
+                                                                            title='Edit this day'
+                                                                            className='containerDetail button flex2Column p-10 mr-5 bg-dkYellow color-yellow contentCenter'
+                                                                            onClick={() => editDay(week.id, day.id)}
+                                                                        >
+                                                                            ✏️ Edit
+                                                                        </div>
+                                                                        <div 
+                                                                            title='Delete this day'
+                                                                            className='containerDetail button flex2Column p-10 bg-dkRed color-yellow contentCenter'
+                                                                            onClick={() => deleteDay(week.id, day.id)}
+                                                                        >
+                                                                            🗑️ Delete
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
 
                                                                 {!day.isCollapsed && (
@@ -663,6 +730,22 @@ const WorkDay = () => {
                                                                             </div>
                                                                             <div className='flex2Column contentLeft'>
                                                                                 {formatDateTime(day.endedAt)}
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className='containerDetail bg-lite mt-5 flexContainer p-10'>
+                                                                            <div 
+                                                                                title='Edit worked hours'
+                                                                                className='button flex2Column p-10 mr-5 bg-dkYellow color-dark size20'
+                                                                                onClick={() => editDay(week.id, day.id)}
+                                                                            >
+                                                                                ✏️ Edit Hours
+                                                                            </div>
+                                                                            <div 
+                                                                                title='Delete this workday'
+                                                                                className='button flex2Column p-10 bg-dkRed color-dark size20'
+                                                                                onClick={() => deleteDay(week.id, day.id)}
+                                                                            >
+                                                                                🗑️ Delete Day
                                                                             </div>
                                                                         </div>
                                                                         <div className='containerDetail bg-lite mt-5'>

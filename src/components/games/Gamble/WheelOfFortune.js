@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './WheelOfFortune.css';
 import Confetti from './Confetti';
 import Sounds from '../../sound/Sounds';
@@ -409,10 +409,19 @@ const WheelOfFortuneGame = () => {
     const [pendingNames, setPendingNames] = useState(players.map(p => p.name));
     const [gameHistory, setGameHistory] = useState(loadGameHistory());
     const [selectedHistory, setSelectedHistory] = useState([]);
+    const [spinWindowOpen, setSpinWindowOpen] = useState(false);
+    const [spinWindowValue, setSpinWindowValue] = useState('');
+    const [spinWindowTrail, setSpinWindowTrail] = useState([]);
+    const spinIntervalRef = useRef(null);
+    const spinFinalizeRef = useRef(null);
 
     // --- Persist to localStorage whenever state changes ---
     useEffect(() => {
+        console.log(`WheelOfFortune => useEffect => LS_KEYS.phraseData: ${LS_KEYS.phraseData} phraseData: ${JSON.stringify(phraseData, null, 2)}`);
         localStorage.setItem(LS_KEYS.phraseData, JSON.stringify(phraseData));
+        if (validate(phraseData)) {
+            setPhrase(phraseData.text);
+        }
     }, [phraseData]);
     useEffect(() => {
         localStorage.setItem(LS_KEYS.revealed, JSON.stringify(revealed));
@@ -463,12 +472,16 @@ const WheelOfFortuneGame = () => {
         localStorage.setItem(LS_KEYS.gameHistory, JSON.stringify(gameHistory));
     }, [gameHistory]);
 
-    // --- Phrase logic ---
     useEffect(() => {
-        if (validate(phraseData)) {
-            setPhrase(phraseData.text);
-        }
-    }, [phraseData]);
+        return () => {
+            if (spinIntervalRef.current) {
+                clearInterval(spinIntervalRef.current);
+            }
+            if (spinFinalizeRef.current) {
+                clearTimeout(spinFinalizeRef.current);
+            }
+        };
+    }, []);
 
     useEffect(() => {
         const localPlayers = initializeData('wofPlayers', PLAYER_INIT);
@@ -495,9 +508,10 @@ const WheelOfFortuneGame = () => {
         setMessage('Wheel is spinning...');
 
         const result = getRandomSector();
-        setTimeout(() => {
+        const finalizeSpin = () => {
             setCurrentSector(result);
             setSpinning(false);
+            setSpinWindowOpen(false);
 
             if (result.label === 'Bankrupt') {
                 const updated = [...players];
@@ -513,7 +527,36 @@ const WheelOfFortuneGame = () => {
             } else {
                 setMessage(`${players[currentPlayer].name}, you spun ${result.label}. Guess a consonant!`);
             }
-        }, 5000);
+        };
+
+        if (spinIntervalRef.current) clearInterval(spinIntervalRef.current);
+        if (spinFinalizeRef.current) clearTimeout(spinFinalizeRef.current);
+
+        const cycles = 4;
+        const totalSteps = (SECTORS.length * cycles) + result.index;
+        const stepMs = 110;
+        const startIndex = (result.index - (totalSteps % SECTORS.length) + SECTORS.length) % SECTORS.length;
+        let cursor = startIndex;
+        let step = 0;
+
+        setSpinWindowOpen(true);
+        setSpinWindowValue(SECTORS[startIndex]);
+        setSpinWindowTrail([SECTORS[startIndex]]);
+
+        spinIntervalRef.current = setInterval(() => {
+            cursor = (cursor + 1) % SECTORS.length;
+            const value = SECTORS[cursor];
+            setSpinWindowValue(value);
+            setSpinWindowTrail((prev) => [...prev.slice(-10), value]);
+
+            step += 1;
+            if (step >= totalSteps) {
+                clearInterval(spinIntervalRef.current);
+                spinIntervalRef.current = null;
+                setSpinWindowValue(result.label);
+                spinFinalizeRef.current = setTimeout(finalizeSpin, 650);
+            }
+        }, stepMs);
     };
 
     const handleLetterClick = useCallback((letter) => {
@@ -744,9 +787,9 @@ const WheelOfFortuneGame = () => {
     const displayPuzzle = () => {
         return phrase.split('').map((char, idx) => (
             char === ' ' ? (
-                <div key={idx} className='width-100-percent'> </div>
+                <div key={`${idx}-${char}`} className='width-100-percent'> </div>
             ) : (
-                <span key={idx} className={`tile color-dark ${isLetterRevealed(char) ? 'flip-in' : ''}`}>
+                <span key={`${idx}-${char}`} className={`tile color-dark ${isLetterRevealed(char) ? 'flip-in' : ''}`}>
                     {isLetterRevealed(char) ? char : '_'}
                 </span>
             )
@@ -766,14 +809,14 @@ const WheelOfFortuneGame = () => {
             <div className='containerDetail color-yellow bg-lite m-5 p-20 size30'>
                 🎡 Wheel of Fortune
             </div>
-            <div className='containerBox flexContainer bg-lite'>
-                <div className='containerBox flex2Column'>
+            <div className='flexContainer color-lite'>
+                <div className='containerDetail size20 m-5 p-10 flex2Column bg-lite noScroll'>
                     <span className='color-yellow p-10 button' onClick={() => editPlayer(0)}>
                         {players[0]?.name}:
                     </span> 
                     💰 {players[0]?.balance}
                 </div>
-                <div className='containerBox flex2Column'>
+                <div className='containerDetail size20 m-5 p-10 flex2Column bg-lite noScroll'>
                     <span className='color-yellow p-10' onClick={() => editPlayer(1)}>
                         {players[1]?.name}:
                     </span> 
@@ -787,6 +830,24 @@ const WheelOfFortuneGame = () => {
                 {displayPuzzle()}
             </div>
             {bonusWon && <Confetti />}
+            {spinWindowOpen && (
+                <div className='modal-overlay containerDetail p-10 size20 bg-tintedMedium'>
+                    <div className='r-10 bg-white color-lite width--20'>
+                        <div className='wof-spin-window'>
+                            <div className='wof-spin-window-list'>
+                                {spinWindowTrail.map((value, idx) => (
+                                    <div
+                                        key={`${value}-${idx}`}
+                                        className={`wof-spin-window-item ${value === spinWindowValue ? 'wof-spin-window-item-active' : ''}`}
+                                    >
+                                        {value}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
             {message && <div className='containerDetail p-10 m-10 size20 completedSelector bg-dkGreen'>
                 {/*
                             <p>📊 Scoreboard - {players[0].name}: ${scoreboard[0]}, {players[1].name}: ${scoreboard[1]}</p>
@@ -796,7 +857,7 @@ const WheelOfFortuneGame = () => {
             </div>
             }
             {/*             
-            <div className='containerBox color-yellow'>
+            <div className='containerDetail p-10 size20 color-yellow'>
                 👤 Current Player: <span className='color-lite'>{players[currentPlayer].name}</span>
             </div>
              */}
@@ -807,12 +868,12 @@ const WheelOfFortuneGame = () => {
                     </div>
                 )}
                 {!roundOver && !bonusMode && message.includes('consonant') && (
-                    <div className='containerBox scoreboard h-scroll' style={{ overflowX: 'auto', whiteSpace: 'nowrap', paddingBottom: 10 }}>
-                        {allLetters.map((letter) => (
+                    <div className='containerDetail p-10 size20 scoreboard h-scroll' style={{ overflowX: 'auto', whiteSpace: 'nowrap', paddingBottom: 10 }}>
+                        {allLetters.map((letter, idx) => (
                             guessedLetters.includes(letter)
                                 ? null
                                 : <div
-                                    key={letter}
+                                    key={`${letter}${idx}-${letter.toLowerCase()}-${letter.toUpperCase()}`}
                                     onClick={() => handleLetterClick(letter)}
                                     disabled={guessedLetters.includes(letter)}
                                     className={`containerDetail button ${guessedLetters.includes(letter) ? 'bg-lite' : VOWELS.includes(letter) ? 'vowel' : 'consonant'} pt-10 pb-10`}
@@ -849,7 +910,7 @@ const WheelOfFortuneGame = () => {
 
             {bonusMode && (
                 <div className='containerDetail m-10 pt-10 pb-15 color-lite borderOrange bg-dkOrange'>
-                    <h3 className='containerBox'>🎁 Bonus Round</h3>
+                    <h3 className='containerDetail p-10 size20'>🎁 Bonus Round</h3>
                     <p>Guess the final phrase for a chance to win {bonusPrize}!</p>
                     <input
                         className='containerDetail p-10 size20 color-lite width--10 mb-10'
@@ -868,10 +929,10 @@ const WheelOfFortuneGame = () => {
                 </div>
             )}
             {showPlayerModal && (
-                <div className='modal-overlay containerBox bg-tintedMedium'>
+                <div className='modal-overlay containerDetail p-10 size20 bg-tintedMedium'>
                     <div className='containerDetail p-30 bg-tintedMedium'>
                         {pendingNames.map((name, idx) => (
-                            <div key={idx}>
+                            <div key={`${name}-${idx}`}>
                                 <label>Player {idx + 1}:</label>
                                 <input
                                     className='containerDetail bg-dark color-lite p-10 m-10'
@@ -895,17 +956,17 @@ const WheelOfFortuneGame = () => {
             </div>
 
             {/* Game History Section */}
-            <div className='containerBox bg-lite mt-30'>
+            <div className='containerDetail p-10 size20 bg-lite mt-30'>
                 <div className='containerDetail flexContainer size25 color-yellow p-10 mb-10'>
                     <div className='p-10 flex1Column contentLeft'>
                         🕑 Game History
                     </div>
-                    <div title='Clear History' className='containerBox flexColumn contentRight'>
+                    <div title='Clear History' className='containerDetail p-10 size20 flexColumn contentRight'>
                         🗑️
                     </div>
                 </div>
                 {gameHistory.length === 0 ? (
-                    <div className='containerBox color-lite p-10'>No games played yet.</div>
+                    <div className='containerDetail p-10 size20 color-lite p-10'>No games played yet.</div>
                 ) : (
                         <div className= 'h-scroll'>
                             <div className='color-lite'>
@@ -920,8 +981,8 @@ const WheelOfFortuneGame = () => {
                                 </div>
                                 <div className=''>
                                     {gameHistory.map((entry, idx) => (
-                                                                                <div
-                                            key={idx}
+                                        <div
+                                            key={entry.id ? entry.id : `${entry.date}-${idx}`}
                                             className={`containerDetail size12 m-5 p-5 flexContainer ${selectedHistory.includes(idx) ? 'bg-dkRed' : 'bg-lite'}`}
                                             style={{ width: 'max-content', minWidth: '100%', display: 'flex' }}
                                         >
@@ -940,10 +1001,10 @@ const WheelOfFortuneGame = () => {
                                                 <span className='color-yellow size15'>{entry.date.split(', ')[1]}</span>
                                             </div>
                                             <div className='flex5Column'>
-                                                {entry.players.map(p => <div className='containerDetail color-lite m-5 size15 w-80' key={p.name}>{p.name}</div>)}
+                                                {entry.players.map((p, pidx) => <div className='containerDetail color-lite m-5 size15 w-80' key={p.name + '-' + pidx}>{p.name}</div>)}
                                             </div>
                                             <div className='flex5Column'>
-                                                {entry.players.map(p => <div className='containerDetail color-lite m-5 size15' key={p.money}>{p.money}</div>)}
+                                                {entry.players.map((p, pidx) => <div className='containerDetail color-lite m-5 size15' key={p.money + '-' + pidx}>{p.money}</div>)}
                                             </div>
                                             <div className='flex5Column containerDetail m-5 color-lite size15 w-50 h-scroll'>{entry.prize || 'no prize'}</div>
                                             <div className='flex5Column containerDetail m-5 size15 w-60'>{entry.bonusSolved ? '✅' : '☑️'}</div>

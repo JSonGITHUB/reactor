@@ -95,7 +95,7 @@ const SurfScores = ({
                             align='left'
                         />
                     </div>
-                    <div className='pb-5 flexContainer color-dark text-outline-light' >
+                    <div className='pb-5 flexContainer color-dark text-outline-lite' >
                     {
                         (!priorityCollapse)
                         ? playersInGame().map((player, index) => (player.surf) 

@@ -110,7 +110,7 @@ const ExchangeRatesConfig = ({ onExchangeRatesChange }) => {
                 {Object.keys(exchangeRates).map((rate,index) => (
                     <div key={rate} className={`containerDetail color-lite ${(index>0)?'mt-5':null}`}>
                         <label
-                            className='p-10 m-5 color-lite'
+                            className='p-10 m-5 color-yellow'
                             htmlFor={rate}
                         >
                             {rate}

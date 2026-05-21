@@ -130,12 +130,12 @@ const ScoreCard = ({ game, playerIndex, scoreIndex, updateScores, winner }) => {
     const isDoubleBoagie = (score, par) => (score === (Number(par) + 2)) ? true : false;
     const getOuterCSS = (score, winner) => {
         if (game === 'golf' && isEagle(score, winner)) return 'completedSelector r-50-percent pb-5 pt-3';
-        if (game === 'golf' && isDoubleBoagie(score, winner)) return 'brdr-light p-5 r-10';
+        if (game === 'golf' && isDoubleBoagie(score, winner)) return 'brdr-lite p-5 r-10';
         return 'brdr-transparent r-10';
     }
     const getInnerCSS = (score, winner) => {
-        if (game === 'golf' && isBoagie(score, winner) && isDoubleBoagie(score, winner)) return 'brdr-light r-5 font50 ht-50 pt-12 pl-10 pr-10';
-        if (game === 'golf' && isBoagie(score, winner)) return 'brdr-light r-5 font50 ht-50 pt-12 pl-10 pr-10 mt-5 mb-5';
+        if (game === 'golf' && isBoagie(score, winner) && isDoubleBoagie(score, winner)) return 'brdr-lite r-5 font50 ht-50 pt-12 pl-10 pr-10';
+        if (game === 'golf' && isBoagie(score, winner)) return 'brdr-lite r-5 font50 ht-50 pt-12 pl-10 pr-10 mt-5 mb-5';
         if (game === 'golf' && !isDoubleBoagie(score, winner) && !isEagle(score, winner)) return 'ht-40 p-5 r-5 font50 m-10';
         return 'p-5 r-5 font50 m-10';
     }

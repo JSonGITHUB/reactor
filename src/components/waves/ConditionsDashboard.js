@@ -12,8 +12,10 @@ import ConditionsSelectors from './ConditionsSelectors';
 import getDirection from './getDirection';
 import SunTracker from './SunTracker';
 import SwellDisplay from './SwellDisplay';
+import Cams from './Cams';
 import WaterTemp from './WaterTemp';
 import WindDirection from './WindDirection';
+import SurfDashboard from './SurfDashboard';
 //import BuoyReadingsChart from './BuoyReadingsChart';
 //import MarineDataChart from './MarineDataChart';
 //import MarineChart from './MarineChart';
@@ -38,20 +40,29 @@ const {
     const [conditionCollapse, setConditionCollapse] = useState(collapseStateInit('conditionCollapse'));
     const [buoyCollapse, setBuoyCollapse] = useState(collapseStateInit('buoyCollapse'));
     const [buoyData, setBuoyData] = useState(buoysTemplateData);
+    const [isBuoyFallbackActive, setIsBuoyFallbackActive] = useState(false);
     const [range] = useState(0.05);
     const SURFLINE_BASE_URL = process.env.REACT_APP_SURFLINE_BASE_URL;
     const SURFLINE_TOKEN = process.env.REACT_APP_SURFLINE_TOKEN;
+    const hasValidSurflineConfig = Boolean(
+        SURFLINE_BASE_URL
+        && SURFLINE_TOKEN
+        && SURFLINE_TOKEN !== 'your_surfline_token_here'
+    );
     const localBuoyReadings = () => `${SURFLINE_BASE_URL}/bounds?north=${Number(localStorage.getItem('latitude')) - range}&south=${Number(localStorage.getItem('latitude')) + range}&east=${Number(localStorage.getItem('longitude')) + 1}&west=${Number(localStorage.getItem('longitude')) - 1}&accesstoken=${SURFLINE_TOKEN}`;
     const getCachedBuoyData = () => initializeData('buoyData', buoysTemplateData);
     const setBuoyDataSafely = (payload) => {
         if (payload && Array.isArray(payload.data)) {
             setBuoyData(payload);
             localStorage.setItem('buoyData', JSON.stringify(payload));
+            setIsBuoyFallbackActive(false);
+            localStorage.removeItem(BUOY_FETCH_WARNING_KEY);
             return true;
         }
         return false;
     };
     const warnBuoyFallbackOnce = () => {
+        setIsBuoyFallbackActive(true);
         if (localStorage.getItem(BUOY_FETCH_WARNING_KEY) === 'true') return;
         localStorage.setItem(BUOY_FETCH_WARNING_KEY, 'true');
         console.warn('ConditionsDashboard => Using cached buoy data due to fetch issue.');
@@ -68,6 +79,14 @@ const {
     }, [buoyCollapse]);
 
     const fetchAndSetBuoyData = (controller, isMountedRef) => {
+        if (!hasValidSurflineConfig) {
+            if (!isMountedRef.current) return;
+            const cached = getCachedBuoyData();
+            setBuoyData(cached);
+            warnBuoyFallbackOnce();
+            return;
+        }
+
         fetch(localBuoyReadings(), { signal: controller.signal })
             .then((res) => {
                 if (!res.ok) {
@@ -107,10 +126,13 @@ const {
         const nextSwell2Direction = swells[1] && swells[1].latestData
             ? getDirection(swells[1].latestData.direction)
             : null;
-        if (nextSwell1Direction && nextSwell1Direction !== status.swell1Direction) {
+        const hasStoredSwell1Direction = Boolean(localStorage.getItem('swell1Direction'));
+        const hasStoredSwell2Direction = Boolean(localStorage.getItem('swell2Direction'));
+
+        if (!hasStoredSwell1Direction && nextSwell1Direction && nextSwell1Direction !== status.swell1Direction) {
             handleSwell1Selection(null, null, nextSwell1Direction);
         }
-        if (nextSwell2Direction && nextSwell2Direction !== status.swell2Direction) {
+        if (!hasStoredSwell2Direction && nextSwell2Direction && nextSwell2Direction !== status.swell2Direction) {
             handleSwell2Selection(null, null, nextSwell2Direction);
         }
     }, [buoyData, status.swell1Direction, status.swell2Direction]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -125,21 +147,52 @@ const {
         };
     }, [range]); // eslint-disable-line react-hooks/exhaustive-deps
 
+    const formatWindDirection = (windDirectionValue) => {
+        if (typeof windDirectionValue === 'string' && /[A-Za-z]/.test(windDirectionValue)) {
+            return windDirectionValue;
+        }
+
+        const directionDegrees = Number(windDirectionValue);
+        if (!Number.isFinite(directionDegrees)) {
+            return 'N';
+        }
+
+        const normalizedDegrees = ((directionDegrees % 360) + 360) % 360;
+        return getDirection(normalizedDegrees, 'windDirection');
+    };
+
+    const normalizeTemperature = (value, fallbackStorageKey) => {
+        const parsedValue = Number(value);
+        if (Number.isFinite(parsedValue)) {
+            return Math.round(parsedValue);
+        }
+
+        const fallbackValue = Number(initializeData(fallbackStorageKey, 0));
+        if (Number.isFinite(fallbackValue)) {
+            return Math.round(fallbackValue);
+        }
+
+        return 0;
+    };
+
+    const currentWaterTemp = normalizeTemperature(status?.waterTemp, 'waterTemp');
+    const currentAirTemp = normalizeTemperature(status?.airTemp, 'airTemp');
+
     const windHeader = () => <div>
-            {icons.wind} {status.windDirection} {status.windGusts}
+            {icons.wind} {formatWindDirection(status.windDirection)} {status.windGusts}
             <span className='size12'>
                 mph
             </span> 
-            {icons.water}{initializeData('waterTemp', 0)}°
+            {icons.water}{currentWaterTemp}°
             <span className='size12'>
                 F
             </span> 
-            {icons.temperature} {initializeData('airTemp', 0)}°
+            {icons.temperature} {currentAirTemp}°
             <span className='size12'>
                 F
             </span>
             {
-                (localStorage.getItem(BUOY_FETCH_WARNING_KEY) === 'true')
+                isBuoyFallbackActive
                 ? <span className='size15 ml-5 color-orange'>🤔</span>
                     : null
             }
@@ -149,7 +202,25 @@ const {
         time={time}
         //status={status}
         //setStatus={setStatus}
-    />
+    />;
+
+    // Cams dropdown state
+    const [camsCollapse, setCamsCollapse] = useState(true);
+    const camsDisplay = () => (
+        <div className='mt-5 mb-25'>
+            <div className='containerDetail size20 color-yellow bg-lite p-20 mb--20'>
+                <CollapseToggleButton
+                    title={'📹 Cams'}
+                    isCollapsed={camsCollapse}
+                    setCollapse={setCamsCollapse}
+                    align='left'
+                />
+            </div>
+            {
+                camsCollapse ? null : <Cams />
+            }
+        </div>
+    );
     return (
         <div className=''>
             {/*<BuoyReadingsChart lat={localStorage.getItem('latitude')} long={localStorage.getItem('longitude')} />*/}
@@ -215,7 +286,6 @@ const {
                 */
             }
             {(conditionsCollapse) ? null : swellDisplay()}
-            {tideDisplay('wide')}
             <div className='containerDetail size20 mt-5 mb-5 bold color-yellow bg-lite p-20'>
                 <CollapseToggleButton
                     title={''}
@@ -231,7 +301,7 @@ const {
                         <div className='containerBox bold color-yellow'>
                             WIND {icons.wind}
                         </div>
-                        <WindDirection columns='2' setWind={setWind} height='0px' collapse={conditionCollapse} />
+                        <WindDirection columns='2' setWind={setWind} height='0px' collapse={conditionCollapse} waterTemp={currentWaterTemp} airTemp={currentAirTemp} />
                     </div>
                     <div className='containerBox flex2Column'>
                         <div className='containerBox bold color-yellow'>
@@ -243,10 +313,12 @@ const {
                         <div className='containerBox bold color-yellow'>
                             AIR {icons.temperature}
                         </div>
-                        <AirTemp/>
+                        <AirTemp setStatus={setStatus} />
                     </div>
                 </div>
             </div>
+            {tideDisplay('wide')}
+            {camsDisplay()}
             <SunTracker />
             <div className='containerDetail size20 bold mb-5 color-yellow bg-lite p-20'>
                 <CollapseToggleButton

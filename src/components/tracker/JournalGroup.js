@@ -67,7 +67,7 @@ const JournalGroup = ({
         //setScroll(journalGroupIndex * 50);
         scrollToBottom(elementRef);
     }
-    return <div key={`journal-group-${journalGroupIndex}-${String(journalGroup?.title || 'group')}`} className='' ref={targetElementRef}>
+    return <div key={`journal-group-${journalGroupIndex}-${String(journalGroup?.title || 'group')}`} className='mt-5' ref={targetElementRef}>
                 {/*<div className='containerDetail'>*/}
                     <div className='containerDetail flexContainer'>
                         <div className='flex1Auto'>
@@ -119,7 +119,7 @@ const JournalGroup = ({
                                     onClick={() => addToGroup(journalGroupIndex, targetElementRef)}
                                 >
                                     <div className='flexContainer'>
-                                        <div className='flex2Column text-outline-light size20 mt-5'>
+                                        <div className='flex2Column text-outline-lite size20 mt-5'>
                                             {icons.plus}
                                         </div>
                                         <div className='flex2Column p-5 size25'>
@@ -137,7 +137,7 @@ const JournalGroup = ({
                             </div>
                         </div>
                     }
-                    <div>
+                    <div className=''>
                         {
                             (isCollapsed) 
                             ? null

@@ -26,6 +26,9 @@ import icons from '../site/icons';
 import ActivitiesPieChart from '../tracker/ActivitiesPieChart';
 import getKey from '../utils/KeyGenerator';
 
+const LAST_EXPENSE_LOCATION_KEY = 'lastExpenseLocation';
+const LAST_EXPENSE_CURRENCY_KEY = 'lastExpenseCurrency';
+
 const REPORT_COLORS = [
   '#4fc3f7',
   '#ff8c42',
@@ -75,12 +78,26 @@ const Expenses = () => {
     return { updated, changed };
   };
 
+  const buildExpenseDraft = (lastLocation = '', lastCurrency = '') => ({
+    ...defaultExpenses,
+    location: lastLocation,
+    currency: lastCurrency,
+    countryCode: lastCurrency
+  });
+
+  const getLastExpenseDefaults = () => {
+    const lastLocation = localStorage.getItem(LAST_EXPENSE_LOCATION_KEY) || '';
+    const lastCurrency = localStorage.getItem(LAST_EXPENSE_CURRENCY_KEY) || '';
+    return buildExpenseDraft(lastLocation, lastCurrency);
+  };
+
   const [exchangeRates, setExchangeRates] = useState(defaultExchangeRates);
   const [expenses, setExpenses] = useState(() => ensureCategories(getLocalExpenses()).updated);
-  const [expenseData, setExpenseData] = useState(defaultExpenses);
+  const [expenseData, setExpenseData] = useState(() => getLastExpenseDefaults());
   const [formCollapse, setFormCollapse] = useState(true);
   const [logCollapse, setLogCollapse] = useState(true);
-  const [categorySort, setCategorySort] = useState(false);
+  const [sortField, setSortField] = useState('date');
+  const [sortDirection, setSortDirection] = useState('desc');
   const [category, setCategory] = useState();
   const [location, setLocation] = useState();
   const [startDate, setStartDate] = useState('');
@@ -149,8 +166,8 @@ const Expenses = () => {
     setExpenses(getLocalExpenses());
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
-    //console.log(`categorySort: ${categorySort}`)
-  }, [categorySort]);
+    //console.log(`sortField: ${sortField} sortDirection: ${sortDirection}`)
+  }, [sortField, sortDirection]);
   useEffect(() => {
     const { updated, changed } = ensureCategories(expenses);
     if (changed) {
@@ -184,8 +201,10 @@ const Expenses = () => {
     if (!newExpense.category || !String(newExpense.category).trim()) {
       newExpense.category = inferCategoryFromExpense(newExpense.expense) || 'other';
     }
+    localStorage.setItem(LAST_EXPENSE_LOCATION_KEY, String(newExpense.location || ''));
+    localStorage.setItem(LAST_EXPENSE_CURRENCY_KEY, String(newExpense.currency || ''));
     setExpenses((prevExpenses) => [...prevExpenses, newExpense]);
-    setExpenseData(defaultExpenses);
+    setExpenseData(buildExpenseDraft(newExpense.location || '', newExpense.currency || ''));
     setFormCollapse(true);
   };
 
@@ -273,9 +292,9 @@ const Expenses = () => {
     }
   }
   const getForm = (expense, index) => <div>
-    <label className='flexContainer containerInput contentCenter mt-15'>
-      <div className='containerBox p-15 columnRightAlign width-50-percent'>
-        <span className='inputText'>
+    <label className='flexContainer containerInput contentCenter'>
+      <div className='size20 m-5 p-15 columnRightAlign width-50-percent'>
+        <span className='color-yellow'>
           Expense:
         </span>
       </div>
@@ -286,13 +305,13 @@ const Expenses = () => {
           name='expense'
           value={expense.expense}
           onChange={e => handleInputChange(e, expense)}
-          className='inputField'
+          className='containerDetail size20 p-10 color-lite width-100-percent'
         />
       </div>
     </label>
     <label className='flexContainer containerInput contentCenter'>
-      <div className='containerBox p-15 columnRightAlign width-50-percent'>
-        <span className='inputText'>
+      <div className='size20 m-5 p-15 columnRightAlign width-50-percent'>
+        <span className='color-yellow'>
           Category:
         </span>
       </div>
@@ -301,7 +320,7 @@ const Expenses = () => {
           name='category'
           value={expense.category || ''}
           onChange={e => handleInputChange(e, expense)}
-          className='inputSelect'
+          className='containerDetail size20 p-10 color-lite width-100-percent'
         >
           <option value=''>Select Category</option>
           {categories.map((category) => (
@@ -313,8 +332,8 @@ const Expenses = () => {
       </div>
     </label>
     <label className='flexContainer containerInput contentCenter'>
-      <div className='containerBox p-15 columnRightAlign width-50-percent'>
-        <span className='inputText'>
+      <div className='size20 m-5 p-15 columnRightAlign width-50-percent'>
+        <span className='color-yellow'>
           Location:
         </span>
       </div>
@@ -323,7 +342,7 @@ const Expenses = () => {
           name='location'
           value={expense.location}
           onChange={e => handleInputChange(e, expense)}
-          className='inputSelect'
+          className='containerDetail size20 p-10 color-lite width-100-percent'
         >
           <option value=''>Select Location</option>
           {Object.keys(currencyOptions).map((location) => (
@@ -335,8 +354,8 @@ const Expenses = () => {
       </div>
     </label>
     <label className='flexContainer containerInput contentCenter'>
-      <div className='containerBox p-15 columnRightAlign width-50-percent'>
-        <span className='inputText'>
+      <div className='size20 m-5 p-15 columnRightAlign width-50-percent'>
+        <span className='color-yellow'>
           Currency:
         </span>
       </div>
@@ -345,7 +364,7 @@ const Expenses = () => {
           name='currency'
           value={expense.currency}
           onChange={e => handleInputChange(e, expense)}
-          className='inputSelect'
+          className='containerDetail size20 p-10 color-lite width-100-percent'
         >
           <option value=''>Select Currency</option>
           {currencyCodes.map((currency) => (
@@ -357,8 +376,8 @@ const Expenses = () => {
       </div>
     </label>
     <label className='flexContainer containerInput contentCenter'>
-      <div className='containerBox p-15 columnRightAlign width-50-percent'>
-        <span className='inputText'>
+      <div className='size20 m-5 p-15 columnRightAlign width-50-percent'>
+        <span className='color-yellow'>
           Cost:
         </span>
       </div>
@@ -369,7 +388,7 @@ const Expenses = () => {
           name='cost'
           value={expense.cost}
           onChange={e => handleInputChange(e, expense)}
-          className='inputField'
+          className='containerDetail size20 p-10 color-lite width-100-percent'
         />
       </div>
     </label>
@@ -391,7 +410,7 @@ const Expenses = () => {
     </div>
   </div>
   const expenseEntry = () => <div>
-    <div className='containerBox bg-lite'>
+    <div className='containerDetail size20 m-5 bg-lite'>
       <ExchangeRatesConfig onExchangeRatesChange={setExchangeRates}></ExchangeRatesConfig>
     </div>
     {
@@ -421,13 +440,11 @@ const Expenses = () => {
     newExpenses[expenseIndex].category = convertSelection(selection);
     setExpenses(newExpenses);
   }
-  const selectSort = (index, x, selection) => {
-    //console.log(`Expenses => selectSort(selection: ${selection})`);
-    if (selection === 'category') {
-      setCategorySort(true);
-    } else {
-      setCategorySort(false);
-    }
+  const selectSortField = (index, x, selection) => {
+    setSortField(selection);
+  }
+  const selectSortDirection = (index, x, selection) => {
+    setSortDirection(selection);
   }
   const filterByDateRange = (selectedExpenses) => {
     if (!startDate && !endDate) return selectedExpenses;
@@ -454,11 +471,52 @@ const Expenses = () => {
     ? selectedExpenses.filter(expense => expense.location === location)
     : selectedExpenses;
 
+  const getExpenseTimestamp = (expense) => {
+    const dateTime = new Date(`${expense?.date || ''} ${expense?.time || ''}`);
+    if (!Number.isNaN(dateTime.getTime())) return dateTime.getTime();
+    const dateOnly = new Date(expense?.date || '');
+    return Number.isNaN(dateOnly.getTime()) ? 0 : dateOnly.getTime();
+  };
+
+  const sortExpensesList = (selectedExpenses) => {
+    const list = Array.isArray(selectedExpenses) ? [...selectedExpenses] : [];
+    const directionMultiplier = sortDirection === 'asc' ? 1 : -1;
+
+    const compareValues = (valueA, valueB) => {
+      if (valueA < valueB) return -1;
+      if (valueA > valueB) return 1;
+      return 0;
+    };
+
+    return list.sort((a, b) => {
+      let comparison = 0;
+
+      if (sortField === 'category') {
+        const catA = String(normalizeCategory(a?.category) || '').toUpperCase();
+        const catB = String(normalizeCategory(b?.category) || '').toUpperCase();
+        comparison = compareValues(catA, catB);
+      } else if (sortField === 'amount') {
+        const amountA = Number(convertToUS(a?.cost, a?.countryCode || a?.currency || 'USD')) || 0;
+        const amountB = Number(convertToUS(b?.cost, b?.countryCode || b?.currency || 'USD')) || 0;
+        comparison = compareValues(amountA, amountB);
+      } else if (sortField === 'name') {
+        const nameA = String(a?.expense || '').toUpperCase();
+        const nameB = String(b?.expense || '').toUpperCase();
+        comparison = compareValues(nameA, nameB);
+      } else {
+        const dateA = getExpenseTimestamp(a);
+        const dateB = getExpenseTimestamp(b);
+        comparison = compareValues(dateA, dateB);
+      }
+
+      return comparison * directionMultiplier;
+    });
+  };
+
   const getList = () => {
-    const baseList = categorySort
-      ? filteredlocations(filteredExpenses(sortedByCategory()))
-      : filteredlocations(filteredExpenses(sortedByDate.reverse()));
-    return filterByDateRange(baseList);
+    const filteredList = filteredlocations(filteredExpenses(expenses));
+    const dateFiltered = filterByDateRange(filteredList);
+    return sortExpensesList(dateFiltered);
   };
 
   const getLocations = () => {
@@ -468,30 +526,12 @@ const Expenses = () => {
     return locations
   }
 
-  const sortedByCategory = () => (expenses)
-                                  ? [...expenses].reverse().sort((a, b) => {
-                                      const catA = a.category.toUpperCase(); // ignore case
-                                      const catB = b.category.toUpperCase();
-
-                                      if (catA < catB) return -1;
-                                      if (catA > catB) return 1;
-                                      return 0; // equal
-                                    })
-                                  : null;
   const sortedBySkill = (expenseSkill) => [...expenseSkill].reverse().sort((a, b) => {
     const catA = a.skill.toUpperCase(); // ignore case
     const catB = b.skill.toUpperCase();
 
     if (catA < catB) return -1;
     if (catA > catB) return 1;
-    return 0; // equal
-  });
-  const sortedByDate = [...expenses].sort((a, b) => {
-    const dateA = new Date(a.date);
-    const dateB = new Date(b.date);
-
-    if (dateA < dateB) return -1;
-    if (dateA > dateB) return 1;
     return 0; // equal
   });
   const colors = [
@@ -587,7 +627,7 @@ const Expenses = () => {
     }
   }
   const filterDisplay = () => <div className='containerDetail bg-lite mt-5 contentLeft'>
-    <div className='containerDetail color-yellow size20'>
+    <div className='containerDetail color-yellow size20 p-10'>
       <CollapseToggleButton
         title={`Grand Total: ${getTotalExpenses()}`}
         isCollapsed={totalCollapse}
@@ -627,17 +667,17 @@ const Expenses = () => {
                   const getCategoryHeader = (category, total) => (
                     <div className='flexContainer verticalCenter'>
                       <div title={category} className='flex3Column'>
-                        <div className='containerDetail mt-5 mb-5 size40 contentCenter'>
+                        <div className='mt-10 mb-5 size40 contentCenter'>
                           {icons[category]}
                         </div>
                       </div>
                       <div className='flex3Column'>
-                        <div className='containerDetail m-5 pl-20'>
+                        <div className='mt-10 mb-5 pl-20'>
                           ${formatNumber(total.toFixed(0))}
                         </div>
                       </div>
                       <div className='flex3Column contentLeft'>
-                        <div className='containerDetail m-5 pl-20'>
+                        <div className='mt-10 mb-10 pl-20'>
                           {
                             (Number(getTotalExpenses()) > 0)
                               ? ((total / Number(getTotalExpenses()) * 100) < 1)
@@ -650,7 +690,7 @@ const Expenses = () => {
                     </div>
                   );
                   return (
-                    <div key={getKey(category)} className='containerBox' style={categoryStyle(categories.indexOf(category))}>
+                    <div key={getKey(category)} className='containerDetail size20 m-5' style={categoryStyle(categories.indexOf(category))}>
                       {getCategoryHeader(category, total)}
                     </div>
                   );
@@ -660,62 +700,81 @@ const Expenses = () => {
         </div>
     }
     <div className='containerDetail mt-5 color-lite'>
-      <CollapseToggleButton
-        title={<span className='pl-10 mr-10'>filters: {(startDate || endDate) ? <span title={`${startDate} - ${endDate}`} className='p-10 lite r-10'>📅</span> : ''} {(!category || category === 'all') ? null : <span title={category} className='p-10 bg-lite r-10 '>{icons[category]}</span>} {(location) ? <span title={location} className='p-10 bg-lite r-10 ml-5 mr-10'>🌎</span> : ''} sort: {(categorySort) ? <span title='category sort' className='p-10 bg-lite r-10 '>📂</span> : <span title='date sort' className='p-10 ml-5 bg-lite r-10 '>📅</span>}</span>}
-        isCollapsed={filterCollapse}
-        setCollapse={setFilterCollapse}
-        align='left'
-      />
+      <div className='containerDetail bg-lite'>
+        <CollapseToggleButton
+          title={<span className='pl-10 mr-10'>filters: {(startDate || endDate) ? <span title={`${startDate} - ${endDate}`} className='p-10 lite r-10'>📅</span> : ''} {(!category || category === 'all') ? null : <span title={category} className='p-10 bg-lite r-10 '>{icons[category]}</span>} {(location) ? <span title={location} className='p-10 bg-lite r-10 ml-5 mr-10'>🌎</span> : ''} sort: <span title={`${sortField} ${sortDirection}`} className='p-10 ml-5 bg-lite r-10 '>{sortDirection === 'asc' ? '⬆️' : '⬇️'} {sortField}</span></span>}
+          isCollapsed={filterCollapse}
+          setCollapse={setFilterCollapse}
+          align='left'
+        />
+      </div>
       {
         (filterCollapse)
           ? null
-          : <div className='containerBox'>
-            <div className='containerBox flexContainer'>
-              <div className='containerBox flex2Column contentRight'>
+          : <div className='containerDetail size20 mt-5'>
+            <div className='containerDetail mb-5 size20 flexContainer'>
+              <div className='size20 mt-15 mr-10 flex2Column contentRight color-yellow'>
                 start:
               </div>
               <input
                 type='date'
                 value={startDate}
                 onChange={e => setStartDate(e.target.value)}
-                className='containerDetail bg-lite flex2Column'
+                className='containerDetail bg-tintedMedium m-5 color-lite flex2Column'
                 placeholder='Start Date'
               />
             </div>
-            <div className='containerBox flexContainer'>
-              <div className='containerBox flex2Column contentRight'>
+            <div className='containerDetail size20 mb-5 flexContainer'>
+              <div className='size20 mt-15 mr-10 flex2Column contentRight color-yellow'>
                 end:
               </div>
               <input
                 type='date'
                 value={endDate}
                 onChange={e => setEndDate(e.target.value)}
-                className='flex2Column containerDetail bg-lite'
+                className='containerDetail bg-tintedMedium color-lite flex2Column m-5'
                 placeholder='End Date'
               />
             </div>
-            <div className='containerBox flexContainer pr-15'>
-              <div className='containerBox flex2Column contentRight'>
+            <div className='containerDetail size20 mb-5 flexContainer pr-15'>
+              <div className='size20 mt-20 mr-10 flex2Column contentRight color-yellow'>
                 sort:
               </div>
-              <div className='flex2Column'>
+              <div className='flex2Column pb-5'>
                 <Selector
-                  groupTitle='sort'
-                  label='sort:'
-                  items={['category', 'date']}
-                  selected={(categorySort) ? 'category' : 'date'}
-                  onChange={selectSort}
+                  groupTitle='sort-field'
+                  label='sort by:'
+                  items={['date', 'amount', 'category', 'name']}
+                  selected={sortField}
+                  onChange={selectSortField}
                   fontSize='25'
                   padding='10px'
                   width='50px'
                 />
               </div>
             </div>
-            <div className='containerBox flexContainer pr-15'>
-              <div className='containerBox flex2Column contentRight'>
+            <div className='containerDetail size20 mb-5 flexContainer pr-15'>
+              <div className='size20 mt-20 mr-10 flex2Column contentRight color-yellow'>
+                order:
+              </div>
+              <div className='flex2Column pb-5'>
+                <Selector
+                  groupTitle='sort-direction'
+                  label='order:'
+                  items={['asc', 'desc']}
+                  selected={sortDirection}
+                  onChange={selectSortDirection}
+                  fontSize='25'
+                  padding='10px'
+                  width='50px'
+                />
+              </div>
+            </div>
+            <div className='containerDetail size20 mb-5 flexContainer pr-15'>
+              <div className='size20 mt-20 mr-10 flex2Column contentRight color-yellow'>
                 category:
               </div>
-              <div className='flex2Column'>
+              <div className='flex2Column pb-5'>
                 <Selector
                   groupTitle='category'
                   label='category:'
@@ -728,11 +787,11 @@ const Expenses = () => {
                 />
               </div>
             </div>
-            <div className='containerBox flexContainer pr-15'>
-              <div className='containerBox flex2Column contentRight'>
+            <div className='containerDetail size20 flexContainer pr-15'>
+              <div className='size20 mt-20 mr-10 flex2Column contentRight color-yellow'>
                 location:
               </div>
-              <div className='flex2Column'>
+              <div className='flex2Column pb-5'>
                 <Selector
                   groupTitle='location'
                   label='location:'
@@ -750,7 +809,7 @@ const Expenses = () => {
     </div>
   </div>
 
-  const displayLog = () => <div className='containerBox'>
+  const displayLog = () => <div className='containerDetail size20 mt-5'>
     <div>
       {expenses.length === 0 ? (
         <p>No expenses recorded.</p>
@@ -759,25 +818,25 @@ const Expenses = () => {
           {getList().map((expense, index) => {
             const expenseIndex = getExpenseIndex(expense);
             return (
-            <div className='relative containerDetail scrollSnapTop m-5 bg-veryLite' key={index}>
+            <div className='relative containerDetail scrollSnapTop bg-veryLite mt-5' key={index}>
               {
                 (expense.edit)
                 ? getForm(expense, index)
                 : <div>
-                  <div className='containerBox min-height-60'>
+                  <div className='containerDetail size20 min-height-60 pt-10'>
                     <div
                       title='remove expense'
-                      className='absolute w-50 rt-20 t-0 r-5 size15 bg-lite color-yellow button pr-20 pl-20 pt-10 pb-10 contentRight mt-20'
+                      className='absolute w-50 rt-15 t-0 r-5 size15 bg-lite color-yellow button pr-20 pl-20 pt-10 pb-10 contentRight mt-15'
                       onClick={() => removeExpense(expense)}
                     >
                       X
                     </div>
-                    <div className='min-height-40 columnLeftAlign color-yellow width--60 button' onClick={() => editExpense(expense)}>
+                    <div className='min-height-40 columnLeftAlign color-yellow width--60 button pl-10' onClick={() => editExpense(expense)}>
                       {expense.expense}: ${formatNumber(convertToUS(expense.cost, expense.countryCode || 'USD'))} {/*exchangeRates[expense.currency]'USD'*/} {/*expense.currency*/}
                     </div>
                   </div>
-                  <div className='flexContainer pr-15'>
-                    <div className='p-10 ml-10 flex2Column mt-2 columnLeftAlign color-lite size15 mb-5'>
+                  <div className='flexContainer pr-5'>
+                    <div className='p-10 flex2Column columnLeftAlign color-lite size15'>
                       {expense.location} : ${formatNumber(expense.cost)} {expense.currency}s<br />{expense.date} - {expense.time}
                     </div>
                     <Selector

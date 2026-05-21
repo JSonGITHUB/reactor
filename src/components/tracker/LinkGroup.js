@@ -43,7 +43,7 @@ const LinkGroup = ({
                                 onClick={() => addLink(linkProjectIndex)}
                             >
                                 <div className='flex2Column'>
-                                    <span className='text-outline-light'>➕</span> {icons.link}
+                                    <span className='text-outline-lite'>➕</span> {icons.link}
                                 </div>
                             </div>
                             <div

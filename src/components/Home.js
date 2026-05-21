@@ -1,25 +1,239 @@
-import { useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import Selector from './forms/FunctionalSelector';
 import icons from './site/icons';
 import NavItems from './site/NavItems';
 import NavItemsMeta from './site/NavItemsMeta';
 import initializeData from './utils/InitializeData';
-import getKey from './utils/KeyGenerator';
 import Timer from './utils/Timer';
 import Calculator from "./utils/Calculator";
 
-const Home = () => {
-  const initCategories = [
-    'all', 'play', 'train', 'track', 'convert', 'schedule', 'document',
-    'reflect', 'simplify', 'improve'
-  ];
+const INIT_CATEGORIES = [
+  'all', 'play', 'train', 'track', 'convert', 'schedule', 'document',
+  'reflect', 'simplify', 'improve'
+];
 
+const MENUS_INIT = {
+  all: NavItems,
+  play: [
+    "Scores",
+    "Waves",
+    "SurfDasboard",
+    "Sets",
+    "TicTacToe",
+    //"CrosswordPuzzle",
+    "Roulette",
+    "BlackJack",
+    "Poker",
+    "Animation",
+    "Checkers",
+    "WheelOfFortune",
+    "News", // Added News to play menu
+    "Water",
+    "Music",
+    "Grocery"
+  ],
+  train: [
+    "TrainingLog",
+    "Journals",
+    "Circuit"
+  ],
+  track: [
+    "TrainingLog",
+    "Journals",
+    "Scores",
+    "Fuel",
+    "Camp",
+    "Parks",
+    "Moon",
+    "PhotoAssistant",
+    "Notes",
+    "Tasks",
+    "Sets",
+    //"Events",
+    "Links",
+    "Sessions",
+    "Dose",
+    "Expenses",
+    "Interest",
+    "Mortgage",
+    "Budget",
+    "TradeView",
+    "Trade",
+    "Crypto",
+    "Pricing",
+    "Collections",
+    "WorkDay",
+    "BusinessTax",
+    "GeoZipFind",
+    "Weather"
+  ],
+  convert: [
+    "TrainingLog",
+    "Fuel",
+    "Parks",
+    "PhotoAssistant",
+    "Expenses",
+    "Interest",
+    "Mortgage",
+    "Budget",
+    "Pricing",
+    "Converter",
+    "Currency",
+    "Collections",
+    "WorkDay",
+    "NaturalRX"
+  ],
+  schedule: [
+    "Scheduler",
+    "Camp",
+    "Dose",
+    "Todos"
+  ],
+  document: [
+    "TrainingLog",
+    "Journals",
+    "Scores",
+    "Camp",
+    "Cook",
+    "NaturalRX",
+    "Notes",
+    "Tasks",
+    "Sets",
+    //"Events",
+    "Links",
+    "Sessions",
+    "Expenses",
+    "Interest",
+    "Budget",
+    "Pricing",
+    "Collections",
+    "WorkDay",
+    "BusinessTax",
+    "Note",
+    "Charges"
+  ],
+  reflect: [
+    "TrainingLog",
+    "Journals",
+    "Scores",
+    "Fuel",
+    "Parks",
+    "PhotoAssistant",
+    "Notes",
+    "Links",
+    "Sessions",
+    "Note",
+    "Photos",
+    "Videos",
+    "Wiki"
+  ],
+  simplify: [
+    "TrainingLog",
+    "Journals",
+    "Scores",
+    "Tide",
+    "Buoys",
+    "Camp",
+    "Scheduler",
+    "Mortgage",
+    "Shop",
+    "Vote",
+    "House",
+    "Cook",
+    "NaturalRX",
+    "Links",
+    "Garden",
+    "Fishing",
+    "Translate",
+    "Videos",
+    "Photos",
+    "News", // Added News to simplify menu
+    "Water",
+    "Music",
+    "Grocery"
+  ],
+  improve: [
+    "TrainingLog",
+    "Journals",
+    "Camp",
+    "Scheduler",
+    "Mortgage",
+    "Circuit",
+    "NaturalRX"
+  ],
+  admin: [
+    "MenuScreen",
+    "Admin",
+  ]
+};
+
+const QuickAppButton = memo(function QuickAppButton({ label, onOpen, icon }) {
+  return (
+    <div
+      title={label}
+      onClick={() => onOpen(label)}
+      className='z1 button containerBox flexColumn'
+      tabIndex={0}
+      aria-label={`Open ${label}`}
+      onKeyDown={e => { if (e.key === 'Enter') onOpen(label); }}
+    >
+      {icon}
+    </div>
+  );
+});
+
+const PortraitAppButton = memo(function PortraitAppButton({ label, onOpen, icon, classes }) {
+  return (
+    <div
+      className='ml-auto pl-10 pr-10 mr-auto'
+      title={label}
+      tabIndex={0}
+      aria-label={`Open ${label}`}
+      onClick={() => onOpen(label)}
+      onKeyDown={e => { if (e.key === 'Enter') onOpen(label); }}
+    >
+      <div className={classes}>
+        <div className='size50 m-10 mt-20 text-outline-dark'>
+          {icon}
+        </div>
+        <div className='color-yellow text-outline-dark'>
+          {label}
+        </div>
+      </div>
+    </div>
+  );
+});
+
+const SelectableAppButton = memo(function SelectableAppButton({ label, onToggle, icon, isSelected }) {
+  const btnClasses = `containerDetail fl-left pb-15 m-5 pl-15 pr-15 bg-${isSelected ? 'black' : 'lite'}`;
+  return (
+    <div
+      className={btnClasses}
+      title={label}
+      tabIndex={0}
+      aria-label={`Select ${label}`}
+      onClick={() => onToggle(label)}
+      onKeyDown={e => { if (e.key === 'Enter') onToggle(label); }}
+    >
+      <div className='size30 m-10 mt-20'>
+        {icon}
+      </div>
+      <div className='color-yellow'>
+        {label}
+      </div>
+    </div>
+  );
+});
+
+const Home = () => {
+
+  const history = useHistory();
   const [showCalc, setShowCalc] = useState();
   const [result, setResult] = useState();
   const [firstTime, setFirstTime] = useState();
   const [categorySort, setCategorySort] = useState();
   const [menus, setMenus] = useState();
-  const [menuItems, setMenuItems] = useState();
   const [categories, setCategories] = useState();
   const [addCategoryDialog, setAddCategoryDialog] = useState();
   const [newCategory, setNewCategory] = useState('');
@@ -30,142 +244,6 @@ const Home = () => {
 
   const handleCalculatorSubmit = (val) => {
     setResult(val);
-  };
-
-  // Menu definitions
-  const menusInit = {
-    all: NavItems,
-    play: [
-      "Scores",
-      "Waves",
-      "Sets",
-      "TicTacToe",
-      //"CrosswordPuzzle",
-      "Roulette",
-      "BlackJack",
-      "Poker",
-      "Animation",
-      "Checkers",
-      "WheelOfFortune"
-    ],
-    train: [
-      "TrainingLog",
-      "Journals",
-      "Circuit"
-    ],
-    track: [
-      "TrainingLog",
-      "Journals",
-      "Scores",
-      "Fuel",
-      "Parks",
-      "Moon",
-      "PhotoAssistant",
-      "Notes",
-      "Tasks",
-      "Sets",
-      //"Events",
-      "Links",
-      "Sessions",
-      "Dose",
-      "Expenses",
-      "Interest",
-      "Budget",
-      "TradeView",
-      "Pricing",
-      "Collections",
-      "WorkDay",
-      "BusinessTax",
-      "GeoZipFind",
-      "Weather"
-    ],
-    convert: [
-      "TrainingLog",
-      "Fuel",
-      "Parks",
-      "PhotoAssistant",
-      "Expenses",
-      "Interest",
-      "Budget",
-      "Pricing",
-      "Converter",
-      "Currency",
-      "Collections",
-      "WorkDay",
-      "NaturalRX"
-    ],
-    schedule: [
-      "Scheduler",
-      "Dose",
-      "Todos"
-    ],
-    document: [
-      "TrainingLog",
-      "Journals",
-      "Scores",
-      "Cook",
-      "NaturalRX",
-      "Notes",
-      "Tasks",
-      "Sets",
-      //"Events",
-      "Links",
-      "Sessions",
-      "Expenses",
-      "Interest",
-      "Budget",
-      "Pricing",
-      "Collections",
-      "WorkDay",
-      "BusinessTax",
-      "Note",
-      "Charges"
-    ],
-    reflect: [
-      "TrainingLog",
-      "Journals",
-      "Scores",
-      "Fuel",
-      "Parks",
-      "PhotoAssistant",
-      "Notes",
-      "Links",
-      "Sessions",
-      "Note",
-      "Photos",
-      "Videos",
-      "Wiki"
-    ],
-    simplify: [
-      "TrainingLog",
-      "Journals",
-      "Scores",
-      "Tide",
-      "Buoys",
-      "Scheduler",
-      "Shop",
-      "Vote",
-      "House",
-      "Cook",
-      "NaturalRX",
-      "Links",
-      "Garden",
-      "Fishing",
-      "Translate",
-      "Videos",
-      "Photos"
-    ],
-    improve: [
-      "TrainingLog",
-      "Journals",
-      "Scheduler",
-      "Circuit",
-      "NaturalRX"
-    ]
-    ,admin: [
-      "MenuScreen",
-      "Admin",
-    ]
   };
 
   // Add new category
@@ -207,20 +285,21 @@ const Home = () => {
       setMeta(storedMeta);
     }
     localStorage.setItem('firstTime', 'false');
-    setMeta(initializeData('NavItemsMeta', NavItemsMeta));
-    const storedCategories = initializeData('categories', initCategories);
+    const storedCategories = initializeData('categories', INIT_CATEGORIES);
     //console.log(`useEffect => storedCategories: ${JSON.stringify(storedCategories, null, 2)}`);
     //console.log(`useEffect => storedCategories.length: ${storedCategories.length}`);
-    if (storedCategories.length > 0) {
-      setCategories(storedCategories);
+    // Deduplicate categories to prevent multiple 'recent' entries
+    const uniqueCategories = Array.from(new Set(storedCategories.length > 0 ? storedCategories : INIT_CATEGORIES));
+    if (uniqueCategories.length > 0) {
+      setCategories(uniqueCategories);
     } else {
-      setCategories(initCategories);
+      setCategories(INIT_CATEGORIES);
     }
-    const storedMenus = initializeData('menus', menusInit);
-    const mergedMenus = { ...menusInit, ...storedMenus };
+    const storedMenus = initializeData('menus', MENUS_INIT);
+    const mergedMenus = { ...MENUS_INIT, ...storedMenus };
 
-    Object.keys(menusInit).forEach((category) => {
-      const defaultItems = Array.isArray(menusInit[category]) ? menusInit[category] : [];
+    Object.keys(MENUS_INIT).forEach((category) => {
+      const defaultItems = Array.isArray(MENUS_INIT[category]) ? MENUS_INIT[category] : [];
       const existingItems = Array.isArray(mergedMenus[category]) ? mergedMenus[category] : [];
       mergedMenus[category] = Array.from(new Set([...existingItems, ...defaultItems]));
     });
@@ -229,15 +308,7 @@ const Home = () => {
     if (Object.keys(mergedMenus).length > 1) {
       setMenus(mergedMenus);
     } else {
-      setMenus(menusInit);
-    }
-    const storedMenuItems = localStorage.getItem('menuItems');
-    if (storedMenuItems) {
-      if (JSON.parse(storedMenuItems).includes('529')) {
-        setMenuItems(JSON.parse(storedMenuItems));
-      } else {
-        setMenuItems(NavItems);
-      }
+      setMenus(MENUS_INIT);
     }
     // If no menus found, set to default
     if (Object.keys(mergedMenus).length === 0)
@@ -246,37 +317,36 @@ const Home = () => {
     // Redirect to /reactor/home if needed
     const timer = setTimeout(() => {
       const path = String(window.location).split('/reactor/')[1];
-      if (path === '') window.location = `/reactor/home`;
+      if (path === '') history.push('/home');
     }, 1000);
-    const timer2 = setTimeout(() => {
-      if (categories) {
-        setCategorySort(categories[0]);
-      } else {
-        setCategories(initCategories);
-        setCategorySort('all');
-      }
-    }, 1010);
     return () => {
       clearTimeout(timer);
-      clearTimeout(timer2);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const currentMenuItems = useMemo(() => {
+    if (!(menus && categorySort && Array.isArray(menus[categorySort]))) return [];
+    return menus[categorySort];
+  }, [menus, categorySort]);
+
   useEffect(() => {
     if (editCategory) {
-      setSelectedApps(menuItems);
+      setSelectedApps(currentMenuItems);
       setNewCategory(categorySort);
       setAddCategoryDialog(true);
     }
-  }, [editCategory, menuItems, categorySort]);
+  }, [editCategory]);
   useEffect(() => {
     if (menus && Object.keys(menus).length === 0) return;
     localStorage.setItem('menus', JSON.stringify(menus));
   }, [menus]);
   useEffect(() => {
     if (categories && categories.length > 0) {
-      if (!categories.includes(categorySort)) {
-        setCategorySort(categories[0]);
-        localStorage.setItem('categories', JSON.stringify(categories));
+      // Deduplicate categories before storing to prevent accumulation of duplicates
+      const uniqueCategories = Array.from(new Set(categories));
+      localStorage.setItem('categories', JSON.stringify(uniqueCategories));
+      if (!uniqueCategories.includes(categorySort)) {
+        setCategorySort(uniqueCategories[0]);
       }
     }
   }, [categories, categorySort]);
@@ -286,81 +356,124 @@ const Home = () => {
   }, [meta]);
   useEffect(() => {
     if (menus && categorySort && menus[categorySort]) {
-      const newMenuItems = menus[categorySort];
-      setMenuItems(newMenuItems);
-      localStorage.setItem('menuItems', JSON.stringify(newMenuItems));
+      localStorage.setItem('menuItems', JSON.stringify(currentMenuItems));
       localStorage.setItem('categorySort', categorySort);
     }
-  }, [menus, categorySort]);
+  }, [menus, categorySort, currentMenuItems]);
 
   // Category selector handler
-  const selectSort = (_, __, value) => setCategorySort(value);
+  const selectSort = useCallback((_, __, value) => setCategorySort(value), []);
 
-  const getIcon = (label) => icons[String(label).replace(' ', '').toLowerCase()];
+  const getIcon = useCallback((label) => icons[String(label).replace(' ', '').toLowerCase()], []);
+  const normalizedSearch = appSearch.trim().toLowerCase();
+
+  const matchesSearch = useCallback((appLabel) => {
+    if (!normalizedSearch) return true;
+    const categoryTerms = Array.isArray(meta?.[appLabel]) ? meta[appLabel] : [];
+    return categoryTerms.some(term => typeof term === 'string' && term.toLowerCase().includes(normalizedSearch));
+  }, [meta, normalizedSearch]);
+
+  const filteredMenuItems = useMemo(() => {
+    return currentMenuItems.filter(matchesSearch);
+  }, [currentMenuItems, matchesSearch]);
 
   // Portrait button for menu items
   const classes = 'containerBox button bg-lite w-150 height-100 ml-auto mr-10 mt-10 mb-10';
-    const getApp = (label) => {
-      // Always start from the full menus object
-      const newMenus = { ...menus };
-  
+
+  const openDirectApp = useCallback((label) => {
+    history.push(`/${label}`);
+  }, [history]);
+
+  const getApp = useCallback((label) => {
+    // Always start from the latest menus object
+    setMenus((prevMenus) => {
+      const currentMenus = prevMenus || {};
+      const nextMenus = { ...currentMenus };
+
       // Update 'recent' without removing other keys
       const MAX_RECENT = 10;
-      const recentList = newMenus.recent ? [...newMenus.recent] : [];
-      newMenus.recent = [label, ...recentList.filter(item => item !== label)].slice(0, MAX_RECENT);
-  
-      // Optionally add 'recent' to categories if not present
-      if (!categories.includes('recent')) setCategories([...categories, 'recent']);
-      setMenus(newMenus);
-      window.location = `/reactor/${label}`;
-  };
-  const portraitButton = (label) => (
-    <div
-      className='ml-auto pl-10 pr-10 mr-auto'
-      title={label}
-      key={getKey(label)}
-      tabIndex={0}
-      aria-label={`Open ${label}`}
-      onClick={() => getApp(label)}
-      onKeyDown={e => { if (e.key === 'Enter') getApp(label); }}
-    >
-      <div className={classes}>
-        <div className='size50 m-10 mt-20 text-outline-dark'>
-          {getIcon(label)}
-        </div>
-        <div className='color-yellow text-outline-dark'>
-          {label}
-        </div>
-      </div>
-    </div>
-  );
-  const selectCategory = (label) => {
+      const recentList = currentMenus.recent ? [...currentMenus.recent] : [];
+      const nextRecent = [label, ...recentList.filter(item => item !== label)].slice(0, MAX_RECENT);
+
+      const recentUnchanged = (
+        Array.isArray(currentMenus.recent)
+        && currentMenus.recent.length === nextRecent.length
+        && currentMenus.recent.every((item, index) => item === nextRecent[index])
+      );
+
+      if (recentUnchanged) {
+        return prevMenus;
+      }
+
+      nextMenus.recent = nextRecent;
+      return nextMenus;
+    });
+
+    // Optionally add 'recent' to categories if not present
+    setCategories((prevCategories = []) => (
+      prevCategories.includes('recent') ? prevCategories : [...prevCategories, 'recent']
+    ));
+
+    history.push(`/${label}`);
+  }, [history]);
+
+  const selectCategory = useCallback((label) => {
     setSelectedApps((prev = []) =>
       prev.includes(label) ? prev.filter(item => item !== label) : [...prev, label]
     );
-  };
-  const selectButton = (label) => {
-    const isSelected = Array.isArray(selectedApps) && selectedApps.includes(label);
-    const btnClasses = `containerDetail fl-left pb-15 m-5 pl-15 pr-15 bg-${isSelected ? 'black' : 'lite'}`;
-    return (
-      <div
-        className={btnClasses}
-        title={label}
-        key={label}
-        tabIndex={0}
-        aria-label={`Select ${label}`}
-        onClick={() => selectCategory(label)}
-        onKeyDown={e => { if (e.key === 'Enter') selectCategory(label); }}
-      >
-        <div className='size30 m-10 mt-20'>
-          {icons[String(label).toLowerCase()]}
-        </div>
-        <div className='color-yellow'>
-          {label}
-        </div>
-      </div>
-    );
-  };
+  }, []);
+
+  const selectedAppsSet = useMemo(() => new Set(selectedApps || []), [selectedApps]);
+
+  const selectableAppButtons = useMemo(() => {
+    return NavItems.map((item) => {
+      const isSelected = selectedAppsSet.has(item);
+      return (
+        <SelectableAppButton
+          key={item}
+          label={item}
+          onToggle={selectCategory}
+          icon={icons[String(item).toLowerCase()]}
+          isSelected={isSelected}
+        />
+      );
+    });
+  }, [selectedAppsSet, selectCategory]);
+
+  const quickMenuButtons = useMemo(() => {
+    return filteredMenuItems.map((notification) => (
+      <QuickAppButton
+        key={notification}
+        label={notification}
+        onOpen={openDirectApp}
+        icon={getIcon(notification)}
+      />
+    ));
+  }, [filteredMenuItems, openDirectApp, getIcon]);
+
+  const firstTimeButtons = useMemo(() => {
+    return NavItems.map((notification) => (
+      <QuickAppButton
+        key={notification}
+        label={notification}
+        onOpen={openDirectApp}
+        icon={icons[notification.toLowerCase()]}
+      />
+    ));
+  }, [openDirectApp]);
+
+  const portraitMenuButtons = useMemo(() => {
+    return filteredMenuItems.map((item) => (
+      <PortraitAppButton
+        key={item}
+        label={item}
+        onOpen={getApp}
+        icon={getIcon(item)}
+        classes={classes}
+      />
+    ));
+  }, [filteredMenuItems, getApp, getIcon, classes]);
+
   const deleteCategory = () => {
     const newCategories = categories.filter(cat => cat !== newCategory);
     const newMenus = { ...menus };
@@ -379,28 +492,7 @@ const Home = () => {
         ? (
         <div className='containerDetail p-10 color-lite bg-lite mt-5 ml-10 mr-10'>
           <div className='relative containerDetail p-10 m-5 flexContainer bg-dark h-scroll'>
-            {menuItems &&  menuItems
-              .filter(notification => {
-                if (!appSearch) return true;
-                const lowerSearch = appSearch.toLowerCase();
-                const categoryTerms = meta[notification] || [];
-                return categoryTerms.some(term =>
-                  term.toLowerCase().includes(lowerSearch)
-                );
-              })
-              .map((notification, index) => (
-                <div
-                  title={notification}
-                  onClick={() => window.location = `/reactor/${notification}`}
-                  key={getKey(index)}
-                  className='z1 button containerBox flexColumn'
-                  tabIndex={0}
-                  aria-label={`Open ${notification}`}
-                  onKeyDown={e => { if (e.key === 'Enter') window.location = `/reactor/${notification}`; }}
-                >
-                  {getIcon(notification)}
-                </div>
-              ))}
+            {quickMenuButtons}
           </div>
           <div className='containerBox mr-10 pr-10'>
             <div className='pl-10 pr-10 pb-10 size30 bold color-yellow'>Let's Go!</div>
@@ -439,7 +531,7 @@ const Home = () => {
                 </div>
                 <div className='containerDetail ht-120 x-scroll-only'>
                   <div className='content-width-fit'>
-                    {NavItems.map(item => selectButton(item))}
+                    {selectableAppButtons}
                   </div>
                 </div>
                 <div className='containerBox flexContainer'>
@@ -485,19 +577,7 @@ const Home = () => {
           /> 
           */}
           <div className='containerDetail p-10 m-5 flexContainer bg-dark h-scroll'>
-            {NavItems.map((notification, index) => (
-              <div
-                title={notification}
-                onClick={() => window.location = `/reactor/${notification}`}
-                key={getKey(index)}
-                className='containerBox flexColumn'
-                tabIndex={0}
-                aria-label={`Open ${notification}`}
-                onKeyDown={e => { if (e.key === 'Enter') window.location = `/reactor/${notification}`; }}
-              >
-                {icons[notification.toLowerCase()]}
-              </div>
-            ))}
+            {firstTimeButtons}
           </div>
           <div className='containerBox bg-green'>
             <Timer />
@@ -509,17 +589,8 @@ const Home = () => {
           <div className='menu-container containerBox'>
             {
               //NavItems
-              (menus && categorySort && menus[categorySort] && menus[categorySort].length > 0)
-              ? menus[categorySort]
-                .filter(app => {
-                  if (!appSearch) return true;
-                  const lowerSearch = appSearch.toLowerCase();
-                  const categoryTerms = meta[app] || [];
-                  return categoryTerms.some(term =>
-                    term.toLowerCase().includes(lowerSearch)
-                  );
-                })
-                .map(item => portraitButton(item))
+              (filteredMenuItems.length > 0)
+              ? portraitMenuButtons
               : 'No apps found'
             }
           </div>
@@ -549,10 +620,10 @@ const Home = () => {
         <div className='containerBox'>
           <div
             className='button p-20 bold size20 r-10 bg-dkGreen'
-            onClick={() => window.location = 'https://jsongithub.github.io/portfolio/'}
+            onClick={() => window.open('https://jsongithub.github.io/portfolio/', '_blank', 'noopener,noreferrer')}
             tabIndex={0}
             aria-label='Open portfolio'
-            onKeyDown={e => { if (e.key === 'Enter') window.location = 'https://jsongithub.github.io/portfolio/'; }}
+            onKeyDown={e => { if (e.key === 'Enter') window.open('https://jsongithub.github.io/portfolio/', '_blank', 'noopener,noreferrer'); }}
           >
             portfolio
           </div>

@@ -1,7 +1,7 @@
 // TradingViewWidgetWrapper.js
-import React from 'react';
+import React, { useState } from 'react';
 import { 
-    AdvancedRealTimeChart, 
+    MiniChart,
     TechnicalAnalysis, 
     SymbolInfo, 
     CompanyProfile,
@@ -12,6 +12,8 @@ const TradingViewWidgetWrapper = ({
     symbol,
     height
 }) => {
+    const [showDetails, setShowDetails] = useState(false);
+
     return (
         <div className='m-5'>
             <div className='containerDetail mb-5 bg-tintedMediumDark'>
@@ -42,34 +44,25 @@ const TradingViewWidgetWrapper = ({
                 />
             </div>
             <div className='containerDetail bg-tintedMediumDark mb-5'>
-                <AdvancedRealTimeChart
-                    symbol={symbol}
+                <MiniChart
+                    symbol={symbol?.includes(':') ? symbol : `NASDAQ:${symbol}`}
                     width='100%'
                     height={height}
                     locale='en'
                     theme='dark'
                     colorTheme='dark'
                     isTransparent={true}
-                    allow_symbol_change={true}
-                    calendar={false}
-                    details={true}
-                    hide_side_toolbar={true}
-                    hide_top_toolbar={true}
-                    hide_legend={false}
-                    hide_volume={true}
-                    hotlist={false}
-                    interval='D'
-                    save_image={true}
-                    timezone='Etc/UTC'
-                    backgroundColor='#0F0F0F'
-                    gridColor='rgba(242, 242, 242, 0.06)'
-                    watchlist={[]}
-                    withdateranges={false}
-                    compareSymbols={[]}
-                    studies={[]}
-                    autosize={false}
+                    dateRange='12M'
                 />
             </div>
+            <div
+                className='containerDetail p-10 mb-5 bg-tintedMediumDark button'
+                onClick={() => setShowDetails(v => !v)}
+                style={{ textAlign: 'center', cursor: 'pointer', color: '#aaa', fontSize: 13 }}
+            >
+                {showDetails ? '▲ Hide Details' : '▼ Show Details (Profile & Fundamentals)'}
+            </div>
+            {showDetails && (
             <div className='containerDetail mb-10 bg-tintedMediumDark'>
                 <CompanyProfile
                     symbol={symbol}
@@ -80,6 +73,8 @@ const TradingViewWidgetWrapper = ({
                     height={height}
                 />
             </div>
+            )}
+            {showDetails && (
             <div className='containerDetail mb-10 bg-tintedMediumDark'>
                 <FundamentalData
                     symbol={symbol}
@@ -90,40 +85,7 @@ const TradingViewWidgetWrapper = ({
                     height={height}
                 />
             </div>
-            {/*
-            <div className='containerDetail mb-10 bg-tintedMediumDark'>
-                <SymbolOverview
-                    symbols={symbol}
-                    theme='dark'
-                    colorTheme='dark'
-                    width='100%'
-                    height={height}
-                    lineColor='#00FF00'
-                    lineWidth={1}
-                    lineType={0}
-                    chartType='area'
-                    fontColor='#DDDDDD'
-                    gridLineColor='#555'
-                    volumeUpColor='#00FF00'
-                    volumeDownColor='#FF0000'
-                    backgroundColor='#0F0F0F'
-                    widgetFontColor='#DBDBDB'
-                    upColor='#00FF00'
-                    downColor='#f7525f'
-                    borderUpColor='#22ab94'
-                    borderDownColor='#f7525f'
-                    wickUpColor='#22ab94'
-                    wickDownColor='#f7525f'
-                    isTransparent={true}
-                    locale='en'
-                    chartOnly={false}
-                    scalePosition='left'
-                    scaleMode='Normal'
-                    bottomColor='#00ff0007'
-                    topColor='#00ff0039'
-                />
-            </div>
-            */}
+            )}
         </div>
     );
 };

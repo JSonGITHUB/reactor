@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useEffect, useRef, useState } from 'react';
 import initCircuitTracking from '../tracker/initCircuitTracking';
 import initializeData from '../utils/InitializeData'
 import validate from '../utils/validate';
@@ -25,6 +25,7 @@ const CircuitsParent = ({
   const [dimensions, setDimensions] = useState({ width: 560, height: 349 });
   const [groupIndex, setGroupIndex] = useState(0);
   const [group, setGroup] = useState();
+  const previousActiveIndexRef = useRef(null);
   const notNull = (value) => (value !== null) ? true : false;
   const notEmpty = (value) => (value !== "") ? true : false;
   const isGood = (value) => (notNull(value) && notEmpty(value)) ? true : false;
@@ -150,7 +151,40 @@ const CircuitsParent = ({
       //console.log(`nextActiveIndex => ${nextActiveIndex}`);
       setNextActiveIndex(nextActiveIndex);
     }
-    scrollToElement(activeIndex);
+    const previousActiveIndex = previousActiveIndexRef.current;
+    if (previousActiveIndex === null) {
+      scrollToElement(activeIndex);
+      previousActiveIndexRef.current = activeIndex;
+      return;
+    }
+
+    if (previousActiveIndex !== activeIndex) {
+      const previousExerciseIndex = Number(getIndex(String(previousActiveIndex), 'index', 'groupIndex'));
+      const currentExerciseIndex = Number(getIndex(String(activeIndex), 'index', 'groupIndex'));
+      const previousIsChill = String(previousActiveIndex).includes('chillindex');
+      const currentIsChill = String(activeIndex).includes('chillindex');
+      const previousIsSession = String(previousActiveIndex).includes('sessionindex');
+
+      // Do not auto-reposition during chill transitions; keep user's viewport stable.
+      if (previousIsChill || currentIsChill) {
+        previousActiveIndexRef.current = activeIndex;
+        return;
+      }
+
+      let scrollStep = 280;
+      if (!Number.isNaN(previousExerciseIndex) && !Number.isNaN(currentExerciseIndex)) {
+        if (currentExerciseIndex > previousExerciseIndex) {
+          scrollStep = 280;
+        } else if (currentExerciseIndex < previousExerciseIndex) {
+          scrollStep = -280;
+        } else if (previousIsSession) {
+          scrollStep = 280;
+        }
+      }
+
+      window.scrollBy({ top: scrollStep, behavior: 'smooth' });
+    }
+    previousActiveIndexRef.current = activeIndex;
   }, [activeIndex]);
   useEffect(() => {
     if (activated === undefined) {
@@ -170,13 +204,17 @@ const CircuitsParent = ({
     if (elementId !== null) {
       const element = document.getElementById(elementId);
       if (element) {
-        element.style.scrollMarginTop = (window.innerWidth < 400) ? '320px' : '500px';
+        const baseMarginTop = (window.innerWidth < 400) ? 120 : 300;
+        const isChillTimer = String(elementId).includes('chillindex');
+        const adjustedMarginTop = isChillTimer ? Math.max(0, baseMarginTop - 200) : baseMarginTop;
+        element.style.scrollMarginTop = `${adjustedMarginTop}px`;
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
   };
   const jumpToActive = () => {
-    if (activated) {
+    const isChillTimer = String(activeIndex).includes('chillindex');
+    if (activated && !isChillTimer) {
       scrollToElement(activeIndex);
     }
   }

@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 // Hook that fetches browser geolocation and reverse geocodes it via Nominatim.
 // Provides a snapshot object plus a request function so it can be reused outside the UI component.
-const useLocationData = ({ autoRequest = true } = {}) => {
+// Now also accepts a coords tuple [latitude, longitude] to bypass geolocation.
+const useLocationData = ({ autoRequest = true, coords = null } = {}) => {
     const [location, setLocation] = useState(null);
     const [data, setData] = useState(null);
     const [zipCode, setZipCode] = useState('');
@@ -26,6 +27,11 @@ const useLocationData = ({ autoRequest = true } = {}) => {
             if (opts && typeof opts.latitude === 'number' && typeof opts.longitude === 'number') {
                 latitude = opts.latitude;
                 longitude = opts.longitude;
+                setLocation({ latitude, longitude });
+            } else if (coords && Array.isArray(coords) && coords.length === 2 &&
+                typeof coords[0] === 'number' && typeof coords[1] === 'number') {
+                latitude = coords[0];
+                longitude = coords[1];
                 setLocation({ latitude, longitude });
             } else {
                 if (!navigator.geolocation) {
@@ -74,10 +80,22 @@ const useLocationData = ({ autoRequest = true } = {}) => {
     }, []);
 
     useEffect(() => {
-        if (autoRequest) {
+        if (coords && Array.isArray(coords) && coords.length === 2 &&
+            typeof coords[0] === 'number' && typeof coords[1] === 'number') {
+            // If coords is provided, use it directly and do not call requestLocation
+            (async () => {
+                setLoading(true);
+                setError('');
+                try {
+                    await requestLocation({ latitude: coords[0], longitude: coords[1] });
+                } finally {
+                    setLoading(false);
+                }
+            })();
+        } else if (autoRequest) {
             requestLocation();
         }
-    }, [autoRequest, requestLocation]);
+    }, [autoRequest, requestLocation, coords]);
 
     const snapshot = useMemo(
         () => ({

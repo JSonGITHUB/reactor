@@ -3,6 +3,7 @@ import getKey from '../utils/KeyGenerator';
 import useCurrentTime from '../utils/useCurrentTime';
 import TideDisplay from './TideDisplay';
 import initializeData from '../utils/InitializeData';
+import { getNearestTideStation } from './api';
 
 const defaultTide = {
     data: {
@@ -38,7 +39,9 @@ const defaultTide = {
 };
 
 const NewTide = ({
-    display
+    display,
+    lat,
+    lon
 }) => {
 
     const [tides, setNewTideData] = useState(null);
@@ -47,7 +50,8 @@ const NewTide = ({
     const time = useCurrentTime();
     const startTime = time[0].startTime;
     const endTime = time[0].endTime;
-    const uriMLL = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=NOS.COOPS.TAC.WL&begin_date=${startTime}&end_date=${endTime}&datum=MLLW&station=9410230&time_zone=lst_ldt&units=english&interval=hilo&format=json`;
+    const hiloStation = getNearestTideStation(lat || 32.87, lon || -117.26);
+    const uriMLL = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=NOS.COOPS.TAC.WL&begin_date=${startTime}&end_date=${endTime}&datum=MLLW&station=${hiloStation.id}&time_zone=lst_ldt&units=english&interval=hilo&format=json`;
     const findClosestDate = (data) => {
         let datesArray = (data.predictions) ? data.predictions.map((tide) => tide.t) : [];
         if (!Array.isArray(datesArray) || datesArray.length === 0) {
@@ -219,6 +223,8 @@ const NewTide = ({
                 getTide={getTide}
                 getTideTime={getTideTime}
                 getTideHeight={getTideHeight}
+                lat={lat}
+                lon={lon}
             />;
 };
 

@@ -2,7 +2,8 @@ import React, { useMemo, PureComponent } from 'react';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 
 const TideGraph = ({
-    tideChart
+    tideChart,
+    stationName
 }) => {
 
     const convertedData = useMemo(() => {
@@ -153,7 +154,7 @@ const TideGraph = ({
         (isDataConverted)
             ? <div>
                 <div className='color-yellow size20 containerDetail contentLeft pl-20 pt-10 pb-10 bg-lite'>
-                    La Jolla
+                    {stationName || 'Tide Station'}
                 </div>
                 <div className='mb-20'></div>
                 <div className='ml--20 mb-20'>

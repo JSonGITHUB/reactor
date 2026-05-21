@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import getKey from '../utils/KeyGenerator';
+import React, { useState, useEffect, useRef } from 'react';
 import Sounds from '../sound/Sounds';
 import icons from '../site/icons';
 import TodoTimer from '../utils/TodoTimer';
@@ -9,21 +8,56 @@ import initializeData from '../utils/InitializeData';
 export default function Todos(props) {
 
     const getLocal = () => initializeData('todos', initTodos);
-    const [todos, setTodos] = useState(getLocal());
+    // On mount, recalculate currentTime for active timers
+    const recalcActiveTimers = (todosArr) => {
+        const now = Date.now();
+        return todosArr.map(todo => {
+            if (todo.activated && (todo.type === 'timer' || todo.type === 'track') && todo.startTime > 0) {
+                // For timer: countdown, for track: count up
+                const elapsed = Math.floor((now - todo.startTime) / 1000);
+                if (todo.type === 'timer') {
+                    // Countdown: currentTime = max(0, original time - elapsed)
+                    return { ...todo, currentTime: Math.max(0, (todo.time || 0) - elapsed) };
+                } else {
+                    // Track: currentTime = original + elapsed
+                    return { ...todo, currentTime: (todo.currentTime || 0) + elapsed };
+                }
+            }
+            return todo;
+        });
+    };
+    const [todos, setTodos] = useState(() => recalcActiveTimers(getLocal()));
     const [pausedTodos, setPausedTodos] = useState();
     const [edit, setEdit] = useState(false);
     const [add, setAdd] = useState(false);
     const [paused, setPaused] = useState(false);
+    const listRef = useRef(null);
     const todoInput = () => document.getElementById('todo').value;
     const clearInput = () => document.getElementById('todo').value = '';
     const getNewTodo = (todo) => todo.charAt(0).toUpperCase() + todo.slice(1);
 
     useEffect(() => {
         localStorage.setItem('todos', JSON.stringify(todos));
-        console.log('TODOS CHANGED!!!!!!!!!!!!!!!!!!!!')
+        //console.log('TODOS CHANGED!!!!!!!!!!!!!!!!!!!!')
         //const timerActive = todos.some(obj => obj.activated);
         //setTimerOn(timerActive);
     }, [todos]);
+
+    // On mount (or when component is shown), recalc timers from storage
+    useEffect(() => {
+        setTodos(recalcActiveTimers(getLocal()));
+    }, []);
+
+    useEffect(() => {
+        if (add && listRef.current) {
+            setTimeout(() => {
+                const lastTodoElement = listRef.current?.lastElementChild;
+                if (lastTodoElement) {
+                    lastTodoElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }, 0);
+        }
+    }, [add]);
 
     const addTodo = () => {
         const newTodo = {
@@ -48,6 +82,16 @@ export default function Todos(props) {
         console.log(`remove todo: ${todos[id].description}`);
         const newTodos = [...todos];
         newTodos.splice(id, 1)
+        setTodos(newTodos);
+        Sounds.boop(0, 1);
+    }
+    const moveTodo = (fromIndex, toIndex) => {
+        if (toIndex < 0 || toIndex >= todos.length || fromIndex === toIndex) {
+            return;
+        }
+        const newTodos = [...todos];
+        const [movedTodo] = newTodos.splice(fromIndex, 1);
+        newTodos.splice(toIndex, 0, movedTodo);
         setTodos(newTodos);
         Sounds.boop(0, 1);
     }
@@ -286,19 +330,23 @@ export default function Todos(props) {
                     </label>
                 </div>
             </div>
-            <div id='list' className='height--360 scroll'>
+            <div id='list' ref={listRef} className='height--360 scroll'>
                 {todos.map((todo, index) => (
-                    <div key={getKey('todo')} className='containerDetail p-10 size20 scrollSnapTop'>
+                    <div key={`${todo.description}-${index}`} className='containerDetail size20 scrollSnapTop bg-lite m-5'>
 
-                        <div className='containerDetail p-10 size20 p-20 flexContainer color-lite'>
+                        <div className='containerDetail p-10 size20 p-20 flexContainer color-yellow bg-lite'>
                             <div className=''>
-                                <input
-                                    name='completed'
-                                    className='regular-checkbox button mr-10'
-                                    checked={todo.completed}
-                                    type='checkbox'
-                                    onChange={() => toggleCheckbox(index)}
-                                />
+                                {
+                                    (todo.type === 'counter' && (todo.counterTarget > todo.counterValue))
+                                    ? ''
+                                    : <input
+                                        name='completed'
+                                        className='regular-checkbox button mr-10'
+                                        checked={todo.completed}
+                                        type='checkbox'
+                                        onChange={() => toggleCheckbox(index)}
+                                    />
+                                }
                             </div>
                             <div className=''>
                                 {
@@ -307,11 +355,19 @@ export default function Todos(props) {
                                         : ((todo.type === 'track')
                                             ? <div className='size25'>{icons.track}</div>
                                             : ((todo.type === 'counter')
-                                                ? <div className='size25'>🔢</div>
+                                                ? ((Number(todo.counterTarget || 0) > 0) && (todo.counterValue < todo.counterTarget) && todo.counterValue > 0) 
+                                                    ? <div className='containerDetail brdr-lite p-10 size20 bg-lite'>
+                                                        {
+                                                            (todo.counterValue) 
+                                                            ? <span className='color-yellow'>{todo.counterValue}</span> 
+                                                            : '🔢'
+                                                        }
+                                                        </div> 
+                                                    : '🔢'
                                                 : ''))
                                 }
                             </div>
-                            <div className='size25 ml-10'>
+                            <div className={`size25 ml-10 ${((todo.type === 'counter') && ((todo.counterValue < todo.counterTarget) && (todo.counterValue > 0))) ? 'mt-10' : ''}`}>
                                 {todo.description}
                             </div>
                         </div>
@@ -327,7 +383,7 @@ export default function Todos(props) {
                                         />
                                     */
                                     ? <div className='flexContainer'>
-                                        <div className='flex2Column containerDetail p-10 size20 m-5'>
+                                        <div className='flex2Column size20 mt-5'>
                                             {/*
                                                         <TimerComponent
                                                             todo={todo}
@@ -352,45 +408,51 @@ export default function Todos(props) {
                                             {
                                                 (todo.type === 'counter')
                                                     ? <div className='flexContainer size20'>
-                                                        <div className='containerDetail flex1Column flexContainer size20 bg-lite'>
+                                                        <div className='containerDetail mr-1 flex2Column flexContainer size20'>
+                                                            <div
+                                                                title='reset counter'
+                                                                className='containerDetail bg-dkGreen size30 flex5Column button color-lite mt-5 pt-20 mr-5'
+                                                                onClick={() => resetCounter(index)}
+                                                            >
+                                                                ♻️
+                                                            </div>
+                                                            <div
+                                                                title='set counter target'
+                                                                className='containerDetail bg-dkYellow size35 flex5Column button color-lite mt-5 pt-15'
+                                                                onClick={() => setCounterTarget(index)}
+                                                            >
+                                                                🎯<span className='copyright ml--10'>{todo.counterTarget || 0}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className='containerDetail flex1Column flexContainer size20'>
                                                             <div
                                                                 title='decrement'
-                                                                className='containerDetail p-20 size20 flex3Column button color-lite bg-dkRed text-outline-light'
+                                                                className='containerDetail p-20 size20 flex3Column button color-lite bg-dkRed text-outline-lite'
                                                                 onClick={() => updateCounter(index, -1)}
                                                             >
                                                                 {icons.minus}
                                                             </div>
                                                             <div className='containerDetail pt-15 flex3Column ml-5 mr-5 size30 bg-lite color-yellow'>
-                                                                <div>{Number(todo.counterValue || 0)}</div>
+                                                                {
+                                                                    (todo.counterValue < todo.counterTarget)
+                                                                    ? Number(todo.counterValue || 0)
+                                                                    : <span className='color-red'>{Number(todo.counterValue || 0)}</span>
+                                                                }
                                                                 {
                                                                     Number(todo.counterTarget || 0) > 0
-                                                                        ? <div className='size12 color-lite'>
-                                                                            / {Number(todo.counterTarget || 0)}
+                                                                        ? <div className='size25 color-lite'>
+                                                                            <span className='size12'>of {Number(todo.counterTarget || 0)}</span>
                                                                         </div>
                                                                         : null
                                                                 }
                                                             </div>
                                                             <div
                                                                 title='increment'
-                                                                className='containerDetail p-20 size20 flex3Column button color-yellow bg-dkGreen text-outline-light'
+                                                                className='containerDetail p-20 size20 flex3Column button color-yellow bg-dkGreen text-outline-lite'
                                                                 onClick={() => updateCounter(index, 1)}
                                                             >
                                                                 {icons.plus}
                                                             </div>
-                                                        </div>
-                                                        <div
-                                                            title='reset counter'
-                                                            className='size60 flex5Column button color-lite mt-20 contentRight'
-                                                            onClick={() => resetCounter(index)}
-                                                        >
-                                                            🔄
-                                                        </div>
-                                                        <div
-                                                            title='set counter target'
-                                                            className='size60 flex5Column button color-lite mt-20'
-                                                            onClick={() => setCounterTarget(index)}
-                                                        >
-                                                            🎯
                                                         </div>
                                                     </div>
                                                     : <TodoTimer
@@ -411,60 +473,78 @@ export default function Todos(props) {
                             }
                             {
                                 (edit || ((add === true) && (index === todos.length - 1)))
-                                    ? <div className='flexContainer containerDetail p-10 size20'>
+                                    ? <div className='flexContainer containerDetail p-10 size20 color-yellow'>
                                         <div 
                                             title='checkbox' 
                                             id={`setTimert${index}`} 
                                             name={`setTimer${todo.description}`} 
-                                            className='button flex4Column containerDetail size12 m-1' 
+                                            className={`button flex4Column containerDetail size25 p-10 m-1 ${(todo.type === 'checkbox') ? 'brdr-green' : ''}`}
                                             onClick={() => checkboxTodo(index)}
                                         >
-                                            {icons.checkbox} Check
+                                            {icons.checkbox}
                                         </div>
                                         <div 
                                             title={`${icons.timer} Timer`}
                                             id={`setTimert${index}`} 
                                             name={`setTimer${todo.description}`} 
-                                            className='button flex4Column containerDetail size12 m-1' 
+                                            className={`button flex4Column containerDetail size25 p-10 m-1 ${(todo.type === 'timer') ? 'brdr-green' : ''}`}
                                             onClick={() => timerTodo(index)}
                                         >
-                                            {icons.timer} Timer
+                                            {icons.timer}
                                         </div>
                                         <div 
                                             title={`${icons.track} Track`}
                                             id={`time${index}`} 
                                             name={`time${todo.description}`} 
-                                            className='button flex4Column containerDetail size12 m-1' 
+                                            className={`button flex4Column containerDetail size25 p-10 m-1 ${(todo.type === 'track') ? 'brdr-green' : ''}`} 
                                             onClick={() => trackTodo(index)}
                                         >
-                                            {icons.track} Track
+                                            {icons.track}
                                         </div>
                                         <div
                                             title='Counter'
                                             id={`counter${index}`}
                                             name={`counter${todo.description}`}
-                                            className='button flex4Column containerDetail size12 m-1'
+                                            className={`button flex4Column containerDetail size25 p-10 m-1 ${(todo.type === 'counter') ? 'brdr-green' : ''}`}
                                             onClick={() => counterTodo(index)}
                                         >
-                                            🔢 Counter
+                                            🔢
+                                        </div>
+                                        <div
+                                            title='Move up'
+                                            id={`moveup${index}`}
+                                            name={`moveup${todo.description}`}
+                                            className={`button flex4Column containerDetail size25 p-10 m-1 ${(index === 0) ? 'opacity30' : ''}`}
+                                            onClick={() => moveTodo(index, index - 1)}
+                                        >
+                                            {icons.upArrow}
+                                        </div>
+                                        <div
+                                            title='Move down'
+                                            id={`movedown${index}`}
+                                            name={`movedown${todo.description}`}
+                                            className={`button flex4Column containerDetail size25 p-10 m-1 ${(index === todos.length - 1) ? 'opacity30' : ''}`}
+                                            onClick={() => moveTodo(index, index + 1)}
+                                        >
+                                            {icons.downArrow}
                                         </div>
                                         <div 
                                             title={`${icons.edit} Edit`}
                                             id={`edit${index}`} 
                                             name={`edit${todo.description}`} 
-                                            className='button flex4Column containerDetail size12 m-1' 
+                                            className='button flex4Column containerDetail size25 p-10 m-1' 
                                             onClick={() => editTodo(index)}
                                         >
-                                            {icons.edit} Edit
+                                            {icons.edit}
                                         </div>
                                         <div 
                                             title={`${icons.delete} Delete`}
                                             id={`remove${index}`} 
                                             name={`remove${todo.description}`} 
-                                            className='button flex4Column containerDetail size12' 
+                                            className='button flex4Column containerDetail size25 p-10' 
                                             onClick={() => removeTodo(index)}
                                         >
-                                            {icons.delete} Delete
+                                            {icons.delete}
                                         </div>
                                     </div>
                                     : null

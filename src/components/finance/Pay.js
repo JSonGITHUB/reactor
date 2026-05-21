@@ -136,7 +136,7 @@ const Pay = () => {
             </div>
 
             <div className='containerDetail bg-lite mb-5'>
-                <div className='containerDetail color-yellow mb-5 size20 bg-lite'>
+                <div className='containerDetail color-yellow size20 bg-lite'>
                     <CollapseToggleButton
                         title={<span className='color-yellow'>Income Type</span>}
                         isCollapsed={incomeSectionCollapsed}
@@ -147,15 +147,15 @@ const Pay = () => {
                 {
                     incomeSectionCollapsed
                         ? null
-                        : <div className='containerDetail'>
-                    <select
-                        className='containerDetail p-10 m-5 color-lite width--10'
-                        value={incomeType}
-                        onChange={(event) => setIncomeType(event.target.value)}
-                    >
-                        <option value='annual'>Annual Salary</option>
-                        <option value='hourly'>Hourly Rate</option>
-                    </select>
+                        : <div className='containerDetail mt-5'>
+                            <select
+                                className='containerDetail p-10 m-5 color-lite width--10'
+                                value={incomeType}
+                                onChange={(event) => setIncomeType(event.target.value)}
+                            >
+                                <option value='annual'>Annual Salary</option>
+                                <option value='hourly'>Hourly Rate</option>
+                            </select>
 
                 {
                     incomeType === 'annual'
@@ -194,7 +194,7 @@ const Pay = () => {
             </div>
 
             <div className='containerDetail bg-lite mb-5'>
-                <div className='containerDetail color-yellow mb-5 size20 bg-lite'>
+                <div className='containerDetail color-yellow size20 bg-lite'>
                     <CollapseToggleButton
                         title={<span className='color-yellow'>Taxes & Paycheck</span>}
                         isCollapsed={taxesSectionCollapsed}
@@ -205,30 +205,30 @@ const Pay = () => {
                 {
                     taxesSectionCollapsed
                         ? null
-                        : <div className='containerDetail mb-5'>
-                    <input
-                        className='containerDetail p-10 m-5 color-lite width--10'
-                        type='number'
-                        placeholder='Federal tax %'
-                        value={federalTaxPercent}
-                        onChange={(event) => setFederalTaxPercent(event.target.value)}
-                    />
-                    <input
-                        className='containerDetail p-10 m-5 color-lite width--10'
-                        type='number'
-                        placeholder='State tax %'
-                        value={stateTaxPercent}
-                        onChange={(event) => setStateTaxPercent(event.target.value)}
-                    />
-                    <select
-                        className='containerDetail p-10 m-5 color-lite width--10'
-                        value={payWeeks}
-                        onChange={(event) => setPayWeeks(event.target.value)}
-                    >
-                        <option value='1'>1 week paycheck</option>
-                        <option value='2'>2 week paycheck</option>
-                    </select>
-                </div>
+                        : <div className='containerDetail mb-5 mt-5'>
+                            <input
+                                className='containerDetail p-10 m-5 color-lite width--10'
+                                type='number'
+                                placeholder='Federal tax %'
+                                value={federalTaxPercent}
+                                onChange={(event) => setFederalTaxPercent(event.target.value)}
+                            />
+                            <input
+                                className='containerDetail p-10 m-5 color-lite width--10'
+                                type='number'
+                                placeholder='State tax %'
+                                value={stateTaxPercent}
+                                onChange={(event) => setStateTaxPercent(event.target.value)}
+                            />
+                            <select
+                                className='containerDetail p-10 m-5 color-lite width--10'
+                                value={payWeeks}
+                                onChange={(event) => setPayWeeks(event.target.value)}
+                            >
+                                <option value='1'>1 week paycheck</option>
+                                <option value='2'>2 week paycheck</option>
+                            </select>
+                        </div>
                 }
             </div>
 

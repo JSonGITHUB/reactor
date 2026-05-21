@@ -27,7 +27,8 @@ const SettingsMenu = ({
     changeList,
     emptyCart,
     deselectList,
-    selectList
+    selectList,
+    onShowShoppingHistory
 
 }) => {
 
@@ -37,6 +38,8 @@ const SettingsMenu = ({
         'Sort by Name',
         'Font Size',
         'Tax',
+        'Report',
+        'Shopping History',
         //'Save', 
         //'Restore',
         'Export',
@@ -60,8 +63,19 @@ const SettingsMenu = ({
         console.log(`aislessss: ${JSON.stringify(aisles, null, 2)}`);
     }, [aisles]);
 
+    // Add report display state
+    const [showReport, setShowReport] = useState(false);
+
     const getSetting = (index) => {
-        if (status.settings[index] === 'Clear') {
+        if (status.settings[index] === 'Report') {
+            setShowReport(true);
+            return;
+        } else if (status.settings[index] === 'Shopping History') {
+            if (typeof onShowShoppingHistory === 'function') {
+                onShowShoppingHistory();
+            }
+            return;
+        } else if (status.settings[index] === 'Clear') {
             clear();
         } else if (status.settings[index] === 'Sort by Name') {
             sortName();
@@ -109,32 +123,15 @@ const SettingsMenu = ({
         }));
     };
     const getCategories = () => {
-        //aisles.filter((_, index) => ![2, 3, 4].includes(index));
+        // Add 'Items Left' and 'In Cart' to the categories list
+        let categories = [];
         if (aisles) {
-            const newCategories = [ ...aisles];
-            if (newCategories[0] !== 'all') {
-                const categories = ['all', ...aisles];
-                console.log(`categories: ${JSON.stringify(categories, null, 2)}`);
-                return categories;
-            }
-            console.log(`newCategories: ${JSON.stringify(newCategories, null, 2)}`);
-            return newCategories;
+            categories = ['all', 'Items Left', 'In Cart', ...aisles];
+        } else {
+            const savedCategories = initializeData('aisles', aislesInit);
+            categories = ['all', 'Items Left', 'In Cart', ...savedCategories];
         }
-        const savedCategories = initializeData('aisles', aislesInit);
-        if (savedCategories[0] !== 'all') {
-            const newSavedCategories = ['all', ...savedCategories];
-            console.log(`newSavedCategories: ${JSON.stringify(newSavedCategories, null, 2)}`);
-            return newSavedCategories;
-        }
-        console.log(`savedCategories: ${JSON.stringify(savedCategories, null, 2)}`);
-        return savedCategories;
-
-        /*         
-        if (itemMenuDefault.concat(aisles)) {
-            return itemMenuDefault.concat(aisles).slice(5);
-        }
-        return itemMenuDefault.concat(aislesInit).slice(5); 
-        */
+        return categories;
     }
     /* 
     const getCategories = () => { 
@@ -144,21 +141,47 @@ const SettingsMenu = ({
         return itemMenuDefault.concat(aislesInit).slice(5);
     } 
     */
-    const settingsMenu = <div id='shopSettingsMenu' className='bg-lite'>
+   const closeReport = () => {
+       setShowReport(false);
+       const newState = {...state};
+       newState.displaySettings = false;
+       setStatus(prevState => ({
+           ...prevState,
+           displaySettings: newState.displaySettings
+       }))
+    }
+    // --- REPORT INTERFACE ---
+    let reportContent = null;
+    if (showReport) {
+        // Lazy load the report component
+        const Report = require('./ShopReport').default;
+        reportContent = <Report onClose={() => closeReport()} />;
+    }
+
+    const settingsMenu = <div id='shopSettingsMenu' className='containerDetail bg-tintedDark'>
             {
                 (state.displaySettings) 
-                ? status.settings.map((item, index) => {
-                    return (
-                        <div 
-                            title={status.settings[index]}
-                            key={getKey(status.settings[index])} 
-                            className='settingsButton' 
-                            onClick={() => getSetting(index)}
-                        >
-                            { status.settings[index] }
-                        </div>  
-                    )
-                })
+                ? <>
+                    {
+                        (showReport)
+                        ? reportContent
+                        : null
+                    }
+                    {
+                        (showReport)
+                        ? null
+                        : status.settings.map((item, index) => (
+                                <div 
+                                    title={status.settings[index]}
+                                    key={getKey(status.settings[index])} 
+                                    className='containerDetail p-15 button size20 m-5 color-yellow bg-lite' 
+                                    onClick={() => getSetting(index)}
+                                >
+                                    { status.settings[index] }
+                                </div>  
+                            ))
+                    }
+                  </>
                 : null
             }
             {!!shopFilter && (
@@ -168,7 +191,14 @@ const SettingsMenu = ({
                         selected={category}
                         label={category}
                         items={getCategories()}
-                        onChange={updateCategory}
+                        onChange={(groupTitle, id, selected) => {
+                            if (selected === 'Items Left' || selected === 'In Cart') {
+                                // Set a special category value for 'Items Left' or 'In Cart'
+                                setCategory(selected);
+                            } else {
+                                updateCategory(groupTitle, id, selected);
+                            }
+                        }}
                         padding='5px'
                         fontSize='15'
                     />

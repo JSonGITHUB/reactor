@@ -1,13 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import initializeData from '../utils/InitializeData';
+import LocalStorageImporter from './LocalStorageImporter';
+import NavItems from '../site/NavItems';
 
 const Admin = () => {
+    const history = useHistory();
+    const demoActiveKey = 'reactorAdminDemoActive';
+    const demoTimerKey = '__reactorAdminDemoTimer';
+    const demoDelayMs = 10000;
 
     const [key, setKey] = useState('');
     const [action, setAction] = useState('view');
     const [data, setData] = useState(null);
     const [message, setMessage] = useState(null);
     const [editableData, setEditableData] = useState('');
+    const [isDemoRunning, setIsDemoRunning] = useState(false);
 
     const localDataItems = [
         'Select a key',
@@ -109,7 +117,8 @@ const Admin = () => {
         'activated',
         'countdown',
         'ticker',
-        'breathing'
+        'breathing',
+        'All Data'
     ];
     
     const defaultData = [
@@ -128,9 +137,61 @@ const Admin = () => {
         console.log(`data: ${data}`);
     }, [data]);
 
+    const clearDemoTimer = () => {
+        if (window[demoTimerKey]) {
+            window.clearTimeout(window[demoTimerKey]);
+            window[demoTimerKey] = null;
+        }
+    };
+
+    const stopDemo = () => {
+        localStorage.removeItem(demoActiveKey);
+        clearDemoTimer();
+        setIsDemoRunning(false);
+    };
+
+    const startDemo = () => {
+        const demoRoutes = NavItems.filter((item) => item && item !== 'Admin');
+        if (!demoRoutes.length) {
+            setMessage('No demo routes found.');
+            return;
+        }
+
+        stopDemo();
+        localStorage.setItem(demoActiveKey, 'true');
+        setIsDemoRunning(true);
+        setMessage(`▶️ Demo started (${demoRoutes.length} routes, ${demoDelayMs / 1000}s each).`);
+
+        let demoIndex = 0;
+
+        const runDemoStep = () => {
+            if (localStorage.getItem(demoActiveKey) !== 'true') {
+                stopDemo();
+                return;
+            }
+
+            if (demoIndex >= demoRoutes.length) {
+                stopDemo();
+                return;
+            }
+
+            const routeLabel = demoRoutes[demoIndex];
+            demoIndex += 1;
+            history.push(`/${routeLabel}`);
+
+            if (demoIndex < demoRoutes.length) {
+                window[demoTimerKey] = window.setTimeout(runDemoStep, demoDelayMs);
+            } else {
+                stopDemo();
+            }
+        };
+
+        runDemoStep();
+    };
+
     const handleView = () => {
         const storedData = initializeData(key, null);
-        if (key === '*') {
+        if (key === '*' || key.toLowerCase() === 'all data') {
               const allData = Object.fromEntries(Object.entries(localStorage));
               setMessage(null);
               setData(JSON.stringify(allData, null, 2));
@@ -196,6 +257,7 @@ const Admin = () => {
         setMessage(`${key} has been added to localStorage`);
     };
     const handleActionChange = (e) => {
+        stopDemo();
         setAction(e.target.value);
         setData(null);
         setMessage(null);
@@ -276,6 +338,22 @@ const Admin = () => {
                 </label>
                 <button className='containerBox button width-100-percent bg-green' type='submit'>Select</button>
                 <button className='containerBox button width-100-percent bg-red' type='button' onClick={handleRemoveMenuSystem}>🗑️ Remove Menu System Data</button>
+                {isDemoRunning
+                    ? <button
+                        className='containerBox button width-100-percent bg-red'
+                        type='button'
+                        onClick={() => { stopDemo(); setMessage('⏹️ Demo stopped.'); }}
+                    >
+                        ⏹️ Stop Demo
+                    </button>
+                    : <button
+                        className='containerBox button width-100-percent bg-green'
+                        type='button'
+                        onClick={startDemo}
+                    >
+                        ▶️ Demo
+                    </button>
+                }
             </form>
 
             {action === 'view' && data && (
@@ -320,6 +398,7 @@ const Admin = () => {
                     <h3>{message}</h3>
                 </div>
             )}
+            <LocalStorageImporter />
         </div>
     );
 };

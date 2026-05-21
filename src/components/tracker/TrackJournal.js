@@ -10,6 +10,16 @@ const TrackJournal = ({
     targetElementRef,
     scrollToBottom
 }) => {
+    const normalizeJournalGroups = (groups) => {
+        if (!Array.isArray(groups)) return [];
+
+        return groups.map((group) => ({
+            ...group,
+            display: group?.display !== false,
+            journals: Array.isArray(group?.journals) ? group.journals : Array.isArray(group?.journal) ? group.journal : [],
+            journal: Array.isArray(group?.journal) ? group.journal : Array.isArray(group?.journals) ? group.journals : [],
+        }));
+    };
 
     const storedSort = initializeData('journalSort', 'false');
     const initialSort = storedSort ? storedSort === 'true' : true;
@@ -20,16 +30,26 @@ const TrackJournal = ({
             //setJournals(initJournalTracking);
         } else {
             if (journals !== null && journals !== undefined && journals !== 'undefined' && journals[0] !== undefined) {
-                localStorage.setItem('journalTracking', JSON.stringify(journals));
+                localStorage.setItem('journalTracking', JSON.stringify(normalizeJournalGroups(journals)));
             }
         }
     }, [journals]);
 
     useEffect(() => {
-        const storedJournals = (journals !== null && journals !== undefined) 
-                                ? journals 
-                                : initializeData('journalTracking', initJournalTracking)
-        setJournals(storedJournals);
+        if (!Array.isArray(journals)) {
+            setJournals(initializeData('journalTracking', initJournalTracking));
+            return;
+        }
+
+        const needsNormalization = journals.some((group) => (
+            group?.display === undefined
+            || !Array.isArray(group?.journals)
+            || !Array.isArray(group?.journal)
+        ));
+
+        if (needsNormalization) {
+            setJournals(normalizeJournalGroups(journals));
+        }
     }, [journals, setJournals]);
 
     useEffect(() => {
@@ -50,7 +70,7 @@ const TrackJournal = ({
         if (isGood(journalDescription)) {
             updatedJournals[journalGroupIndex].journals.push(newJournal)
             updatedJournals[journalGroupIndex].journal.push(newJournal)
-            setJournals(updatedJournals);
+            setJournals(normalizeJournalGroups(updatedJournals));
         }
 
     };
@@ -66,7 +86,7 @@ const TrackJournal = ({
         if (toggle) {
             const newJournals = [...journals];
             removeItemByIndex(newJournals, journalGroupIndex);
-            setJournals(newJournals);
+            setJournals(normalizeJournalGroups(newJournals));
         }
     }
     return (
@@ -83,9 +103,9 @@ const TrackJournal = ({
             (sort && journals)
             ? <div className='containerDetail color-lite size20 mb-5'>
                 {
-                    journals.slice().reverse().map((journalGroup, journalGroupIndex, array) => <div key={`journal-group-sorted-${array.length - 1 - journalGroupIndex}-${String(journalGroup?.title || 'group')}`} className=''>
+                    normalizeJournalGroups(journals).slice().reverse().map((journalGroup, journalGroupIndex, array) => <div key={`journal-group-sorted-${array.length - 1 - journalGroupIndex}-${String(journalGroup?.title || 'group')}`} className=''>
                         <JournalGroup
-                            journals={journals}
+                            journals={normalizeJournalGroups(journals)}
                             setJournals={setJournals}
                             journalGroup={journalGroup}
                             journalGroupIndex={(array.length - 1 - journalGroupIndex)}
@@ -100,11 +120,11 @@ const TrackJournal = ({
                 }
             </div>
             : (journals)
-                ? journals.map((journalGroup, journalGroupIndex) => (
-                    (journalGroup.display && journalGroup.display === true)
+                ? normalizeJournalGroups(journals).map((journalGroup, journalGroupIndex) => (
+                    (journalGroup.display !== false)
                         ? <div key={`journal-group-${journalGroupIndex}-${String(journalGroup?.title || 'group')}`} className=''>
                             <JournalGroup
-                                journals={journals}
+                                journals={normalizeJournalGroups(journals)}
                                 setJournals={setJournals}
                                 journalGroup={journalGroup}
                                 journalGroupIndex={journalGroupIndex}

@@ -1,8 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-const AirTemp = ({isMotionOn}) => {
+const AirTemp = ({ isMotionOn, setStatus }) => {
     
-    const [temp,setTemp] = useState() ;      
+    const [temp,setTemp] = useState();
+    const setStatusRef = useRef(setStatus);
+
+    useEffect(() => {
+        setStatusRef.current = setStatus;
+    }, [setStatus]);
+
     useEffect(() => {
         let isMounted = true;
         const controller = new AbortController();
@@ -48,12 +54,26 @@ const AirTemp = ({isMotionOn}) => {
             if (!isMounted) return;
             if (temp !== null) {
                 console.log(`AirTemp => fetchAirTemp => Current air temperature: ${temp} °F`);
-                setTemp(temp)
+                const roundedTemp = Number(temp).toFixed(0);
+                setTemp(roundedTemp);
+                if (typeof setStatusRef.current === 'function') {
+                    setStatusRef.current(prevState => ({
+                        ...prevState,
+                        airTemp: roundedTemp
+                    }));
+                }
             } else {
                 const cachedTempRaw = localStorage.getItem('airTemp');
                 const cachedTemp = cachedTempRaw ? JSON.parse(cachedTempRaw) : null;
                 if (cachedTemp !== null && cachedTemp !== undefined && cachedTemp !== '') {
-                    setTemp(cachedTemp);
+                    const roundedCachedTemp = Number(cachedTemp).toFixed(0);
+                    setTemp(roundedCachedTemp);
+                    if (typeof setStatusRef.current === 'function') {
+                        setStatusRef.current(prevState => ({
+                            ...prevState,
+                            airTemp: roundedCachedTemp
+                        }));
+                    }
                     console.warn('AirTemp => Using cached air temperature');
                 } else {
                     console.log('AirTemp => fetchAirTemp => No temperature data available');

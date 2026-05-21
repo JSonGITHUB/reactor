@@ -6,6 +6,36 @@
     font-family: Arial, sans-serif;
 }
 
+.budget-main-shell {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.budget-main {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+}
+
+.budget-main.expanded {
+    padding-bottom: 0;
+}
+
+.budget-content-expanded {
+    min-height: calc(100vh - 220px);
+}
+
+.budget-restore-tab {
+    position: sticky;
+    bottom: 0px;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    background: transparent;
+}
+
 /* Sidebar */
 .budget-sidebar {
     width: 220px;
@@ -207,12 +237,18 @@
     .budget-manager.sidebar-collapsed {
         flex-direction: column;
     }
-    .sidebar.collapsed {
-        /*display: none;*/
+    .budget-main-shell {
+        width: 100%;
     }
     .budget-main {
         width: 100%;
         height: calc(100% - 300px);
+    }
+    .budget-main.expanded {
+        padding-bottom: 0;
+    }
+    .budget-content-expanded {
+        min-height: calc(100vh - 260px);
     }
     .budget-main .flexContainer>.flexColumn,
     .budget-main .flexContainer>.width-100-percent {

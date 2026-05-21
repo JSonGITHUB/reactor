@@ -44,6 +44,12 @@ const CircuitTimer = ({
     const totalSeconds = (milliseconds) => Math.floor(milliseconds / 1000);
     const id = `${category}index${index}groupIndex${groupIndex}subgroupIndex${subgroupIndex}`;
 
+    useEffect(() => {
+        const localActivated = initializeData('activated', 'false');
+        const shouldRun = activeIndex === id && (activated === true || activated === 'true' || localActivated === 'true');
+        setPause(!shouldRun);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
     const calculateTimeLeft = () => {
         const millisecondsRemaining = currentTime * 1000;
         const elapsedMilliseconds = Number(Date.now() - startTime);
@@ -70,6 +76,11 @@ const CircuitTimer = ({
         setStartTime(Date.now());
         localStorage.setItem('activated', true);
         setPause(false);
+    };
+
+    const isAutoPlayEnabled = () => {
+        const localActivated = initializeData('activated', 'false');
+        return activated === true || activated === 'true' || localActivated === 'true';
     };
     const startManualTimer = () => {
         setActivated(true);
@@ -122,6 +133,20 @@ const CircuitTimer = ({
             jumpToActive();
         }
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        if (activeIndex === id && pause && isAutoPlayEnabled() && currentTime > 0) {
+            startTimer();
+            jumpToActive();
+        }
+    }, [activeIndex, activated]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        if (activeIndex !== id && !pause) {
+            setPause(true);
+        }
+    }, [activeIndex]); // eslint-disable-line react-hooks/exhaustive-deps
+
     const formatTime = (seconds) => {
         if (activeIndex === id) {
             localStorage.setItem('activeCircuitTime', seconds);

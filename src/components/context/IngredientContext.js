@@ -28,6 +28,7 @@ const IngredientParent = ({
         }
     }, []);
     useEffect(() => {
+        //console.log('Saving ingredients to localStorage:', JSON.stringify(ingredients, null, 2));
         if ((validate(ingredients) !== null) && (ingredients !== undefined)) {
             localStorage.setItem('ingredients', JSON.stringify(ingredients));
         } else {

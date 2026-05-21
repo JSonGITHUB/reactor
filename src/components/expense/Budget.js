@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import icons from '../site/icons';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
 import ExpenseEditDialog from './ExpenseEditDialog';
@@ -7,6 +7,7 @@ import { BarChart, Bar, PieChart, Pie, LineChart, Line, XAxis, YAxis, CartesianG
 import './Budget.css';
 
 const STANDARD_CATEGORIES = ['Housing', 'Food', 'Transport', 'Utilities', 'Entertainment', 'Misc'];
+const BUDGET_LIST_HIDDEN_KEY = 'budgetListHidden';
 
 const CATEGORY_ICONS = {
     'Housing': '🏠',
@@ -34,15 +35,18 @@ const Budget = () => {
     const [compareMode] = useState(false);
     const [selectedForCompare] = useState([]);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [budgetListHidden, setBudgetListHidden] = useState(false);
     const [graphCollapsed, setGraphCollapsed] = useState(true);
     const [incomeSort, setIncomeSort] = useState('source'); // 'source' | 'amount'
     const [expenseSort, setExpenseSort] = useState('category'); // 'category' | 'amount'
     const [categoryManageCollapsed, setCategoryManageCollapsed] = useState(true);
     const [editingExpense, setEditingExpense] = useState(null);
     const [addingCategory, setAddingCategory] = useState(null);
+    const sidebarActionsRef = useRef(null);
 
     useEffect(() => {
         const storedBudgets = JSON.parse(localStorage.getItem('budgets')) || [];
+        const storedBudgetListHidden = localStorage.getItem(BUDGET_LIST_HIDDEN_KEY) === 'true';
         // Ensure all expenses have assignedCategory field
         const normalizedBudgets = storedBudgets.map(b => ({
             ...b,
@@ -53,6 +57,7 @@ const Budget = () => {
             }))
         }));
         setBudgets(normalizedBudgets);
+        setBudgetListHidden(storedBudgetListHidden);
         if (normalizedBudgets.length) setCurrentBudgetId(normalizedBudgets[0].id);
     }, []);
 
@@ -61,6 +66,11 @@ const Budget = () => {
             localStorage.setItem('budgets', JSON.stringify(budgets));
         }
     }, [budgets]);
+
+    useEffect(() => {
+        localStorage.setItem(BUDGET_LIST_HIDDEN_KEY, String(budgetListHidden));
+    }, [budgetListHidden]);
+
     useEffect(() => {
         console.log(`Budget => useEffect => activeTabs: ${JSON.stringify(activeTabs, null, 2)}`);
     }, [activeTabs]);
@@ -74,6 +84,32 @@ const Budget = () => {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    const revealBudgetList = () => {
+        setBudgetListHidden(false);
+        if (window.innerWidth < 700) {
+            setTimeout(() => {
+                sidebarActionsRef.current?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'end'
+                });
+            }, 80);
+        }
+    };
+
+    const hideBudgetList = () => {
+        setBudgetListHidden(true);
+    };
+
+    const openBudget = (budgetId) => {
+        setCurrentBudgetId(budgetId);
+        if (!activeTabs.includes(budgetId)) {
+            setActiveTabs([...activeTabs, budgetId]);
+        }
+        if (window.innerWidth < 700) {
+            setBudgetListHidden(true);
+        }
+    };
 
     const addBudget = () => {
         const name = prompt('Enter new budget name');
@@ -379,7 +415,7 @@ const Budget = () => {
                         className='containerDetail p-20 button bg-green color-yellow size20'
                         onClick={() => addIncome(budget.id)}
                     >
-                        <span className='text-outline-light mr-5'>➕</span> Add Income
+                        <span className='text-outline-lite mr-5'>➕</span> Add Income
                     </div>
                     <select 
                         value={incomeSort} 
@@ -423,7 +459,7 @@ const Budget = () => {
                         className='containerDetail p-20 button bg-red color-yellow size20 flex2Column'
                         onClick={() => addExpense(budget.id)}
                     >
-                        <span className='text-outline-light mr-5'>➕</span> Add Expense
+                        <span className='text-outline-lite mr-5'>➕</span> Add Expense
                     </div>
                     <select 
                         value={expenseSort} 
@@ -706,28 +742,37 @@ const Budget = () => {
 
     return (
         <div className={`mt--25 ml-5 mr-5 budget-manager${sidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
-            {sidebarCollapsed && (
+            {sidebarCollapsed && !budgetListHidden && (
                 <div className='containerDetail color-lite bg-lite mb-5 p-20 size20 contentLeft'>
                     <span className='size20 m-5'>
                         {icons.budget}
                     </span> Budget Manager
                 </div>
             )}
+            {!budgetListHidden && (
             <aside className={`containerDetail sidebar${sidebarCollapsed ? ' collapsed' : ''}`}>
                 {!sidebarCollapsed && (
-                    <div className='containerDetail color-lite bg-lite mb-5 p-20 size20'>
-                        <span className='size40 m-5'>{icons.budget}</span> Budget Manager
+                    <div className='containerDetail color-lite bg-lite mb-5 p-20 size20 flexContainer'>
+                        <div className='flex2Column'>
+                            <span className='size40 m-5'>{icons.budget}</span> Budget Manager
+                        </div>
+                        <div className='flexColumn contentRight'>
+                            <button
+                                className='containerDetail p-10 bg-lite button'
+                                title='Hide budget list'
+                                onClick={hideBudgetList}
+                            >
+                                Hide
+                            </button>
+                        </div>
                     </div>
                 )}
-                <div className='containerDetail ht-300 bg-lite scroll'>
+                <div className='containerDetail bgl-lite ht-200'>
                     {budgets.map(b => (
                         <div key={b.id} className='containerDetail p-5 m-5 color-lite contentLeft flexContainer'>
                             <div
                                 className='button flex2Column'
-                                onClick={() => {
-                                    setCurrentBudgetId(b.id);
-                                    if (!activeTabs.includes(b.id)) setActiveTabs([...activeTabs, b.id]);
-                                }}
+                                onClick={() => openBudget(b.id)}
                             >
                                 {/*<input type='checkbox' checked={selectedForCompare.includes(b.id)} onChange={() => toggleCompare(b.id)} />*/}
                                 <span className='ml-10 size20 color-yellow'>{b.name}</span>
@@ -751,12 +796,12 @@ const Budget = () => {
                         </div>
                     ))}
                 </div>
-                <div className='containerDetail flexContainer mt-5 bg-lite'>
+                <div ref={sidebarActionsRef} className='containerDetail flexContainer mt-5 bg-lite'>
                     <div 
                         className='containerDetail button flexContainer size20 p-5 m-5 flex3Column bg-lite color-lite' 
                         onClick={addBudget}
                     >
-                        <div className='flexColumn text-outline-light pl-10'>
+                        <div className='flexColumn text-outline-lite pl-10'>
                             ➕
                         </div> 
                         <div className='flex2Column p-10'>
@@ -792,37 +837,61 @@ const Budget = () => {
                         */
                     }
                     {sidebarCollapsed && (
-                        <button 
-                            className='containerDetail size20 p-5 m-5 flex3Column bg-lite' 
-                            onClick={() => setSidebarCollapsed(false)}
-                        >
-                            {icons.menu || '→ Expand'}
-                        </button>
+                        <>
+                            <button 
+                                className='containerDetail size20 p-5 m-5 flex3Column bg-lite' 
+                                onClick={() => setSidebarCollapsed(false)}
+                            >
+                                {icons.menu || '→ Expand'}
+                            </button>
+                            <button
+                                className='containerDetail size20 p-5 m-5 flex3Column bg-lite color-yellow'
+                                title='Hide budget list'
+                                onClick={hideBudgetList}
+                            >
+                                Hide
+                            </button>
+                        </>
                     )}
                 </div>
             </aside>
-            <main className={`budget-main h-scroll ${(sidebarCollapsed) ? 'mt--5' : null} ${(activeTabs.length < 2) ? 'width--10 mr-5' : null}`}>
-                <div className={`${(activeTabs.length < 2) ? 'width--100-percent' : 'flexContainer'}`}>
-                    {
-                        (!compareMode)
-                        ? activeTabs.map(tabId => (
-                            <div 
-                                key={tabId} 
-                                onClick={() => setCurrentBudgetId(tabId)} 
-                                className={`${(activeTabs.length < 2) ? 'width-100-percent' : 'flex2Column'} brdr-transparent ${tabId === currentBudgetId ? 'active' : ''}`}
-                            >
-                                <div className={`ml-5 budget-content${sidebarCollapsed ? ' stacked' : ''}`}>
-                                    {renderBudgetView(budgets.find(b => b.id === (tabId)) || { name: 'No Budget Selected', income: [], expenses: [] })}
+            )}
+            <div className='budget-main-shell'>
+                <main className={`budget-main h-scroll ${(sidebarCollapsed && !budgetListHidden) ? 'mt--5' : null} ${(activeTabs.length < 2) ? 'width--10 mr-5' : null} ${budgetListHidden ? 'expanded' : ''}`}>
+                    <div className={`${(activeTabs.length < 2) ? 'width--100-percent' : 'flexContainer'}`}>
+                        {
+                            (!compareMode)
+                            ? activeTabs.map(tabId => (
+                                <div 
+                                    key={tabId} 
+                                    onClick={() => setCurrentBudgetId(tabId)} 
+                                    className={`${(activeTabs.length < 2) ? 'width-100-percent' : 'flex2Column'} brdr-transparent ${tabId === currentBudgetId ? 'active' : ''}`}
+                                >
+                                    <div className={`ml-5 budget-content${sidebarCollapsed ? ' stacked' : ''} ${budgetListHidden ? 'budget-content-expanded' : ''}`}>
+                                        {renderBudgetView(budgets.find(b => b.id === (tabId)) || { name: 'No Budget Selected', income: [], expenses: [] })}
+                                    </div>
                                 </div>
-                            </div>
-                        ))
-                        : null
-                    }
-                </div>
-                <div className={`budget-content${sidebarCollapsed ? ' stacked' : ''}`}>
-                    {compareMode ? renderComparisonView() : (activeTabs.length < 1) ? renderBudgetView(budgets.find(b => b.id === currentBudgetId) || { name: 'No Budget Selected', income: [], expenses: [] }) : null}
-                </div>
-            </main>
+                            ))
+                            : null
+                        }
+                    </div>
+                    <div className={`budget-content${sidebarCollapsed ? ' stacked' : ''} ${budgetListHidden ? 'budget-content-expanded' : ''}`}>
+                        {compareMode ? renderComparisonView() : (activeTabs.length < 1) ? renderBudgetView(budgets.find(b => b.id === currentBudgetId) || { name: 'No Budget Selected', income: [], expenses: [] }) : null}
+                    </div>
+                    {budgetListHidden && (
+                        <div className='budget-restore-tab containerDetail mt-5'>
+                            <button
+                                className='containerDetail button bg-green color-yellow p-15 size20 contentLeft width-100-percent ml--5'
+                                title='Show budget list'
+                                onClick={revealBudgetList}
+                            >
+                                <span className='mr-10'>{icons.budget}</span>
+                                Budgets
+                            </button>
+                        </div>
+                    )}
+                </main>
+            </div>
             {editingExpense && (
                 <ExpenseEditDialog
                     expense={editingExpense.expense}

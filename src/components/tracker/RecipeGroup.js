@@ -86,7 +86,7 @@ const RecipeGroup = ({
         selectedNewRecipeGroup.collapsed = collapse;
         setRecipes(newRecipes);
         setCollapsed(collapse);
-        setCollapseAll(false);
+        setCollapseAll(undefined);
     }
 
     const addToGroup = (recipeGroupIndex, elementRef) => {
@@ -113,7 +113,14 @@ const RecipeGroup = ({
             setRecipes(newRecipes);
         }
     }
-    const recipeGroupTitle = (recipeGroup.category) ? `${recipeGroup.category} (${recipeGroup.recipes.length})` : 'New Category';
+    const visibleRecipeCount = Array.isArray(recipeGroup.recipes)
+        ? recipeGroup.recipes.filter((recipe) => recipe?.display === true || recipe?.display === 'true').length
+        : 0;
+    const recipeGroupTitle = (recipeGroup.category) ? <>{recipeGroup.category} <span className='copyright color-lite'>{visibleRecipeCount}</span></> : 'New Category';
+
+    if (visibleRecipeCount === 0) {
+        return null;
+    }
     
     return <div className=''>
             <div className=''>
@@ -154,7 +161,7 @@ const RecipeGroup = ({
                                 onClick={() => addToGroup(recipeGroupIndex, targetElementRef)}
                             >
                                 <div className='flexContainer'>
-                                    <div className='flex2Column text-outline-light size20 mt-5'>
+                                    <div className='flex2Column text-outline-lite size20 mt-5'>
                                         {icons.plus}
                                     </div>
                                     <div className='flex2Column p-5 size25'>
