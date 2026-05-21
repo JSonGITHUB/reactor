@@ -11,7 +11,7 @@
  * @param {string} options.scene - optional scene type
  * @returns {Object} - Recommended camera settings
  */
-export default function calculatePhotoSettings({
+function calculatePhotoSettings({
     subject = '',
     description = '',
     lighting = 'normal',
@@ -106,3 +106,5 @@ export default function calculatePhotoSettings({
 
     return settings;
 }
+
+module.exports = calculatePhotoSettings;
