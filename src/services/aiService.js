@@ -1,9 +1,9 @@
 export async function fetchAIRecommendations(prompt) {
-  // Use Netlify function in production, local proxy in development
+
   const isProd = process.env.NODE_ENV === 'production';
   const apiUrl = isProd
-    ? 'https://jazzy-dango-dd81f4.netlify.app/.netlify/functions/ai-recommendations'
-    : '/api/ai/recommendations';
+    ? 'https://keepfrothalive.netlify.app/.netlify/functions/ai-recommendations'
+    : '/api/ai/recommendations'; // local proxy
 
   const response = await fetch(apiUrl, {
     method: 'POST',
@@ -14,6 +14,5 @@ export async function fetchAIRecommendations(prompt) {
   if (!response.ok) {
     throw new Error('AI request failed');
   }
-
   return response.json();
 }

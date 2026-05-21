@@ -1,20 +1,30 @@
-exports.handler = async function (event, context) {
-    const prompt = event.body ? JSON.parse(event.body) : {};
+// Netlify Function: ai-recommendations.js
+// Uses calculatePhotoSettings for dynamic recommendations
 
-    // TODO: Replace with real AI logic or API call
-    return {
-        statusCode: 200,
-        body: JSON.stringify({
-            iso: 200,
-            shutterSpeed: '1/60s',
-            aperture: 'f/4',
-            explanation: 'For indoor shots, use a higher ISO and a moderate aperture.',
-            tips: [
-                'Stabilize your camera.',
-                'Use available light.',
-                'Mind your background.'
-            ],
-            mock: false
-        })
-    };
+const path = require('path');
+const calculatePhotoSettings = require('../../src/components/utils/calculatePhotoSettings').default;
+
+exports.handler = async function(event, context) {
+  const prompt = event.body ? JSON.parse(event.body) : {};
+  // Use the utility to calculate settings
+  const settings = calculatePhotoSettings(prompt);
+  // Map to expected API response shape
+  return {
+    statusCode: 200,
+    body: JSON.stringify({
+      iso: settings.iso,
+      shutterSpeed: settings.shutter,
+      aperture: settings.aperture,
+      focalLength: settings.focalLength,
+      whiteBalance: settings.whiteBalance,
+      metering: settings.metering,
+      explanation: settings.notes,
+      tips: [
+        'Adjust settings as needed for your camera.',
+        'Review histogram for exposure.',
+        'Use a tripod for stability if required.'
+      ],
+      mock: false
+    })
+  };
 };
