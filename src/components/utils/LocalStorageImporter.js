@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import CollapseToggleButton from "./CollapseToggleButton";
+import JSON5 from 'json5';
 
 export default function LocalStorageImporter() {
     const [input, setInput] = useState("");
@@ -11,7 +12,7 @@ export default function LocalStorageImporter() {
         setError(null);
 
         try {
-            const data = eval("(" + input + ")");
+            const data = JSON5.parse(input);
             setParsedData(data);
         } catch (err) {
             setError("Invalid object format. Paste the object copied from DevTools.");
@@ -101,13 +102,13 @@ export default function LocalStorageImporter() {
 
                     <div className='flexContainer size20 contentCenter mt-5'>
                         <div 
-                            className='containerDetail button ht-70 p-15 bg-green width-100-percent color-yellow'
+                            className='containerDetail button p-15 bg-green width-100-percent color-lite'
                             onClick={parseInput}
                         >
                             Preview
                         </div>
                         <div 
-                            className='containerDetail button ht-70 p-15 bg-green ml-5 width-100-percent color-yellow'
+                            className='containerDetail button p-15 bg-green ml-5 width-100-percent color-lite'
                             onClick={applyStorage} 
                             disabled={!parsedData}
                         >
@@ -115,7 +116,7 @@ export default function LocalStorageImporter() {
                         </div>
                     </div>
                     <div
-                        className='containerDetail ht-70 button p-25 contentCenter color-yellow size20 bg-green mt-5 width-100-percent'
+                        className='containerDetail ht-70 button p-25 contentCenter color-lite size20 bg-green mt-5 width-100-percent'
                         onClick={backupStorage}
                     >
                         Backup Current localStorage

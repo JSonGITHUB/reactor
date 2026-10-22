@@ -1,5 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
-import mobileRecipeTracking from './data_mobile'; 
+import React, { useEffect, useState, useContext, useMemo, useRef, useCallback } from 'react';
 import RecipeGroup from './RecipeGroup';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
 import Ingredient from './Ingredient';
@@ -8,6 +7,7 @@ import { useKitchenInventory } from '../context/KitchenInventoryContext';
 import Selector from '../forms/FunctionalSelector.js';
 import { parseIngredientLine } from './ingredientParsing';
 import AddProjectInterface from './AddProjectInterface';
+import mobileRecipeTracking from './data_mobile';
 
 const TrackRecipe = ({
 
@@ -34,10 +34,33 @@ const TrackRecipe = ({
     const [collapseAll, setCollapseAll] = useState();
     const [migrationFeedback, setMigrationFeedback] = useState('');
     const [newProjectDescription, setNewProjectDescription] = useState('');
+    const [hydrated, setHydrated] = useState(false);
+    const [scrollTop, setScrollTop] = useState(0);
+    const [viewportHeight, setViewportHeight] = useState(600);
+    const [recipeTrackerVisible, setRecipeTrackerVisible] = useState(false);
+    const recipeViewportRef = useRef(null);
 
-    const createIngredientRowId = () => `ingredient-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+    useEffect(() => {
+        const enableTracker = () => setRecipeTrackerVisible(true);
 
-    const normalizeIngredientRow = (row) => {
+        if (typeof window !== 'undefined' && typeof window.requestIdleCallback === 'function') {
+            const idleHandle = window.requestIdleCallback(enableTracker, { timeout: 250 });
+            return () => window.cancelIdleCallback?.(idleHandle);
+        }
+
+        const timerHandle = setTimeout(enableTracker, 200);
+        return () => clearTimeout(timerHandle);
+    }, []);
+    const virtualizedGroupHeight = 220;
+    const virtualizedBuffer = 4;
+    const normalizedSearchTerm = useMemo(() => String(newProjectDescription || '').trim().toLowerCase(), [newProjectDescription]);
+
+    const createIngredientRowId = useCallback(
+        () => `ingredient-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`,
+        []
+    );
+
+    const normalizeIngredientRow = useCallback((row) => {
         if (!Array.isArray(row)) {
             return { row, changed: false };
         }
@@ -65,9 +88,9 @@ const TrackRecipe = ({
             || String(row[4] || '') !== String(nextRow[4] || '');
 
         return { row: nextRow, changed };
-    };
+    }, [createIngredientRowId]);
 
-    const migrateExistingRecipeData = (showFeedback = false) => {
+    const migrateExistingRecipeData = useCallback((showFeedback = false) => {
         if (!Array.isArray(recipes) || recipes.length === 0) {
             if (showFeedback) {
                 setMigrationFeedback('No recipes found to repair');
@@ -156,11 +179,11 @@ const TrackRecipe = ({
         if (showFeedback) {
             setMigrationFeedback('Recipe data is already clean');
         }
-    };
+    }, [recipes, setRecipes, normalizeIngredientRow]);
     const refreshPage = () => {
         window.location.reload();
     };
-    const addProject = () => {
+    const addProject = useCallback(() => {
         if (!newProjectDescription || newProjectDescription.trim() === '') {
             alert('Please enter a category name');
             return;
@@ -176,13 +199,12 @@ const TrackRecipe = ({
         const updatedRecipes = [...recipes, recipe];
         setRecipes(updatedRecipes);
 
-        // Use setTimeout to ensure display updates after state is set
         setTimeout(() => {
             refreshPage();
         }, 100);
-    };
+    }, [newProjectDescription, recipes, setRecipes]);
 
-    const normalizeIngredientKey = (ingredientValue) => {
+    const normalizeIngredientKey = useCallback((ingredientValue) => {
         const unitAliases = {
             tsp: 'teaspoon',
             tsps: 'teaspoon',
@@ -282,7 +304,7 @@ const TrackRecipe = ({
             .join(' ')
             .replace(/\s+/g, ' ')
             .trim() || normalized;
-    };
+    }, []);
 
     const mergeIngredients = (previousIngredients, nextIngredients) => {
         const current = Array.isArray(previousIngredients) ? previousIngredients : [];
@@ -300,7 +322,7 @@ const TrackRecipe = ({
         return Array.from(uniqueByIngredient.values());
     };
 
-    const getUniqueIngredientLabels = (ingredientValues) => {
+    const getUniqueIngredientLabels = useCallback((ingredientValues) => {
         const labels = Array.isArray(ingredientValues)
             ? ingredientValues.map((item) => String(item || '').trim()).filter(Boolean)
             : [];
@@ -314,9 +336,9 @@ const TrackRecipe = ({
         });
 
         return Array.from(uniqueByNormalizedKey.values());
-    };
+    }, [normalizeIngredientKey]);
 
-    const getCheckedIngredientKeys = () => {
+    const getCheckedIngredientKeys = useCallback(() => {
         const isCheckedValue = (value) => value === true || value === 'true';
         const statusEntries = Object.entries(ingredientStatus || {});
         return new Set(
@@ -324,12 +346,13 @@ const TrackRecipe = ({
                 .filter(([, checked]) => isCheckedValue(checked))
                 .map(([ingredientName]) => normalizeIngredientKey(ingredientName))
         );
-    };
+    }, [ingredientStatus, normalizeIngredientKey]);
 
     useEffect(() => {
-        if (!Array.isArray(ingredients)) {
+        if (!recipeTrackerVisible || !Array.isArray(ingredients)) {
             return;
         }
+
         const dedupedIngredients = mergeIngredients([], ingredients);
         const hasChanged = dedupedIngredients.length !== ingredients.length
             || dedupedIngredients.some((item, index) => item !== ingredients[index]);
@@ -337,8 +360,9 @@ const TrackRecipe = ({
         if (hasChanged) {
             setIngredients(dedupedIngredients);
         }
+
         upsertInventoryFromIngredients(dedupedIngredients);
-    }, [ingredients]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [ingredients, recipeTrackerVisible, setIngredients, upsertInventoryFromIngredients]);
 
     const addActiveIngredientsToList = () => {
         //const activeIngredients = getIngredients();
@@ -455,7 +479,7 @@ const TrackRecipe = ({
         clearIngredientStatuses();
     };
 
-    const uncheckedIngredientCount = (() => {
+    const uncheckedIngredientCount = useMemo(() => {
         const activeIngredients = getUniqueIngredientLabels(ingredients);
         if (activeIngredients.length === 0) {
             return 0;
@@ -465,8 +489,115 @@ const TrackRecipe = ({
         return activeIngredients.filter(
             (ingredientName) => !checkedIngredientKeys.has(normalizeIngredientKey(ingredientName))
         ).length;
-    })();
-    
+    }, [ingredients, getCheckedIngredientKeys, getUniqueIngredientLabels, normalizeIngredientKey]);
+
+    const safeRecipes = useMemo(() => Array.isArray(recipes) ? recipes : [], [recipes]);
+    const filteredRecipeGroups = useMemo(() => {
+        if (!recipeTrackerVisible || !Array.isArray(safeRecipes)) {
+            return [];
+        }
+
+        return safeRecipes
+            .map((recipeGroup, recipeGroupIndex) => {
+                const groupMatchesCategory = category === 'all' || recipeGroup?.category === category;
+                const normalizedGroupRecipes = Array.isArray(recipeGroup?.recipes)
+                    ? recipeGroup.recipes.map((recipe) => {
+                        if (!recipe) {
+                            return recipe;
+                        }
+
+                        const matchesSearch = normalizedSearchTerm === ''
+                            || (recipe.dish || '').toLowerCase().includes(normalizedSearchTerm)
+                            || (recipe.description || '').toLowerCase().includes(normalizedSearchTerm)
+                            || (Array.isArray(recipe.ingredients) && recipe.ingredients.some((ingredient) => {
+                                const ingredientName = Array.isArray(ingredient) ? String(ingredient[2] || '') : String(ingredient || '');
+                                return ingredientName.toLowerCase().includes(normalizedSearchTerm);
+                            }))
+                            || (Array.isArray(recipe.instructions) && recipe.instructions.some((instruction) => {
+                                if (instruction?.step && instruction.step.toLowerCase().includes(normalizedSearchTerm)) {
+                                    return true;
+                                }
+                                if (Array.isArray(instruction?.ingredients)) {
+                                    return instruction.ingredients.some((ingredient) => {
+                                        const ingredientName = Array.isArray(ingredient) ? String(ingredient[2] || '') : String(ingredient || '');
+                                        return ingredientName.toLowerCase().includes(normalizedSearchTerm);
+                                    });
+                                }
+                                return false;
+                            }));
+
+                        return {
+                            ...recipe,
+                            display: matchesSearch && groupMatchesCategory
+                        };
+                    })
+                    : [];
+
+                const hasVisibleRecipe = normalizedGroupRecipes.some((recipe) => recipe.display === true || recipe.display === 'true');
+                return {
+                    recipeGroup: {
+                        ...recipeGroup,
+                        display: hasVisibleRecipe,
+                        recipes: normalizedGroupRecipes
+                    },
+                    recipeGroupIndex
+                };
+            })
+            .filter(({ recipeGroup }) => recipeGroup.display === true || recipeGroup.display === 'true');
+    }, [category, normalizedSearchTerm, safeRecipes]);
+
+    const virtualizedStartIndex = useMemo(() => {
+        if (!recipeTrackerVisible || filteredRecipeGroups.length <= 20) {
+            return 0;
+        }
+
+        return Math.max(0, Math.floor(scrollTop / virtualizedGroupHeight) - virtualizedBuffer);
+    }, [filteredRecipeGroups.length, scrollTop]);
+
+    const virtualizedEndIndex = useMemo(() => {
+        if (!recipeTrackerVisible || filteredRecipeGroups.length <= 20) {
+            return filteredRecipeGroups.length;
+        }
+
+        return Math.min(
+            filteredRecipeGroups.length,
+            Math.ceil((scrollTop + viewportHeight) / virtualizedGroupHeight) + virtualizedBuffer
+        );
+    }, [filteredRecipeGroups.length, scrollTop, viewportHeight]);
+
+    const visibleRecipeGroups = useMemo(() => {
+        if (!recipeTrackerVisible || filteredRecipeGroups.length <= 20) {
+            return filteredRecipeGroups;
+        }
+
+        return filteredRecipeGroups.slice(virtualizedStartIndex, virtualizedEndIndex);
+    }, [filteredRecipeGroups, virtualizedStartIndex, virtualizedEndIndex]);
+
+    const totalVirtualizedHeight = recipeTrackerVisible ? filteredRecipeGroups.length * virtualizedGroupHeight : 0;
+    const topSpacer = recipeTrackerVisible && filteredRecipeGroups.length > 20 ? virtualizedStartIndex * virtualizedGroupHeight : 0;
+
+    useEffect(() => {
+        if (!recipeViewportRef.current) {
+            return;
+        }
+
+        const updateViewportHeight = () => {
+            setViewportHeight(recipeViewportRef.current.clientHeight || 600);
+        };
+
+        updateViewportHeight();
+
+        if (typeof ResizeObserver === 'undefined') {
+            setViewportHeight(window.innerHeight || 600);
+            return undefined;
+        }
+
+        const resizeObserver = new ResizeObserver(updateViewportHeight);
+        resizeObserver.observe(recipeViewportRef.current);
+
+        return () => resizeObserver.disconnect();
+    }, []);
+
     useEffect(() => {
         if (collapseAll === undefined) return; // Don't run on initial mount
         const nextCollapsedState = !!collapseAll;
@@ -505,83 +636,75 @@ const TrackRecipe = ({
     }, [collapseAll, setRecipes]);
 
     useEffect(() => {
-        if (recipes === null) {
-            const storedRecipes = JSON.parse(localStorage.getItem('recipeTracking')) || mobileRecipeTracking;
-            setRecipes(storedRecipes);
-        }
-        const storedCategory = localStorage.getItem('recipeCategory');
-        if (storedCategory !== null) {
-            setCategory(storedCategory);
-        } else {
-            setCategory('all');
-        }
-        setTimeout(() => {
-            setNewProjectDescription('');
-        }, 1000);
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
-useEffect(() => {
-        if (newProjectDescription === undefined) return;
+        let isActive = true;
 
-        const debounceTimer = setTimeout(() => {
-            const searchTerm = newProjectDescription.toLowerCase() || '';
-            localStorage.setItem('trackerSearch', searchTerm);
-            if (recipes !== undefined) {
-                const inRecipeTitle = (recipe) => recipe.dish.toLowerCase().includes(searchTerm);
-                const inDescription = (recipe) => recipe.description.toLowerCase().includes(searchTerm);
-                const inIngredients = (recipe) => {
-                    if (recipe.ingredients && recipe.ingredients.length > 0) {
-                        return recipe.ingredients.some((ingredient) => {
-                            return ingredient[2] && ingredient[2].toLowerCase().includes(searchTerm);
-                        });
-                    }
-                    return false;
-                };
-                const inInstructions = (recipe) => {
-                    if (recipe.instructions && recipe.instructions.length > 0) {
-                        return recipe.instructions.some((instruction) => {
-                            if (instruction.step && instruction.step.toLowerCase().includes(searchTerm)) {
-                                return true;
-                            }
-                            if (instruction.ingredients && instruction.ingredients.length > 0) {
-                                return instruction.ingredients.some((ingredient) =>
-                                    ingredient[2] && ingredient[2].toLowerCase().includes(searchTerm)
-                                );
-                            }
-                            return false;
-                        });
-                    }
-                    return false;
-                };
-                const category = localStorage.getItem('recipeCategory') || 'all';
-                const filteredRecipes = [...recipes];
-                filteredRecipes.forEach((recipeGroup) => {
-                    recipeGroup.display = false;
-                    if (recipeGroup.recipes && recipeGroup.recipes.length > 0) {
-                        recipeGroup.recipes.forEach((recipe) => {
-                            if ((inInstructions(recipe) || inIngredients(recipe) || inDescription(recipe) || inRecipeTitle(recipe) || searchTerm === '' || searchTerm === ' ' || searchTerm === null) && (category === 'all' || recipeGroup.category === category)) {
-                                recipe.display = true;
-                                recipeGroup.display = true;
-                            } else {
-                                recipe.display = false;
-                            }
-                        });
-                    }
-                });
-                setRecipes(filteredRecipes);
+        const hydrateRecipeStorage = async () => {
+            let storedRecipes = Array.isArray(recipes) ? recipes : null;
+
+            if (storedRecipes === null) {
+                try {
+                    const storedValue = localStorage.getItem('recipeTracking');
+                    storedRecipes = storedValue ? JSON.parse(storedValue) : null;
+                } catch (error) {
+                    storedRecipes = null;
+                }
+
+                if (!Array.isArray(storedRecipes)) {
+                    storedRecipes = Array.isArray(mobileRecipeTracking) ? mobileRecipeTracking : [];
+                }
+
+                if (isActive) {
+                    setRecipes(storedRecipes);
+                }
             }
-        }, 300);
 
-        return () => clearTimeout(debounceTimer);
-    }, [newProjectDescription]); // eslint-disable-line react-hooks/exhaustive-deps
+            if (isActive) {
+                const storedCategory = localStorage.getItem('recipeCategory');
+                setCategory(storedCategory ?? 'all');
+                setHydrated(true);
+                setTimeout(() => {
+                    setNewProjectDescription('');
+                }, 1000);
+            }
+        };
+
+        hydrateRecipeStorage();
+
+        return () => {
+            isActive = false;
+        };
+    }, [recipes, setRecipes]);
+useEffect(() => {
+        if (normalizedSearchTerm === '') {
+            localStorage.setItem('trackerSearch', '');
+            return;
+        }
+        localStorage.setItem('trackerSearch', normalizedSearchTerm);
+    }, [normalizedSearchTerm]);
     useEffect(() => {
         if (!migrationFeedback) return;
         const timer = setTimeout(() => setMigrationFeedback(''), 2200);
         return () => clearTimeout(timer);
     }, [migrationFeedback]);
 
+    const mountMigrationScheduledRef = useRef(false);
+
     useEffect(() => {
-        migrateExistingRecipeData(false);
-    }, [recipes, setRecipes]);
+        if (!recipeTrackerVisible || !hydrated || !Array.isArray(recipes) || recipes.length === 0 || mountMigrationScheduledRef.current) {
+            return;
+        }
+
+        mountMigrationScheduledRef.current = true;
+        const scheduleMigration = () => migrateExistingRecipeData(false);
+
+        if (typeof window !== 'undefined' && typeof window.requestIdleCallback === 'function') {
+            const idleHandle = window.requestIdleCallback(scheduleMigration, { timeout: 250 });
+            return () => window.cancelIdleCallback?.(idleHandle);
+        }
+
+        const timerHandle = setTimeout(scheduleMigration, 0);
+        return () => clearTimeout(timerHandle);
+    }, [hydrated, recipeTrackerVisible, recipes, migrateExistingRecipeData]);
 
     useEffect(() => {
         if ((category === null) || (category === '') || (category === undefined)) {
@@ -589,30 +712,7 @@ useEffect(() => {
         } else {
             localStorage.setItem('recipeCategory', category);
         }
-        if (!Array.isArray(recipes) || recipes.length === 0) {
-            return;
-        }
-
-        let hasAnyChange = false;
-        const newRecipes = recipes.map((recipeGroup) => {
-            const hasVisibleRecipe = Array.isArray(recipeGroup.recipes)
-                && recipeGroup.recipes.some((recipe) => recipe?.display === true || recipe?.display === 'true');
-            const shouldDisplay = (category === 'all' || recipeGroup.category === category) && hasVisibleRecipe;
-            const currentDisplay = recipeGroup.display === true || recipeGroup.display === 'true';
-            if (currentDisplay !== shouldDisplay) {
-                hasAnyChange = true;
-                return {
-                    ...recipeGroup,
-                    display: shouldDisplay
-                };
-            }
-            return recipeGroup;
-        });
-
-        if (hasAnyChange) {
-            setRecipes(newRecipes);
-        }
-    }, [category, recipes, setRecipes]);    
+    }, [category]);
     const notNull = (value) => (value !== null) ? true : false;
     const notEmpty = (value) => (value !== "") ? true : false;
     const isGood = (value) => (notNull(value) && notEmpty(value)) ? true : false;
@@ -647,18 +747,22 @@ useEffect(() => {
             setRecipes(newRecipes);
         }
     }
-    const getCategories = () => {
+    const getCategories = useMemo(() => {
+        if (!recipeTrackerVisible) {
+            return ['all'];
+        }
+
         const categories = ['all'];
-        recipes.forEach((recipeGroup) => {
+        safeRecipes.forEach((recipeGroup) => {
             if (recipeGroup.category !== undefined && recipeGroup.category !== null) {
                 categories.push(recipeGroup.category);
             }
         });
         return categories;
-    }
-    const updateCategory = (a, b, selected) => {
+    }, [recipeTrackerVisible, safeRecipes]);
+    const updateCategory = useCallback((a, b, selected) => {
         setCategory(selected);
-    }
+    }, []);
     
     const ingredientHeader = <div>
                                 <span className='size30 mr-10'>
@@ -669,6 +773,21 @@ useEffect(() => {
                                     <span className='pl-5 color-yellow size12'>{ingredients.length}</span>
                                 </span>
                             </div>;
+    if (!recipeTrackerVisible) {
+        return (
+            <div className='containerDetail bg-lite color-yellow m-5 p-20 contentLeft'>
+                <div className='size25 mb-10'>👩🏼‍🍳 Recipes</div>
+                <button
+                    type='button'
+                    className='containerDetail button bg-green color-lite p-10 size14'
+                    onClick={() => setRecipeTrackerVisible(true)}
+                >
+                    Open Recipe Tracker
+                </button>
+            </div>
+        );
+    }
+
     return (
         <div>
             {
@@ -749,7 +868,7 @@ useEffect(() => {
                     groupTitle='Category'
                     selected={category}
                     label={'Category'}
-                    items={getCategories()}
+                    items={getCategories}
                     onChange={updateCategory}
                     padding='5px'
                     fontSize='15'
@@ -762,29 +881,35 @@ useEffect(() => {
             >
                 🛠️ Repair Existing Recipe Data
             </div>
-            {
-                recipes.map((recipeGroup, recipeGroupIndex) => {
-                    if (recipeGroup.display === true || recipeGroup.display === 'true') {
-                        return <div key={`${recipeGroup?.category || 'recipe-group'}-${recipeGroupIndex}`}>
-                            <RecipeGroup
-                                recipes={recipes}
-                                setRecipes={setRecipes}
-                                setCollapseAll={setCollapseAll}
-                                recipeGroup={recipeGroup}
-                                recipeGroupIndex={recipeGroupIndex}
-                                deleteGroup={deleteGroup}
-                                addRecipe={addRecipe}
-                                //setScroll={setScroll}
-                                targetElementRef={targetElementRef}
-                                scrollToBottom={scrollToBottom}
-                            />
-                        </div>
-                    }
-                    return null;
-                })
-            }
+            <div
+                ref={recipeViewportRef}
+                style={{ maxHeight: '70vh', overflowY: 'auto' }}
+                onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
+            >
+                <div style={{ height: filteredRecipeGroups.length > 20 ? totalVirtualizedHeight : 'auto', position: 'relative' }}>
+                    <div style={{ position: filteredRecipeGroups.length > 20 ? 'absolute' : 'static', top: filteredRecipeGroups.length > 20 ? topSpacer : 0, left: 0, right: 0 }}>
+                        {
+                            visibleRecipeGroups.map(({ recipeGroup, recipeGroupIndex }) => (
+                                <div key={`${recipeGroup?.category || 'recipe-group'}-${recipeGroupIndex}`}>
+                                    <RecipeGroup
+                                        recipes={safeRecipes}
+                                        setRecipes={setRecipes}
+                                        setCollapseAll={setCollapseAll}
+                                        recipeGroup={recipeGroup}
+                                        recipeGroupIndex={recipeGroupIndex}
+                                        deleteGroup={deleteGroup}
+                                        addRecipe={addRecipe}
+                                        targetElementRef={targetElementRef}
+                                        scrollToBottom={scrollToBottom}
+                                    />
+                                </div>
+                            ))
+                        }
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }
 
-export default TrackRecipe
+export default React.memo(TrackRecipe);
