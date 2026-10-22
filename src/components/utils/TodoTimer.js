@@ -20,40 +20,6 @@ const TodoTimer = ({
     const [currentTime, setCurrentTime] = useState(todo.currentTime);
 
     const isStart = () => (currentTime === time) ? true : false;
-    const totalSeconds = (milliseconds) => Math.floor(milliseconds / 1000);
-
-    const calculateTimeLeft = () => {
-        const millisecondsRemaining = currentTime * 1000;
-        const elapsedMilliseconds = Number(Date.now() - startTime);
-        const remainingMilliseconds = Number(millisecondsRemaining - elapsedMilliseconds);
-        const timeRemaining = totalSeconds(remainingMilliseconds);
-        const secondsRemaining = (timeRemaining > 0) ? timeRemaining : 0;
-        if (secondsRemaining <= 10 && secondsRemaining > 0) {
-            Sounds.boop(0, 1);
-        }
-        if (timeRemaining <= 0) {
-            Sounds.boop(0, secondsRemaining);
-            setCurrentTime(secondsRemaining);
-            setPause(true);
-            toggleCheckbox(index);
-        } else {
-            setCurrentTime(timeRemaining);
-        }
-    };
-
-    const calculateElapsedTime = () => {
-        const millisecondsElapsed = currentTime * 1000;
-        console.log(`calculateElapsedTime => millisecondsElapsed: ${millisecondsElapsed}`)
-        const dateNow = Date.now();
-        const elapsedMilliseconds = Number(dateNow - startTime);
-        console.log(`calculateElapsedTime => elapsedMilliseconds: ${elapsedMilliseconds}`);
-        const totalMilliseconds = Number(millisecondsElapsed + elapsedMilliseconds);
-        console.log(`calculateElapsedTime => totalMilliseconds: ${totalMilliseconds}`)
-        const timeElapsed = totalSeconds(totalMilliseconds);
-        console.log(`calculateElapsedTime => timeElapsed: ${timeElapsed}`)
-        setCurrentTime(timeElapsed);
-    };
-
     const startTimer = () => {
         setStartTime(Date.now());
         setPause(false);
@@ -72,21 +38,26 @@ const TodoTimer = ({
     useEffect(() => {
         let timerInterval;
         if (!pause) {
-            if (todo.type === 'timer') {
-                calculateTimeLeft();
-            } else {
-                calculateElapsedTime()
-            }
             timerInterval = setInterval(() => {
                 if (todo.type === 'timer') {
-                    calculateTimeLeft();
+                    setCurrentTime((previousTime) => {
+                        const nextTime = Math.max(0, Number(previousTime) - 1);
+                        if (nextTime <= 10 && nextTime > 0) {
+                            Sounds.boop(0, 1);
+                        }
+                        if (nextTime === 0) {
+                            setPause(true);
+                            toggleCheckbox(index);
+                        }
+                        return nextTime;
+                    });
                 } else {
-                    calculateElapsedTime()
+                    setCurrentTime((previousTime) => Number(previousTime) + 1);
                 }
             }, 1000);
         }
         return () => clearInterval(timerInterval);
-    }, [pause]);
+    }, [pause, todo.type, index, toggleCheckbox]);
 
     useEffect(() => {
         console.log(`TodoTimer => ${todo.description}: `)
@@ -95,7 +66,7 @@ const TodoTimer = ({
         newTodos[index].currentTime = currentTime;
         newTodos[index].startTime = startTime;
         localStorage.setItem(localData, JSON.stringify(newTodos));
-    }, [pause, currentTime, startTime]);
+    }, [pause, currentTime, startTime, index, localData, todo.description, todos]);
 
     useEffect(() => {
         if (todo !== undefined) {
@@ -103,7 +74,7 @@ const TodoTimer = ({
         }
         localStorage.setItem('time', time);
         setStartTime(todo.startTime);
-    }, []);
+    }, [time, todo]);
 
     const formatTime = (seconds) => {
         const hoursDisplay = Math.floor(seconds / 3600);
@@ -126,7 +97,7 @@ const TodoTimer = ({
             <div className={`containerBox flex3Column button color-lite ${getTimerButtonClasses()}`} onClick={(pause) ? ((todo.type === 'timer') && (currentTime === 0)) ? resetTimer : startTimer : pauseTimer}>
                 {!pause ? 'PAUSE' : (isStart()) ? 'START' : (currentTime === 0) ? 'RESTART' : 'RESUME'}
             </div>
-            <div className='containerDetail pt-15 flex3Column size30 bg-tinted color-yellow'>
+            <div className='containerDetail pt-15 flex3Column size25 bg-tinted color-yellow'>
                 <span className={getTimerClasses()}>
                     {formatTime(Number(currentTime))}
                 </span>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import icons from '../site/icons';
-import getKey from '../utils/KeyGenerator';
 import ActivitiesPieChart from './ActivitiesPieChart';
 import validate from '../utils/validate';
 import TimeSelectorDialog from '../utils/TimesSelectorDialog';
@@ -10,6 +9,7 @@ import { secondsToTime, timeToSeconds } from './TimeConversions';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
 import initializeData from '../utils/InitializeData';
 
+const TRAINING_STATUS_EVENT = 'trainingTimerStatusChanged';
 const TrainingLog = () => {
     const categories = ['SKILL', 'TIME', 'percentage'];
     const colors = [
@@ -43,9 +43,6 @@ const TrainingLog = () => {
     const [activeTimers, setActiveTimers] = useState();
     const [admin, setAdmin] = useState(false);
 
-    const setGoals = () => setGoalData(trainingData);
-    const toggleAdmin = () => setAdmin(prev => !prev);
-    const toggleActiveTimer = () => setActiveTimers(prev => !prev);
     const convertSecondsToTime = (totalSeconds) => {
         const hours = Math.floor(totalSeconds / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -55,10 +52,37 @@ const TrainingLog = () => {
         const paddedSeconds = String(seconds).padStart(2, '0');
         return `${paddedHours}:${paddedMinutes}:${paddedSeconds}`;
     };
+    const setTime = (time, category) => {
+        if (category === 'training') {
+            setTotalTime(time);
+        } else if (category === 'goal') {
+            setGoalTime(time);
+        }
+    };
+
+    const setGoals = () => setGoalData(trainingData);
+    const toggleAdmin = () => setAdmin(prev => !prev);
+    const toggleActiveTimer = () => setActiveTimers(prev => !prev);
 
     const convertTimeToSeconds = (timeString) => {
         const [hours, minutes, seconds] = timeString.split(':').map(Number);
         return (hours * 3600) + (minutes * 60) + seconds;
+    };
+
+    const calculatePercentages = (activities, category) => {
+        const totalSeconds = activities.reduce((total, activity) => {
+            const activityTime = timeToSeconds(activity.time);
+            return total + activityTime;
+        }, 0);
+        setTime(totalSeconds, category);
+        return activities.map((activity) => {
+            const activitySeconds = timeToSeconds(activity.time);
+            const percentage = (activitySeconds / totalSeconds) * 100;
+            return {
+                ...activity,
+                percentage: percentage.toFixed(2)
+            };
+        });
     };
 
     const reset = () => {
@@ -86,46 +110,23 @@ const TrainingLog = () => {
                 time: '00:00:00',
                 percentage: '0'
             }));
-            console.log(`TrainingLog => zeroData: ${JSON.stringify(zeroData, null, 2)}`);
             setTrainingData(zeroData); 
         }
     }
-    const setTime = (time, category) => {
-        if (category === 'training') {
-            setTotalTime(time);
-        } else if (category === 'goal') {
-            setGoalTime(time);
-        }
-    }
-    const calculatePercentages = (activities, category) => {
-        const totalSeconds = activities.reduce((total, activity) => {
-            const activityTime = timeToSeconds(activity.time);
-            return total + activityTime;
-        }, 0);
-        setTime(totalSeconds, category);
-        return activities.map((activity) => {
-            const activitySeconds = timeToSeconds(activity.time);
-            const percentage = (activitySeconds / totalSeconds) * 100;
-            return {
-                ...activity,
-                percentage: percentage.toFixed(2)
-            };
-        });
-    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         let timerInterval;
         if (timer) {
-            console.log('timer started')
             timerInterval = setInterval(() => {
                 setCurrentTime((prevTime) => prevTime + 1);
             }, 1000);
         } else {
-            console.log('timer stopped')
             return () => clearInterval(timerInterval);
         }
         return () => clearInterval(timerInterval);
     }, [timer]);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (validate(activeTimers) !== null) {
             localStorage.setItem('activeTimers', activeTimers);
@@ -138,26 +139,26 @@ const TrainingLog = () => {
         setTrainingData(defaultTrainingData);
         setGoalData(defaultGoalData);
     }
-    const restart = (training) => {
-        const now = new Date();
-        const storedStartTime = new Date(parseInt(initializeData('trainingStartTime', now.getTime()), 10));
-        const storedElapsedTime = Number(initializeData('trainingElapsedTime', 0))
-        const elapsedSeconds = Math.floor((now - storedStartTime) / 1000);
-        const newTrainingData = [...training];
-        console.log(`currentTime: ${currentTime} storedElapsedTime: ${storedElapsedTime}`);
-        const storedActiveIndex = initializeData('trainingActiveIndex', false);
-
-        if (storedActiveIndex && storedStartTime) {
-            newTrainingData[storedActiveIndex].time = convertSecondsToTime(elapsedSeconds + storedElapsedTime);
-        }
-        const updatedActivities = calculatePercentages(newTrainingData, 'training');
-        setTrainingData(updatedActivities);
-    }
+    
     useEffect(() => {
+
+        const restart = (training) => {
+            const now = new Date();
+            const storedStartTime = new Date(parseInt(initializeData('trainingStartTime', now.getTime()), 10));
+            const storedElapsedTime = Number(initializeData('trainingElapsedTime', 0))
+            const elapsedSeconds = Math.floor((now - storedStartTime) / 1000);
+            const newTrainingData = [...training];
+            const storedActiveIndex = initializeData('trainingActiveIndex', false);
+
+            if (storedActiveIndex && storedStartTime) {
+                newTrainingData[storedActiveIndex].time = convertSecondsToTime(elapsedSeconds + storedElapsedTime);
+            }
+            const updatedActivities = calculatePercentages(newTrainingData, 'training');
+            setTrainingData(updatedActivities);
+        }
         
         const localData = initializeData('trainingData', defaultTrainingData);
         const localGoalData = initializeData('goalData', defaultGoalData);
-        console.log(`TrainingLog => useEffect => localData: ${JSON.stringify(localData, null, 2)}`);
         //setTrainingData(localData);
         restart(localData);
         calculatePercentages(localData, 'training');
@@ -189,7 +190,7 @@ const TrainingLog = () => {
             setCollapseTraining(false);
         }, 1000);
         return () => clearTimeout(timer);
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (validate(trainingData) !== null && trainingData !== undefined) {
@@ -207,11 +208,10 @@ const TrainingLog = () => {
             const updatedActivities = calculatePercentages(newData, 'training');
             setTrainingData(updatedActivities);
         }
-    }, [currentTime]);
+    }, [currentTime]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (timing) {
-            console.log(`timing: ${timing.goal} time: ${timing.time}`)
         }
     }, [timing]);
     
@@ -222,7 +222,6 @@ const TrainingLog = () => {
     }, [goalData]);
 
     useEffect(() => {
-        //console.log(`editIndex: ${editIndex} timeUnit: ${timeUnit}`);
     }, [editIndex]);
 
     const toggleEdit = (index, category, unit/*, timeUnits*/) => {
@@ -340,6 +339,7 @@ const TrainingLog = () => {
             time
         })
         setTimer(true);
+        window.dispatchEvent(new Event(TRAINING_STATUS_EVENT));
     }
     const stopTimer = () => {
         const now = new Date();
@@ -349,13 +349,13 @@ const TrainingLog = () => {
         localStorage.removeItem('trainingStartTime');
         localStorage.removeItem('trainingActiveIndex');
         const newTrainingData = [...trainingData];
-        console.log(`currentTime: ${currentTime} storedElapsedTime: ${storedElapsedTime}`);
         newTrainingData[timing.index].time = convertSecondsToTime(elapsedSeconds + storedElapsedTime);
         const updatedActivities = calculatePercentages(newTrainingData, 'training');
         localStorage.removeItem('trainingElapsedTime');
         setTrainingData(updatedActivities);
         setTiming(null);
         setTimer(false);
+        window.dispatchEvent(new Event(TRAINING_STATUS_EVENT));
     }
     const toggleTimer = (training, index) => {
         if (timer) {
@@ -418,12 +418,12 @@ const TrainingLog = () => {
                         <div className='flexContainer'>
                             {
                                 (categories && goalData !== null)
-                                ? categories.map((category, i) => <div key={getKey(category)} className='flex3Column'>
+                                ? categories.map((category, i) => <div key={`training-goal-category-${i}-${String(category)}`} className='flex3Column'>
                                     <div className={`containerDetail mt-5 ${(i === 1) ? 'ml-5 mr-5 ': null}pt-10 pb-10 color-lite size20 bg-lite`}>
                                         {(category === 'TIME') ? secondsToTime(goalTime) : (category === 'percentage') ? '%' : category}
                                     </div>
                                     {
-                                        goalData.map((training, index) => <div key={getKey(training)} className={`containerDetail mt-5 ${(index === 1) ? 'ml-5 mr-5 ': null}pt-10 pb-10 flexContainer button size20`} style={categoryStyle(index)}>
+                                        goalData.map((training, index) => <div key={`training-goal-row-${i}-${index}-${String(training?.skill || 'training')}`} className={`containerDetail mt-5 ${(index === 1) ? 'ml-5 mr-5 ': null}pt-10 pb-10 flexContainer button size20`} style={categoryStyle(index)}>
                                             <div className='flex3Column'>
                                                 {
                                                     (category === 'TIME')
@@ -470,7 +470,7 @@ const TrainingLog = () => {
                         </div>
                         <div className='containerBox'>
                             <div className='flexContainer'>
-                                <div className='flex2Column containerBox p-20 button text-outline-light bg-dkGreen' onClick={() => addGoal()}>
+                                <div className='flex2Column containerBox p-20 button text-outline-lite bg-dkGreen' onClick={() => addGoal()}>
                                     {icons.plus}
                                 </div>
                                 <div className='flex2Column containerBox button p-20 bg-dkRed' onClick={() => toggleAdmin()}>
@@ -548,10 +548,10 @@ const TrainingLog = () => {
                             <div className='flexContainer'>
                                 {
                                     (categories && trainingData !== null)
-                                        ? categories.map((category, index) => <div key={getKey(category)} className='flex3Column'>
+                                        ? categories.map((category, index) => <div key={`training-category-${index}-${String(category)}`} className='flex3Column'>
                                             <div className='containerDetail m-5 pt-10 pb-10 color-lite size20 bg-lite'>{(category === 'TIME') ? secondsToTime(totalTime) : (category === 'percentage') ? '%' : category}</div>
                                             {
-                                                trainingData.map((training, index) => <div key={getKey(training)} className={`containerDetail m-5 pt-10 pb-10 flexContainer button size20  ${((isObjectWithGoal(timing)) && (timer && (timing.goal === training.skill))) ? 'brdr-blue' : ''}`} style={categoryStyle(index)}>
+                                                trainingData.map((training, index) => <div key={`training-row-${category}-${index}-${String(training?.skill || 'training')}`} className={`containerDetail m-5 pt-10 pb-10 flexContainer button size20  ${((isObjectWithGoal(timing)) && (timer && (timing.goal === training.skill))) ? 'brdr-blue' : ''}`} style={categoryStyle(index)}>
                                                     {
                                                         (showArrows(category) && edit && (index === editIndex))
                                                             ? <div className='flex3Column button' onClick={() => removeTime(index)}>

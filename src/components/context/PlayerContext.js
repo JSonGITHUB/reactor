@@ -1,10 +1,10 @@
 import React, { createContext, useEffect, useState, useContext } from 'react';
 
 import validate from '../utils/validate';
-import { initNewPlayer, initPlayers } from '../games/scorekeeper/PlayerInit';
+import { initPlayers } from '../games/scorekeeper/PlayerInit';
 import golfScoring from '../games/scorekeeper/golfScoring';
 import initializeData from '../utils/InitializeData';
-import { initAllGolfShots, initGolfShots } from '../games/scorekeeper/initGolfShots';
+import { initAllGolfShots } from '../games/scorekeeper/initGolfShots';
 //import initAndroidPlayers from './initAndroidPlayers';
 export const PlayerContext = createContext();
 
@@ -28,9 +28,7 @@ const PlayerParent = ({
         if (newPlayer !== null) {
             let newPlayers = [...players];
             newPlayers[index].name = newPlayer;
-            if (newPlayers != []) {
-                setPlayers(newPlayers);
-            }
+            setPlayers(newPlayers);
         }
     }
     const checkItemType = (item) => {
@@ -49,21 +47,21 @@ const PlayerParent = ({
         const localPlayers = initializeData('players', initPlayers);
         //console.log(`PlayerContext => useEffect => localPlayers: ${JSON.stringify(localPlayers, null, 2)}`);
         const newPlayers = [...localPlayers];
-        newPlayers.map((player, index) => {
+        newPlayers.forEach((player) => {
             if (!player.cricketScores) {
                 player.cricketScores = [0, 0, 0, 0, 0, 0, 0];
                 player.dartsScore = 0;
             }
         });
         const initGolfStats = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false]
-        newPlayers.map((player, index) => {
+        newPlayers.forEach((player) => {
             if (!player.golfPutts || !player.golfFW || !player.golfGIR) {
                 player.golfPutts = golfScoring;
                 player.golfFW = initGolfStats;
                 player.golfGIR = initGolfStats;
             }
         });
-        newPlayers.map((player, index) => {
+        newPlayers.forEach((player) => {
             if (!player.golfShots) {
                 player.golfShots = initAllGolfShots;
             } else if (checkItemType(player.golfShots[0]) === 'Object' || checkItemType(player.golfShots[0]) === 'Neither') {
@@ -75,7 +73,6 @@ const PlayerParent = ({
 
     useEffect(() => {
         if (JSON.stringify(players) !== '[]' && validate(players) !== null) {
-            let index = 0;
             //console.log(`UseEffect => players: ${localStorage.getItem('players')}`)
             players.forEach((player) => {
                 if (player[game()]) {
@@ -99,9 +96,7 @@ const PlayerParent = ({
     const deletePlayer = (index) => {
         const newPlayers = [...players].slice();
         newPlayers.splice(index, 1);
-        if (newPlayers != []) {
-            setPlayers(newPlayers);
-        }
+        setPlayers(newPlayers);
     };
 
     return (

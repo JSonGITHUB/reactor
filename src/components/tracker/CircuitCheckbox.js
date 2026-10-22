@@ -1,7 +1,5 @@
 import React, { useState, useContext } from 'react';
 import icons from '../site/icons';
-import initCircuitTracking from './initCircuitTracking';
-import initializeData from './initializeData';
 import { CircuitContext } from '../context/CircuitContext';
 
 const CircuitCheckBox = ({
@@ -18,9 +16,6 @@ const CircuitCheckBox = ({
     const {
         circuits,
         setCircuits,
-        activeIndex,
-        setActiveIndex,
-        setActivated,
         edit, 
         setEdit
     } = useContext(CircuitContext);
@@ -82,19 +77,13 @@ const CircuitCheckBox = ({
     }
     const shiftCircuitUp = (index) => {
         const newCircuits = [...circuits];
-        const excercises = newCircuits[circuitIndex].circuits[circuitGroupIndex].excersizes;
-        console.log(`CircuitCheckBox => shiftCircuitUp = (${index}) => excercises: ${JSON.stringify(excercises, null, 2)}`);
         const updateCircuits = swapItems(newCircuits[circuitIndex].circuits[circuitGroupIndex].excersizes, index, (index - 1));
-        console.log(`CircuitCheckBox => shiftCircuitUp = (${index}) => updateCircuits: ${JSON.stringify(updateCircuits, null, 2)}`);
         newCircuits[circuitIndex].circuits[circuitGroupIndex].excersizes = updateCircuits;
         setCircuits(newCircuits);
     };
     const shiftCircuitDown = (index) => {
         const newCircuits = [...circuits];
-        const excercises = newCircuits[circuitIndex].circuits[circuitGroupIndex].excersizes;
-        console.log(`CircuitCheckBox => shiftCircuitUp = (${index}) => excercises: ${JSON.stringify(excercises, null, 2)}`);
         const updateCircuits = swapItems(newCircuits[circuitIndex].circuits[circuitGroupIndex].excersizes, index, (index + 1));
-        console.log(`CircuitCheckBox => shiftCircuitUp = (${index}) => updateCircuits: ${JSON.stringify(updateCircuits, null, 2)}`);
         newCircuits[circuitIndex].circuits[circuitGroupIndex].excersizes = updateCircuits;
         setCircuits(newCircuits);
     };
@@ -126,7 +115,6 @@ const CircuitCheckBox = ({
                         : null
                     }
                     <input
-                        id='completed'
                         name='completed'
                         title={goal.title}
                         className='flexColumn regular-checkbox button'

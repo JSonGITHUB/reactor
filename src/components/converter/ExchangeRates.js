@@ -1,6 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import fetchTimer from '../utils/FetchTimer';
 
+const TEMPLATE_DATA = {
+  success: true,
+  timestamp: 1519296206,
+  base: "EUR",
+  date: "2021-03-17",
+  rates: {
+    AUD: 1.566015,
+    CAD: 1.560132,
+    CHF: 1.154727,
+    CNY: 7.827874,
+    GBP: 0.882047,
+    JPY: 132.360679,
+    USD: 1.23396
+  }
+};
+
 const ExchangeRates = () => {
 
   // set endpoint and your access key
@@ -12,24 +28,8 @@ const ExchangeRates = () => {
   //const to = 'EUR';
   //const amount = 25;
 
-  const templateData = {
-    success: true,
-    timestamp: 1519296206,
-    base: "EUR",
-    date: "2021-03-17",
-    rates: {
-      AUD: 1.566015,
-      CAD: 1.560132,
-      CHF: 1.154727,
-      CNY: 7.827874,
-      GBP: 0.882047,
-      JPY: 132.360679,
-      USD: 1.23396
-    }
-  }
-
   //const [rates, setRates] = useState(null);
-  const [data, setData] = useState(templateData);
+  const [data, setData] = useState(TEMPLATE_DATA);
 
   useEffect(() => {
 
@@ -41,13 +41,13 @@ const ExchangeRates = () => {
         const response = await fetch(url);
         const data = await response.json();
         //alert(JSON.stringify(data.error.code, null, 2));
-        console.log(`templateData: ${JSON.stringify(templateData, null, 2)}`);
+        console.log(`templateData: ${JSON.stringify(TEMPLATE_DATA, null, 2)}`);
         console.log(`data: ${JSON.stringify(data, null, 2)}`);
         setData(data);
         //setData(templateData);
       } catch (error) {
         console.error('USING TEMPLATE DATA! - Error fetching exchange rates:', error);
-        setData(templateData);
+        setData(TEMPLATE_DATA);
       }
     };
     fetchTimer('ExchangeRates', dataServer, fetchRates);
@@ -57,7 +57,7 @@ const ExchangeRates = () => {
     return <div>Loading...</div>;
   }
 
-  const rates = data.rates || templateData.rates;
+  const rates = data.rates || TEMPLATE_DATA.rates;
   /*
   return (
     <div>

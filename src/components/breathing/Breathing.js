@@ -3,6 +3,10 @@ import Sounds from '../sound/Sounds';
 import icons from '../site/icons';
 import { CircuitContext } from '../context/CircuitContext';
 
+const BREATHING_INSTRUCTIONS = ['inhale', 'hold', 'exhale', ''];
+const BREATHING_TIMES = [5, 5, 9, 0];
+const BREATHING_SOUND_EFFECTS = [Sounds.tuningUp, '', Sounds.tuningDown, ''];
+
 const Breathing = () => {
     
     const {
@@ -11,9 +15,6 @@ const Breathing = () => {
     } = useContext(CircuitContext);
 
     const [index, setIndex] = useState(0);
-    const instructions = ['inhale', 'hold', 'exhale', ''];
-    const soundEffects = [Sounds.tuningUp, '', Sounds.tuningDown, ''];
-    const times = [5, 5, 9, 0];
     const [timer, setTimer] = useState(0);
 
     useEffect(() => {
@@ -23,7 +24,7 @@ const Breathing = () => {
             return () => clearInterval(intervalId);
     }, []);
     useEffect(() => {
-            if (timer >= (times[index])) {
+            if (timer >= (BREATHING_TIMES[index])) {
                 setTimeout(() => {
                     setTimer(0);
                     if (index === 3) {
@@ -33,21 +34,21 @@ const Breathing = () => {
                     }
                 }, 1);
             }
-    }, [timer]);
+    }, [timer, index]);
     useEffect(() => {
         if (breathing) {
             console.log(`Breathing => ${index}`);
             if ((index !== 1) && (index !== 3)) {
-                soundEffects[index]();
+                BREATHING_SOUND_EFFECTS[index]();
             }
         }
-    }, [index]);
+    }, [index, breathing]);
     return (
         <div className='width-100-percent'>
             <div className='ball-container m-auto'>
                 <div className='ball box-shadow'>
                     <div className='pt-15 size12 bold color-dark contentCenter'>
-                        {instructions[index]}
+                        {BREATHING_INSTRUCTIONS[index]}
                     </div>
                 </div>
             </div>

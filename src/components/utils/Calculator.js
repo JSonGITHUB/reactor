@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import evaluateMathExpression from './evaluateMathExpression';
 
 const Calculator = ({
     newValue,
@@ -32,8 +33,7 @@ const Calculator = ({
     const evaluate = (expr) => {
         try {
             if (!/^[\d+\-*/.() ]+$/.test(expr)) return 'Error';
-            // eslint-disable-next-line no-eval
-            const res = eval(expr);
+            const res = evaluateMathExpression(expr);
             return isNaN(res) ? 'Error' : res;
         } catch {
             return 'Error';

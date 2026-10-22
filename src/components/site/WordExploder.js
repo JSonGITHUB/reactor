@@ -13,18 +13,6 @@ const words = [
     'simplify', 
     'improve'
 ];
-const quotes = [
-    'Small steps every day.',
-    'Progress, not perfection.',
-    'Your future starts now.',
-    'One step at a time.',
-    'Consistency is the key.',
-    'Do what you can, today.',
-    'Every day counts.',
-    'Action creates momentum.',
-    'Little by little, you grow.',
-    'Your path is yours to make.'
-];
 
 const WordExploder = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -62,7 +50,7 @@ const WordExploder = () => {
             clearTimeout(explode);
             clearTimeout(next);
         };
-    }, [currentIndex]);
+    }, [currentIndex, word]);
 
     return (
         <div className='exploder-container'>

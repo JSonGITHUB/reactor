@@ -1,67 +1,34 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import Circuit from './Circuit';
-import getKey from '../utils/KeyGenerator';
-import CollapseToggleButton from '../utils/CollapseToggleButton';
 import { CircuitContext } from '../context/CircuitContext';
 import CircuitGroupNavigation from './CircuitGroupNavigation';
 import CircuitGroupEditTitle from './CircuitGroupEditTitle';
-import initCircuitTracking from './initCircuitTracking';
-import initializeData from './initializeData';
-import validate from '../utils/validate';
 
 const CircuitGroup = () => {
 
     const {
         circuits,
         setCircuits,
-        sort,
         targetElementRef,
         scrollToBottom,
         groupIndex,
-        setGroupIndex,
-        group,
-        setGroup,
         deleteGroup,
         addCircuit
     } = useContext(CircuitContext);
 
-    const [collapsed, setCollapsed] = useState();
     const [edit, setEdit] = useState(false);
     const isEditedCircuitGroupTitle = () => (edit) ? true : false;
     const [editedCircuitGroupTitle, setEditedCircuitGroupTitle] = useState(null);
     const [cursorPosition, setCursorPosition] = useState(0);
     const textareaRef = useRef(null);
-    const [circuitGroup, setCircuitGroup] = useState(circuits[0].circuits[groupIndex]);
+    const [circuitGroup] = useState(circuits[0].circuits[groupIndex]);
 
-    const focusTextarea = () => {
+    useEffect(() => {
         if (textareaRef.current) {
             textareaRef.current.focus();
             textareaRef.current.setSelectionRange(cursorPosition, cursorPosition);
         }
-    };
-    useEffect(() => {
-        focusTextarea();
     }, [editedCircuitGroupTitle, cursorPosition]);
-    useEffect(() => {
-        console.log(`CircuitGroup => sort: ${sort}`);
-        console.log(`CircuitGroup => groupIndex: ${groupIndex}`);
-        console.log(`CircuitGroup => group: ${group}`);
-    }, []);
-    
-    useEffect(() => {
-        if (groupIndex >= 0 && circuits[0].circuits[groupIndex]) {
-            const updatedCircuits = [...circuits];
-            const selectedCircuitGroup = updatedCircuits[0].circuits[groupIndex];
-            //console.log(`CircuitGroup => groupIndex: ${groupIndex} selectedCircuitGroup: ${JSON.stringify(selectedCircuitGroup, null, 2)} updatedCircuits: ${JSON.stringify(updatedCircuits, null, 2)}`);
-            //updatedCircuits[0].circuits[groupIndex].isCollapsed = collapsed;
-            //updatedCircuits[groupIndex].circuits.map((circuit, index) => circuit.isCollapsed = collapsed)
-            //setCircuits(updatedCircuits);
-            localStorage.setItem('circuitTracking', JSON.stringify(updatedCircuits))
-            //console.log(`localStorage.setItem('circuitTracking')1`)
-            //console.log(`setCollapsed => updatedCircuits: ${JSON.stringify(updatedCircuits, null, 2)}`);
-            //console.log(`CircuitGroup => ${updatedCircuits[0].circuits[groupIndex].title} isCollapsed: ${updatedCircuits[0].circuits[groupIndex].isCollapsed}`);
-        }
-    }, [collapsed]);
     
     /* 
     useEffect(() => {
@@ -79,9 +46,7 @@ const CircuitGroup = () => {
             //}
             //return circuitGroup;
         });
-        //console.log(`setCollapsed => updatedCircuits: ${updatedCircuits.map((circuitGroup, groupIndex) => circuitGroup.circuits.map((circuit) => (circuit.isCollapsed)))}`);
         localStorage.setItem('circuitTracking', JSON.stringify(updatedCircuits));
-        //console.log(`setCollapsed => updatedCircuits: ${JSON.stringify(updatedCircuits, null, 2)}`);
     }, [collapsed]);
     */
     const toggleEdit = () => {
@@ -106,11 +71,10 @@ const CircuitGroup = () => {
         addCircuit(groupIndex)
         scrollToBottom(elementRef);
     }
-    //console.log(`CircuitGroup => ${circuitGroup.title} circuitGroup.display: ${circuitGroup.display}`);
-    //console.log(`CircuitGroup => circuitGroup: ${JSON.stringify(circuitGroup, null, 2)}`);
+    const collapsed = circuitGroup?.isCollapsed;
     return (
         (circuitGroup)
-        ? <div key={getKey(`circuit${groupIndex}`)} ref={targetElementRef}>
+        ? <div key={`circuit-${groupIndex}-${String(circuitGroup?.title || 'group')}`} ref={targetElementRef}>
             <div className=''>
                 <div className='flexContainer'>
                     <div className='flex1Auto'>

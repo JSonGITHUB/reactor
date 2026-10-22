@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState, useContext } from 'react';
+import React, { createContext, useCallback, useEffect, useState, useContext } from 'react';
 import initializeData from '../utils/InitializeData';
 import validate from '../utils/validate';
 import directionObject from '../waves/DirectionObject';
@@ -12,22 +12,16 @@ const OceanParent = ({
     targetElementRef
 }) => {
 
-    const getLocal = (item) => initializeData(item, null);
-    const getProps = (item) => item;
-    const getDistance = () => {
-        const newDistance = (getLocal('distance') === null) ? getProps('distance') : getLocal('distance');
+    const getDistance = useCallback(() => {
+        const newDistance = initializeData('distance', 10);
         if (isNaN(newDistance) || newDistance === '' || Number(newDistance) < 1) {
             return 10;
         }
         return newDistance;
-    }
+    }, []);
 
-    const getDefault = (item) => (getLocal(item) === null)
-        ? getProps(item)
-        : getLocal(item);
-
-    const getSwell1Direction = () => initializeData('swell1Direction', 'SSW');
-    const getSwell2Direction = () => initializeData('swell2Direction', 'SSW');
+    const getSwell1Direction = useCallback(() => initializeData('swell1Direction', 'SSW'), []);
+    const getSwell2Direction = useCallback(() => initializeData('swell2Direction', 'SSW'), []);
 
     //const swellUrl = "https://marine-api.open-meteo.com/v1/marine?latitude=33.085692&longitude=-117.319371&current=wave_height,wave_direction,wave_period,wind_wave_height,wind_wave_direction,wind_wave_period,wind_wave_peak_period,swell_wave_height,swell_wave_direction,swell_wave_period,swell_wave_peak_period&length_unit=imperial&timeformat=unixtime&timezone=America%2FLos_Angeles&forecast_days=1&models=best_match";
     const latitude = localStorage.getItem('latitude');
@@ -37,95 +31,88 @@ const OceanParent = ({
     const [retry, setRetry] = useState('');
     const swellData = useOceanData('swell', swellUrl, '', setRetry);
     const [swell, setSwell] = useState(null);
-    const [dataInit, setDataInit] = useState(false);
 
     const [status, setStatusData] = useState();
 
     const handleSwell1LiveSelection = () => {
+        const liveSwellData = swell || JSON.parse(localStorage.getItem('swellData'));
+        if (!liveSwellData) {
+            return;
+        }
 
-        const swellData = JSON.parse(localStorage.getItem('swellData'));
-        //console.log(`handleSwell1LiveSelection => swellData: ${JSON.stringify(swellData, null, 2)}`);
-        const swell1Angle = getDirection(swellData.swell_wave_direction);
-        //console.log(`handleSwell1LiveSelection => swell_wave_period: ${Number(swellData.swell_wave_period).toFixed(0)} - ${directionObject[swell1Angle]} or ${roundToNearestFive(directionObject[swell1Angle])} swell1Angle: ${swell1Angle}`);
+        // Keep this aligned with SwellDisplay header, which uses wave_* values.
+        const swell1Angle = getDirection(liveSwellData.wave_direction);
         localStorage.setItem('swell1Direction', swell1Angle);
-        localStorage.setItem('swell1Angle', roundToNearestFive(swellData.swell_wave_direction));
-        localStorage.setItem('swell1Height', swellData.swell_wave_height);
-        localStorage.setItem('swell1Interval', swellData.swell_wave_period);
+        localStorage.setItem('swell1Angle', roundToNearestFive(liveSwellData.wave_direction));
+        localStorage.setItem('swell1Height', liveSwellData.wave_height);
+        localStorage.setItem('swell1Interval', liveSwellData.wave_period);
         setStatus(prevState => ({
             ...prevState,
             pause: true,
             swell1Direction: swell1Angle,
-            swell1Angle: roundToNearestFive(swellData.swell_wave_direction),
-            swell1Height: Number(swellData.swell_wave_height).toFixed(0),
-            swell1Interval: `${Number(swellData.swell_wave_period).toFixed(0)}`,
-            swellData
+            swell1Angle: roundToNearestFive(liveSwellData.wave_direction),
+            swell1Height: Number(liveSwellData.wave_height).toFixed(0),
+            swell1Interval: `${Number(liveSwellData.wave_period).toFixed(0)}`,
+            swellData: liveSwellData
         }));
 
     }
     const handleSwell2LiveSelection = () => {
+        const liveSwellData = swell || JSON.parse(localStorage.getItem('swellData'));
+        if (!liveSwellData) {
+            return;
+        }
 
-        const swellData = JSON.parse(localStorage.getItem('swellData'));
-        //console.log(`handleSwell2LiveSelection => swellData: ${JSON.stringify(swellData, null, 2)}`);
-        const swell2Angle = getDirection(swellData.wave_direction);
-        localStorage.setItem('swell2Direction', swell2Angle);
-        localStorage.setItem('swell2Angle', roundToNearestFive(swellData.wave_direction));
-        localStorage.setItem('swell2Height', swellData.wave_height);
-        localStorage.setItem('swell2Interval', swellData.wave_period);
-        //console.log(`handleSwell2LiveSelection => wave_period: ${Number(swellData.wave_period).toFixed(0)} - ${roundToNearestFive(directionObject[swell2Angle])} swell2Angle: ${swell2Angle}`);
+        // Prefer secondary swell fields; fall back to wave_* if unavailable.
+        const swell2DirectionValue = Number.isFinite(Number(liveSwellData.swell_wave_direction))
+            ? liveSwellData.swell_wave_direction
+            : liveSwellData.wave_direction;
+        const swell2HeightValue = Number.isFinite(Number(liveSwellData.swell_wave_height))
+            ? liveSwellData.swell_wave_height
+            : liveSwellData.wave_height;
+        const swell2PeriodValue = Number.isFinite(Number(liveSwellData.swell_wave_period))
+            ? liveSwellData.swell_wave_period
+            : liveSwellData.wave_period;
+
+        const swell2DirectionLabel = getDirection(swell2DirectionValue);
+        localStorage.setItem('swell2Direction', swell2DirectionLabel);
+        localStorage.setItem('swell2Angle', roundToNearestFive(swell2DirectionValue));
+        localStorage.setItem('swell2Height', swell2HeightValue);
+        localStorage.setItem('swell2Interval', swell2PeriodValue);
         setStatus(prevState => ({
             ...prevState,
             pause: true,
-            swell2Direction: swell2Angle,
-            swell2Angle: roundToNearestFive(directionObject[swell2Angle]),
-            swell2Height: Number(swellData.wave_height).toFixed(0),
-            swell2Interval: `${Number(swellData.wave_period).toFixed(0)}`,
-            swellData
+            swell2Direction: swell2DirectionLabel,
+            swell2Angle: roundToNearestFive(swell2DirectionValue),
+            swell2Height: Number(swell2HeightValue).toFixed(0),
+            swell2Interval: `${Number(swell2PeriodValue).toFixed(0)}`,
+            swellData: liveSwellData
         }));
 
     }
 
     const setStatus = (newValue) => {
-        //console.log(`setStatus => newValue.length: ${newValue.length} newValue: ${JSON.stringify(newValue, null, 2)}`);
-        if (newValue && newValue !== undefined && newValue.length > 0) {
-            //localStorage.setItem('players', JSON.stringify(newValue));
-            //////////////////////////////////////////////////////////////
+        if (typeof newValue === 'function') {
+            setStatusData((prevState) => newValue(prevState));
+            return;
+        }
 
-            const swellData = initializeData('swellData', [])
-
-            //console.log(`SwellDisplay => swellData[0].current: ${JSON.stringify(swellData[0], null, 2)}`);
-            //const swellData = swellData[0].current;
-            const swell1Angle = getDirection(swellData.swell_wave_direction);
-            const swell2Angle = getDirection(swellData.wave_direction);
-            const roundToNearestFive = (number) => Math.round(number / 5) * 5;
-            //console.log(`OceanContext => newValue: ${JSON.stringify(newValue, null, 2)}`);
-            
-            newValue.pause = true;
-            newValue.swell1Direction = swell1Angle;
-            newValue.swell1Angle = roundToNearestFive(swellData.swell_wave_direction);
-            newValue.swell1Height = Number(swellData.swell_wave_height).toFixed(0);
-            newValue.swell1Interval = `${Number(swellData.swell_wave_period).toFixed(0)}`;
-            newValue.swell2Direction = swell2Angle;
-            newValue.swell2Angle = roundToNearestFive(swellData.wave_direction);
-            newValue.swell2Height = Number(swellData.wave_height).toFixed(0);
-            newValue.swell2Interval = `${Number(swellData.wave_period).toFixed(0)}`;
-            newValue.swellData = swellData;
-            //////////////////////////////////////////////////////////////
-            setStatusData(newValue);
+        if (newValue && typeof newValue === 'object') {
+            setStatusData((prevState) => ({
+                ...prevState,
+                ...newValue
+            }));
         }
     };
 
-    
-
     useEffect(() => {
-        
         setStatusData({
             module: 'Waves',
             pause: true,
             date: new Date(),
-            //edit: false,
-            tide: getDefault('tide'),
-            stars: getDefault('stars'),
-            waterTemp: '66.2',
+            tide: initializeData('tide', 'medium'),
+            stars: initializeData('stars', 3),
+            waterTemp: initializeData('waterTemp', '66.2'),
             swell1Height: initializeData('swell1Height', '2.0'),
             swell1Interval: initializeData('swell1Interval', 17),
             swell1Direction: getSwell1Direction(),
@@ -134,28 +121,17 @@ const OceanParent = ({
             swell2Direction: getSwell2Direction(),
             swell1Angle: directionObject[getSwell1Direction()],
             swell2Angle: directionObject[getSwell2Direction()],
-            //swell1Direction: getDefault('swell1Direction'),
-            //swell2Direction: getDefault('swell2Direction'),
-            //swell1Angle: getDefault('swell1Angle'),
-            //swell2Angle: getDefault('swell2Angle'),
-            //swell1Height: getDefault('swell1Height'),
-            //swell2Height: getDefault('swell2Height'),
-            //swell1Interval: getDefault('swell1Interval'),
-            //swell2Interval: getDefault('swell2Interval'),
-            windDirection: getDefault('windDirection'),
+            windDirection: initializeData('windDirection', 0),
             distance: getDistance(),
             isSwell1: (initializeData('isSwell1', null) === true) ? true : false,
             isSwell2: (initializeData('isSwell2', null) === true) ? true : false,
             isTide: (initializeData('isTide', null) === true) ? true : false,
             isWind: (initializeData('isWind', null) === true) ? true : false,
-            //locations: getLocalLocations(),
             matches: [],
             init: false
-        })
-    }, []);
-    useEffect(() => {
-        
-    }, [status]);
+        });
+    }, [getDistance, getSwell1Direction, getSwell2Direction]);
+
     useEffect(() => {
         const templateData = {
             time: 1719878400,
@@ -171,17 +147,16 @@ const OceanParent = ({
             swell_wave_direction: 275,
             swell_wave_period: 5.95,
             swell_wave_peak_period: null
-        }
-        //console.log(`swellData: ${JSON.stringify(swellData, null, 2)}`);
+        };
+
         if (swellData[0].current) {
             if (swellData[0].current.swell_wave_period === 'NaN' || isNaN(swellData[0].current.swell_wave_period)) {
-                const localSwell = initializeData('swellData', templateData)
+                const localSwell = initializeData('swellData', templateData);
                 setSwell(localSwell);
             } else {
                 localStorage.setItem('swellData', JSON.stringify(swellData[0].current));
                 setSwell(swellData[0].current);
             }
-            setDataInit(true);
         }
     }, [swellData]);
 
@@ -192,7 +167,7 @@ const OceanParent = ({
             return 3;
         }
         return 0;
-    }
+    };
 
     const setWindStatus = (selected) => {
         localStorage.setItem('windDirection', roundToNearestFive(selected));
@@ -201,7 +176,8 @@ const OceanParent = ({
             pause: true,
             windDirection: roundToNearestFive(selected)
         }));
-    }
+    };
+
     const handleTideSelection = (groupTitle, label, selected) => {
         const height = getDefaultHeights(selected);
         localStorage.setItem('tide', selected);
@@ -212,31 +188,39 @@ const OceanParent = ({
             tide: selected,
             height: height
         }));
-    }
+    };
+
     const setWind = (direction, angle, speed, gusts) => {
+        const parsedSpeed = Number(speed).toFixed(0);
+        const parsedGusts = Number(gusts).toFixed(0);
         localStorage.setItem('windDirection', direction);
+        localStorage.setItem('windSpeed', `${parsedSpeed}mph`);
+        localStorage.setItem('windGusts', parsedGusts);
         setStatus(prevState => ({
             ...prevState,
             windDirection: direction,
             windAngle: Number(angle).toFixed(0),
-            windSpeed: Number(speed).toFixed(0),
-            windGusts: Number(gusts).toFixed(0)
+            windSpeed: parsedSpeed,
+            windGusts: parsedGusts
         }));
-    }
+    };
+
     const handleWindCheck = () => {
         setStatus(prevState => ({
             ...prevState,
             pause: true,
             isWind: !status.isWind
         }));
-    }
+    };
+
     const handleTideCheck = () => {
         setStatus(prevState => ({
             ...prevState,
             pause: true,
             isTide: !status.isTide
         }));
-    }
+    };
+
     const handleSwellCheck = (id) => {
         if (id === '1') {
             setStatus(prevState => ({
@@ -251,30 +235,10 @@ const OceanParent = ({
                 isSwell2: !status.isSwell2
             }));
         }
-    }
-    // eslint-disable-next-line
-    const handleSwellSelection = (id, groupTitle, label, selected) => {
-        // eslint-disable-next-line
-        const swellAngle = directionObject[selected];
-        if (id === '1') {
-            setStatus(prevState => ({
-                ...prevState,
-                pause: true,
-                swell1Direction: selected,
-                swell1Angle: swellAngle
-            }));
-        } else {
-            setStatus(prevState => ({
-                ...prevState,
-                pause: true,
-                swell2Direction: selected,
-                swell2Angle: swellAngle
-            }));
-        }
-    }
+    };
+
     const handleSwell1Selection = (groupTitle, label, selected) => {
         const swell1Angle = directionObject[selected];
-        console.log(`OceanContext => handleSwell1Selection: ${selected} swell1Angle: ${swell1Angle}`);
         localStorage.setItem('swell1Direction', selected);
         localStorage.setItem('swell1Angle', swell1Angle);
         setStatus(prevState => ({
@@ -283,7 +247,8 @@ const OceanParent = ({
             swell1Direction: selected,
             swell1Angle: swell1Angle
         }));
-    }
+    };
+
     const handleSwell2Selection = (groupTitle, label, selected) => {
         const swell2Angle = directionObject[selected];
         localStorage.setItem('swell2Direction', selected);
@@ -294,13 +259,11 @@ const OceanParent = ({
             swell2Direction: selected,
             swell2Angle: swell2Angle
         }));
-    }
+    };
+
     const roundToNearestFive = (number) => Math.round(number / 5) * 5;
     
     const handleSwell1Angle = (groupTitle, label, selected) => {
-
-        //console.log(`handleSwell1Angle => selected: ${selected} getDirection(selected): ${getDirection(selected)}`);
-
         localStorage.setItem('swell1Angle', selected);
         localStorage.setItem('swell1Direction', getDirection(selected));  
             
@@ -310,9 +273,9 @@ const OceanParent = ({
             swell1Angle: selected,
             swell1Direction: getDirection(selected)
         }));
-    }
-    const handleSwell2Angle = (groupTitle, label, selected) => {
+    };
 
+    const handleSwell2Angle = (groupTitle, label, selected) => {
         localStorage.setItem('swell2Angle', selected);
         localStorage.setItem('swell2Direction', getDirection(selected));
 
@@ -322,7 +285,8 @@ const OceanParent = ({
             swell2Angle: selected,
             swell2Direction: getDirection(selected)
         }));
-    }
+    };
+
     const handleSwell1Height = (groupTitle, label, selected) => {
         localStorage.setItem('swell1Height', selected);
         setStatus(prevState => ({
@@ -330,7 +294,8 @@ const OceanParent = ({
             pause: true,
             swell1Height: selected.replace('ft', '')
         }));
-    }
+    };
+
     const handleSwell2Height = (groupTitle, label, selected) => {
         localStorage.setItem('swell2Height', selected);
         setStatus(prevState => ({
@@ -338,7 +303,8 @@ const OceanParent = ({
             pause: true,
             swell2Height: selected.replace('ft', '')
         }));
-    }
+    };
+
     const handleSwell1Interval = (groupTitle, label, selected) => {
         localStorage.setItem('swell1Interval', selected);
         setStatus(prevState => ({
@@ -346,7 +312,8 @@ const OceanParent = ({
             pause: true,
             swell1Interval: selected
         }));
-    }
+    };
+
     const handleSwell2Interval = (groupTitle, label, selected) => {
         localStorage.setItem('swell2Interval', selected);
         setStatus(prevState => ({
@@ -354,15 +321,18 @@ const OceanParent = ({
             pause: true,
             swell2Interval: selected
         }));
-    }
+    };
+
     const handleStarSelection = (groupTitle, label, selected) => {
+        
         localStorage.setItem('stars', selected);
         setStatus(prevState => ({
             ...prevState,
             pause: true,
             stars: selected
         }));
-    }
+    };
+
     const handleDistanceSelection = (event) => {
         const target = event.target;
         if (isNaN(target.value) || target.value === '' || Number(target.value) < 1) {
@@ -373,21 +343,17 @@ const OceanParent = ({
             ...prevState,
             distance: target.value
         }));
-    }
+    };
+
     const pause = (event) => {
         setStatus(prevState => ({
             ...prevState,
             pause: true
         }));
-    }
-    // eslint-disable-next-line
-    const unpause = () => {
-        setStatus(prevState => ({
-            ...prevState,
-            pause: true
-        }));
     };
+
     const setTide = (tide, height) => {
+        console.log(`OceanContext => setTide => tide: ${tide}, height: ${height}`);
         localStorage.setItem('tide', tide);
         localStorage.setItem('height', height);
         if (initializeData('tide', null) !== tide) {
@@ -397,7 +363,7 @@ const OceanParent = ({
                 height: height
             }));
         }
-    }
+    };
     
     return (
 

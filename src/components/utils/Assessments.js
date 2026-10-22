@@ -3,7 +3,6 @@ import React from 'react';
 const Assessments = () => {
 
     const loopRange = (value) => {
-        let i = 0;
         const array = [];
         /*
         while (i < 100) {
@@ -344,9 +343,9 @@ const Assessments = () => {
         const notLastIndex = (index) => (index < (binaryArray.length - 1)) ? true : false;
         const digitLengthBigger = (digit) => (digit.length > gap) ? true : false;
 
-        binaryArray.map((digit, index) => {
+        binaryArray.forEach((digit, index) => {
             gap = (notLastIndex(index) && digitLengthBigger(digit)) ? digit.length : gap;
-        })
+        });
         return gap;
 
     }
@@ -420,7 +419,7 @@ const Assessments = () => {
         let lastValue = 0;
         let missingNumber = 1;
         const isNextNumber = (value) => ((value-lastValue) === 1) ? true : false;
-        sortedArray.map((value, index) => {
+        sortedArray.forEach((value, index) => {
             missingNumber = (!isNextNumber(value)) ? (value-1) : missingNumber;
             lastValue = value;
         });
@@ -443,6 +442,26 @@ const Assessments = () => {
         const smallestNumber = Math.min(...newArray);
         return <div>The smallest number is: {smallestNumber}</div>
     }
+
+    // Keep sample helpers referenced so they remain available for manual assessment testing.
+    const sampleAssessments = {
+        displayLoopList,
+        displayFactorial,
+        displayTriangle,
+        someShit,
+        displayFibonacci,
+        displayDays,
+        solution,
+        weiredStringManipulation,
+        generateString,
+        myWay,
+        getLargestBinaryGap,
+        arrayShifter,
+        displayUniqueValue,
+        howManyJumps,
+        missingElementDisplay,
+    };
+    void sampleAssessments;
  
     return (
         <div className='mt--20 mr-10 ml-10 color-lite bold'>

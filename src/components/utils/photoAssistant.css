@@ -1,0 +1,143 @@
+/* src/styles/photoAssistant.css */
+
+/* Global panel and container styles */
+.photo-assistant-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 15px;
+    background-color: #1e1e1e;
+    /* dark background */
+    color: #f5f5f5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Card styles */
+.shot-summary-card,
+.shot-log-card,
+.entry-card {
+    background-color: #2c2c2c;
+    border-radius: 10px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.shot-summary-card:hover,
+.shot-log-card:hover,
+.entry-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* Flex helpers */
+.flexRow {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.flexColumn {
+    display: flex;
+    flex-direction: column;
+}
+
+.alignCenter {
+    align-items: center;
+}
+
+.justifyBetween {
+    justify-content: space-between;
+}
+
+/* Typography */
+.size12 {
+    font-size: 12px;
+}
+
+.size14 {
+    font-size: 14px;
+}
+
+.size16 {
+    font-size: 16px;
+}
+
+.size18 {
+    font-size: 18px;
+}
+
+.bold {
+    font-weight: 600;
+}
+
+.color-white {
+    color: #f5f5f5;
+}
+
+.color-gray {
+    color: #aaaaaa;
+}
+
+.color-yellow {
+    color: #f1c40f;
+}
+
+/* Buttons and icon buttons */
+button,
+.icon-button {
+    background-color: transparent;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+    transition: background 0.2s ease;
+}
+
+button:hover,
+.icon-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Input fields */
+.inputField {
+    background-color: #333;
+    border: 1px solid #555;
+    border-radius: 8px;
+    color: #f5f5f5;
+    padding: 8px 12px;
+    width: 100%;
+    font-size: 14px;
+}
+
+.inputField::placeholder {
+    color: #888;
+}
+
+/* Media type icons */
+.media-type-icon {
+    font-size: 18px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .photo-assistant-container {
+        padding: 10px;
+    }
+
+    .shot-summary-card,
+    .shot-log-card,
+    .entry-card {
+        padding: 8px 10px;
+    }
+
+    .size14 {
+        font-size: 12px;
+    }
+
+    .size16 {
+        font-size: 14px;
+    }
+}

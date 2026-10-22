@@ -22,7 +22,7 @@ const ScheduleSelector = React.memo(() => {
         }
         const newSchedules = [...schedules];
         let currenSchedules = [];
-        if (schedules && scheduleNames && (schedules.length > scheduleNames.length || schedules.length == scheduleNames.length)) {
+        if (schedules && scheduleNames && (schedules.length > scheduleNames.length || schedules.length === scheduleNames.length)) {
             currenSchedules = newSchedules.map((schedule) => schedule.title);
         } else {
             currenSchedules = scheduleNames || ['Weekday', 'Training'];
@@ -48,18 +48,6 @@ const ScheduleSelector = React.memo(() => {
             setWasRunning(false);
         }
     };
-    const handleTouchStart = () => {
-        if (isRunning) {
-            setIsRunning(false);
-        }
-    };
-
-    const handleTouchEnd = () => {
-        if (!isRunning) {
-            setIsRunning(true);
-        }
-    };
-
     return (
         schedules && schedules.length > 0 && (
                 <div

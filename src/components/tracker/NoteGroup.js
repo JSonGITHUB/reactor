@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import icons from '../site/icons';
 import Note from './Note';
-import getKey from '../utils/KeyGenerator';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
 
 const NoteGroup = ({
@@ -24,7 +23,7 @@ const NoteGroup = ({
         newNotes[noteGroupIndex].isCollapsed = collapsed;
         let dataToString = JSON.stringify(newNotes);
         localStorage.setItem('projects', dataToString);
-    }, [collapsed]);
+    }, [collapsed, noteGroupIndex, notes]);
 
     const toggleEdit = () => {
         const toggle = (edit)
@@ -58,47 +57,45 @@ const NoteGroup = ({
     }
     return (
         (noteGroup.display && noteGroup.display === true)
-        ? <div key={`note${noteGroupIndex}`} className='containerBox' ref={targetElementRef}>
-                <div className='containerBox'>
-                    <div className='containerBox bg-lite'>
-                        <div className='bold size25 color-yellow'>
-                            {
-                                (isEditedNoteGroupTitle())
-                                    ? <div className='containerBox flexContainer'>
-                                            <div className='flex2Column'>
-                                                <textarea
-                                                    className='inputField ht-55 size25 r-10 color-yellow bold'
-                                                    onChange={(e) => setEditedNoteGroupTitle(e.target.value)}
-                                                    value={(editedNoteGroupTitle !== null) ? editedNoteGroupTitle : noteGroup.title}
-                                                    placeholder={editedNoteGroupTitle}
-                                                >
-                                                    {editedNoteGroupTitle}
-                                                </textarea>
-                                            </div>
-                                            <div
-                                                title='save' 
-                                                className='containerBox flexColumn p-15 bg-neogreen color-dark bold button' 
-                                                onClick={() => toggleEdit(noteGroupIndex)}
+        ? <div key={`note${noteGroupIndex}`} className='' ref={targetElementRef}>
+                <div className='containerDetail m-5 size20 color-yellow bg-lite'>
+                    <div className='bold size25 color-yellow'>
+                        {
+                            (isEditedNoteGroupTitle())
+                                ? <div className='containerDetail m-5 size20 color-yellow flexContainer'>
+                                        <div className='flex2Column'>
+                                            <textarea
+                                                className='inputField ht-55 size25 r-10 color-yellow bold'
+                                                onChange={(e) => setEditedNoteGroupTitle(e.target.value)}
+                                                value={(editedNoteGroupTitle !== null) ? editedNoteGroupTitle : noteGroup.title}
+                                                placeholder={editedNoteGroupTitle}
                                             >
-                                                save
-                                            </div>
+                                                {editedNoteGroupTitle}
+                                            </textarea>
                                         </div>
-                                    : <div className='containerBox bg-lite centerVertical p-20 bold size25 color-yellow'>
-                                        <CollapseToggleButton
-                                            title={noteGroup.title}
-                                            isCollapsed={collapsed}
-                                            setCollapse={setCollapsed}
-                                            align='left'
-                                            editTitle={toggleEdit}
-                                        />
+                                        <div
+                                            title='save' 
+                                            className='containerDetail m-5 size20 color-yellow flexColumn p-15 bg-neogreen color-dark bold button' 
+                                            onClick={() => toggleEdit(noteGroupIndex)}
+                                        >
+                                            save
+                                        </div>
                                     </div>
-                            }
-                        </div>
+                                : <div className='containerDetail size20 color-yellow bg-lite centerVertical p-20 bold size25 color-yellow'>
+                                    <CollapseToggleButton
+                                        title={noteGroup.title}
+                                        isCollapsed={collapsed}
+                                        setCollapse={setCollapsed}
+                                        align='left'
+                                        editTitle={toggleEdit}
+                                    />
+                                </div>
+                        }
                     </div>
                     {
                         (collapsed) 
                         ? null 
-                        : <div className='containerBox'>
+                        : <div className='containerDetail mt-5 size20 color-yellow'>
                             <div className='flexContainer contentRight'>
                                 <div
                                     title='add to group'
@@ -106,7 +103,7 @@ const NoteGroup = ({
                                     onClick={() => addToGroup(noteGroupIndex, targetElementRef)}
                                 >
                                     <div className='flexContainer'>
-                                        <div className='flex2Column text-outline-light size20 mt-5'>
+                                        <div className='flex2Column text-outline-lite size20 mt-5'>
                                             {icons.plus}
                                         </div>
                                         <div className='flex2Column p-5 size25'>
@@ -129,7 +126,7 @@ const NoteGroup = ({
                             (collapsed) 
                             ? null 
                             : noteGroup.notes.map((note, noteIndex) => (
-                                <div key={getKey(`note${noteIndex}`)}>
+                                <div key={`note-${noteGroupIndex}-${noteIndex}-${String(note?.description || 'note')}`}>
                                     <Note
                                         notes={notes}
                                         setNotes={setNotes}

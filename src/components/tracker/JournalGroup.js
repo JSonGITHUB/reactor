@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import icons from '../site/icons';
 import Journal from './Journal';
-import getKey from '../utils/KeyGenerator';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
 import validate from '../utils/validate';
 
@@ -21,7 +20,6 @@ const JournalGroup = ({
     const [edit, setEdit] = useState(false);
     const isEditedJournalGroupTitle = () => (edit) ? true : false;
     const [editedJournalGroupTitle, setEditedJournalGroupTitle] = useState(null);
-    //console.log(`JournalGroup => journals: ${JSON.stringify(journals,null,2)}`)
         
     useEffect(() => {
         let dataUpdated = false;
@@ -33,12 +31,10 @@ const JournalGroup = ({
             dataUpdated = true;
         }
         if (dataUpdated) {
-            console.log(`JournalGrouop => useEffect => selectedNewJournal.isCollapsed: ${selectedNewJournal.isCollapsed}`);
             setJournals(newJournals);
         }
-        console.log(`JournalGrouop => useEffect => selectedNewJournal.isCollapsed: ${selectedNewJournal.isCollapsed}`);
 
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
     useEffect(() => {
         const newJournals = [...journals];
         const selectedJournalGroup = newJournals[journalGroupIndex];
@@ -48,10 +44,9 @@ const JournalGroup = ({
         const stringifiedData = JSON.stringify(newJournals);
         
         if (stringifiedData !== 'undefined' && stringifiedData !== undefined && stringifiedData !== '[null]') {
-            console.log(`Journal => stringifiedData: ${stringifiedData}`);
             localStorage.setItem('journalTracking', stringifiedData);
         }
-    }, [isCollapsed]);
+    }, [isCollapsed, journalGroupIndex, journals]);
     
     const toggleEdit = () => {
         const toggle = (edit)
@@ -72,8 +67,8 @@ const JournalGroup = ({
         //setScroll(journalGroupIndex * 50);
         scrollToBottom(elementRef);
     }
-    return <div key={getKey(`journal${journalGroupIndex}`)} className='' ref={targetElementRef}>
-                {/*<div className='containerBox'>*/}
+    return <div key={`journal-group-${journalGroupIndex}-${String(journalGroup?.title || 'group')}`} className='mt-5' ref={targetElementRef}>
+                {/*<div className='containerDetail'>*/}
                     <div className='containerDetail flexContainer'>
                         <div className='flex1Auto'>
                             {
@@ -93,7 +88,7 @@ const JournalGroup = ({
                                         <span>
                                             <div
                                                 title='save' 
-                                                className='containerBox bg-neogreen color-dark bold button p-15' 
+                                                className='containerDetail bg-neogreen color-dark bold button p-15' 
                                                 onClick={() => toggleEdit(journalGroupIndex)}
                                             >
                                                 save
@@ -120,11 +115,11 @@ const JournalGroup = ({
                             <div className='flexContainer contentRight'>
                                 <div
                                     title='add to group'
-                                    className='containerBox flex2Column button bg-lite centeredContent'
+                                    className='containerDetail flex2Column button bg-lite centeredContent p-10 mr-5'
                                     onClick={() => addToGroup(journalGroupIndex, targetElementRef)}
                                 >
                                     <div className='flexContainer'>
-                                        <div className='flex2Column text-outline-light size20 mt-5'>
+                                        <div className='flex2Column text-outline-lite size20 mt-5'>
                                             {icons.plus}
                                         </div>
                                         <div className='flex2Column p-5 size25'>
@@ -134,7 +129,7 @@ const JournalGroup = ({
                                 </div>
                                 <div
                                     title='delete group' 
-                                    className='containerBox p-15 flex2Column button bg-lite centeredContent' 
+                                    className='containerDetail p-15 flex2Column button bg-lite centeredContent' 
                                     onClick={() => deleteGroup(journalGroupIndex)}
                                 >
                                     {icons.delete}
@@ -142,13 +137,13 @@ const JournalGroup = ({
                             </div>
                         </div>
                     }
-                    <div>
+                    <div className=''>
                         {
                             (isCollapsed) 
                             ? null
                             : (sort)
                                 ? journalGroup.journal.slice().reverse().map((journal, journalIndex, array) => (
-                                        <div key={getKey(`journalContainer${journalIndex}`)}>
+                                        <div key={`journal-container-sorted-${journalGroupIndex}-${array.length - 1 - journalIndex}-${String(journal?.description || 'journal')}`}>
                                             <Journal
                                                 journals={journals}
                                                 setJournals={setJournals}
@@ -159,7 +154,7 @@ const JournalGroup = ({
                                         </div>
                                     ))
                                 : journalGroup.journals.map((journal, journalIndex) => (
-                                    <div key={getKey(`journalContainer${journalIndex}`)}>
+                                    <div key={`journal-container-${journalGroupIndex}-${journalIndex}-${String(journal?.description || 'journal')}`}>
                                         <Journal
                                             journals={journals}
                                             setJournals={setJournals}

@@ -1,12 +1,10 @@
-import React, { useContext } from 'react';
-import Dialog from '../../functional/Dialog.js';
+import { useContext } from 'react';
 import { PlayerContext } from '../../context/PlayerContext';
 
 export const useGetSurferIndexWithPriority = (priorityIndex) => {
 
     const {
-        players,
-        playersInGame
+        players
     } = useContext(PlayerContext);
 
     let index = 0;
@@ -19,27 +17,6 @@ export const useGetSurferIndexWithPriority = (priorityIndex) => {
     });
     return null;
 }
-
-const priorityDialog = (
-    players,
-    index,
-    selectedPriority
-) => <Dialog title={`Loss of priority:`} message={`Did ${players[index].name} interfere with priority?`}>
-        <button
-            title='yes'
-            onClick={() => alert('yes')}
-            className='ml-5 greet p-20 r-10 w-200 bg-green brdr-green'
-        >
-            Yes
-        </button>
-        <button
-            title='no'
-            onClick={() => alert('no')}
-            className='ml-5 greet p-20 r-10 w-200 bg-green brdr-green'
-        >
-            No
-        </button>
-    </Dialog>
 
 export const losePriority = (
     selectedPriority,
@@ -81,7 +58,7 @@ export const losePriority = (
 */
 
     if (selectedPriority < playersInGame().length) {
-        newPlayers.map((player, index) => {
+        newPlayers.forEach((player) => {
             if (player.surf) {
                 if (selectedPriority === player.surfPriority) {
                     player.surfPriority = playersInGame().length;

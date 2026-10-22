@@ -1,4 +1,4 @@
-import {currentTime, currentDate} from '../utils/CurrentCalendar.js';
+import { currentDate } from '../utils/CurrentCalendar.js';
 
 const date = currentDate();
 const months = ['Jan', 'Feb', 'March', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']

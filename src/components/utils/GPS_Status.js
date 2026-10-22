@@ -10,7 +10,7 @@ const GPSStatus = () => {
     }, []);
 
     return (
-        <div className='containerDetail columnCenterAlign'>
+        <div className='ml-30 columnCenterAlign'>
             <div className={`gps-circle ${isInitialized ? 'success' : 'pulsing'}`}>
                 {!isInitialized && <div className='gps-text'>Initializing GPS...</div>}
                 {isInitialized && <div className='gps-text'>GPS Initialized</div>}

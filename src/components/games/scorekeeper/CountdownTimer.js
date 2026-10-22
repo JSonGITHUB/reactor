@@ -71,6 +71,8 @@ const CountdownTimer = ({
     }
 
     return () => clearInterval(timerInterval);
+    // calculateTimeLeft intentionally reads current closure state for this timer flow.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pause, startTime]);
 
   useEffect(() => {
@@ -87,6 +89,8 @@ const CountdownTimer = ({
       resetTimer()
     }
     localStorage.setItem('time', time);
+    // resetTimer/isStart are intentionally excluded to avoid timer reset loops.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [time]);
 
   useEffect(() => {
@@ -108,6 +112,8 @@ const CountdownTimer = ({
     if (timeLeft === time) {
       //setPause(true);
     }
+    // This runs as mount-time hydration; keep dependencies intentionally narrow.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const formatTime = (seconds) => {
@@ -127,22 +133,22 @@ const CountdownTimer = ({
   }
 
   return (
-    <div className='containerBox bg-lite flexContainer size20 bold'>
+    <div className='containerBox bg-lite flexContainer size20'>
       <div 
         title={!pause ? 'PAUSE' : (isStart()) ? 'START' : (timeLeft === 0) ? 'RESTART' : 'RESUME'}
-        className={`flex3Column r-10 pt-10 pb-10 button color-lite ${getTimerButtonClasses()}`} 
+        className={`flexColumn r-10 p-10 bold button color-lite ${getTimerButtonClasses()}`} 
         onClick={(pause) ? (timeLeft === 0) ? resetTimer : startTimer : pauseTimer}
       >
         {!pause ? 'PAUSE' : (isStart()) ? 'START' : (timeLeft === 0)?'RESTART':'RESUME'}
       </div>
-      <div className='containerDetail p-10 ml-5 mr-5 flex3Column size30 color-yellow'>
+      <div className='containerDetail p-10 ml-5 mr-5 flex2Column size35 color-yellow'>
         <span className={getTimerClasses()}>
           {formatTime(Number(timeLeft))}
         </span>
       </div>
       <div 
         title='reset'
-        className={`flex3Column r-10 pt-10 pb-10 color-lite button ${getTimerButtonClasses()}`} 
+        className={`flexColumn r-10 p-10 color-lite bold button ${getTimerButtonClasses()}`} 
         onClick={resetTimer}
       >
         RESET

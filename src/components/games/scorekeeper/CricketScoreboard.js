@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import getKey from '../../utils/KeyGenerator';
 import Sounds from '../../sound/Sounds.js';
 import { PlayerContext } from '../../context/PlayerContext';
@@ -10,11 +10,7 @@ const CricketScoreboard = () => {
 
     const {
         players,
-        setPlayers,
-        edit,
-        setEdit,
-        editPlayer,
-        deletePlayer
+        setPlayers
     } = useContext(PlayerContext);
 
     /* 
@@ -55,7 +51,7 @@ const CricketScoreboard = () => {
             total = total + score
         });
         newPlayers[playerIndex].dartsScore = total;
-        if (newPlayers != []) {
+        if (newPlayers.length > 0) {
             setPlayers(newPlayers);
         }
 

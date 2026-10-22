@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
+const isLocalDev = typeof window !== 'undefined' && window.location?.hostname === 'localhost';
+const NDBC_BASE = isLocalDev ? '/api/ndbc' : 'https://www.ndbc.noaa.gov';
+
 async function getNearbyStations(lat, lon, radiusKm) {
-    const url = `https://www.ndbc.noaa.gov/data/radial_search.php?lat=${lat}&lon=${lon}&range=${radiusKm}&time=0`;
+    const url = `${NDBC_BASE}/data/radial_search.php?lat=${lat}&lon=${lon}&range=${radiusKm}&time=0`;
     const resp = await fetch(url);
     const text = await resp.text();
     const lines = text.trim().split('\n');
@@ -13,7 +16,7 @@ async function getNearbyStations(lat, lon, radiusKm) {
 }
 
 async function getLatestData(stationId) {
-    const url = `https://www.ndbc.noaa.gov/data/realtime2/${stationId}.txt`;
+    const url = `${NDBC_BASE}/data/realtime2/${stationId}.txt`;
     const resp = await fetch(url);
     const text = await resp.text();
     const lines = text.trim().split('\n');

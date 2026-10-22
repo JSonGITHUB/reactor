@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
-import DropDown from '../forms/DropDown';
+import React, { useState, useEffect, useRef } from 'react';
 import AddProjectInterface from './AddProjectInterface';
 //import TimerComponent from '../hooks/TimerComponent';
 import TrackTasks from './TrackTasks';
@@ -19,15 +18,12 @@ import initWaves from './initWaves';
 import initTasks from './initTasks';
 import initCharges from './initCharges';
 import initEvents from './initEvents';
-import trackables from './trackables';
 import initLinkTracking from './initLinkTracking';
 import initNoteTracking from './initNoteTracking';
 import initJournalTracking from './initJournalTracking';
 import initCircuitTracking from './initCircuitTracking';
-import initRecipeTracking from './initRecipeTracking';
 import mobileRecipeTracking from './data_mobile';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
-import getKey from '../utils/KeyGenerator';
 import CircuitsParent from '../context/CircuitContext';
 import icons from '../site/icons';
 import initializeData from '../utils/InitializeData';
@@ -46,11 +42,10 @@ const Train = () => {
     const [tasks, setTasks] = useState(initializeData('taskTracking', initTasks));
     const [charges, setCharges] = useState(initializeData('chargeTracking', initCharges));
     //const [scroll, setScroll] = useState();
-    const [tracking, setTracking] = useState('circuits');
+    const [tracking] = useState('circuits');
     const [initialized, setInitialized] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState();
     const [newProjectDescription, setNewProjectDescription] = useState('');
-    const [activated, setActivated] = useState(true);
     const [currentGoalsCollapse, setCurrentGoalsCollapse] = useState(true);
     const [futureGoalsCollapse, setFutureGoalsCollapse] = useState(true);
     const [completedGoalsCollapse, setCompletedGoalsCollapse] = useState(true);
@@ -84,7 +79,6 @@ const Train = () => {
             if (!recipeGroup.isCollapsed) {
                 recipeGroup.recipes.forEach((recipe) => {
                     if (!recipe.isCollapsed && recipe.ingredients && recipe.ingredients.length > 0) {
-                        console.log(`getIngredient => recipe: ${JSON.stringify(recipe, null, 2)}`);
                         recipe.ingredients.forEach((ingredient) => {
                             newIngredients.push(ingredient);
                         });
@@ -159,10 +153,8 @@ const Train = () => {
         }
         const removeExtraStuff = (ingredient) => {
             const cleanIngredient = removeables.reduce((acc, word) => removeIt(acc, word), ingredient);
-            //console.log(`TrackRecipe => removeExtraStuff => cleanIngredient: ${cleanIngredient}`);
             return cleanIngredient;
         }
-        //console.log(`ingredients: ${JSON.stringify(getAllIngredients(), null, 2)}`);
         const ingredientLabel = (ingredient, index) => (ingredient[index] && (ingredient[index] !== '') && (ingredient[index] !== undefined)) ? String(ingredient[index]).toLowerCase() : '';
         //const allIngredients = newIngredients.map(ingredient => (ingredientLabel(ingredient, 2) !== null) ? ingredientLabel(ingredient, 2) : (ingredientLabel(ingredient, 1) !== null) ? ingredientLabel(ingredient, 1) : (ingredientLabel(ingredient, 0) !== null) ? ingredientLabel(ingredient, 0) : 'salt');
         const allIngredients = newIngredients.map(ingredient => `${ingredientLabel(ingredient, 2)} ${ingredientLabel(ingredient, 0)} ${ingredientLabel(ingredient, 1)}`);
@@ -184,9 +176,6 @@ const Train = () => {
         const removeEmpty = (arr) => {
             return arr.filter(item => item !== '');
         };
-        const removeAnds = (arr) => {
-            return arr.filter(item => item !== 'and');
-        };
         const removeSingularIfPluralExists = (words) => {
             const wordSet = new Set(words);
             return words.filter(word => {
@@ -194,25 +183,23 @@ const Train = () => {
                 return !(wordSet.has(pluralForm) && !word.endsWith('s'));
             });
         };
-        //console.log(`sterilIngredients: ${JSON.stringify(sterilIngredients, null, 2)}`);
         const pluralPriority = removeSingularIfPluralExists(sterilIngredients);
         const noAnd = removeAndItems(pluralPriority);
         const sortAlphabetically = (arr) => {
             return arr.sort((a, b) => a.localeCompare(b));
         };
         const parenthesisStart = removeParenthesisStart(noAnd);
-        const andsRemoved = removeAnds(pluralPriority);
         const empty = removeEmpty(parenthesisStart)
         const number1 = remove1InBeginning(empty)
         const aStart = removeAInBeginning(number1)
         const sorted = sortAlphabetically(aStart);
-        //console.log(`Train => ingredients sorted: ${JSON.stringify(sorted, null, 2)}`);
         //setIngredients(sorted);
         //localStorage.setItem('ingredients', JSON.stringify(ingredients));
         //setIngredients(ingredients);
         return sorted;
     }
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (recipes !== undefined) {
             const ingredients = getIngredients();
@@ -220,8 +207,9 @@ const Train = () => {
                 localStorage.setItem('ingredients', JSON.stringify(ingredients));
             }
         }
-    }, [recipes]);
+    }, [recipes]); // eslint-disable-line react-hooks/exhaustive-deps
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         const storedEvents = initializeData('eventTracking', initEvents)
         if (storedEvents) {
@@ -229,7 +217,6 @@ const Train = () => {
         } else {
             setEvents([initSession(currentDate(), currentTime(), currentDate(), currentTime(), 0)]);
         }
-        //console.log(`local Projects: ${JSON.stringify(localProjects(), null, 2)}`)
         if (projects === null) setProjects(initProjects);
         if (tasks === null) setTasks(initTasks);
         if (waves === null) setWaves(initWaves);
@@ -241,22 +228,23 @@ const Train = () => {
         if (circuits === null) setCircuits(initCircuitTracking);
         //if (recipes === null) setRecipes(initRecipeTracking);
         if (recipes === null) setRecipes(mobileRecipeTracking);
-        //console.log(`Train =>  notes: ${JSON.stringify(notes, null, 2)}`)
         //setTracking('recipes')
         // alert(`tracking: ${tracking}`)
         if (tracking === 'recipes') {
-            const timer = setTimeout(() => {
+            setTimeout(() => {
                 setNewProjectDescription('');
             }, 1000);
         }
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (projects !== undefined || projects !== '') {
             localStorage.setItem('projects', JSON.stringify(projects));
         }
     }, [projects]);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
 
         if (initialized) {
@@ -292,7 +280,6 @@ const Train = () => {
             } else if (tracking === 'journals') {
                 setJournals(updatedTrackingData);
             } else if (tracking === 'circuits') {
-                console.log(`updatedTrackingData: circuits => ${JSON.stringify(updatedTrackingData, null, 2)}`);
                 setCircuits(updatedTrackingData);
             } else if (tracking === 'events') {
                 setEvents(updatedTrackingData);
@@ -308,7 +295,7 @@ const Train = () => {
         } else {
             setInitialized(true);
         }
-    }, [isCollapsed]);
+    }, [isCollapsed]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (waves !== undefined || waves !== '') {
@@ -317,7 +304,6 @@ const Train = () => {
     }, [waves]);
 
     useEffect(() => {
-        //console.log(`Train => links: ${JSON.stringify(links, null, 2)}`);
         if (links !== undefined || links !== '') {
             localStorage.setItem('linkTracking', JSON.stringify(links));
         }
@@ -325,14 +311,12 @@ const Train = () => {
 
     useEffect(() => {
         if (tasks !== undefined || tasks !== '') {
-            console.log(`Train => tasks: ${JSON.stringify(tasks, null, 2)}`);
             localStorage.setItem('taskTracking', JSON.stringify(tasks));
         }
     }, [tasks]);
 
     useEffect(() => {
         if (charges !== undefined || charges !== '') {
-            console.log(`charges: ${JSON.stringify(charges, null, 2)}`);
             localStorage.setItem('chargeTracking', JSON.stringify(charges));
         }
     }, [charges]);
@@ -388,10 +372,9 @@ const Train = () => {
                 };
                 const category = localStorage.getItem('recipeCategory') || 'all';
                 const filteredRecipes = [...recipes];
-                console.log(`Train => searchTerm: '${searchTerm}'`);
-                filteredRecipes.map((recipeGroup) => {
+                filteredRecipes.forEach((recipeGroup) => {
                     recipeGroup.display = false;
-                    recipeGroup.recipes.map((recipe) => {
+                    recipeGroup.recipes.forEach((recipe) => {
                         if ((inInstructions(recipe) || inIngredients(recipe) || inDescription(recipe) || inRecipeTitle(recipe) || searchTerm === '' || searchTerm === ' ' || searchTerm === null) && (category === 'all' || recipeGroup.category === category)) {
                             recipe.display = true;
                             recipeGroup.display = true;
@@ -404,12 +387,10 @@ const Train = () => {
             } else if (tracking === 'tasks' && tasks !== undefined) {
                 const inTaskGoupDescription = (taskGroup) => {
                     const result = taskGroup.description.toLowerCase().includes(searchTerm);
-                    console.log(`Train => inTaskGoupDescription => task.description: ${taskGroup.description} searchTerm: ${searchTerm} result: ${result}`);
                     return result;
                 }
                 const inTaskDescription = (task) => {
                     const result = task.description.toLowerCase().includes(searchTerm);
-                    console.log(`Train => inTaskDescription => task.description: ${task.description} searchTerm: ${searchTerm} result: ${result}`);
                     return result;
                 }
                 const inTaskSessionDescription = (task) => {
@@ -425,14 +406,12 @@ const Train = () => {
                 const category = localStorage.getItem('tasksCategory') || 'all';
                 const filteredTasks = [...tasks];
 
-                filteredTasks.map((taskGroup) => {
+                filteredTasks.forEach((taskGroup) => {
                     taskGroup.display = inTaskGoupDescription(taskGroup);
-                    taskGroup.tasks.map((task) => {
+                    taskGroup.tasks.forEach((task) => {
                         if ((inTaskGoupDescription(taskGroup) || inTaskDescription(task) || inTaskSessionDescription(task) || searchTerm === '' || searchTerm === ' ' || searchTerm === null) && (category === 'all' || taskGroup.category === category)) {
                             task.display = true;
                             taskGroup.display = true;
-                            console.log(`Train => category: ${category} searchTerm: '${searchTerm}' true`);
-                            console.log(`Train taskGroup: ${JSON.stringify(taskGroup, null, 2)}`);
                         }
                     });
                 });
@@ -440,7 +419,7 @@ const Train = () => {
             } else if (tracking === 'waves' && waves !== undefined) {
                 const inWaveDescription = (wave) => wave.description.toLowerCase().includes(searchTerm);
                 const filteredWaves = [...waves];
-                filteredWaves.map((wave) => {
+                filteredWaves.forEach((wave) => {
                     wave.display = false;
                     if (inWaveDescription(wave) || searchTerm === '' || searchTerm === ' ' || searchTerm === null) {
                         wave.display = true;
@@ -451,13 +430,12 @@ const Train = () => {
                 const inChargeGoupDescription = (chargeGroup) => String(chargeGroup.description).toLowerCase().includes(searchTerm);
                 const inChargeDescription = (charge) => {
                     const result = charge.description.toLowerCase().includes(searchTerm);
-                    console.log(`Train => inChargeDescription => charge.description: ${charge.description} searchTerm: ${searchTerm} result: ${result}`);
                     return result;
                 }
                 const filteredCharges = [...charges];
-                filteredCharges.map((chargeGroup) => {
+                filteredCharges.forEach((chargeGroup) => {
                     chargeGroup.display = false;
-                    chargeGroup.tasks.map((task) => {
+                    chargeGroup.tasks.forEach((task) => {
                         if ((inChargeGoupDescription(chargeGroup) || inChargeDescription(task) || searchTerm === '' || searchTerm === ' ' || searchTerm === null)) {
                             task.display = true;
                             chargeGroup.display = true;
@@ -469,14 +447,13 @@ const Train = () => {
                 const inLinkGroupTitle = (linkGroup) => linkGroup.title.toLowerCase().includes(searchTerm);
                 const inLinkDescription = (link) => {
                     const result = link.description.toLowerCase().includes(searchTerm);
-                    console.log(`Train => inLinkDescription => link.description: ${link.description} searchTerm: ${searchTerm} result: ${result}`);
                     return result;
                 }
                 const filteredLinks = [...links];
-                filteredLinks.map((linkGroup) => {
+                filteredLinks.forEach((linkGroup) => {
                     linkGroup.display = false;
                     if (linkGroup.links !== undefined) {
-                        linkGroup.links.map((link) => {
+                        linkGroup.links.forEach((link) => {
                             if ((inLinkGroupTitle(linkGroup) || inLinkDescription(link) || searchTerm === '' || searchTerm === ' ' || searchTerm === null)) {
                                 link.display = true;
                                 linkGroup.display = true;
@@ -498,9 +475,8 @@ const Train = () => {
                     }
                     return false;
                 };
-                const category = localStorage.getItem('notesCategory') || 'all';
                 const filteredNotes = [...notes];
-                filteredNotes.map((noteGroup) => {
+                filteredNotes.forEach((noteGroup) => {
                     noteGroup.display = false;
                     if ((inNoteGroupTitle(noteGroup) || inNotes(noteGroup) || searchTerm === '' || searchTerm === ' ' || searchTerm === null)) {
                         noteGroup.display = true;
@@ -530,10 +506,10 @@ const Train = () => {
                 }
                 const inGratefulFor = (journal) => journal.gratefulFor.toLowerCase().includes(searchTerm);
                 const filteredJournals = [...journals];
-                filteredJournals.map((journalGroup) => {
+                filteredJournals.forEach((journalGroup) => {
                     if (journalGroup.journals && journalGroup?.journals.length > 0) {
                         journalGroup.display = false;
-                        journalGroup.journals.map((journal) => {
+                        journalGroup.journals.forEach((journal) => {
                             if (inJournalGroupTitle(journalGroup) || inJournalDescription(journal) || inJournal(journal) || inFeelings(journal) || inTodaysGoals(journal) || inFutureGoals(journal) || inGratefulFor(journal) || searchTerm === '' || searchTerm === ' ' || searchTerm === null) {
                                 journal.display = true;
                                 journalGroup.display = true;
@@ -544,18 +520,14 @@ const Train = () => {
                 setJournals(filteredJournals);
             }
         }
-    }, [newProjectDescription]);
+    }, [newProjectDescription]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const toggleTimer = () => {
         Sounds.boop(0, 1);
-        setActivated(prev => !prev);
     }
 
     const toggleParentTimer = () => toggleTimer();
 
-    const selectTracking = (event) => {
-        setTracking(event.target.value);
-    };
     const addProject = () => {
         const project = {
             description: newProjectDescription,
@@ -602,7 +574,6 @@ const Train = () => {
         const addRecipeGroup = () => {
             const updatedRecipes = [...recipes];
             const title = newProjectDescription;
-            console.log(`addRecipeGroup => newProjectDescription: ${title}`);
             if (title) {
                 const recipeGroup = {
                     category: title,
@@ -715,10 +686,8 @@ const Train = () => {
         setProjects(updatedProjects);
         //return (!project.isCollapsed) ? setIsCollapsed(false) : null;
         if (!project.isCollapsed) {
-            console.log(`toggleCollapseSubmenu => projectIndex(${projectIndex}): setIsCollapsed(false)`);
             setIsCollapsed(false);
         } else {
-            console.log(`toggleCollapseSubmenu => projectIndex(${projectIndex}): setIsCollapsed(true)`);
             setIsCollapsed(true);
         }
     };
@@ -738,28 +707,6 @@ const Train = () => {
         const goalComplete = (selectedGoal[1]) ? false : true;
         selectedGoal[1] = goalComplete;
         setJournals(newJournals);
-    }
-    const deleteLocalData = (tracking) => {
-        if (tracking === 'recipes') {
-            localStorage.removeItem('recipeTracking');
-        } else if (tracking === 'links') {
-            localStorage.removeItem('linkTracking');
-        } else if (tracking === 'notes') {
-            localStorage.removeItem('noteTracking');
-        } else if (tracking === 'journals') {
-            localStorage.removeItem('journalTracking');
-        } else if (tracking === 'circuits') {
-            localStorage.removeItem('circuitTracking');
-        } else if (tracking === 'events') {
-            localStorage.removeItem('eventTracking');
-        } else if (tracking === 'waves') {
-            localStorage.removeItem('waveTracking');
-        } else if (tracking === 'tasks') {
-            localStorage.removeItem('taskTracking');
-        } else if (tracking === 'charges') {
-            localStorage.removeItem('chargeTracking')
-        }
-        window.location.reload();
     }
 
     return <div className='mt--30'>
@@ -800,7 +747,7 @@ const Train = () => {
                                                     ? journalGroup.journals.map((journal, journalIndex) => (
                                                         journal.todaysGoals.map((currentGoal, currentGoalIndex) => (
                                                             (!currentGoal[1])
-                                                                ? <div className='containerBox flexContainer centerVertical' key={getKey(`currentGoal${currentGoal}`)}>
+                                                                ? <div className='containerBox flexContainer centerVertical' key={`current-goal-${journalGroupIndex}-${journalIndex}-${currentGoalIndex}-${String(currentGoal?.[0] || 'goal')}`}>
                                                                     <div className='flex2Column contentLeft'>
                                                                         {currentGoal[0]}
                                                                     </div>
@@ -811,7 +758,6 @@ const Train = () => {
                                                                             onClick={() => toggleCheckbox('todaysGoals', journalGroupIndex, journalIndex, currentGoalIndex)}
                                                                         >
                                                                             <input
-                                                                                id='completed'
                                                                                 name='completed'
                                                                                 className='regular-checkbox'
                                                                                 checked={currentGoal[1]}
@@ -848,7 +794,7 @@ const Train = () => {
                                                     ? journalGroup.journals.map((journal, journalIndex) => (
                                                         journal.futureGoals.map((futureGoal, futureGoalIndex) => (
                                                             (!futureGoal[1])
-                                                                ? <div className='containerBox flexContainer centerVertical' key={getKey(`futureGoal${futureGoal}`)}>
+                                                                ? <div className='containerBox flexContainer centerVertical' key={`future-goal-${journalGroupIndex}-${journalIndex}-${futureGoalIndex}-${String(futureGoal?.[0] || 'goal')}`}>
                                                                     <div className='flex2Column contentLeft'>
                                                                         {futureGoal[0]}
                                                                     </div>
@@ -858,7 +804,6 @@ const Train = () => {
                                                                         onClick={() => toggleCheckbox('futureGoals', journalGroupIndex, journalIndex, futureGoalIndex)}
                                                                     >
                                                                         <input
-                                                                            id='completed'
                                                                             name='completed'
                                                                             className='regular-checkbox button'
                                                                             checked={futureGoal[1]}
@@ -894,7 +839,7 @@ const Train = () => {
                                                     ? journalGroup.journals.map((journal, journalIndex) => (
                                                         journal.todaysGoals.map((todaysGoal, todaysGoalIndex) => (
                                                             (todaysGoal[1])
-                                                                ? <div className='containerBox flexContainer centerVertical' key={getKey(`todaysGoal${todaysGoal}`)}>
+                                                                ? <div className='containerBox flexContainer centerVertical' key={`completed-today-goal-${journalGroupIndex}-${journalIndex}-${todaysGoalIndex}-${String(todaysGoal?.[0] || 'goal')}`}>
                                                                     <div className='flex2Column contentLeft'>
                                                                         {todaysGoal[0]}
                                                                     </div>
@@ -904,7 +849,6 @@ const Train = () => {
                                                                         onClick={() => toggleCheckbox('todaysGoals', journalGroupIndex, journalIndex, todaysGoalIndex)}
                                                                     >
                                                                         <input
-                                                                            id='completed'
                                                                             name='completed'
                                                                             className='regular-checkbox button'
                                                                             checked={todaysGoal[1]}
@@ -925,7 +869,7 @@ const Train = () => {
                                                 return journalGroup.journals.map((journal, journalIndex) => (
                                                     journal.futureGoals.map((futureGoal, futureGoalIndex) => (
                                                         (futureGoal[1])
-                                                            ? <div className='containerBox flexContainer centerVertical' key={getKey(`futureGoal${futureGoal}`)}>
+                                                            ? <div className='containerBox flexContainer centerVertical' key={`completed-future-goal-${journalGroupIndex}-${journalIndex}-${futureGoalIndex}-${String(futureGoal?.[0] || 'goal')}`}>
                                                                 <div className='flex2Column contentLeft'>
                                                                     {futureGoal[0]}
                                                                 </div>
@@ -935,7 +879,6 @@ const Train = () => {
                                                                     onClick={() => toggleCheckbox('futureGoals', journalGroupIndex, journalIndex, futureGoalIndex)}
                                                                 >
                                                                     <input
-                                                                        id='completed'
                                                                         name='completed'
                                                                         className='regular-checkbox button'
                                                                         checked={futureGoal[1]}
@@ -947,6 +890,7 @@ const Train = () => {
                                                     ))
                                                 ))
                                             }
+                                            return null;
                                         })
                                     }
                                 </div>

@@ -15,40 +15,21 @@ const TideSelector = ({
 
     const {
         status,
-        setStatus,
-        setTide,
-        setWind,
-        setWindStatus,
         handleTideCheck,
-        handleTideSelection,
-        handleWindCheck,
-        handleSwellCheck,
-        handleSwell1Selection,
-        handleSwell2Selection,
-        handleSwell1LiveSelection,
-        handleSwell2LiveSelection,
-        handleSwell1Angle,
-        handleSwell2Angle,
-        handleSwell1Height,
-        handleSwell2Height,
-        handleSwell1Interval,
-        handleSwell2Interval,
-        handleStarSelection,
-        handleDistanceSelection,
-        pause
+        handleTideSelection
     } = useContext(OceanContext);
-
-    const isTideSelected = () => (status.isTide === true) ? 'bg-veryLite fadeInFaded' : 'bg-tinted fadeOutFaded';
-    const tideClass = () => `${isTideSelected()} containerBox flex2Column contentCenter`;
+    
+    const isTideSelected = () => (status.isTide === true) ? 'bg-veryLite fadeInFaded brdr-green' : 'bg-tinted fadeOutFaded';
+    const tideClass = () => `${isTideSelected()} containerDetail flex2Column contentCenter size20 mt-5 mb-5`;
     
     return (
         <div className={tideClass()}>
-            <div className='containerBox'>
-                <div className='containerBox bg-lite'>
-                    Tide <img src={tide} className='ml-5 mt--5 mb--5 ht-25 w-25' alt='icon' />
+            <div className='size20'>
+                <div className='containerDetail bg-lite contentLeft p-15 color-yellow'>
+                    <img src={tide} className='mt--5 mb--5 ht-25 w-25' alt='icon' /> Tide
                 </div>
-                <div className='size20 pt-10'>{tideDisplay('narrow')}</div>
-                <div className='mr-10 mb-5'>
+                <div className='size20'>{tideDisplay('narrow')}</div>
+                <div className='mb-5'>
                     <Selector 
                         groupTitle='Tide'
                         selected={status.tide} 
@@ -60,9 +41,9 @@ const TideSelector = ({
                         width='93%'
                     />
                 </div>
-            </div>
-            <div className='containerBoxDetail button size40 p-20' onClick={handleTideCheck}>
-                {((status.isTide) === true) ? icons.good : icons.bad }
+                <div className='containerDetail button size40 p-20' onClick={handleTideCheck}>
+                    {((status.isTide) === true) ? icons.good : icons.bad }
+                </div>
             </div>
         </div>
     );

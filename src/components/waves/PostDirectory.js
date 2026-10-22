@@ -4,7 +4,7 @@ import initializeData from '../utils/InitializeData';
 const PostDirectory = () => {
 
     const localPostDirectory = initializeData('postDirectory', []);
-    const [postDirectory, setPostDirectory] = useState(localPostDirectory);
+    const [postDirectory, setPostDirectory] = useState(Array.isArray(localPostDirectory) ? localPostDirectory : []);
 
     useEffect(() => {
         localStorage.setItem('postDirectory', JSON.stringify(postDirectory));
@@ -25,8 +25,6 @@ const PostDirectory = () => {
         console.log(`PostDirectory => getLastPost: ${JSON.stringify(lastPost,null,2)}`);
         return lastPost;
     }
-
-    console.log(`PostDirectory => getLastId: ${getLastId()}`);
 
     const addPost = (id, post) => {
         const newPost = JSON.stringify(post);

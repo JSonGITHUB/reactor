@@ -16,7 +16,7 @@ const EditableTextField = ({
 
     useEffect(() => {
         setEdited(data !== null && data !== undefined ? data : '');
-    }, [data]);
+    }, [data, setEdited]);
 
     const ifUndefinedString = (value) => {
         //console.log(`ifUndefinedString => value: ${value}`);
@@ -31,8 +31,8 @@ const EditableTextField = ({
                 {
                     (!title)
                     ? null
-                    : <div className='flexContainer containerBox bg-lite centerVertical'>
-                        <div className='containerBox flex2Column color-yellow p-20'>
+                    : <div className='flexContainer containerDetail bg-lite centerVertical'>
+                        <div className='containerDetail flex2Column color-yellow size20 p-20'>
                             {title}
                         </div>
                         <div className='flexColumn contentRight'>
@@ -53,7 +53,7 @@ const EditableTextField = ({
                         </div>
                     </div>
                 }
-                <div className='containerBox'>
+                <div className='containerDetail'>
                     <div className='color-soft button'>
                     {
                         (edit)
@@ -72,14 +72,18 @@ const EditableTextField = ({
                             //placeholder={ifUndefinedString(data)}
                             placeholder={edited || ifUndefinedString(data) || 'Enter your journal...'}
                         />
-                        : <div onClick={() => {
-                            setEdited(data !== null && data !== undefined ? data : '');
-                            toggle();
-                        }}>
+                        : <div 
+                            onClick={() => {
+                                setEdited(data !== null && data !== undefined ? data : '');
+                                toggle();
+                            
+                            }}
+                            className='height-400'
+                        > 
                             {
                                 (ifUndefinedString(data))
                                     ? ifUndefinedString(data).split('\n').map((line, index) => (
-                                        <div key={getKey(`data${index}`)} className='containerBox p-20'>
+                                        <div key={getKey(`data${index}`)} className='containerDetail p-20 mb-5'>
                                             {line}
                                             <br />
                                         </div>

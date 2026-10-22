@@ -23,8 +23,8 @@ class SignUpDialog extends React.Component {
                     <Dialog title={title}
                             message={message}>
                         <input
-                            id='login' 
-                            name='login'
+                            id='signup-login' 
+                            name='signup-login'
                             value={login} 
                             placeholder='Enter here...'
                             onChange={this.handleChange} 

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import icons from '../site/icons';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
@@ -21,14 +20,14 @@ const Note = ({
         if (note.note === '') {
             toggleEditNote();
         }
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         const newNotes = [...notes];
         newNotes[noteGroupIndex].notes[noteIndex].isCollapsed = collapsed;
         const dataToString = JSON.stringify(newNotes);
         localStorage.setItem('noteTracking', dataToString);
-    }, [collapsed]);
+    }, [collapsed, noteGroupIndex, noteIndex, notes]);
 
     const isEditedTitle = () => (editTitle) ? true : false;
     const isEditedNote = () => (editNote) ? true : false;
@@ -76,8 +75,8 @@ const Note = ({
         }
     }
 
-    return <div key={`note${noteIndex}`} className='containerBox lowerBorder contentLeft'>
-                <div className='containerBox flexContainer bg-lite'>
+    return <div key={`note${noteIndex}`} className='containerDetail m-5 size20 lowerBorder contentLeft bg-lite'>
+                <div className='containerDetail m-5 size20 flexContainer'>
                     <div className='flex1Auto contentLeft'>
                         {
                             (isEditedTitle())
@@ -89,7 +88,7 @@ const Note = ({
                                 >
                                     {note.description}
                                 </textarea>
-                                : <div className='containerBox bg-lite centerVertical p-20'>
+                                : <div className='size20 p-10 color-orange'>
                                         <CollapseToggleButton
                                             title={note.description}
                                             isCollapsed={collapsed}
@@ -104,7 +103,7 @@ const Note = ({
                         (isEditedTitle())
                         ? <div
                                 title='save' 
-                                className='containerBox p-15 bg-neogreen color-dark bold size15' 
+                                className='containerDetail m-5 size20 p-15 bg-neogreen color-dark bold size15' 
                                 onClick={() => toggleEditTitle()}
                             >
                                 save
@@ -116,33 +115,31 @@ const Note = ({
                     (collapsed)
                     ? null
                     : <div>
-                        <div className='containerBox'>
-                            <div className='containerBox p-20 mt-10 color-soft button'>
-                                {
-                                    (isEditedNote())
-                                    ? <textarea
-                                        className='inputField size20 r-10 height-200'
-                                        onChange={(e) => setEditedNote(e.target.value)}
-                                        value={(editedNote !== null) ? editedNote : note.note}
-                                        placeholder={editedNote}
-                                    >
-                                        {editedNote}
-                                    </textarea>
-                                    : <div onClick={() => toggleEditNote()}>
-                                            {note.note.split('\n').map((line, index) => (
-                                                <React.Fragment key={`note${index}`}>
-                                                    {line}
-                                                    {<br />}
-                                                </React.Fragment>
-                                            ))}
-                                        </div>
-                                }
-                            </div>
+                        <div className='containerDetail m-5 size20 p-20 color-soft button'>
+                            {
+                                (isEditedNote())
+                                ? <textarea
+                                    className='inputField size20 r-10 height-200'
+                                    onChange={(e) => setEditedNote(e.target.value)}
+                                    value={(editedNote !== null) ? editedNote : note.note}
+                                    placeholder={editedNote}
+                                >
+                                    {editedNote}
+                                </textarea>
+                                : <div onClick={() => toggleEditNote()}>
+                                        {note.note.split('\n').map((line, index) => (
+                                            <React.Fragment key={`note${index}`}>
+                                                {line}
+                                                {<br />}
+                                            </React.Fragment>
+                                        ))}
+                                    </div>
+                            }
                         </div>
-                        <div className='containerBox flexContainer contentRight'>
+                        <div className='containerDetail m-5 size20 flexContainer contentRight'>
                             <div
                                 title={(isEditedNote())?'save':'edit'}
-                                className={`rt-25 t-0 ml-5 mt-5 r-10 size20 button pl-20 contentRight ${(isEditedNote()) ? '' : 'pt-10 pr-20 bg-lite'}`}
+                                className={`rt-25 t-0 ml-5 r-10 size20 button pl-20 contentRight ${(isEditedNote()) ? '' : 'pt-10 pr-20 bg-lite'}`}
                                 onClick={() => toggleEditNote()}
                             >
                                 {
@@ -153,7 +150,7 @@ const Note = ({
                             </div>
                             <div 
                                 title='delete'
-                                className='rt-25 t-0 ml-5 mt-5 r-10 size20 button pl-20 pb-10 contentRight pt-10 pr-20 bg-lite bold' 
+                                className='rt-25 t-0 ml-5 r-10 size20 button pl-20 pb-10 contentRight pt-10 pr-20 bg-lite bold' 
                                 onClick={() => deleteNote()}
                             >
                                 {icons.delete}

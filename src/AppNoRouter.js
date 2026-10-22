@@ -11,9 +11,12 @@ import BowlBuilder from './components/BowlBuilder';
 import Sessions from './components/waves/LogDirectoryNoRouter';
 import Session from './components/waves/Session';
 import Waves from './components/waves/Waves';
+//import SurfDashboard from './components/waves/SurfDashboard';
 import Weather from './components/waves/Weather';
+import Dive from './components/waves/Dive';
 import Location from './components/waves/Location';
 import WindDirection from './components/waves/WindDirection';
+import Cams from './components/waves/Cams';
 import Product from './components/shop/Product';
 //import EyeExercises from './components/eye/EyeExercises';
 //import PDFReport from './components/eye/PDFReport';
@@ -23,6 +26,7 @@ import StepManager from './components/StepManager';
 import Garden from './components/garden/Garden';
 import FishFinder from './components/fishing/FishFinder';
 import DebtCollector from './components/finance/DebtCollector';
+import WorkDay from './components/finance/WorkDay';
 import Snippets from './components/utils/Snippets';
 import TideChart from './components/waves/tide/TideChart';
 import Buoys from './components/waves/SurfReports';                            
@@ -42,23 +46,31 @@ import Admin from './components/utils/Admin';
 //import AIDashboard from './components/utils/AIDashboard';
 import Currency from './components/utils/Currency';
 import Expenses from './components/utils/Expenses';
+import Interest from './components/finance/Interest';
+import Pay from './components/finance/Pay';
 import Budget from './components/utils/Budget';
 import TradeView from './components/utils/TradeView';
+import Trade from './components/utils/Trade';
+import Crypto from './components/utils/Crypto'; 
 import Pricing from './components/utils/Pricing';
 import Converter from './components/utils/Converter';
+import News from './components/utils/News';
 import Tracker from './components/tracker/Tracker';
 import Expense529 from './components/tracker/Expense529';
 import Notes from './components/tracker/Notes';
 import Tasks from './components/tracker/Tasks';
 import Sets from './components/tracker/Sets';
-import Events from './components/tracker/Events';
+//import Events from './components/tracker/Events';
 import Charges from './components/tracker/Charges';
+import Ingredients from './components/tracker/Ingredients';
 import Cook from './components/tracker/Cook';
 import Train from './components/tracker/Train';
 import Journals from './components/tracker/Journals';
 import BusinessTax from './components/tracker/BusinessTax';
 import Scheduler from './components/tracker/Scheduler';
-import BlackJack from './components/tracker/BlackJack';
+import BlackJack from './components/games/Gamble/BlackJack';
+import Poker from './components/games/Poker';
+import Animation from './components/tracker/Animation';
 import Checkers from './components/games/checkers/Checkers.jsx';
 import WheelOfFortune from './components/tracker/WheelOfFortune';
 import Roulette from './components/tracker/Roulette';
@@ -139,19 +151,24 @@ export default ({ props }) => {
                             distance='10' 
                         />
                     </Route>
+                    {/*
+                    <Route path='/SurfDashboard'>
+                        <SurfDashboard />
+                    </Route>
+                    */}
                     <Route path='/MenuScreen'>
                         <MenuScreen />
                     </Route>
                     <Route path='/Weather'>
                         <Weather />
                     </Route>
+                    <Route path='/Dive'>
+                        <Dive coreMetricsOnly={window.location.search.includes('core=true')} />
+                    </Route>
                     <Route path='/Location'>
                         <Location mode='display' />
                     </Route>
                     <Route path='/Wind'>
-                        <WindDirection />
-                    </Route>
-                    <Route path='/Water'>
                         <WindDirection />
                     </Route>
                     <Route path='/Air'>
@@ -169,11 +186,13 @@ export default ({ props }) => {
                     <Route path='/GuestList'><SignUpDialog /></Route>
                     <Route path='/Session'><Session logId={logId} /></Route>
                     <Route path='/SunTracker'><SunTracker /></Route>
+                    <Route path='/Water'><Water /></Route>
                     {/*
                     <Route path='/EyeExercises'><EyeExercises /></Route>
                     <Route path='/PDFReport'><PDFReport /></Route>
                     */}
                     <Route path='/Product'><Product /></Route>
+                    <Route path='/Cams'><Cams /></Route>
                     <Route path='/Waves'>
                         <Waves 
                             {...props} 
@@ -209,6 +228,9 @@ export default ({ props }) => {
                     <Route path='/Collections'>
                         <DebtCollector />
                     </Route>
+                    <Route path='/WorkDay'>
+                        <WorkDay />
+                    </Route>
                     <Route path='/Buoys'><Buoys /></Route>
                     <Route path='/Sessions'><Sessions /></Route>
                     <Route path='/Swell'><SlideShow /></Route>
@@ -228,29 +250,37 @@ export default ({ props }) => {
                     <Route path='/ExchangeRates'><ExchangeRates /></Route>
                     <Route path='/Currency'><Currency /></Route>
                     <Route path='/Expenses'><Expenses /></Route>
+                    <Route path='/Interest'><Interest /></Route>
+                    <Route path='/Pay'><Pay /></Route>
                     <Route path='/Budget'><Budget /></Route>
                     <Route path='/TradeView'><TradeView /></Route>
+                    <Route path='/Trade'><Trade /></Route>
+                    <Route path='/Crypto'><Crypto /></Route>
                     <Route path='/Pricing'><Pricing /></Route>
                     <Route path='/Converter'><Converter /></Route>
+                    <Route path='/News'><News /></Route>
                     <Route path='/Tracker'><Tracker /></Route>
                     <Route path='/529'><Expense529 /></Route>
                     <Route path='/Notes'><Notes /></Route>
                     <Route path='/Tasks'><Tasks /></Route>
                     <Route path='/Sets'><Sets /></Route>
                     <Route path='/Charges'><Charges /></Route>
-                    <Route path='/Events'><Events /></Route>
+                    {/*<Route path='/Events'><Events /></Route>*/}
                     <Route path='/Links'><Links /></Route>
                     <Route path='/Circuit'><Train /></Route>
                     <Route path='/Journals'><Journals /></Route>
                     <Route path='/Cook'><Cook /></Route>
+                    <Route path='/Ingredients'><Ingredients /></Route>
                     <Route path='/BusinessTax'><BusinessTax /></Route>
                     <Route path='/Dose'><Dose /></Route>
                     <Route path='/Scheduler'><Scheduler /></Route>
                     <Route path='/BlackJack'><BlackJack /></Route>
+                    <Route path='/Poker'><Poker /></Route>
+                    <Route path='/Animation'><Animation /></Route>
                     <Route path='/Checkers'><Checkers /></Route>
                     <Route path='/WheelOfFortune'><WheelOfFortune /></Route>
                     <Route path='/Roulette'><Roulette /></Route>
-                    <Route path='/Tide'><TideChart /></Route>
+                    <Route path='/Tide'><TideChart standalone='true' /></Route>
                     <Route path='/TrainingLog'><TrainingLog /></Route>
                     <Route path='/Admin'><Admin /></Route>
                     {/*<Route path='/AIDashboard'><AIDashboard /></Route>*/}

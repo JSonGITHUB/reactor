@@ -93,20 +93,15 @@ const TaskTimer = ({
 
     const calculateElapsedTime = () => {
         const millisecondsElapsed = currentTime * 1000;
-        console.log(`calculateElapsedTime => millisecondsElapsed: ${millisecondsElapsed}`)
         const dateNow = Date.now();
         const elapsedMilliseconds = Number(dateNow - startTime);
-        console.log(`calculateElapsedTime => elapsedMilliseconds: ${elapsedMilliseconds}`);
         const totalMilliseconds = Number(millisecondsElapsed + elapsedMilliseconds);
-        console.log(`calculateElapsedTime => totalMilliseconds: ${totalMilliseconds}`)
         const timeElapsed = totalSeconds(totalMilliseconds);
-        console.log(`calculateElapsedTime => timeElapsed: ${timeElapsed}`)
         setCurrentTime(timeElapsed);
     };
 
     const startTimer = () => {
         setStartTime(Date.now());
-        console.log(`currentTime: ${getRecordedCurrentTime()}`)
         setPause(false);
     };
 
@@ -162,13 +157,10 @@ const TaskTimer = ({
     useEffect(() => {
         const localTime = Number(localStorage.getItem('time'));
         if ((isStart() || (time !== localTime)) && session.type === 'timer') {
-            console.log(`time: ${time} localTime: ${localTime}`)
             setCurrentTime(time);
             resetTimer()
         }
-        //console.log(`TaskTimer: currentTime: ${currentTime} time: ${time}`)
         //setPause(true);
-        //console.log(`ContdownTimer => time: ${time}`);
         localStorage.setItem('time', time);
     }, [time]);
     */

@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import Sounds from '../../sound/Sounds';
 import Selector from '../../forms/FunctionalSelector';
 import { PlayerContext } from '../../context/PlayerContext';
 import initializeData from '../../utils/InitializeData';
-import DialogBox from '../../site/DialogBox';
 import PlayerDialog from '../../utils/PlayerDialog';
 import { initPlayers } from './PlayerInit';
 
@@ -13,16 +12,14 @@ const ScoreCard = ({ game, playerIndex, scoreIndex, updateScores, winner }) => {
         players,
         setPlayers,
         edit,
-        editPlayer,
-        setEdit, 
-        deletePlayer
+        setEdit
     } = useContext(PlayerContext);
 
     const player = players[playerIndex];
     const initGolfStats = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
     const initGolfPutts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     const puttsArray = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    const getScore = () => {
+    const getScore = useCallback(() => {
         if (game === 'golf') {
             //const newPlayers = initializeData('players', initPlayers);
             const newPlayers = [...players] || initializeData('players', initPlayers);
@@ -31,12 +28,12 @@ const ScoreCard = ({ game, playerIndex, scoreIndex, updateScores, winner }) => {
         if (players && player) {
             return player[`${game}Score`] || 0;
         }
-    }
+    }, [game, player, playerIndex, players, scoreIndex]);
     const [score, setScore] = useState(getScore());
 
     useEffect(() => {
         setScore(getScore());
-    }, [game]);
+    }, [getScore]);
 
     const toggleEdit = () => {
         setEdit(prev => !prev);
@@ -59,12 +56,12 @@ const ScoreCard = ({ game, playerIndex, scoreIndex, updateScores, winner }) => {
             if (!newPlayers[playerIndex].golfPutts) {
                 newPlayers[playerIndex].golfPutts = initGolfPutts;
             }
-            if (newPlayers != []) {
+            if (newPlayers.length !== 0) {
                 setPlayers(newPlayers);
             }
         } else {
             //player[`${game}Score`] = newScore;
-            newPlayers.map((player, index) => {
+            newPlayers.forEach((player, index) => {
                 if (index === playerIndex) {
                     player[`${game}Score`] = newScore;
                     console.log(`updateScore => ${index} player: ${(player.player || player.name)}: ${newScore}`);
@@ -90,9 +87,6 @@ const ScoreCard = ({ game, playerIndex, scoreIndex, updateScores, winner }) => {
     const subtractScore = () => {
         const newScore = Number(score) - 1;
         updateScore(newScore);
-    }
-    const modifyPlayer = (playerIndex) => {
-        editPlayer(playerIndex);
     }
     const editNav = () => {
         if (edit) {
@@ -136,12 +130,12 @@ const ScoreCard = ({ game, playerIndex, scoreIndex, updateScores, winner }) => {
     const isDoubleBoagie = (score, par) => (score === (Number(par) + 2)) ? true : false;
     const getOuterCSS = (score, winner) => {
         if (game === 'golf' && isEagle(score, winner)) return 'completedSelector r-50-percent pb-5 pt-3';
-        if (game === 'golf' && isDoubleBoagie(score, winner)) return 'brdr-light p-5 r-10';
+        if (game === 'golf' && isDoubleBoagie(score, winner)) return 'brdr-lite p-5 r-10';
         return 'brdr-transparent r-10';
     }
     const getInnerCSS = (score, winner) => {
-        if (game === 'golf' && isBoagie(score, winner) && isDoubleBoagie(score, winner)) return 'brdr-light r-5 font50 ht-50 pt-12 pl-10 pr-10';
-        if (game === 'golf' && isBoagie(score, winner)) return 'brdr-light r-5 font50 ht-50 pt-12 pl-10 pr-10 mt-5 mb-5';
+        if (game === 'golf' && isBoagie(score, winner) && isDoubleBoagie(score, winner)) return 'brdr-lite r-5 font50 ht-50 pt-12 pl-10 pr-10';
+        if (game === 'golf' && isBoagie(score, winner)) return 'brdr-lite r-5 font50 ht-50 pt-12 pl-10 pr-10 mt-5 mb-5';
         if (game === 'golf' && !isDoubleBoagie(score, winner) && !isEagle(score, winner)) return 'ht-40 p-5 r-5 font50 m-10';
         return 'p-5 r-5 font50 m-10';
     }
@@ -153,7 +147,7 @@ const ScoreCard = ({ game, playerIndex, scoreIndex, updateScores, winner }) => {
             newPlayers[playerIndex].golfFW[scoreIndex] = false;
         }
         Sounds.boop(3000, newPlayers[playerIndex].golfScores[scoreIndex]);
-        if (newPlayers != []) {
+        if (newPlayers.length !== 0) {
             setPlayers(newPlayers);
         }
         updateScores();
@@ -166,7 +160,7 @@ const ScoreCard = ({ game, playerIndex, scoreIndex, updateScores, winner }) => {
             newPlayers[playerIndex].golfGIR[scoreIndex] = false;
         }
         Sounds.boop(3000, newPlayers[playerIndex].golfScores[scoreIndex]);
-        if (newPlayers != []) {
+        if (newPlayers.length !== 0) {
             setPlayers(newPlayers);
         }
         updateScores();
@@ -175,15 +169,17 @@ const ScoreCard = ({ game, playerIndex, scoreIndex, updateScores, winner }) => {
         if (!players[playerIndex].golfFW) {
             const newPlayers = [...players];
             newPlayers[playerIndex].golfFW = initGolfStats;
-            if (newPlayers != []) {
+            if (newPlayers.length !== 0) {
                 setPlayers(newPlayers);
             }
             updateScores();
         }
         const FW = players[playerIndex].golfFW[scoreIndex] || false;
+        const fwFieldId = `fw-${playerIndex}-${scoreIndex}`;
+        const fwFieldName = `fw-${playerIndex}-${scoreIndex}`;
         let checkBox = <input 
-                            id='fw'
-                            name='fw'
+                            id={fwFieldId}
+                            name={fwFieldName}
                             className='regular-checkbox button glassy ml-5' 
                             checked 
                             type='checkbox'  
@@ -191,8 +187,8 @@ const ScoreCard = ({ game, playerIndex, scoreIndex, updateScores, winner }) => {
                         />
         if (FW !== true) {
             checkBox = <input 
-                            id='fw'
-                            name='fw'
+                            id={fwFieldId}
+                            name={fwFieldName}
                             className='regular-checkbox button glassy ml-5' 
                             type='checkbox'  
                         />
@@ -203,23 +199,25 @@ const ScoreCard = ({ game, playerIndex, scoreIndex, updateScores, winner }) => {
         if (!players[playerIndex].golfGIR) {
             const newPlayers = [...players];
             newPlayers[playerIndex].golfGIR = initGolfStats;
-            if (newPlayers != []) {
+            if (newPlayers.length !== 0) {
                 setPlayers(newPlayers);
             }
             updateScores();
         }
         const GIR = players[playerIndex].golfGIR[scoreIndex] || false;
+        const girFieldId = `gir-${playerIndex}-${scoreIndex}`;
+        const girFieldName = `gir-${playerIndex}-${scoreIndex}`;
         let checkBox = <input 
-                            id='gir'
-                            name='gir'
+                            id={girFieldId}
+                            name={girFieldName}
                             className='regular-checkbox button glassy ml-5 mr-10' 
                             checked type='checkbox'
                             onChange={() => console.log(`gir`)}
                         />
         if (GIR !== true) {
             checkBox = <input 
-                        id='gir'
-                        name='gir'
+                        id={girFieldId}
+                        name={girFieldName}
                         className='regular-checkbox button glassy ml-5 mr-10' 
                         type='checkbox'  
                     />
@@ -235,7 +233,7 @@ const ScoreCard = ({ game, playerIndex, scoreIndex, updateScores, winner }) => {
         newPlayers[playerIndex].golfPutts[scoreIndex] = selected;
         newPlayers[playerIndex].golfScore = newPlayers[playerIndex].golfScore + newSelectionDifference;
         Sounds.boop(3000, newPlayers[playerIndex].golfScores[scoreIndex]);
-        if (newPlayers != []) {
+        if (newPlayers.length !== 0) {
             setPlayers(newPlayers);
         }
         updateScores();

@@ -1,21 +1,13 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { PlayerContext } from '../context/PlayerContext';
+import React, { useState } from 'react';
 import getKey from './KeyGenerator';
 import clubs from '../games/scorekeeper/clubs';
 
 const ShotDialog = ({
     shot,
-    score,
     isOpen,
     onClose,
     pickClub
 }) => {
-
-    const {
-        players,
-        setPlayers,
-        playersInGame
-    } = useContext(PlayerContext);
 
     const [clubId, setClubId] = useState();
 
@@ -39,7 +31,7 @@ const ShotDialog = ({
                 {
                     clubs.map((club, index) => <div key={getKey(`${index}`)}
                         className={`containerBox button`}
-                        onClick={() => pickClub(index)}
+                        onClick={() => setClubId(index)}
                     >
                         <div>{club}</div>
                     </div>

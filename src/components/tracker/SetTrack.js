@@ -17,13 +17,11 @@ const SetTrack = ({
 
     useEffect(() => {
 
-        console.log(`setTrack: ${JSON.stringify(waves[waveProjectIndex],null,2)} setIndex: ${setIndex}`)
         const updatedTrackingData = [...waves];
         updatedTrackingData[waveProjectIndex].tasks[setIndex].isCollapsed = setCollapse;
-        console.log(`waveCollapse: ${updatedTrackingData[waveProjectIndex].tasks[setIndex].description}.isCollapsed = ${updatedTrackingData[waveProjectIndex].tasks[setIndex].isCollapsed}`)
         const dataToString = JSON.stringify(updatedTrackingData);
         localStorage.setItem('waveTracking', dataToString);
-    }, [setCollapse]);
+    }, [setCollapse, setIndex, waveProjectIndex, waves]);
 
     return <div key={`set${setIndex}`} className='containerBox lowerBorder'>
                 <div className='containerBox bold'>

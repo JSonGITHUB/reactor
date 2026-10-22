@@ -138,6 +138,7 @@ const Tide = ({
         }
 
         localStorage.setItem('height', waterLevel);
+        console.log(`Tide => useEffect => height: ${waterLevel}`);
         localStorage.setItem('heightTime', waterLevelTime)
         setTide(getCurrentTide, waterLevel);
 
@@ -347,6 +348,7 @@ const Tide = ({
 
     const getHeight = () => {
         const height = getClosestValue()[0];
+        console.log(`Tide => getHeight => height: ${height}`);
         localStorage.setItem('height', height);
         return <div className=''>
             <div className='bold pb-10 mt--10'>{/*levelDisplay*/}{getCurrentTide}</div>

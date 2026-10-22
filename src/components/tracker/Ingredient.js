@@ -1,11 +1,43 @@
-import React, { useState } from 'react'
-import getKey from '../utils/KeyGenerator';
+import React, { useState, useEffect } from 'react'
+import icons from '../site/icons';
+import { useIngredient } from '../context/IngredientContext';
+import Sounds from '../sound/Sounds';
 
 const Ingredient = ({
     ingredient
 }) => {
+    const { getIngredientStatus, toggleIngredientStatus, removeIngredient } = useIngredient();
     const [check, setCheck] = useState(false);
-    const toggleIngredient = () => setCheck(prev => !prev);
+
+    // Initialize checkbox from context on mount
+    useEffect(() => {
+        const savedStatus = getIngredientStatus(ingredient);
+        console.log(`Ingredient "${ingredient}" checkbox savedStatus:`, savedStatus);
+        setCheck(savedStatus);
+    }, [ingredient, getIngredientStatus]);
+    useEffect(() => {
+        console.log(`Ingredient "${ingredient}" checkbox status:`, check);
+    }, [check]);
+    const playSound = () => {
+        if (typeof Sounds.playSoftBell === 'function') {
+            Sounds.playSoftBell();
+            return;
+        }
+        if (typeof Sounds.softBell === 'function') {
+            Sounds.softBell(250);
+            return;
+        }
+        if (typeof Sounds.boop === 'function') {
+            Sounds.boop(0, 1);
+        }
+    };
+    const toggleIngredient = () => {
+        const newStatus = !check;
+        setCheck(newStatus);
+        toggleIngredientStatus(ingredient, newStatus);
+        playSound();
+    };
+
     const getCheckBox = (item) => <input
         id={`${item}`}
         name={`${item}`}
@@ -14,14 +46,19 @@ const Ingredient = ({
         type='checkbox'
         onChange={toggleIngredient}
     />
-    //console.log(`Ingredient => ingredient: ${JSON.stringify(ingredient, null, 2)}`);
+    const onRemoveIngredient = (ingredient) => () => {
+        removeIngredient(ingredient);
+    }
     return (
-        <div key={getKey(ingredient)} className='containerBox flexContainer button' onClick={toggleIngredient}>
-            <div className='containerBox flexColumn columnRightAlign bold color-yellow'>
+        <div className='containerDetail m-5 size20 color-lite bg-lite flexContainer button'>
+            <div className='containerDetail p-10 size20 color-lite flexColumn columnRightAlign bold color-yellow'>
                 {getCheckBox(ingredient)}
             </div>
-            <div className='containerBox flex2Column columnLeftAlign p-15'>
+            <div className='containerDetail p-10 ml-5 mr-5 size20 color-lite flex2Column columnLeftAlign p-15'>
                 {ingredient}
+            </div>
+            <div className='containerDetail p-15 button flexColumn columnRightAlign' title='remove' onClick={onRemoveIngredient(ingredient)}>
+               {icons.delete}
             </div>
         </div>
     )

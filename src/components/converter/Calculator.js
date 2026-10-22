@@ -1,5 +1,5 @@
 //stateful component
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import TemperatureInput from './TemperatureInput';
 import BoilingVerdict, {tryConvert, toCelsius, toFahrenheit} from './BoilingVerdict';
 // eslint-disable-next-line
@@ -43,27 +43,7 @@ const Calculator = () => {
     // eslint-disable-next-line
     const liters = () => (unit2 === 'Liters') ? tryConvert(value2, toGallons) : value2;
 
-    useEffect(() => {
-        console.log(`unit1 => ${unit1}`);
-        console.log(`unit1: ${unit1} value1: ${value1}`); 
-        console.log(`unit2: ${unit2} value2: ${value2}`);      
-    }, [unit1]);
-    useEffect(() => {
-        console.log(`unit2 => ${unit2}`); 
-        console.log(`unit1: ${unit1} value1: ${value1}`); 
-        console.log(`unit2: ${unit2} value2: ${value2}`);
-    }, [unit2]);
-    useEffect(() => {
-        console.log(`value1 => ${value1}`); 
-        console.log(`unit1: ${unit1} value1: ${value1}`); 
-        console.log(`unit2: ${unit2} value2: ${value2}`);
-    }, [value1]);
-    useEffect(() => {
-        console.log(`value2 => ${value2}`); 
-        console.log(`unit1: ${unit1} value1: ${value1}`); 
-        console.log(`unit2: ${unit2} value2: ${value2}`);
-    }, [value2]);
-    
+
     return (
         <div className="fadeIn mt--14">
             <TemperatureInput

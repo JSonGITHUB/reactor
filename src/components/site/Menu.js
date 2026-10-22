@@ -45,11 +45,11 @@ const Menu = ({ closeMenu }) => {
                                             onClick={() => getApp(label)}
                                         >
                                             <div key={getKey(label)} className={classes}>
-                                                <div className='flexContainer color-yellow mt-25 contentCenter'>
-                                                    <div className='size30 m-10'>
+                                                <div className='color-yellow mt-25 contentCenter'>
+                                                    <div className='size60 m-10'>
                                                         {icons[String(label).toLowerCase()]}
                                                     </div>
-                                                    <div>
+                                                    <div className='text-outline-dark'>
                                                         {label}
                                                     </div>
                                                 </div>
@@ -72,24 +72,10 @@ const Menu = ({ closeMenu }) => {
         : navItems.filter(item => String(item).toLowerCase().includes(searchTerm));
     const menuItems = filteredItems.map(item => portraitButton(item));
 
-    const menu = () => {
-        return  <div >
-                    {navItems.map((label, index) => (
-                        <button key={getKey(label)} className='menu-button containerBox button'>
-                            <div style={{ width: `${maxLabelLength * 8}px` }} className='label-container'>
-                                <span className='containerBox'>
-                                    {icons[String(label).toLowerCase()]}
-                                </span>
-                                {label}
-                            </div>
-                        </button>
-                    ))}
-                </div>
-    }
     return <div onScroll={handleScrollChild} className='scrollHeight550 bg-tintedDark menu pb-100'>
         <input
-            id='app search'
-            name='app search'
+            id='menu-app-search'
+            name='menu-app-search'
             className='containerBox color-lite bg-dark width--10'
             type='text'
             placeholder={'Find an app...'}
@@ -98,7 +84,6 @@ const Menu = ({ closeMenu }) => {
             onKeyDown={e => e.key === 'Enter' && e.preventDefault()}
         />
         {menuItems}
-        {/*menu()*/}
     </div>;
 }
 export default Menu;

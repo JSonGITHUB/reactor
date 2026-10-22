@@ -53,6 +53,20 @@ const SlideShow = () => {
         url3: images[60].image
     });
     useEffect(() => {
+       const getDaysInMonth = () => {
+            const year = time.year;
+            const month = time.month + 1;
+            const firstDayOfNextMonth = new Date(year, month, 1);
+            const lastDayOfCurrentMonth = new Date(firstDayOfNextMonth - 1);
+            return lastDayOfCurrentMonth.getDate();
+        };
+        const getDaysInLastMonth = () => {
+            const year = time.year;
+            const month = time.month - 1;
+            const firstDayOfLastMonth = new Date(year, month, 1);
+            const lastDayOfLastMonth = new Date(firstDayOfLastMonth - 1);
+            return lastDayOfLastMonth.getDate();
+        };
        const getImage = () => {
             if (status.slideShow) {
                 const i = (status.index === 29) ? 1 : status.index+1; 
@@ -89,7 +103,7 @@ const SlideShow = () => {
         return function cleanUp () {
             clearInterval(timerID);
         }
-    },[status]);
+    }, [status, time.date, time.hours, time.month, time.year, time.monthLong, time.monthNextLong]);
     const togglePlay = () => {
         setStatus(prevState => ({
             ...prevState,

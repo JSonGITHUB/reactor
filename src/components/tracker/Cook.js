@@ -1,64 +1,100 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
-import AddProjectInterface from './AddProjectInterface';
-import TrackRecipe from './TrackRecipe';
-import { currentTime, currentDate } from '../utils/CurrentCalendar';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import initProjects from './initProjects';
-import initWaves from './initWaves';
-import initTasks from './initTasks';
-import initCharges from './initCharges';
-import initEvents from './initEvents';
-import initLinkTracking from './initLinkTracking';
-import initNoteTracking from './initNoteTracking';
-import initJournalTracking from './initJournalTracking';
-import mobileRecipeTracking from './data_mobile';
 import initializeData from '../utils/InitializeData';
 import IngredientParent from '../context/IngredientContext';
-import validate from '../utils/validate';
+import KitchenInventoryProvider from '../context/KitchenInventoryContext';
+import TrackRecipe from './TrackRecipe';
+import CookMenu from './CookMenu';
+import mobileRecipeTracking from './data_mobile';
 
 const Cook = () => {
-
-    const [projects, setProjects] = useState(initializeData('projects', initProjects));
-    const [events, setEvents] = useState(initializeData('eventTracking', initEvents));
-    const [waves, setWaves] = useState(initializeData('waveTracking', initWaves));
-    const [links, setLinks] = useState(initializeData('linkTracking', initLinkTracking));
-    const [notes, setNotes] = useState(initializeData('noteTracking', initNoteTracking));
-    const [journals, setJournals] = useState(initializeData('journalTracking', initJournalTracking));
-    const [circuits, setCircuits] = useState();
-    const [tasks, setTasks] = useState(initializeData('taskTracking', initTasks));
-    const [charges, setCharges] = useState(initializeData('chargeTracking', initCharges));
-    const [tracking, setTracking] = useState('recipes');
+    const tracking='recipes';
+    const [projects] = useState(initializeData('projects', initProjects));
     const [initialized, setInitialized] = useState(false);
-    const [isCollapsed, setIsCollapsed] = useState();
-    const [newProjectDescription, setNewProjectDescription] = useState('');
-    const [recipes, setRecipes] = useState(initializeData('recipeTracking', mobileRecipeTracking));
+    const [isCollapsed] = useState();
+    const [shouldRenderContent, setShouldRenderContent] = useState(false);
+    const [recipeDataReady, setRecipeDataReady] = useState(false);
+    //const [newProjectDescription, setNewProjectDescription] = useState('');
+    const [recipes, setRecipes] = useState(() => initializeData('recipeTracking', []));
     const targetElementRef = useRef(null);
 
-    const scrollToBottom = () => {
-        //alert(`scrollToBottom`);
+    useEffect(() => {
+        let isActive = true;
+
+        const hydrateDefaultRecipes = async () => {
+            const storedRecipes = initializeData('recipeTracking', []);
+            if (Array.isArray(storedRecipes) && storedRecipes.length > 0) {
+                setRecipes(storedRecipes);
+                if (isActive) {
+                    setRecipeDataReady(true);
+                }
+                return;
+            }
+
+            const fallbackRecipes = Array.isArray(mobileRecipeTracking) ? mobileRecipeTracking : [];
+            if (!isActive) {
+                return;
+            }
+
+            setRecipes(fallbackRecipes);
+            setRecipeDataReady(true);
+        };
+
+        hydrateDefaultRecipes();
+
+        return () => {
+            isActive = false;
+        };
+    }, []);
+
+    useEffect(() => {
+        const scheduleContentRender = () => {
+            if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+                return window.requestIdleCallback(() => setShouldRenderContent(true), { timeout: 150 });
+            }
+
+            if (typeof window !== 'undefined' && window.requestAnimationFrame) {
+                return window.requestAnimationFrame(() => setShouldRenderContent(true));
+            }
+
+            return setTimeout(() => setShouldRenderContent(true), 0);
+        };
+
+        const renderHandle = scheduleContentRender();
+
+        return () => {
+            if (typeof renderHandle === 'number') {
+                if (typeof window !== 'undefined' && 'cancelIdleCallback' in window) {
+                    window.cancelIdleCallback(renderHandle);
+                } else if (typeof window !== 'undefined' && window.cancelAnimationFrame) {
+                    window.cancelAnimationFrame(renderHandle);
+                }
+            } else if (renderHandle) {
+                clearTimeout(renderHandle);
+            }
+        };
+    }, []);
+
+    const scrollToBottom = useCallback(() => {
         if (targetElementRef.current) {
             //targetElementRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
+    }, []);
+    /*
+    const refreshPage = () => {
+        window.location.reload();
     };
+    */
+    const getIngredients = useCallback(() => {
+        if (!Array.isArray(recipes)) {
+            return [];
+        }
 
-    const trackingMap = {
-        'projects': [projects, setProjects],
-        'tasks': [tasks, setTasks],
-        'waves': [waves, setWaves],
-        'events': [events, setEvents],
-        'charges': [charges, setCharges],
-        'links': [links, setLinks],
-        'notes': [notes, setNotes],
-        'journals': [journals, setJournals],
-        'circuits': [circuits, setCircuits],
-        'recipes': [recipes, setRecipes],
-    };
-    const getIngredients = () => {
         const newIngredients = [];
         recipes.forEach((recipeGroup) => {
-            if (!recipeGroup.isCollapsed) {
+            if (!recipeGroup?.isCollapsed && recipeGroup?.recipes && recipeGroup.recipes.length > 0) {
                 recipeGroup.recipes.forEach((recipe) => {
-                    if (!recipe.isCollapsed && recipe.ingredients && recipe.ingredients.length > 0) {
-                        //console.log(`getIngredient => recipe: ${JSON.stringify(recipe, null, 2)}`);
+                    if (!recipe?.isCollapsed && recipe.ingredients && recipe.ingredients.length > 0) {
                         recipe.ingredients.forEach((ingredient) => {
                             newIngredients.push(ingredient);
                         });
@@ -66,8 +102,8 @@ const Cook = () => {
                 });
             }
         });
+
         const removeDuplicates = (array) => [...new Set(array)];
-        //const getAllIngredients = () => initializeData('ingredients', [['salt', 'salt', 'salt']]);
         const removeables = [
             'peeled',
             'for',
@@ -75,7 +111,6 @@ const Cook = () => {
             'garnish',
             'optional',
             'seeded',
-            //' and ', 
             'sliced',
             'warm',
             'bruised',
@@ -83,7 +118,6 @@ const Cook = () => {
             'minced',
             'boiling',
             'thinly',
-            'sliced',
             'head of',
             'of ',
             'or ',
@@ -127,80 +161,59 @@ const Cook = () => {
             '()',
             ',',
             ' ,'
-        ]
-        const removeIt = (ingredient, extraWord) => {
-            return String(ingredient).replace(extraWord, '');
-        }
-        const removeExtraStuff = (ingredient) => {
-            const cleanIngredient = removeables.reduce((acc, word) => removeIt(acc, word), ingredient);
-            //console.log(`TrackRecipe => removeExtraStuff => cleanIngredient: ${cleanIngredient}`);
-            return cleanIngredient;
-        }
-        //console.log(`ingredients: ${JSON.stringify(getAllIngredients(), null, 2)}`);
+        ];
+        const removeIt = (ingredient, extraWord) => String(ingredient).replace(extraWord, '');
+        const removeExtraStuff = (ingredient) => removeables.reduce((acc, word) => removeIt(acc, word), ingredient);
         const ingredientLabel = (ingredient, index) => (ingredient[index] && (ingredient[index] !== '') && (ingredient[index] !== undefined)) ? String(ingredient[index]).toLowerCase() : '';
-        //const allIngredients = newIngredients.map(ingredient => (ingredientLabel(ingredient, 2) !== null) ? ingredientLabel(ingredient, 2) : (ingredientLabel(ingredient, 1) !== null) ? ingredientLabel(ingredient, 1) : (ingredientLabel(ingredient, 0) !== null) ? ingredientLabel(ingredient, 0) : 'salt');
-        const allIngredients = newIngredients.map(ingredient => `${ingredientLabel(ingredient, 2)} ${ingredientLabel(ingredient, 0)} ${ingredientLabel(ingredient, 1)}`);
-        const cleanedUpIngredients = allIngredients.map(ingredient => removeExtraStuff(ingredient));
-        const whiteSpace = cleanedUpIngredients.map(ingredient => ingredient.trim());
+        const allIngredients = newIngredients.map((ingredient) => `${ingredientLabel(ingredient, 2)} ${ingredientLabel(ingredient, 0)} ${ingredientLabel(ingredient, 1)}`);
+        const cleanedUpIngredients = allIngredients.map((ingredient) => removeExtraStuff(ingredient));
+        const whiteSpace = cleanedUpIngredients.map((ingredient) => ingredient.trim());
         const sterilIngredients = removeDuplicates(whiteSpace);
-        const removeAndItems = (arr) => {
-            return arr.filter(item => !item.toLowerCase().startsWith('and'));
-        };
-        const removeParenthesisStart = (arr) => {
-            return arr.filter(item => !item.toLowerCase().startsWith('('));
-        };
-        const remove1InBeginning = (arr) => {
-            return arr.filter(item => !item.startsWith('1'));
-        };
-        const removeAInBeginning = (arr) => {
-            return arr.filter(item => !item.startsWith('a '));
-        };
-        const removeEmpty = (arr) => {
-            return arr.filter(item => item !== '');
-        };
-        const removeAnds = (arr) => {
-            return arr.filter(item => item !== 'and');
-        };
+        const removeAndItems = (arr) => arr.filter((item) => !item.toLowerCase().startsWith('and'));
+        const removeParenthesisStart = (arr) => arr.filter((item) => !item.toLowerCase().startsWith('('));
+        const remove1InBeginning = (arr) => arr.filter((item) => !item.startsWith('1'));
+        const removeAInBeginning = (arr) => arr.filter((item) => !item.startsWith('a '));
+        const removeEmpty = (arr) => arr.filter((item) => item !== '');
         const removeSingularIfPluralExists = (words) => {
             const wordSet = new Set(words);
-            return words.filter(word => {
-                const pluralForm = word.endsWith('s') ? word : word + 's';
+            return words.filter((word) => {
+                const pluralForm = word.endsWith('s') ? word : `${word}s`;
                 return !(wordSet.has(pluralForm) && !word.endsWith('s'));
             });
         };
-        //console.log(`sterilIngredients: ${JSON.stringify(sterilIngredients, null, 2)}`);
         const pluralPriority = removeSingularIfPluralExists(sterilIngredients);
         const noAnd = removeAndItems(pluralPriority);
-        const sortAlphabetically = (arr) => {
-            return arr.sort((a, b) => a.localeCompare(b));
-        };
+        const sortAlphabetically = (arr) => arr.sort((a, b) => a.localeCompare(b));
         const parenthesisStart = removeParenthesisStart(noAnd);
-        const andsRemoved = removeAnds(pluralPriority);
-        const empty = removeEmpty(parenthesisStart)
-        const number1 = remove1InBeginning(empty)
-        const aStart = removeAInBeginning(number1)
-        const sorted = sortAlphabetically(aStart);
-        return sorted;
-    }
-
-    useEffect(() => {
-        if (recipes !== undefined) {
-            const ingredients = getIngredients();
-            if ((validate(ingredients) !== null) && (ingredients !== undefined)) {
-                localStorage.setItem('ingredients', JSON.stringify(ingredients));
-            }
-            localStorage.setItem('recipeTracking', JSON.stringify(recipes));
-        }
+        const empty = removeEmpty(parenthesisStart);
+        const number1 = remove1InBeginning(empty);
+        const aStart = removeAInBeginning(number1);
+        return sortAlphabetically(aStart);
     }, [recipes]);
 
     useEffect(() => {
-        if (recipes === null) setRecipes(mobileRecipeTracking);
+        if (recipes !== undefined) {
+            localStorage.setItem('recipeTracking', JSON.stringify(recipes));
+        }
+    }, [recipes]);
+    useEffect(() => {
+        if (projects !== undefined) {
+            localStorage.setItem('projects', JSON.stringify(projects));
+        }
+    }, [projects]);
+
+    useEffect(() => {
+        if (recipes === null && !recipeDataReady) {
+            setRecipeDataReady(false);
+        }
+        /*
         if (tracking === 'recipes') {
-            const timer = setTimeout(() => {
+            setTimeout(() => {
                 setNewProjectDescription('');
             }, 1000);
         }
-    }, []);
+        */
+    }, [recipes, recipeDataReady]);
 
     useEffect(() => {
 
@@ -209,22 +222,18 @@ const Cook = () => {
             if (tracking === 'recipes') {
                 updatedTrackingData = [...recipes];
             }
-            updatedTrackingData.map((group, groupIndex) => group.isCollapsed = isCollapsed);
+            updatedTrackingData.forEach((group) => {
+                group.isCollapsed = isCollapsed;
+            });
             if (tracking === 'recipes') {
                 setRecipes(updatedTrackingData);
             }
         } else {
             setInitialized(true);
         }
-    }, [isCollapsed]);
+    }, [isCollapsed]); // eslint-disable-line react-hooks/exhaustive-deps
 
-
-    useEffect(() => {
-        if (tracking !== undefined || tracking !== '') {
-            localStorage.setItem('tracking', tracking);
-        }
-    }, [tracking]);
-
+    /*
     useEffect(() => {
         if (newProjectDescription !== undefined) {
             const searchTerm = newProjectDescription.toLowerCase() || '';
@@ -258,70 +267,84 @@ const Cook = () => {
                 };
                 const category = localStorage.getItem('recipeCategory') || 'all';
                 const filteredRecipes = [...recipes];
-                console.log(`Cook => searchTerm: '${searchTerm}'`);
-                filteredRecipes.map((recipeGroup) => {
+                filteredRecipes.forEach((recipeGroup) => {
                     recipeGroup.display = false;
-                    recipeGroup.recipes.map((recipe) => {
-                        if ((inInstructions(recipe) || inIngredients(recipe) || inDescription(recipe) || inRecipeTitle(recipe) || searchTerm === '' || searchTerm === ' ' || searchTerm === null) && (category === 'all' || recipeGroup.category === category)) {
-                            recipe.display = true;
-                            recipeGroup.display = true;
-                        } else {
-                            recipe.display = false;
-                        }
-                    });
+                    if (recipeGroup.recipes && recipeGroup.recipes.length > 0) {
+                        recipeGroup.recipes.forEach((recipe) => {
+                            if ((inInstructions(recipe) || inIngredients(recipe) || inDescription(recipe) || inRecipeTitle(recipe) || searchTerm === '' || searchTerm === ' ' || searchTerm === null) && (category === 'all' || recipeGroup.category === category)) {
+                                recipe.display = true;
+                                recipeGroup.display = true;
+                            } else {
+                                recipe.display = false;
+                            }
+                        });
+                    }
                 });
                 setRecipes(filteredRecipes);
             } 
         }
-    }, [newProjectDescription]);
-
+    }, [newProjectDescription]); // eslint-disable-line react-hooks/exhaustive-deps
+    
     const addProject = () => {
-        const project = {
-            description: newProjectDescription,
-            createdDate: currentDate(),
-            startTime: currentTime(),
-            tasks: [],
-            journals: [],
-            totalTime: 0,
-            isCollapsed: false
-        };
-
-        if ((tracking !== 'links' || tracking !== 'notes' || tracking !== 'journals' || tracking !== 'circuits' || tracking !== 'recipes') && trackingMap.hasOwnProperty(tracking)) {
-            trackingMap[tracking][1](prev => [project, ...prev]);
+        if (!newProjectDescription || newProjectDescription.trim() === '') {
+            alert('Please enter a category name');
+            return;
         }
-        setNewProjectDescription('');
+        
+        const recipe = {
+            category: newProjectDescription.trim(),
+            recipes:[],
+            display: true,
+            collapsed:true,
+            isCollapsed:true
+        };
+        const updatedRecipes = [...recipes, recipe];
+        setRecipes(updatedRecipes);
+        
+        // Use setTimeout to ensure display updates after state is set
+        setTimeout(() => {
+            refreshPage();
+        }, 100);
     };
-
-
+    */
     return <div className='mt--30'>
         <div className='containerDetail color-dark bg-yellow m-5 p-20 size30 contentLeft'>
             <span className='size40 m-5'>🧑‍🍳</span> Cooking
         </div>
-        <div className=''>
-            {
-                (tracking !== '')
-                ? <AddProjectInterface
-                    newProjectDescription={newProjectDescription}
-                    setNewProjectDescription={setNewProjectDescription}
-                    addProject={addProject}
-                    tracking={tracking}
-                />
-                : <React.Fragment></React.Fragment>
-            }
-        </div>
-        <div className=''>
-            {
-                (tracking === 'recipes')
-                    ? <IngredientParent targetElementRef={targetElementRef}>
-                        <TrackRecipe
-                            targetElementRef={targetElementRef}
-                            scrollToBottom={scrollToBottom}
-                            recipes={recipes}
-                            setRecipes={setRecipes}
-                            getIngredients={getIngredients}
-                        />
-                    </IngredientParent>
+        {
+            /*
+            <div className=''>
+                {
+                    (tracking !== '')
+                    ? <AddProjectInterface
+                        newProjectDescription={newProjectDescription}
+                        setNewProjectDescription={setNewProjectDescription}
+                        addProject={addProject}
+                        tracking={tracking}
+                    />
                     : <React.Fragment></React.Fragment>
+                }
+            </div>
+            */
+        }
+        <div className=''>
+            {
+                (tracking === 'recipes' && shouldRenderContent && recipeDataReady)
+                    ? <KitchenInventoryProvider>
+                        <CookMenu recipes={recipes} />
+                        <IngredientParent targetElementRef={targetElementRef}>
+                            <TrackRecipe
+                                targetElementRef={targetElementRef}
+                                scrollToBottom={scrollToBottom}
+                                recipes={recipes}
+                                setRecipes={setRecipes}
+                                getIngredients={getIngredients}
+                            />
+                        </IngredientParent>
+                    </KitchenInventoryProvider>
+                    : (tracking === 'recipes')
+                        ? <div className='containerDetail bg-lite p-20 m-5 color-dark'>Loading recipes…</div>
+                        : <React.Fragment></React.Fragment>
             }
         </div>
     </div>

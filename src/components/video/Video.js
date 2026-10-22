@@ -20,10 +20,6 @@ const Video = forwardRef(({ src1, src2 }, ref) => {
   useEffect(() => {
     const speed = (status.isMediumRewind) ? 250 : 80;
     const interval = (status.isSlowRewind) ? 300 : speed;
-    console.log(`status startTime1: ${(status.startTime1) ? status.endTime1 : '??'}`);
-    console.log(`status startTime2: ${(status.endTime2) ? status.endTime2 : '??'}`);
-    console.log(`status endTime1: ${(status.endTime1) ? status.endTime1 : '??'}`);
-    console.log(`status endTime2: ${(status.endTime2) ? status.endTime2 : '??'}`);
     const intervalId = setInterval(() => {
       const time1 = status.videoPlayer1Ref.current.currentTime - 0.05;
       const time2 = status.videoPlayer2Ref.current.currentTime - 0.05;
@@ -48,7 +44,7 @@ const Video = forwardRef(({ src1, src2 }, ref) => {
       clearInterval(intervalId);
     };
 
-  }, [status.isPlaying, status.isSlowRewind, status.isMediumRewind, status.isRewind, status.startTime1, status.startTime2, status.videoRef]);
+  }, [status.isPlaying, status.isSlowRewind, status.isMediumRewind, status.isRewind, status.startTime1, status.startTime2, status.videoPlayer1Ref, status.videoPlayer2Ref]);
 
   const handleTimeUpdate1 = time => {
     /*

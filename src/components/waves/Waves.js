@@ -6,7 +6,7 @@ import WavesNew from './WavesNew';
 const Waves = () => {
 
     const targetElementRef = useRef(null);
-    const [retry, setRetry] = useState('');
+    const [retry] = useState('');
     return (
         (retry !== '')
             ? <div>

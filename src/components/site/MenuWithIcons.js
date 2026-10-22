@@ -58,8 +58,8 @@ const Menu = ({ closeMenu }) => {
     }
     return <div onScroll={handleScrollChild} className='menu scrollHeight550 bg-tintedDark'>
         <input
-            id='app search'
-            name='app search'
+            id='menu-icons-app-search'
+            name='menu-icons-app-search'
             className='containerBox color-lite bg-dark width--10'
             type='text'
             placeholder={'Find an app...'}

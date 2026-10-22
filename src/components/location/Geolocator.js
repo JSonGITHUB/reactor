@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
-import Loader from "../site/Loader.js";
-import GPSStatus from "../utils/GPS_Status.js";
+import React, { useState, useEffect } from 'react';
+import GPSStatus from '../utils/GPS_Status.js';
 
 const Geolocate = ({
   isMotionOn,
@@ -83,21 +82,9 @@ const Geolocate = ({
     localStorage.setItem('latitude', lat);
     return `${lat}, ${long} `;
   }
-  const percent =
-    window.innerWidth < 700
-      ? "twentyfivePercent mt--70 mb--70"
-      : "fiftyPercent mt--40 mb--40";
-  const loading = () => (
-  
-    <div className='containerBox'>
-      <GPSStatus />
-    {/*<div className={percent}>
-      <Loader isMotionOn={isMotionOn} />*/}
-    
-    </div>
-  );
+  const loading = () => <GPSStatus />;
   // eslint-disable-next-line
-  const latlon = () => status.latitude + "," + status.longitude;
+  const latlon = () => status.latitude + ',' + status.longitude;
   const { latitude, errorMessage } = status;
   const errorExists = errorMessage ? true : false;
   const latExists = latitude ? true : false;
@@ -113,10 +100,15 @@ const Geolocate = ({
     */
   return <div 
             title={`${(status.paused) ? 'resume gps' : 'pause gps'}`}
-            className={`button r-10 bg-tinted p-20 width-100-pecent ${(status.paused)?'color-red':'color-yellow'} greet`} 
+            className={`flexContainer button r-10 p-5 mt--5 mb--5 width-100-pecent ${(status.paused)?'color-orange':'color-yellow'} greet`} 
             onClick={() => togglePause()}
           >
-            {geolocationStatus}
+            <div className='gps-icon flexColumn'>
+              🛰️
+            </div>
+            <div className='gps-icon flex2Column'>
+               {geolocationStatus}
+            </div>
           </div>;
 };
 

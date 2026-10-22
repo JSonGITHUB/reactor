@@ -35,15 +35,11 @@ const SwellSelector = ({
         handleSwell1Height,
         handleSwell2Height,
         handleSwell1Interval,
-        handleSwell2Interval,
-        swell1Angle,
-        swell2Angle
+        handleSwell2Interval
     } = useContext(OceanContext);
 
     const isSelected = ((id === '1' && status.isSwell1) || (id === '2' && status.isSwell2)) ? true : false;
-
     const [selected, setSelected] = useState(isSelected);
-
     const roundToNearestFive = (number) => Math.round(number / 5) * 5;
 
     useEffect(() => {
@@ -52,24 +48,24 @@ const SwellSelector = ({
         } else {
             localStorage.setItem('isSwell2', selected);
         }
-    }, [selected]);
+    }, [id, selected]);
 
     const toggleSelected = () => {
         setSelected(prev => !prev);
         handleSwellCheck(id)
     }
 
-    const swellClass = () => `${(selected)? 'bg-veryLite' : 'bg-tinted'} containerBox flex2Column contentCenter`;
+    const swellClass = () => `${(selected) ? 'bg-veryLite fadeInFaded brdr-green' : 'bg-tinted fadeOutFaded'} containerDetail flex2Column contentCenter m-2`;
     const intervals = ['','0 seconds','1 seconds','2 seconds','3 seconds','4 seconds','5 seconds','6 seconds','7 seconds','8 seconds','9 seconds','10 seconds','11 seconds','12 seconds','13 seconds','14 seconds','15 seconds','16 seconds','17 seconds','18 seconds','19 seconds','20 seconds','21 seconds','22 seconds','23 seconds'];
 
     const getSwellIcon = (id) => {
         if (id === '1') {
-            return <img src={swell1} className='shaka r-20 p-2' alt='swell1' />
+            return <img src={swell1} className='shaka mb--5 mr-5' alt='swell1' />
         } else {
-            return <img src={swell2} className='shaka r-20 p-2' alt='swell2' />;
+            return <img src={swell2} className='shaka mb--5 mr-5' alt='swell2' />;
         }
     }
-    const classes = 'h50w50 r-10 p-5 bg-white';
+    const classes = 'h50w50 mt-10 r-10 p-5 bg-white';
     const getDirectionIcon = () => {
         if (swellDirection === 'N') {
             return <img src={N} className={classes} alt={swellDirection} />;
@@ -91,81 +87,103 @@ const SwellSelector = ({
     }
     return (
         <div className={`${swellClass()}`}>
-            <div className='containerBox'>
-                <div className='containerBox bg-lite'>
-                    {getSwellIcon(id)}
-                    <div className='ml-5'>Swell{id}</div>
+            <div className='size20'>
+                <div className='containerDetail p-20 bg-lite size25 color-yellow contentLeft'>
+                    {getSwellIcon(id)}Swell{id}
                 </div>
-                <div className='p-10'>{getDirectionIcon()}</div>  
+                <div className='containerDetail bg-white mt-5'>
+                    {getDirectionIcon()}
+                </div>  
             </div>
             
-            <div className='p-10 r-10 bg-tinted mt-20'>
+            <div className='containerDetail mt-5 size20'>
                 <div className='flex2Column size20'>
-                    <div className='containerBox color-yellow bg-lite'>direction</div>
-                    <div className='containerBox button color-red brdr-red' onClick={(id === '1') ? handleSwell1LiveSelection : handleSwell2LiveSelection}>GET CURRENT</div>
+                    <div className='containerDetail p-15 color-yellow bg-lite contentLeft size20'>
+                        direction
+                    </div>
+                    <div 
+                        className='containerDetail p-10 button bg-green color-lite mt-5 contentLeft size15' 
+                        onClick={(id === '1') ? handleSwell1LiveSelection : handleSwell2LiveSelection}
+                    >
+                        📡.. get live bouy data
+                    </div>
+                    <div className='mt--5 mr-5'>
+                        <Selector
+                            groupTitle={`Swell${id}`}
+                            selected={(id === '1') ? status.swell1Direction : status.swell2Direction} 
+                            //getState(`swell1`)
+                            label='Direction' 
+                            items={directions}
+                            onChange={(id === '1') ? handleSwell1Selection : handleSwell2Selection}
+                            fontSize='20'
+                            padding='10px'
+                            width='70%'
+                        />
+                    </div>
+                </div>
+            </div>
+            <div className='containerDetail mt-5 size20'>
+                <div className='containerDetail p-15 color-yellow bg-lite contentLeft size20'>
+                    angle
+                </div>
+                <div className='mt--5 mr-5'>
                     <Selector
-                        groupTitle={`Swell${id}`}
-                        selected={(id === '1') ? status.swell1Direction : status.swell2Direction} 
-                        //getState(`swell1`)
-                        label='Direction' 
-                        items={directions}
-                        onChange={(id === '1') ? handleSwell1Selection : handleSwell2Selection}
+                        groupTitle={`SwellAngle${id}`}
+                        selected={(id === '1') ? roundToNearestFive(status.swell1Angle) : roundToNearestFive(status.swell2Angle)} 
+                        label='Angle' 
+                        items={angles}
+                        onChange={(id === '1') ? handleSwell1Angle : handleSwell2Angle}
                         fontSize='20'
-                        padding='10px'
+                        padding='5px'
                         width='70%'
                     />
                 </div>
             </div>
-            <div className='p-10 r-10 bg-tinted mt-20'>
-                <div className='containerBox color-yellow bg-lite'>angle</div>
-                <Selector
-                    groupTitle={`SwellAngle${id}`}
-                    selected={(id === '1') ? roundToNearestFive(status.swell1Angle) : roundToNearestFive(status.swell2Angle)} 
-                    label='Angle' 
-                    items={angles}
-                    onChange={(id === '1') ? handleSwell1Angle : handleSwell2Angle}
-                    fontSize='20'
-                    padding='5px'
-                    width='70%'
-                />
-            </div>
-            <div className='p-10 r-10 bg-tinted mt-20'>
-                <div className='containerBox color-yellow bg-lite'>height</div>
-                <Selector
-                    groupTitle={`SwellHeight${id}`}
-                    selected={(id === '1') ? `${Number(localStorage.getItem(`swell1Height`).replace('ft', '')).toFixed(0)}ft` : `${Number(localStorage.getItem('swell2Height').replace('ft', '')).toFixed(0)}ft`} 
-                    label='Height' 
-                    items={waveHeights}
-                    onChange={(id === '1') ? handleSwell1Height : handleSwell2Height}
-                    fontSize='20'
-                    padding='5px'
-                    width='70%'
-                />
+            <div className='containerDetail mt-5 size20'>
+                <div className='containerDetail p-15 color-yellow bg-lite contentLeft'>
+                    height
+                </div>
+                <div className='mt--5 mr-5'>
+                    <Selector
+                        groupTitle={`SwellHeight${id}`}
+                        selected={(id === '1') ? `${Number(localStorage.getItem(`swell1Height`).replace('ft', '')).toFixed(0)}ft` : `${Number(localStorage.getItem('swell2Height').replace('ft', '')).toFixed(0)}ft`} 
+                        label='Height' 
+                        items={waveHeights}
+                        onChange={(id === '1') ? handleSwell1Height : handleSwell2Height}
+                        fontSize='20'
+                        padding='5px'
+                        width='70%'
+                    />
+                </div>
             </div>
             
-            <div className='p-10 r-10 bg-tinted mt-20'>
-                <div className='containerBox color-yellow bg-lite'>interval</div>
-                <Selector
-                    groupTitle={`SwellInterval${id}`}
-                    selected={
-                      (id === '1')
-                        ? (status.swell1Interval && !status.swell1Interval.toString().includes('seconds')
-                            ? `${status.swell1Interval} seconds`
-                            : status.swell1Interval)
-                        : (status.swell2Interval && !status.swell2Interval.toString().includes('seconds')
-                            ? `${status.swell2Interval} seconds`
-                            : status.swell2Interval)
-                    }
-                    label='interval' 
-                    items={intervals}
-                    onChange={(id === '1') ? handleSwell1Interval : handleSwell2Interval}
-                    fontSize='20'
-                    padding='5px'
-                    width='70%'
-                />
+            <div className='containerDetail mt-5 size20'>
+                <div className='containerDetail p-15 color-yellow bg-lite contentLeft size20'>
+                    interval
+                </div>
+                <div className='mt--5 mr-5'>
+                    <Selector
+                        groupTitle={`SwellInterval${id}`}
+                        selected={
+                        (id === '1')
+                            ? (status.swell1Interval && !status.swell1Interval.toString().includes('seconds')
+                                ? `${status.swell1Interval} seconds`
+                                : status.swell1Interval)
+                            : (status.swell2Interval && !status.swell2Interval.toString().includes('seconds')
+                                ? `${status.swell2Interval} seconds`
+                                : status.swell2Interval)
+                        }
+                        label='interval' 
+                        items={intervals}
+                        onChange={(id === '1') ? handleSwell1Interval : handleSwell2Interval}
+                        fontSize='20'
+                        padding='5px'
+                        width='70%'
+                    />
+                </div>
             </div>
             
-            <div className='containerBoxDetail button size40 p-20' onClick={() => toggleSelected()}>
+            <div className='containerDetail mt-5 button size40 p-20' onClick={() => toggleSelected()}>
                 {/*<img src={(selected) ? thumbsUp : thumbsDown} alt={`swell${id}`} className='p-10 r-20' />*/}
                 {((selected) === true) ? icons.good : icons.bad }
             </div>

@@ -24,7 +24,6 @@ const CalculateDistance = (state, item) => {
     const lat2 = initializeData('latitude', null);
     const lon1 = item.longitude;
     const lon2 = initializeData('longitude', null);
-    const unit = "Miles"
     if ((lat1 === lat2) && (lon1 === lon2)) {
         return 0;
     } else {

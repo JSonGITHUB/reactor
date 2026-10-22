@@ -1,0 +1,133 @@
+
+> kfa@0.1.0 build
+> NODE_OPTIONS="--openssl-legacy-provider --no-warnings=DEP0060" react-scripts build && cp build/index.html build/404.html
+
+Creating an optimized production build...
+Compiled with warnings.
+
+src/App.js
+  Line 8:8:  'Trade' is defined but never used  no-unused-vars
+
+src/components/Home.js
+  Line 327:6:  React Hook useEffect has missing dependencies: 'categorySort' and 'currentMenuItems'. Either include them or remove the dependency array. You can also replace multiple useState variables with useReducer if 'setNewCategory' needs the current value of 'categorySort'  react-hooks/exhaustive-deps
+
+src/components/Parks/Parks.js
+  Line 380:12:  'handleAddFeature' is defined but never used  no-unused-vars
+
+src/components/pics/Pics.js
+  Line 321:8:   React Hook useEffect has missing dependencies: 'getRandomNextPhotoId' and 'getSequentialNextPhotoId'. Either include them or remove the dependency array                                                                                        react-hooks/exhaustive-deps
+  Line 331:8:   React Hook useEffect has a missing dependency: 'timerDelay'. Either include it or remove the dependency array. You can also replace multiple useState variables with useReducer if 'setTimerCountdown' needs the current value of 'timerDelay'  react-hooks/exhaustive-deps
+  Line 450:11:  'handlePhotoChanged' is assigned a value but never used                                                                                                                                                                                         no-unused-vars
+
+src/components/site/NavItemsMeta.js
+  Line 1:8:    'News' is defined but never used     no-unused-vars
+  Line 32:18:  Unexpected comma in middle of array  no-sparse-arrays
+
+src/components/tracker/CircuitContainer.js
+  Line 25:9:  'jumpToActive' is assigned a value but never used  no-unused-vars
+
+src/components/tracker/Cook.js
+  Line 2:8:  'AddProjectInterface' is defined but never used  no-unused-vars
+
+src/components/tracker/Ingredient.js
+  Line 20:8:  React Hook useEffect has a missing dependency: 'ingredient'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src/components/tracker/Ingredients.js
+  Line 296:11:  'importFromShopAndCook' is assigned a value but never used  no-unused-vars
+
+src/components/tracker/Journal.js
+  Line 110:12:  'isImageRowCollapsed' is assigned a value but never used     no-unused-vars
+  Line 110:33:  'setIsImageRowCollapsed' is assigned a value but never used  no-unused-vars
+  Line 111:12:  'isVideoRowCollapsed' is assigned a value but never used     no-unused-vars
+  Line 111:33:  'setIsVideoRowCollapsed' is assigned a value but never used  no-unused-vars
+
+src/components/tracker/Recipe.js
+  Line 50:38:    'setAutoCheckUnknownQuantity' is assigned a value but never used                                                            no-unused-vars
+  Line 1029:8:   React Hook useEffect has a missing dependency: 'getCachedInventoryState'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 1558:11:  'scaleIngredientRowQuantity' is assigned a value but never used                                                             no-unused-vars
+
+src/components/tracker/TrackRecipe.js
+  Line 584:8:  React Hook useEffect has a missing dependency: 'migrateExistingRecipeData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src/components/utils/Fuel.js
+  Line 34:11:  'selectedVehicle' is assigned a value but never used  no-unused-vars
+
+src/components/utils/LocalStorageImporter.js
+  Line 14:26:  eval can be harmful  no-eval
+
+src/components/utils/ScrollToTop.js
+  Line 1:8:  'React' is defined but never used  no-unused-vars
+
+src/components/utils/TradeView.js
+  Line 979:31:   Function declared in a loop contains unsafe references to variable(s) 'stooqOk'                                       no-loop-func
+  Line 1056:8:   React Hook useCallback has a missing dependency: 'fetchStooqPrice'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 1594:29:  The attribute aria-expanded is not supported by the role textbox. This role is implicit on the element input          jsx-a11y/role-supports-aria-props
+
+src/components/utils/Water.js
+  Line 168:12:  'isLoading' is assigned a value but never used  no-unused-vars
+
+src/components/waves/ConditionsDashboard.js
+  Line 18:8:  'SurfDashboard' is defined but never used  no-unused-vars
+
+src/components/waves/ForecastChart.js
+  Line 224:8:   React Hook useMemo has an unnecessary dependency: 'nowTs'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 444:15:  'formatTideTime' is assigned a value but never used                                                          no-unused-vars
+  Line 530:19:  'timeOfDay' is assigned a value but never used                                                               no-unused-vars
+  Line 696:19:  'windAvg' is assigned a value but never used                                                                 no-unused-vars
+
+src/components/waves/LogEntryFunctional.js
+  Line 7:8:     'group' is defined but never used                                                                             no-unused-vars
+  Line 11:8:    'validate' is defined but never used                                                                          no-unused-vars
+  Line 15:5:    'formatTime' is defined but never used                                                                        no-unused-vars
+  Line 169:8:   React Hook useEffect has a missing dependency: 'logExists'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 215:11:  'getSessionDetailsComment' is assigned a value but never used                                                 no-unused-vars
+  Line 374:15:  'submitMessage' is assigned a value but never used                                                            no-unused-vars
+  Line 399:15:  'saveMessage' is assigned a value but never used                                                              no-unused-vars
+
+src/components/waves/Session.js
+  Line 18:5:    'formatTime' is defined but never used                                                                                                                                 no-unused-vars
+  Line 568:8:   React Hook useEffect has missing dependencies: 'buildNewSessionLog', 'getSelectedLogData', and 'getSelectedLogId'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  Line 613:15:  'getPeriodLabel' is assigned a value but never used                                                                                                                    no-unused-vars
+  Line 711:11:  'handleEndDateChange' is assigned a value but never used                                                                                                               no-unused-vars
+  Line 770:11:  'formatDuration' is assigned a value but never used                                                                                                                    no-unused-vars
+
+src/components/waves/Sessions.js
+  Line 7:5:  'formatTime' is defined but never used  no-unused-vars
+
+src/components/waves/SurfLocation.js
+  Line 475:11:  'camButton' is assigned a value but never used  no-unused-vars
+
+src/components/waves/TideDisplay.js
+  Line 113:11:  'heightInit' is assigned a value but never used      no-unused-vars
+  Line 261:15:  'getTideDetails' is assigned a value but never used  no-unused-vars
+
+src/components/waves/WavesNew.js
+  Line 15:8:  'settings' is defined but never used          no-unused-vars
+  Line 31:9:  'setTide' is assigned a value but never used  no-unused-vars
+
+src/components/waves/Weather.js
+  Line 158:8:  React Hook useEffect has a missing dependency: 'REFRESH_INTERVAL_MS'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src/components/waves/useLocationData.js
+  Line 80:8:  React Hook useCallback has a missing dependency: 'coords'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+File sizes after gzip:
+
+  812.15 KB  build/static/js/2.05cde1ec.chunk.js
+  477.78 KB  build/static/js/main.2e052528.chunk.js
+  17.17 KB   build/static/css/main.0d1344d2.chunk.css
+  7.16 KB    build/static/css/2.4d33b256.chunk.css
+  778 B      build/static/js/runtime-main.1e567fd2.js
+
+The project was built assuming it is hosted at /reactor/.
+You can control this with the homepage field in your package.json.
+
+The build folder is ready to be deployed.
+
+Find out more about deployment here:
+
+  https://cra.link/deployment
+

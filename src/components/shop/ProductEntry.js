@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import getKey from '../utils/KeyGenerator.js';
 import Selector from '../forms/FunctionalSelector.js';
 import CurrencyInput from 'react-currency-input-field';
@@ -19,21 +19,9 @@ const ProductEntry = ({
         'Price',
         'Save'
     ];
-    const [Price, setPrice] = useState('');
-    const [debouncedPrice, setDebouncedPrice] = useState(Price);
-    const [Item, setItem] = useState(state.item);
+    const [, setPrice] = useState('');
+    const [Item] = useState(state.item);
     console.log(`ProductEntry => search: ${state.search} - Item: ${Item}`);
-
-    useEffect(() => {
-        const timerId = setTimeout(() => {
-            setDebouncedPrice(Price);
-        }, 1000);
-
-        return () => {
-            clearTimeout(timerId);
-        };
-        //debounceType(setDebouncedPrice, Price);
-    }, [Price]);
 
     const initState = () => {
         const initAdd = {
@@ -96,8 +84,8 @@ const ProductEntry = ({
             return <div className='m-20'>
                 <form onSubmit={itemEntry}>
                     <input
-                        id='search'
-                        name='search'
+                        id='product-entry-search'
+                        name='product-entry-search'
                         className='p-10 r-5 bg-dark white size25 glassy width-100-percent'
                         type='text'
                         value={initState().search}
@@ -120,7 +108,7 @@ const ProductEntry = ({
         }
         return <button>Add</button>
     }
-    const productEntry = <div id='settingsMenu' className='bg-dark'>
+    const productEntry = <div id='productEntryMenu' className='bg-dark'>
         {
             status.listItems.map((item, index) => {
                 return (

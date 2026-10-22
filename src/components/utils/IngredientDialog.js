@@ -1,8 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import EditableTextField from './EditableTextField';
-import { validate } from 'uuid';
 
 const itemsAmount = ['single item', 'multiple items'];
+
+const safeQuantityStr = (val) => {
+    if (val === null || val === undefined || val === '') return '';
+    if (typeof val === 'number') return Number.isNaN(val) ? '' : String(val);
+    const s = String(val).trim();
+    return (s === 'NaN' || s === 'null' || s === 'undefined') ? '' : s;
+};
+
+const formatIngredientsToText = (ingredientsArray) => {
+    if (!Array.isArray(ingredientsArray)) return '';
+    return ingredientsArray
+        .map(item => {
+            if (!Array.isArray(item)) return String(item || '').trim();
+            const quantity = safeQuantityStr(item[0]);
+            const unit = String(item[1] ?? '').trim();
+            const name = String(item[2] ?? '').trim();
+            return [quantity, unit, name].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+        })
+        .filter(Boolean)
+        .join('\n');
+};
 
 const IngredientDialog = ({ 
     isOpen, 
@@ -17,8 +36,7 @@ const IngredientDialog = ({
 }) => {
 
     const [ingredient, setIngredient] = useState('');
-    const [ingredients, setIngredients] = useState('');
-    const [recipeIngredients, setRecipeIngredients] = useState();
+    const [ingredientsText, setIngredientsText] = useState('');
     const [unit, setUnit] = useState('');
     const [quantity, setQuantity] = useState('');
     const [items, setItems] = useState(itemsAmount[0]);
@@ -27,55 +45,37 @@ const IngredientDialog = ({
     const handleUnitChange = (e) => setUnit(e.target.value);
     const handleQuantityChange = (e) => setQuantity(e.target.value);
 
-    const modifyArray = (arr) => {
-        return arr.map(item => {
-            console.log(`IngredientDialog => item: ${item}`)
-            if ((Number(item[0]) > 1) && (item[1][item[1].length - 1] !== 's')) item[1] += 's';
-            if (item[item.length - 1] === true || item[item.length - 1] === false) item.pop();
-            return item.join(' ');
-        });
-    };
-
     useEffect(() => {
         if (items === 'multiple items') {
-            const ingredientDisplay = modifyArray(recipe.ingredients).join('\n');
-            console.log(`IngredientDialog => ingredientDisplay: ${ingredientDisplay}`)
-            setIngredients(ingredientDisplay);
+            setIngredientsText(formatIngredientsToText(recipe.ingredients));
         }
-    }, [items]);
+    }, [items, recipe.ingredients]);
+
     useEffect(() => {
         if (isOpen && dialogType === 'edit') {
             setIngredient(recipe.ingredients[index][2]);
             setUnit(recipe.ingredients[index][1]);
             setQuantity(recipe.ingredients[index][0]);
         }
-    }, [isOpen]);
-    
-    useEffect(() => {
-        const newRecipeIngredients = [];
-        setRecipeIngredients(ingredients);
-    }, [ingredients]);
+    }, [isOpen, dialogType, index, recipe.ingredients]);
 
     const handleItemsChange = (e) => {
-        setItems(e.target.value)
+        setItems(e.target.value);
     };
 
     const handleSubmit = () => {
-
-        console.log(`handleSubmit => ${items} recipeIngredients: ${JSON.stringify(recipeIngredients, null, 2)}`);
-
         if (items === 'single item') {
+            const parsedQty = parseFloat(quantity);
             const ingredientData = {
                 ingredient,
                 unit,
-                quantity: parseFloat(quantity)
+                quantity: Number.isFinite(parsedQty) ? parsedQty : ''
             };
             onSubmitIngredient(ingredientData);
-            onClose();
         } else {
-            console.log(`handleSubmit => recipeIngredients: ${JSON.stringify(recipeIngredients, null, 2)}`);
-            onSubmitIngredients(recipeIngredients);
+            onSubmitIngredients(ingredientsText);
         }
+        onClose();
     };
 
     const handleCancel = () => {
@@ -83,8 +83,6 @@ const IngredientDialog = ({
     };
 
     if (!isOpen) return null;
-
-    const editRecipe = () => alert(`IngredientDialog => editRecipe`);
 
     return <div className='modal-overlay bg-tintedDark'>
         <div className='containerBox modal p-20 color-lite bg-lite'>
@@ -100,8 +98,7 @@ const IngredientDialog = ({
                         Items
                     </label>
                     <select
-                        className='containerBox 
-                                flex2Column'
+                        className='containerBox flex2Column'
                         id='items'
                         value={items}
                         onChange={handleItemsChange}
@@ -144,8 +141,7 @@ const IngredientDialog = ({
                                     Units
                                 </label>
                                 <select
-                                    className='containerBox 
-                                            flex2Column'
+                                    className='containerBox flex2Column'
                                     id='unit'
                                     value={unit}
                                     onChange={handleUnitChange}
@@ -180,14 +176,14 @@ const IngredientDialog = ({
                                 />
                             </div>
                         </div>
-                        : <div>
-                            <EditableTextField
-                                title='Ingredients:'
-                                data={recipe.ingredients}
-                                toggle={handleSubmit}
-                                edit={editRecipe}
-                                setEdited={setIngredients}
-                                edited={ingredients}
+                        : <div className='p-10'>
+                            <div className='p-10 color-yellow size15'>One ingredient per line (e.g. "1 cup flour")</div>
+                            <textarea
+                                className='containerBox width-100-percent'
+                                rows={10}
+                                value={ingredientsText}
+                                onChange={(e) => setIngredientsText(e.target.value)}
+                                placeholder={'1 cup flour\n2 tbsp butter\n0.5 teaspoon salt'}
                             />
                         </div>
                 }

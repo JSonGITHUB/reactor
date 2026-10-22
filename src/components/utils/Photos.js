@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 const Photos = () => {
 
     const KEY = process.env.REACT_APP_UNSPLASH_API_KEY;
-    const api = process.env.REACT_APP_UNSPLASH_API_BASE_URL;
 
     const [query, setQuery] = useState('');
     const [photos, setPhotos] = useState([]);
@@ -36,7 +35,7 @@ const Photos = () => {
                             alt={photo.alt_description}
                             className='width-100-percent'
                         />
-                        <div className='containerDetail color-dark copyright'>
+                        <div className='containerDetail color-lite copyright'>
                             {photo.alt_description}
                         </div>
                     </div>

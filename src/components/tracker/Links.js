@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import AddProjectInterface from './AddProjectInterface';
 import LinkSaver from './LinkSaver';
-import { currentTime, currentDate } from '../utils/CurrentCalendar';
 import initLinkTracking from './initLinkTracking';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
 import icons from '../site/icons';
@@ -10,12 +9,9 @@ import initializeData from '../utils/InitializeData';
 const Links = () => {
 
     const [links, setLinks] = useState(initializeData('linkTracking', initLinkTracking));
-    const [tracking, setTracking] = useState('links');
     const [initialized, setInitialized] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState();
     const [newProjectDescription, setNewProjectDescription] = useState('');
-
-    const targetElementRef = useRef(null);
 
     useEffect(() => {
         const storedLinks = initializeData('linkTracking', initLinkTracking);
@@ -27,12 +23,14 @@ const Links = () => {
     useEffect(() => {
         if (initialized) {
             let updatedTrackingData = [...links];
-            updatedTrackingData.map((group, groupIndex) => group.isCollapsed = isCollapsed);
+            updatedTrackingData.forEach((group) => {
+                group.isCollapsed = isCollapsed;
+            });
             setLinks(updatedTrackingData);
         } else {
             setInitialized(true);
         }
-    }, [isCollapsed]);
+    }, [isCollapsed]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (links !== undefined || links !== '') {
@@ -47,14 +45,13 @@ const Links = () => {
             const inLinkGroupTitle = (linkGroup) => linkGroup.title.toLowerCase().includes(searchTerm);
             const inLinkDescription = (link) => {
                 const result = link.description.toLowerCase().includes(searchTerm);
-                console.log(`Links => inLinkDescription => link.description: ${link.description} searchTerm: ${searchTerm} result: ${result}`);
                 return result;
             }
             const filteredLinks = [...links];
-            filteredLinks.map((linkGroup) => {
+            filteredLinks.forEach((linkGroup) => {
                 linkGroup.display = false;
                 if (linkGroup.links !== undefined) {
-                    linkGroup.links.map((link) => {
+                    linkGroup.links.forEach((link) => {
                         if ((inLinkGroupTitle(linkGroup) || inLinkDescription(link) || searchTerm === '' || searchTerm === ' ' || searchTerm === null)) {
                             link.display = true;
                             linkGroup.display = true;
@@ -64,18 +61,9 @@ const Links = () => {
             });
             setLinks(filteredLinks);
         }
-    }, [newProjectDescription]);
+    }, [newProjectDescription]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const addProject = () => {
-        const project = {
-            description: newProjectDescription,
-            createdDate: currentDate(),
-            startTime: currentTime(),
-            tasks: [],
-            journals: [],
-            totalTime: 0,
-            isCollapsed: false
-        };
         const addLinkGroup = () => {
             const updatedLinks = [...links];
             const title = newProjectDescription;
@@ -111,19 +99,15 @@ const Links = () => {
             <span className='size40 m-5'>{icons.links}</span> Links
         </div>
         <div className='containerDetail bg-lite ml-5 mr-5'>
-            {
-                (tracking !== '')
-                    ? <AddProjectInterface
-                        newProjectDescription={newProjectDescription}
-                        setNewProjectDescription={setNewProjectDescription}
-                        addProject={addProject}
-                        tracking={tracking}
-                    />
-                    : <React.Fragment></React.Fragment>
-            }
+            <AddProjectInterface
+                newProjectDescription={newProjectDescription}
+                setNewProjectDescription={setNewProjectDescription}
+                addProject={addProject}
+                tracking={'links'}
+            />
         </div>
         <div className='containerDetail m-5 bg-lite mb-5'>
-            <div className='containerBox'>
+            <div className='containerDetail p-10 color-yellow size20'>
                 <CollapseToggleButton
                     title={isCollapsed ? `Expand All` : `Collapse All`}
                     isCollapsed={isCollapsed}

@@ -149,7 +149,6 @@ const LoungeBeatPlayer = () => {
     };
 
     const schedule = (startTime) => {
-        const ctx = audioCtxRef.current;
         const beatDuration = 60 / tempo;
         const barDuration = beatDuration * 4;
 

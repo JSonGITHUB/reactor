@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import { PieChart, Pie, Cell, Tooltip } from 'recharts';
 import icons from '../site/icons';
 
@@ -10,11 +10,8 @@ const ActivitiesPieChart = ({
     categories
 }) => {
 
-    console.log(`ActivitiesPieChart => trainingData: ${JSON.stringify(trainingData, null, 2)}`);
-    console.log(`ActivitiesPieChart => goalData: ${JSON.stringify(goalData, null, 2)}`);
 
     const convertToDataFormat = (data) => {
-        //console.log(`convertToDataFormat => ${JSON.stringify(data, null, 2)}`)
         return data.map(item => ({
             name: item.skill,
             value: Number(item.percentage),
@@ -53,10 +50,6 @@ const ActivitiesPieChart = ({
         </Pie>
         <Tooltip />
     </PieChart>
-    const tooltipStyle = {
-        color: 'blue',
-        backgroundColor: '#00FF00',
-    };
     const customizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, name}) => {
         const radius = (innerRadius/2)+10;
         const x = cx + (radius*2.5) * Math.cos(-midAngle * RADIAN);

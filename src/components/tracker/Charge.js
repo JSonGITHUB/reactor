@@ -18,7 +18,7 @@ const Charge = ({
         newCharges[chargeProjectIndex].tasks[taskIndex].isCollapsed = taskCollapse;
         const dataToString = JSON.stringify(newCharges);
         localStorage.setItem('chargeTracking', dataToString);
-    }, [taskCollapse]);
+    }, [chargeProjectIndex, charges, taskCollapse, taskIndex]);
 
     const taskSessions = () => <div className='containerBox'>
                             {task.sessions.map((session, sessionIndex) => (

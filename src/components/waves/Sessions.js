@@ -1,117 +1,143 @@
+
 import React from 'react';
-import getKey from '../utils/KeyGenerator.js';
 import PostDirectory from './PostDirectory.js';
 import icons from '../site/icons.js';
+import {
+    normalizeSessionTime,
+    formatTime
+} from '../utils/sessionTimeUtils';
 
-const Sessions = ({ title, message }) => {
+const Sessions = () => {
 
     const [
         postDirectory, 
         setPostDirectory,
         getPost, 
-        getLastIndex,
-        getLastPost
+        getLastIndex
     ] = PostDirectory();
 
-    console.log(`Sessions => getLastPost: ${getLastPost()}`);
-    const getLog = () => window.location.pathname = '/reactor/Session';
+    const getLog = () => {
+        window.location.href = '/reactor/Session';
+    };
     const sessionClick = (item, spot) => {
-        localStorage.setItem('spot', spot)
-        localStorage.setItem('logId', item)
-        console.log(`sessionClick \n${item} --> \nSpot: ${spot}`);
+        localStorage.setItem('spot', spot);
+        localStorage.setItem('logId', item);
         getLog();
-    }
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    };
+
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     const suffix = ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th', 'th'];
     const conditionIcons = ['shaka', 'good', 'bad'];
     const conditions = ['Firing', 'Good', 'Bad'];
 
-    const sessions = () => postDirectory.map((item, index) => {
+    const getSessionTimestamp = (session) => {
+        const directDate = session?.Day?.Date ? new Date(session.Day.Date) : null;
+        if (directDate instanceof Date && !Number.isNaN(directDate.getTime())) {
+            return directDate.getTime();
+        }
 
-        const session = getPost(item);
-        console.log(`Sessions => session${index}: ${JSON.stringify(session, null, 2)}`)
+        const day = Number(session?.Day?.Day);
+        const month = Number(session?.Day?.Month);
+        const year = Number(session?.Day?.Year);
+        if (Number.isFinite(day) && Number.isFinite(month) && Number.isFinite(year)) {
+            const rebuilt = new Date(year, month - 1, day);
+            if (!Number.isNaN(rebuilt.getTime())) {
+                return rebuilt.getTime();
+            }
+        }
 
-        const DeleteButton = () => {
+        return 0;
+    };
 
-            const handleInnerClick = (e) => {
+    const sessions = () => {
+        const sessionRows = postDirectory
+            .map((id) => {
+                const session = getPost(id);
+                return { id, session };
+            })
+            .filter((entry) => entry.session !== null)
+            .sort((a, b) => getSessionTimestamp(b.session) - getSessionTimestamp(a.session));
+
+        return sessionRows.map(({ id: item, session }) => {
+            if (!session) {
+                return null;
+            }
+
+            const handleDelete = (e) => {
                 e.stopPropagation();
                 const id = item;
                 const newPostDirectory = [...postDirectory];
-                console.log(`PostDirectory => deletePost(${id})`)
                 const index = newPostDirectory.indexOf(String(id));
-                console.log(`${index} of ${newPostDirectory.length}`)
                 newPostDirectory.splice(index, 1);
-                console.log(`${index} of ${newPostDirectory.length}`)
                 localStorage.removeItem(id);
                 localStorage.setItem('lastPostId', `${newPostDirectory[getLastIndex()]}`);
                 setPostDirectory(newPostDirectory);
             };
 
-            return (
-                <div
-                    className="rt-25 t-0 r-5 size15 bg-lite bold color-yellow button pr-20 pl-20 pt-10 pb-10 contentRight"
-                    onClick={handleInnerClick}
-                >
-                    X
-                </div>
-            );
-
-        }
-
-        if (session !== null) {
-            const { Conditions, Location, Day, Surf, Swell1 } = session;
+            const { Conditions, Location, Day, Swell1, SessionTime } = session;
             const conditionsIndex = conditions.indexOf(Conditions.Conditions);
             const spot = Location.Break;
             const day = Day.Day;
             const month = months[Day.Month - 1];
             const year = Day.Year;
-            // eslint-disable-next-line
-            const conditionHeight = Surf.Height;
             const height = Swell1.Height;
             const direction = Swell1.Direction;
             const angle = Swell1.Angle;
             const interval = String(Swell1.Interval).replace('seconds', 'sec');
             const condition = conditionIcons[conditionsIndex];
-            
+
+            // Time display helpers
+            // Use robust session time normalization and formatting
+            const normSessionTime = normalizeSessionTime(SessionTime);
+            const startTime = normSessionTime.startTime;
+            const endTime = normSessionTime.endTime;
+            const accumulatedTime = normSessionTime.accumulatedTime;
+            const formatDuration = (minutes) => {
+                if (!minutes || isNaN(minutes)) return '';
+                const h = Math.floor(minutes / 60);
+                const m = minutes % 60;
+                return h > 0 ? `${h}h ${m}m` : `${m}m`;
+            };
             return (
-                <div className='App-content containerBox bg-veryLite button' onClick={() => sessionClick(item, spot)} key={getKey('link')}>
-                    <div className='containerBoxDetail width-100-percent'>
-                        <div className='containerBoxDetail bold color-yellow flexContainer'>
-                            <div className='flex1Auto contentLeft pl-10 pt-10'>
+                <div className='containerDetail bg-lite m-5 button color-lite' onClick={() => sessionClick(item, spot)} key={item}>
+                    <div className='width-100-percent'>
+                        <div className='containerDetail size20 color-yellow flexContainer'>
+                            <div className='flex1Auto contentLeft pl-10 p-10'>
                                 <span className='mr-10'>{icons.wave}</span>{spot}
                             </div>
-                            <DeleteButton />
+                            <div
+                                className='rt-25 t-0 r-5 size15 bg-lite bold color-yellow button pr-20 pl-20 pt-10 pb-10 contentRight'
+                                onClick={handleDelete}
+                            >
+                                X
+                            </div>
                         </div>
-                        <div className='size15 contentLeft pl-25'>
-                            <div className='bold'>{month + ' ' + day + suffix[Number(String(day).slice(-1))]} {year}</div>
+                        <div className='size15 contentLeft p-10'>
+                            <div>{month + ' ' + day + suffix[Number(String(day).slice(-1))]} {year}</div>
                             <div>
-                                <span>
-                                    {height}
-                                </span>
-                                <span className='ml-5'>
-                                    {direction}
-                                </span>
-                                <span className='ml-5'>
-                                    {angle}
-                                </span>
-                                <span className='ml-5'>
-                                    {interval}
-                                </span>
-                                <span className='ml-5'>
-                                    {icons[condition]}
-                                </span>
+                                <span>{height}</span>
+                                <span className='ml-5'>{direction}</span>
+                                <span className='ml-5'>{angle}</span>
+                                <span className='ml-5'>{interval}</span>
+                                <span className='ml-5'>{icons[condition]}</span>
+                            </div>
+                            <div className='mt-5'>
+                                <span className='bold'>Start:</span> {startTime}
+                                <span className='ml-10 bold'>End:</span> {endTime}
+                                <span className='ml-10 bold'>Duration:</span> {formatDuration(accumulatedTime)}
                             </div>
                         </div>
                     </div>
                 </div>
-            )
-        }
-        return '';
-    })
+            );
+        });
+    };
+
     const logSession = () => {
-        localStorage.removeItem('logId')
-        window.location.pathname = '/reactor/Session';
-    }
+        localStorage.removeItem('logId');
+        window.location.href = '/reactor/Session?new=1';
+    };
+
     return (
         <div className='fadeIn mt--30'>
             <div className='containerDetail color-yellow bg-blue m-5 p-22 size30 contentLeft'>
@@ -126,6 +152,6 @@ const Sessions = ({ title, message }) => {
             </div>
         </div>
     );
-}
+};
 
 export default Sessions;

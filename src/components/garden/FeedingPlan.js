@@ -69,6 +69,7 @@ const FeedingPlan = ({
                                                             }
                                                         </div>
                                                     }
+                                                    return null;
                                                 })
                                                 : (item === '')
                                                     ? null

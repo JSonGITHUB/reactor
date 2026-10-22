@@ -1,11 +1,9 @@
 import React, { useState, useContext, useEffect } from 'react';
 import Sounds from '../../sound/Sounds.js';
 import { PlayerContext } from '../../context/PlayerContext';
-import { validate } from 'uuid';
 import initializeData from '../../utils/InitializeData';
-import DialogBox from '../../site/DialogBox';
 import PlayerDialog from '../../utils/PlayerDialog';
-import { initNewPlayer, initPlayers } from './PlayerInit';
+import { initPlayers } from './PlayerInit';
 
 const CricketScore = ({ playerIndex, scoreIndex, updateScores, winner }) => {
 
@@ -13,56 +11,45 @@ const CricketScore = ({ playerIndex, scoreIndex, updateScores, winner }) => {
         players,
         setPlayers,
         edit,
-        setEdit,
-        editPlayer,
-        deletePlayer
+        setEdit
     } = useContext(PlayerContext);
 
-    const [refresh, setRefresh] = useState(false);
-
-    useEffect(() => {
-        setRefresh((prev) => !prev);
-    }, [players]);
-
     const getScore = () => {
-        if (players !== '[]' && players != [] && validate(players)) {
-            return (players[playerIndex].cricketScores)
-                    ? (players[playerIndex].cricketScores[scoreIndex]) 
-                    : 0;
+        if (
+            Array.isArray(players) &&
+            players.length > playerIndex &&
+            Array.isArray(players[playerIndex]?.cricketScores)
+        ) {
+            return players[playerIndex].cricketScores[scoreIndex] || 0;
         }
         const localPlayers = initializeData('players', initPlayers);
-        return (localPlayers[playerIndex].cricketScores)
+        return (localPlayers[playerIndex]?.cricketScores)
             ? (localPlayers[playerIndex].cricketScores[scoreIndex])
             : 0;
-        
-    }
+    };
+
     const [score, setScore] = useState(getScore());
+
     useEffect(() => {
         const player = players[playerIndex];
-        if (!players || players.length == 0 || players === '[]') {
+        if (!players || players.length === 0) {
             const localPlayers = initializeData('players', initPlayers);
             if (localPlayers) {
                 const newPlayers = [...localPlayers];
-                setPlayers(newPlayers)
+                setPlayers(newPlayers);
             }
-            throw new Error('Players not found');
+            return;
         } else if (!player) {
-            throw new Error('Player not found');
+            return;
         } else if (!Array.isArray(player.cricketScores)) {
-            throw new Error('cricketScores not found');
+            return;
         } else {
-            const cricketScores = player.cricketScores;
-            if (players != [] && players != '[]') {
-                if (players[playerIndex].cricketScores && players[playerIndex].cricketScores != [] && players[playerIndex].cricketScoresv != '[]') {
-                    setScore(players[playerIndex].cricketScores[scoreIndex]);
-                    setRefresh((prev) => !prev);
-                }
-            }
+            setScore(players[playerIndex].cricketScores[scoreIndex] || 0);
         }
-    }, [players]);
+    }, [players, playerIndex, scoreIndex, setPlayers]);
+
     // eslint-disable-next-line
     const dartsScores = ['-', '/', 'X', 'O'];
-    const getDartScore = (score) => <div className='white'>{dartsScores[score]}</div>;
 
     const addScore = () => {
         let newScore = Number(score) + 1;
@@ -74,40 +61,16 @@ const CricketScore = ({ playerIndex, scoreIndex, updateScores, winner }) => {
             total = total + score
         });
         newPlayers[playerIndex].dartsScore = total;
-        if (newPlayers != []) {
+        if (newPlayers.length > 0) {
             setPlayers(newPlayers);
         }
         
         Sounds.boop(winner, total);
         updateScores();
         setScore(newScore);
-        setRefresh(prev => !prev);
-    }
+    };
+
     const toggleEdit = () => setEdit(prev => !prev);
-    const editNav = () => {
-        if (edit) {
-            return <div className='subIndex t-0 relative flexContainer color-yellow p-1 bg-dkGreen r-5 bold'>
-                <div className="flex3Column"></div>
-                <div className="flex3Column">
-                    <div 
-                        title='edit'
-                        className='button color-green description r-5 p-5 m-5 bg-yellow' 
-                        onClick={() => editPlayer(playerIndex)}
-                    >
-                        EDIT
-                    </div>
-                    <div 
-                        title='delete'
-                        className='button color-red description r-5 p-5 m-5 bg-yellow' 
-                        onClick={() => deletePlayer(playerIndex)}
-                    >
-                        DELETE
-                    </div>
-                </div>
-                <div className="flex3Column"></div>
-            </div>
-        }
-    }
     
     return (
         <div>
@@ -127,15 +90,7 @@ const CricketScore = ({ playerIndex, scoreIndex, updateScores, winner }) => {
                 game='darts'
                 onClose={toggleEdit}
             />
-            {/*
-            <DialogBox
-                playerIndex={playerIndex}
-            />
-            editNav()
-            */}
         </div>
-    )
-
-}
-
+    );
+};
 export default CricketScore;

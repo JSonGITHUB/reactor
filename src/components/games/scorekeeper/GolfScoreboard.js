@@ -27,8 +27,6 @@ const GolfScoreboard = ({
         return count;
     }
     const toggleEdit = () => setEdit(prev => !prev);
-    const closeDialog = () => setPlayerDialog(false); 
-
     const golfScoreboard = () => <div className='bg-tinted p-10 m-5 r-10'>
         <div className=''>
             <PlayerDialog

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import getKey from '../utils/KeyGenerator';
 import initTasks from './initTasks';
 import initSession from './initSession';
 import initTask from './initTask';
@@ -137,7 +136,7 @@ const TaskProject = ({
         }
     };
 
-    return <div key={getKey(`${project.description}${projectIndex}`)} className=''>
+    return <div key={`task-project-${projectIndex}-${String(project?.description || 'project')}`} className=''>
                 <div className=''>
                     <div className='containerBox flexContainer'>
                         <div className='flex2Column color-yellow bold size25 contentLeft'>
@@ -182,7 +181,7 @@ const TaskProject = ({
                     {((isCollapsed ?? project.isCollapsed) || projectCollapse)
                         ? null
                         : project.tasks.map((task, taskIndex) => (
-                            <div key={getKey(`task${taskIndex}`)}>
+                            <div key={`task-project-item-${projectIndex}-${taskIndex}-${String(task?.description || 'task')}`}>
                                 <Task
                                     projects={projects}
                                     setProjects={setProjects}

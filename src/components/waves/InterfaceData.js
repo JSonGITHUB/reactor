@@ -1,6 +1,11 @@
 import angles from './Angles.js';
 import directions from './Directions.js';
 
+const temperatureSelections = [
+    '',
+    ...Array.from({ length: 101 }, (_, index) => String(index))
+];
+
 const InterfaceData = [{
     'description': 'Location',
     'group': [
@@ -415,6 +420,16 @@ const InterfaceData = [{
                 'choppy',
                 'victory at sea'
             ]
+        },
+        {
+            'type': 'selector',
+            'description': 'WaterTemp',
+            'selections': temperatureSelections
+        },
+        {
+            'type': 'selector',
+            'description': 'AirTemp',
+            'selections': temperatureSelections
         }
     ]
 },

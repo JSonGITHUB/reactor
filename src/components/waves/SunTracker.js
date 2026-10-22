@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import icons from '../site/icons';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
+import { fetchOpenMeteoJson, roundCoord } from '../../utils/openMeteoClient';
 
 const SunTracker = () => {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [sunrise, setSunrise] = useState(null);
     const [sunset, setSunset] = useState(null);
-    const [location, setLocation] = useState(null);
     const [error, setError] = useState(null);
     const [sunCollapse, setSunCollapse] = useState(true);
 
@@ -17,25 +17,51 @@ const SunTracker = () => {
     }, []);
 
     useEffect(() => {
+        let isMounted = true;
+        const controller = new AbortController();
+
         // Get user's geolocation
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                const { latitude, longitude } = position.coords;
-                setLocation({ lat: latitude, lng: longitude });
+                if (!isMounted) return;
+                const latitude = roundCoord(position.coords.latitude, 3);
+                const longitude = roundCoord(position.coords.longitude, 3);
 
                 // Fetch sunrise/sunset times
-                fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=sunrise,sunset&timezone=auto`)
-                    .then((res) => res.json())
+                fetchOpenMeteoJson(
+                    `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=sunrise,sunset&timezone=auto`,
+                    {
+                        cacheKey: `sun:${latitude}:${longitude}`,
+                        ttlMs: 30 * 60 * 1000,
+                        allowStaleOnError: true,
+                        fetchOptions: { signal: controller.signal }
+                    }
+                )
                     .then((data) => {
+                        if (!isMounted) return;
                         const sunriseTime = new Date(data.daily.sunrise[0]);
                         const sunsetTime = new Date(data.daily.sunset[0]);
                         setSunrise(sunriseTime);
                         setSunset(sunsetTime);
                     })
-                    .catch(() => setError('Failed to fetch sunrise/sunset times'));
+                    .catch((error) => {
+                        if (error?.name === 'AbortError') return;
+                        if (isMounted) {
+                            setError('Failed to fetch sunrise/sunset times');
+                        }
+                    });
             },
-            () => setError('Location access denied')
+            () => {
+                if (isMounted) {
+                    setError('Location access denied');
+                }
+            }
         );
+
+        return () => {
+            isMounted = false;
+            controller.abort();
+        };
     }, []);
 
     // Calculate time remaining until sunset

@@ -64,8 +64,7 @@
 }
 
 .selectedRoulette {
-    box-shadow: 0 0 10px 3px yellow;
-    outline: 3px solid yellow;
+    box-shadow: inset 0 0 1px 1px yellow;
 }
 
 .green {
@@ -122,7 +121,7 @@
 }
 
 .controls {
-    margin-top: 10px;
+    margin-top: 5px;
     font-size: 2.1rem;
 }
 
@@ -164,4 +163,47 @@ button:disabled {
 
 .status .black {
     color: #000;
+}
+
+/* Spin History Display */
+.spin-history {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    max-width: 100%;
+}
+
+.history-circle {
+    width: 35px;
+    height: 35px;
+    min-width: 35px;
+    border-radius: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease;
+    cursor: pointer;
+}
+
+.history-circle:hover {
+    transform: scale(1.15);
+    border-color: rgba(255, 215, 0, 0.8);
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+}
+
+.history-circle.red {
+    background: linear-gradient(135deg, #d22 0%, #a00 100%);
+}
+
+.history-circle.black {
+    background: linear-gradient(135deg, #333 0%, #000 100%);
+}
+
+.history-circle.green {
+    background: linear-gradient(135deg, #3eb573 0%, #2e8b57 100%);
 }

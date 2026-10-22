@@ -1,22 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import icons from '../site/icons';
-import getKey from '../utils/KeyGenerator';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
 import EditableTextField from '../utils/EditableTextField';
 import IngredientDialog from '../utils/IngredientDialog';
 import validate from '../utils/validate';
 import VulgarFractions from '../utils/VulgarFractions';
+import Sounds from '../sound/Sounds';
+import { IngredientContext } from '../context/IngredientContext';
+import {
+    getInventoryMatchDebugByNameFromStorage,
+    getInventoryStateByNameFromStorage,
+    queueCookRequiredNames,
+} from '../context/KitchenInventoryContext';
+import { parseIngredientLine } from './ingredientParsing';
 
 const Recipe = ({
-
     recipes,
     setRecipes,
     recipeGroupIndex,
     recipeIndex,
     recipe,
     setCollapseAll
-    
 }) => {
+    const { 
+        setIngredients, 
+        toggleIngredientStatus 
+    } = useContext(IngredientContext);
 
     const [collapsed, setCollapsed] = useState(recipe.collapsed);
     const [editTitle, setEditTitle] = useState(false);
@@ -34,6 +43,75 @@ const Recipe = ({
     const [index, setIndex] = useState();
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [dialogType, setDialogType] = useState();
+    const [help, setHelp] = useState(false);
+    const [factor, setFactor] = useState(1);
+    const [cartFeedback, setCartFeedback] = useState('');
+    const [showInventoryDebug, setShowInventoryDebug] = useState(false);
+    const [autoCheckUnknownQuantity, setAutoCheckUnknownQuantity] = useState(() => {
+        try {
+            return localStorage.getItem('recipeAutoCheckUnknownQuantity') === 'true';
+        } catch (error) {
+            return false;
+        }
+    });
+    const inventoryStateCacheRef = React.useRef(new Map());
+    const inventoryDebugCacheRef = React.useRef(new Map());
+
+    useEffect(() => {
+        if (!cartFeedback) return;
+
+        const timeoutId = setTimeout(() => {
+            setCartFeedback('');
+        }, 1800);
+
+        return () => clearTimeout(timeoutId);
+    }, [cartFeedback]);
+
+    useEffect(() => {
+        localStorage.setItem('recipeAutoCheckUnknownQuantity', String(autoCheckUnknownQuantity));
+    }, [autoCheckUnknownQuantity]);
+
+    useEffect(() => {
+        inventoryStateCacheRef.current.clear();
+        inventoryDebugCacheRef.current.clear();
+    }, [recipes]);
+
+    const getInventoryLookupKey = (ingredientName) => {
+        const normalized = normalizeIngredientKey(ingredientName);
+        return String(normalized || ingredientName || '').trim().toLowerCase();
+    };
+
+    const getCachedInventoryState = (ingredientName) => {
+        const cacheKey = getInventoryLookupKey(ingredientName);
+        if (!cacheKey) {
+            return getInventoryStateByNameFromStorage('');
+        }
+
+        const stateCache = inventoryStateCacheRef.current;
+        if (stateCache.has(cacheKey)) {
+            return stateCache.get(cacheKey);
+        }
+
+        const nextState = getInventoryStateByNameFromStorage(ingredientName);
+        stateCache.set(cacheKey, nextState);
+        return nextState;
+    };
+
+    const getCachedInventoryDebug = (ingredientName) => {
+        const cacheKey = getInventoryLookupKey(ingredientName);
+        if (!cacheKey) {
+            return getInventoryMatchDebugByNameFromStorage('');
+        }
+
+        const debugCache = inventoryDebugCacheRef.current;
+        if (debugCache.has(cacheKey)) {
+            return debugCache.get(cacheKey);
+        }
+
+        const nextDebug = getInventoryMatchDebugByNameFromStorage(ingredientName);
+        debugCache.set(cacheKey, nextDebug);
+        return nextDebug;
+    };
 
     const unitsOfMeasure = [
         'no unit label', 'unit', 'teaspoon', 'tablespoon', 'cup', 'milliliter', 'liter', 'fluid ounce',
@@ -42,6 +120,369 @@ const Recipe = ({
 
     const closeDialog = () => setDialogOpen(false);
     const valuesArray = [0, .25, .5, .75, 1];
+
+    const normalizeIngredientKey = (ingredientValue) => {
+        const unitAliases = {
+            tsp: 'teaspoon',
+            tsps: 'teaspoon',
+            teaspoon: 'teaspoon',
+            teaspoons: 'teaspoon',
+            tbsp: 'tablespoon',
+            tbsps: 'tablespoon',
+            tablespoon: 'tablespoon',
+            tablespoons: 'tablespoon',
+            cup: 'cup',
+            cups: 'cup',
+            oz: 'ounce',
+            ounce: 'ounce',
+            ounces: 'ounce',
+            lb: 'pound',
+            lbs: 'pound',
+            pound: 'pound',
+            pounds: 'pound',
+            g: 'gram',
+            gram: 'gram',
+            grams: 'gram',
+            kg: 'kilogram',
+            kilogram: 'kilogram',
+            kilograms: 'kilogram',
+            ml: 'milliliter',
+            milliliter: 'milliliter',
+            milliliters: 'milliliter',
+            l: 'liter',
+            liter: 'liter',
+            liters: 'liter',
+            bunch: 'bunch',
+            bunches: 'bunch',
+            handful: 'handful',
+            handfull: 'handful',
+            handfuls: 'handful',
+            handfulls: 'handful',
+            clove: 'clove',
+            cloves: 'clove',
+            stalk: 'stalk',
+            stalks: 'stalk',
+            pinch: 'pinch',
+            pinches: 'pinch'
+        };
+        const unitLabels = new Set(Object.values(unitAliases));
+        const descriptorWords = new Set([
+            'and',
+            'or',
+            'coarse',
+            'ground',
+            'fresh',
+            'freshly',
+            'finely',
+            'thinly',
+            'chopped',
+            'minced',
+            'diced',
+            'sliced',
+            'optional',
+            'to',
+            'taste'
+        ]);
+
+        const normalized = String(ingredientValue || '')
+            .toLowerCase()
+            .replace(/[_-]/g, ' ')
+            .replace(/[^a-z0-9\s/.,⁄-]/g, ' ')
+            .trim();
+
+        const sanitized = normalized
+            .replace(/\b\d+([.,]\d+)?\b/g, ' ')
+            .replace(/\b\d+[/⁄]\d+\b/g, ' ')
+            .replace(/[¼½¾⅓⅔⅛⅜⅝⅞]/g, ' ');
+
+        const tokens = normalized
+            .split(/\s+/)
+            .map(token => token.replace(/^[.,]+|[.,]+$/g, ''))
+            .map(token => unitAliases[token] || token)
+            .filter(Boolean);
+
+        const isNumberToken = (token) => {
+            return /^\d*\.?\d+$/.test(token)
+                || /^\d+\/\d+$/.test(token)
+                || /^[¼½¾⅓⅔⅛⅜⅝⅞]$/.test(token);
+        };
+
+        const sanitizedTokens = sanitized
+            .split(/\s+/)
+            .map(token => token.replace(/^[.,]+|[.,]+$/g, ''))
+            .map(token => unitAliases[token] || token)
+            .filter(Boolean);
+
+        const ingredientNameTokens = sanitizedTokens.filter(
+            token => !isNumberToken(token) && !unitLabels.has(token) && !descriptorWords.has(token)
+        );
+        const normalizedName = ingredientNameTokens.join(' ').replace(/\s+/g, ' ').trim();
+        return normalizedName || tokens
+            .filter(token => !isNumberToken(token) && !unitLabels.has(token) && !descriptorWords.has(token))
+            .join(' ')
+            .replace(/\s+/g, ' ')
+            .trim() || normalized;
+    };
+
+    const mergeIngredients = (previousIngredients, nextIngredients) => {
+        const current = Array.isArray(previousIngredients) ? previousIngredients : [];
+        const incoming = Array.isArray(nextIngredients) ? nextIngredients : [];
+        const merged = [...current, ...incoming];
+        const uniqueByIngredient = new Map();
+
+        merged.forEach(item => {
+            const key = normalizeIngredientKey(item);
+            if (!uniqueByIngredient.has(key)) {
+                uniqueByIngredient.set(key, item);
+            }
+        });
+
+        return Array.from(uniqueByIngredient.values());
+    };
+
+    const getUniqueIngredientLabels = (ingredientValues) => {
+        const labels = Array.isArray(ingredientValues)
+            ? ingredientValues.map((item) => String(item || '').trim()).filter(Boolean)
+            : [];
+        const uniqueByNormalizedKey = new Map();
+
+        labels.forEach((label) => {
+            const key = normalizeIngredientKey(label);
+            if (!uniqueByNormalizedKey.has(key)) {
+                uniqueByNormalizedKey.set(key, label);
+            }
+        });
+
+        return Array.from(uniqueByNormalizedKey.values());
+    };
+
+    const ingredientRowToLabel = (ingredientRow) => {
+        if (!Array.isArray(ingredientRow)) return '';
+
+        let quantity = ingredientRow[0] ?? '';
+        let unit = ingredientRow[1] ?? '';
+        let name = ingredientRow[2] ?? '';
+
+        // Handle malformed legacy rows that look like ["lemon", false, "ingredient-..."]
+        if (
+            typeof quantity === 'string'
+            && typeof unit === 'boolean'
+            && typeof name === 'string'
+            && name.startsWith('ingredient-')
+        ) {
+            name = quantity;
+            quantity = '';
+            unit = '';
+        }
+
+        if (typeof unit === 'boolean') unit = '';
+        if (typeof name === 'boolean') name = '';
+        if (typeof name === 'string' && name.startsWith('ingredient-')) name = '';
+
+        const quantityStr = (typeof quantity === 'number' && Number.isNaN(quantity)) ? '' : String(quantity ?? '').trim();
+        const cleanQuantity = (quantityStr === 'NaN' || quantityStr === 'null' || quantityStr === 'undefined') ? '' : quantityStr;
+        return [cleanQuantity, String(unit).trim(), String(name).trim()]
+            .filter(Boolean)
+            .join(' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    };
+
+    const getIngredientDisplayFields = (item) => {
+        if (!Array.isArray(item)) {
+            return { quantity: '', unit: '', name: '' };
+        }
+
+        let quantity = item[0] ?? '';
+        let unit = item[1] ?? '';
+        let name = item[2] ?? '';
+
+        if (
+            typeof quantity === 'string'
+            && typeof unit === 'boolean'
+            && typeof name === 'string'
+            && name.startsWith('ingredient-')
+        ) {
+            name = quantity;
+            quantity = '';
+            unit = '';
+        }
+
+        if (typeof unit === 'boolean') unit = '';
+        if (typeof name === 'boolean') name = '';
+        if (typeof name === 'string' && name.startsWith('ingredient-')) name = '';
+
+        if (!name && typeof quantity === 'string' && quantity.trim() !== '' && Number.isNaN(Number(quantity))) {
+            name = quantity;
+            quantity = '';
+            unit = '';
+        }
+
+        return { quantity, unit, name };
+    };
+
+    const extractUncheckedIngredientLabels = (value) => {
+        if (!Array.isArray(value)) return [];
+
+        return value.flatMap((item) => {
+            // Direct recipe ingredient row: [qty, unit, name, checked, id]
+            if (Array.isArray(item)) {
+                const isChecked = Boolean(item[3]);
+                if (isChecked) {
+                    return [];
+                }
+                const label = ingredientRowToLabel(item);
+                return label ? [label] : [];
+            }
+
+            // Instruction step with nested ingredient rows.
+            if (item && typeof item === 'object' && Array.isArray(item.ingredients)) {
+                return item.ingredients
+                    .filter((ingredientRow) => !Boolean(ingredientRow?.[3]))
+                    .map(ingredientRowToLabel)
+                    .filter(Boolean);
+            }
+
+            return [];
+        });
+    };
+
+    const getUncheckedIngredientCount = (value) => {
+        const uncheckedLabels = getUniqueIngredientLabels(extractUncheckedIngredientLabels(value));
+        return uncheckedLabels.length;
+    };
+
+    const addIngredientsToCart = (value) => {
+        const ingredientLabels = extractUncheckedIngredientLabels(value);
+
+        if (!ingredientLabels.length) {
+            setCartFeedback('No unchecked ingredients to add');
+            return;
+        }
+
+        const normalizedIngredientLabels = getUniqueIngredientLabels(ingredientLabels);
+        if (normalizedIngredientLabels.length === 0) {
+            setCartFeedback('No ingredients were added');
+            return;
+        }
+
+        const uncheckedIngredientLabels = normalizedIngredientLabels;
+
+        // Ensure added items are not auto-marked checked from persisted stale status.
+        uncheckedIngredientLabels.forEach((ingredientName) => {
+            toggleIngredientStatus(ingredientName, false);
+        });
+
+        setIngredients((previousIngredients) => mergeIngredients(previousIngredients, uncheckedIngredientLabels));
+
+        const requiredIngredientNames = uncheckedIngredientLabels
+            .map((label) => normalizeIngredientKey(label))
+            .map((label) => String(label || '').trim())
+            .filter(Boolean);
+        const addedCount = queueCookRequiredNames(requiredIngredientNames);
+
+        if (addedCount > 0) {
+            setCartFeedback(`Added ${addedCount} ingredient${addedCount === 1 ? '' : 's'} to cart`);
+        } else {
+            setCartFeedback('All ingredients are already in the cart');
+        }
+    };
+
+    const getInventoryBadge = (ingredientName) => {
+        const state = getCachedInventoryState(ingredientName);
+        const debug = showInventoryDebug ? getCachedInventoryDebug(ingredientName) : null;
+
+        const debugLabel = debug
+            ? `dbg: lookup="${debug.comparableLookupName || debug.normalizedLookupName || debug.lookup}" match="${debug.comparableMatchedName || debug.matchedName || 'none'}" id="${debug.matchedId || 'none'}" qty="${debug.state?.quantityValue ?? 'unknown'}" expired=${Boolean(debug.state?.expired)} out=${Boolean(debug.state?.outOfStock)} unknown=${Boolean(debug.state?.unknownQuantity)}`
+            : '';
+
+        let statusLabel = 'not in stock';
+        let statusClass = 'ml-10 size15 color-yellow';
+
+        if (state.inStock) {
+            statusLabel = 'in stock';
+            statusClass = 'ml-10 size15 color-neogreen';
+        } else if (state.expired) {
+            statusLabel = 'expired - needs purchase';
+        } else if (state.exists && state.unknownQuantity) {
+            statusLabel = 'quantity unknown';
+        } else if (state.exists && state.outOfStock) {
+            statusLabel = 'out of stock';
+        }
+
+        return <span className={statusClass}>
+            {statusLabel}
+            <span
+                className='ml-5 button size12 color-soft'
+                title='toggle inventory debug details'
+                onClick={(event) => {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    setShowInventoryDebug((previous) => !previous);
+                }}
+            >
+                🐞
+            </span>
+            {
+                showInventoryDebug
+                    ? <span className='ml-10 size10 color-soft'>{debugLabel}</span>
+                    : null
+            }
+        </span>;
+    };
+
+    const refreshPage = () => {
+        // Store the recipe that was just edited before refresh
+        localStorage.setItem('lastEditedRecipe', JSON.stringify({
+            recipeGroupIndex,
+            recipeIndex,
+            recipeName: recipe.dish
+        }));
+        window.location.reload();
+    };
+
+    const createListItemId = (prefix = 'item') => {
+        return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+    };
+
+    const ensureIngredientId = (ingredient, prefix = 'ingredient') => {
+        if (!Array.isArray(ingredient)) return ingredient;
+        const normalizedIngredient = [...ingredient];
+        if (typeof normalizedIngredient[3] !== 'boolean') {
+            normalizedIngredient[3] = Boolean(normalizedIngredient[3]);
+        }
+        if (!normalizedIngredient[4]) {
+            normalizedIngredient[4] = createListItemId(prefix);
+        }
+        return normalizedIngredient;
+    };
+
+    const ensureInstructionId = (instruction, prefix = 'instruction') => {
+        if (typeof instruction === 'string') {
+            return {
+                id: createListItemId(prefix),
+                step: instruction,
+                ingredients: []
+            };
+        }
+
+        if (!instruction || typeof instruction !== 'object') {
+            return {
+                id: createListItemId(prefix),
+                step: '',
+                ingredients: []
+            };
+        }
+
+        return {
+            ...instruction,
+            id: instruction.id || createListItemId(prefix),
+            ingredients: (Array.isArray(instruction.ingredients) ? instruction.ingredients : []).map((ingredient) =>
+                ensureIngredientId(ingredient, `${prefix}-ingredient`)
+            )
+        };
+    };
+
     const roundToNearest = (value) => {
         const wholePart = Math.floor(value);
         const decimalPart = value - wholePart;
@@ -52,44 +493,66 @@ const Recipe = ({
     };
     useEffect(() => {
         if (editRecipe && editedRecipe !== null) {
-            console.log(`editedRecipe: ${editedRecipe}`);
             setEdit(true);
         }
-    },[editedRecipe])
-
+    }, [editRecipe, editedRecipe])
     useEffect(() => {
         const newRecipes = [...recipes];
         const selectedNewRecipe = newRecipes[recipeGroupIndex].recipes[recipeIndex];
         let dataUpdated = false;
         if (validate(selectedNewRecipe.ingredients) === null) {
-            console.log(`[] => selectedNewRecipe: ${JSON.stringify(selectedNewRecipe, null, 2)}`);
-            selectedNewRecipe.ingredients = [
-                []
-            ];
+            selectedNewRecipe.ingredients = [];
             dataUpdated = true;
         } else if (typeof selectedNewRecipe.ingredients === 'string') {
-            console.log(`[] => String => selectedNewRecipe.ingredients: ${JSON.stringify(selectedNewRecipe.ingredients, null, 2)}`);
             selectedNewRecipe.ingredients = [selectedNewRecipe.ingredients];
             dataUpdated = true;
+        } else if (Array.isArray(selectedNewRecipe.ingredients)) {
+            const validIngredients = selectedNewRecipe.ingredients.filter((item) => {
+                if (!Array.isArray(item)) return false;
+                const ingredientLabel = item[2];
+                if (validate(ingredientLabel) === null) return false;
+                const normalized = String(ingredientLabel).trim().toLowerCase();
+                return normalized !== '' && normalized !== 'undefined';
+            });
+            const normalizedIngredients = validIngredients.map((item) => ensureIngredientId(item));
+            const hadInvalidIngredients = validIngredients.length !== selectedNewRecipe.ingredients.length;
+            const hadMissingIngredientIds = normalizedIngredients.some((item, itemIndex) => item[4] !== validIngredients[itemIndex]?.[4]);
+            if (hadInvalidIngredients || hadMissingIngredientIds) {
+                selectedNewRecipe.ingredients = normalizedIngredients;
+                dataUpdated = true;
+            }
         }
         if (validate(selectedNewRecipe.instructions) === null) {
             //selectedNewRecipe.instructions = [];
+            selectedNewRecipe.instructions = [];
+            dataUpdated = true;
+        } else if (typeof selectedNewRecipe.instructions === 'string') {
             selectedNewRecipe.instructions = [
                 {
-                    step: "Add the following ingredients to a bowl.",
-                    ingredients: [
-                        [
-                            1,
-                            "tsp",
-                            "Garlic"
-                        ]
-                    ]
+                    id: createListItemId('instruction'),
+                    step: selectedNewRecipe.instructions,
+                    ingredients: []
                 }
             ];
             dataUpdated = true;
-        } else if (typeof selectedNewRecipe.instructions === 'string') {
-            selectedNewRecipe.instructions = [selectedNewRecipe.instructions];
-            dataUpdated = true;
+        } else if (Array.isArray(selectedNewRecipe.instructions)) {
+            const normalizedInstructions = selectedNewRecipe.instructions.map((instruction) =>
+                ensureInstructionId(instruction)
+            );
+            const hadInstructionShapeChanges = normalizedInstructions.some((instruction, instructionIndex) => {
+                const originalInstruction = selectedNewRecipe.instructions[instructionIndex];
+                if (typeof originalInstruction === 'string') return true;
+                if (!originalInstruction?.id) return true;
+                const originalIngredients = Array.isArray(originalInstruction?.ingredients) ? originalInstruction.ingredients : [];
+                return originalIngredients.some((ingredient, ingredientIndex) => {
+                    const normalizedIngredient = instruction.ingredients?.[ingredientIndex];
+                    return Array.isArray(ingredient) && normalizedIngredient?.[4] !== ingredient?.[4];
+                });
+            });
+            if (hadInstructionShapeChanges) {
+                selectedNewRecipe.instructions = normalizedInstructions;
+                dataUpdated = true;
+            }
         }
         if (selectedNewRecipe.discription) {
             selectedNewRecipe.description = selectedNewRecipe.discription;
@@ -101,29 +564,55 @@ const Recipe = ({
         if (selectedNewRecipe.description === '') {
             //setEdit(true);
         }
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         const newRecipes = [...recipes];
         const selectedNewRecipe = newRecipes[recipeGroupIndex].recipes[recipeIndex];
         selectedNewRecipe.collapseIngredients = collapseIngredients;
         localStorage.setItem('recipeTracking', JSON.stringify(newRecipes));
-    }, [collapseIngredients]);
+    }, [collapseIngredients, recipeGroupIndex, recipeIndex, recipes]);
 
     useEffect(() => {
         const newRecipes = [...recipes];
         const selectedNewRecipe = newRecipes[recipeGroupIndex].recipes[recipeIndex];
         selectedNewRecipe.collapseInstructions = collapseInstructions;
         localStorage.setItem('recipeTracking', JSON.stringify(newRecipes));
-    }, [collapseInstructions]);
+    }, [collapseInstructions, recipeGroupIndex, recipeIndex, recipes]);
 
     useEffect(() => {
-        const newRecipes = [...recipes];
-        const selectedNewRecipe = newRecipes[recipeGroupIndex].recipes[recipeIndex];
-        selectedNewRecipe.isCollapsed = collapsed;
-        selectedNewRecipe.collapsed = collapsed;
-        localStorage.setItem('recipeTracking', JSON.stringify(newRecipes));
-    }, [collapsed]);
+        setRecipes((previousRecipes) => {
+            if (!Array.isArray(previousRecipes)
+                || !previousRecipes[recipeGroupIndex]
+                || !Array.isArray(previousRecipes[recipeGroupIndex].recipes)
+                || !previousRecipes[recipeGroupIndex].recipes[recipeIndex]) {
+                return previousRecipes;
+            }
+
+            const currentRecipe = previousRecipes[recipeGroupIndex].recipes[recipeIndex];
+            if (currentRecipe.isCollapsed === collapsed && currentRecipe.collapsed === collapsed) {
+                return previousRecipes;
+            }
+
+            const updatedRecipes = [...previousRecipes];
+            const updatedGroupRecipes = [...updatedRecipes[recipeGroupIndex].recipes];
+            updatedGroupRecipes[recipeIndex] = {
+                ...currentRecipe,
+                isCollapsed: collapsed,
+                collapsed: collapsed
+            };
+            updatedRecipes[recipeGroupIndex] = {
+                ...updatedRecipes[recipeGroupIndex],
+                recipes: updatedGroupRecipes
+            };
+            localStorage.setItem('recipeTracking', JSON.stringify(updatedRecipes));
+            return updatedRecipes;
+        });
+    }, [collapsed, recipeGroupIndex, recipeIndex, setRecipes]);
+
+    useEffect(() => {
+        setCollapsed(recipe.isCollapsed ?? recipe.collapsed ?? true);
+    }, [recipe.isCollapsed, recipe.collapsed]);
 
     const toggleEditTitle = () => {
         const toggleTitle = (editTitle)
@@ -164,28 +653,14 @@ const Recipe = ({
         const flushBuffer = () => {
             if (section === 'Ingredients') {
                 ingredients = buffer
-                    .map(line => {
-                        const parts = line.trim().split(/\s+/); // split by whitespace
-                        if (parts.length >= 3) {
-                            const [quantity, unit, ...rest] = parts;
-                            const name = rest.join(' ');
-                            // Skip if any part is literally 'undefined'
-                            if (
-                                quantity.toLowerCase() === 'undefined' ||
-                                unit.toLowerCase() === 'undefined' ||
-                                name.toLowerCase() === 'undefined'
-                            ) {
-                                return null;
-                            }
-                            return [quantity, unit, name];
+                    .map((line) => {
+                        const parsed = parseIngredientLine(line);
+                        if (!parsed) {
+                            return null;
                         }
-
-                        // Optional: also skip single-word lines like just 'undefined'
-                        if (line.toLowerCase() === 'undefined') return null;
-
-                        return null; // skip malformed entries
+                        return [parsed.quantity, parsed.unit, parsed.name, false, createListItemId('ingredient')];
                     })
-                    .filter(Boolean); // remove nulls
+                    .filter(Boolean);
             } else if (section === 'Cooking Instructions') {
                 description = buffer
                     .join('\n')
@@ -196,6 +671,7 @@ const Recipe = ({
                 instructions = buffer
                     .filter(Boolean)
                     .map(line => ({
+                        id: createListItemId('instruction'),
                         step: line,
                         ingredients: [] // or extract matched ingredients here if needed
                     }));
@@ -294,21 +770,23 @@ const Recipe = ({
                 recipes: updatedGroupRecipes
             };
             setRecipes(newRecipes);
+            refreshPage();
         }
     }
 
     const toggleEditIngredients = () => {
-        console.log(`toggleEditIngredients => editedIngredients: ${JSON.stringify(editedIngredients, null, 2)}`);
         const toggleIngredients = (editIngredients)
             ? false
             : true;
         const wasIngredientsEdited = (recipe.ingredients !== editedIngredients) ? true : false;
         setEditIngredients(toggleIngredients);
-        setEditedIngredients((toggleIngredients) ? recipe.ingredients : '');
+        setEditedIngredients((toggleIngredients) ? ingredientsToEditorText(recipe.ingredients) : '');
         if (!toggleIngredients && wasIngredientsEdited) {
             const newRecipes = [...recipes];
             const selectedNewRecipe = newRecipes[recipeGroupIndex].recipes[recipeIndex];
-            selectedNewRecipe.ingredients = (wasIngredientsEdited) ? editedIngredients : selectedNewRecipe.ingredients;
+            selectedNewRecipe.ingredients = (wasIngredientsEdited)
+                ? parseIngredientEditorText(editedIngredients)
+                : selectedNewRecipe.ingredients;
             setRecipes(newRecipes);
         }
     }
@@ -333,7 +811,7 @@ const Recipe = ({
             if (index >= 0 && index < array.length) {
                 array.splice(index, 1);
             } else {
-                console.error("Index out of range");
+                //console.error("Index out of range");
             }
         };
         if (toggle) {
@@ -344,12 +822,22 @@ const Recipe = ({
     }
     const ifUndefinedArray = (value) => (validate(value) === null) ? [] : value;
     const addIngredient = (newIngredient) => {
-        console.log(`addIngredient=> newIngredient: ${JSON.stringify(newIngredient, null, 2)}`);
         const newRecipes = [...recipes];
         const selectedNewRecipe = newRecipes[recipeGroupIndex].recipes[recipeIndex];
         const { ingredient, unit, quantity } = newIngredient;
-        const unitLabel = (unit.includes('no unit label')) ? '' : unit;
-        const ingredientData = [Number(quantity), unitLabel, ingredient, false];
+        const unitLabel = (unit && unit.includes('no unit label')) ? '' : (unit || '');
+        const existingIngredientId = (category.toLowerCase().includes('ingredient') && dialogType === 'edit')
+            ? selectedNewRecipe.ingredients?.[index]?.[4]
+            : null;
+        const parsedQty = typeof quantity === 'number' ? quantity : parseFloat(String(quantity ?? ''));
+        const safeQuantity = Number.isFinite(parsedQty) ? parsedQty : '';
+        const ingredientData = [
+            safeQuantity,
+            unitLabel,
+            ingredient,
+            false,
+            existingIngredientId || createListItemId('ingredient')
+        ];
         if (category.toLowerCase().includes('ingredient')) {
             if (dialogType === 'edit') {
                 selectedNewRecipe.ingredients[index] = ingredientData;
@@ -362,64 +850,83 @@ const Recipe = ({
         setRecipes(newRecipes);
 
     }
-    const splitAndCombine = (value) => {
-        const originalIndex = value.split(' ');
-        const newIndex = [];
-        newIndex.push(originalIndex[0]);
-        newIndex.push(originalIndex[1]);
-        if (originalIndex.length > 2) {
-            newIndex.push(originalIndex.slice(2).join(' '));
-        }
-        return newIndex;
-    }
-    const formatIngredient = (newIngredients) => {
-        const ingredients = [];
-        const ingredientConfig = String(newIngredients).split('\n').map(
-            (ingredient, index) => {
-                const ingredientArray = condenseArray(ingredient.split(' '));
-                const newIngredient = splitAndCombine(ingredientArray)
-                ingredients.push(newIngredient);
-            }
-        );
-        console.log(`formatIngredient => ingredientConfig: ${JSON.stringify(ingredientConfig, null, 2)}`);
+    const sanitizeIngredientEditorText = (value) => {
+        return String(value || '')
+            .replace(/\b(?:true|false)\b/gi, '')
+            .replace(/ingredient-[a-z0-9-]+/gi, '')
+            .replace(/,+/g, ',')
+            .replace(/\r/g, '')
+            .replace(/[ \t]+\n/g, '\n')
+            .replace(/\n[ \t]+/g, '\n')
+            .trim();
     };
-    const condenseArray  = (originalArray) => {
-        if (originalArray.length < 3) {
-            return originalArray;
+
+    const ingredientRowToEditorLine = (row) => {
+        const { quantity, unit, name } = getIngredientDisplayFields(row);
+        return `${quantity || ''} ${unit || ''} ${name || ''}`.replace(/\s+/g, ' ').trim();
+    };
+
+    const ingredientsToEditorText = (rows) => {
+        if (!Array.isArray(rows)) {
+            return '';
         }
-        const condensedArray = [
-            originalArray[0],
-            originalArray[1],
-            originalArray.slice(2).join(' ')
-        ];
-        return condensedArray;
-    }
+        return rows
+            .map(ingredientRowToEditorLine)
+            .filter(Boolean)
+            .join('\n');
+    };
+
+    const parseIngredientEditorText = (value) => {
+        const sanitized = sanitizeIngredientEditorText(value);
+        if (!sanitized) {
+            return [];
+        }
+
+        let lines = sanitized
+            .split('\n')
+            .map((line) => line.trim())
+            .filter(Boolean);
+
+        // Recover from legacy comma-flattened array output by splitting into separate entries.
+        if (lines.length === 1 && lines[0].includes(',')) {
+            lines = lines[0]
+                .split(',')
+                .map((token) => token.trim())
+                .filter(Boolean);
+        }
+
+        return lines
+            .map((line) => {
+                const parsed = parseIngredientLine(line);
+                if (!parsed) {
+                    return null;
+                }
+
+                const parsedQuantity = Number(parsed.quantity);
+                return [
+                    parsed.quantity === '' || Number.isNaN(parsedQuantity) ? parsed.quantity : parsedQuantity,
+                    parsed.unit,
+                    parsed.name,
+                    false,
+                    createListItemId('ingredient')
+                ];
+            })
+            .filter(Boolean);
+    };
 
     const addIngredients = (newIngredients) => {
-        //
-        console.log(`addIngredients => newIngredients1: ${JSON.stringify(newIngredients, null, 2)}`);
-        const ingredientArray = newIngredients.split('\n').map((ingredient) => {
-            return {
-                ingredients: [
-                    condenseArray(ingredient.split(' '))
-                ]
-            }
-        });
-        console.log(`addIngredients => ingredientArray: ${JSON.stringify(ingredientArray, null, 2)}`);
         const newRecipes = [...recipes];
         const selectedNewRecipe = newRecipes[recipeGroupIndex].recipes[recipeIndex];
-        const ingredientData = newIngredients.split('\n').map((ingredient) => condenseArray(ingredient.split(' ')));
-        console.log(`addIngredients => ingredientData: ${JSON.stringify(ingredientData, null, 2)}`);
+        const ingredientData = parseIngredientEditorText(newIngredients);
         selectedNewRecipe.ingredients = ingredientData;
-        console.log(`addIngredients => newRecipes: ${JSON.stringify(newRecipes, null, 2)}`);
+        selectedNewRecipe.isCollapsed = false;
+        selectedNewRecipe.collapsed = false;
         setRecipes(newRecipes);
     }
 
     const addCheckbox = (category, index) => {
-        //console.log(`addCheckbox => category: ${category}`)
         const newRecipes = [...recipes];
         const selectedNewRecipe = newRecipes[recipeGroupIndex].recipes[recipeIndex];
-        //console.log(`addCheckbox => selectedNewRecipe: ${JSON.stringify(selectedNewRecipe, null, 2)}`)
         if (category.toLowerCase().includes('ingredient')) {
             setDialogType('add');
             setCategory(category);
@@ -429,6 +936,7 @@ const Recipe = ({
             if (index === null) {
                 const newInstruction = prompt(`Add a new instruction:`, '');
                 const step = {
+                    id: createListItemId('instruction'),
                     step: newInstruction,
                     ingredients: []
                 }
@@ -442,21 +950,83 @@ const Recipe = ({
             }
         }
     }
-    const toggleCheckbox = (category, index, ingredientIndex) => {
-        setCollapseAll(false);
+    const toggleCheckbox = (category, index, ingredientIndex, options = {}) => {
+        setCollapseAll(undefined);
         const newRecipes = [...recipes];
-        const selectedNewRecipe = newRecipes[recipeGroupIndex].recipes[recipeIndex];
-        if (category === 'ingredients') {
-            const ingredientPrepared = (selectedNewRecipe.ingredients[index][3]) ? false : true;
+        const selectedNewRecipe = newRecipes?.[recipeGroupIndex]?.recipes?.[recipeIndex];
+        if (!selectedNewRecipe) {
+            return;
+        }
+
+        if (category.toLowerCase().includes('ingredient')) {
+            const ingredientPrepared = selectedNewRecipe.ingredients[index][3] ? false : true;
             selectedNewRecipe.ingredients[index][3] = ingredientPrepared;
-            setRecipes(newRecipes);
-        } else if (category === 'instructions') {
-            const ingredient = selectedNewRecipe.instructions[index].ingredients[ingredientIndex];
-            const ingredientAdded = (ingredient[3]) ? false : true;
-            ingredient[3] = ingredientAdded;
-            setRecipes(newRecipes);
+        } else if (category.toLowerCase().includes('instruction')) {
+            const ingredientPrepared = selectedNewRecipe.instructions[index].ingredients[ingredientIndex][3] ? false : true;
+            selectedNewRecipe.instructions[index].ingredients[ingredientIndex][3] = ingredientPrepared;
+        }
+
+        setRecipes(newRecipes);
+        if (options.playSound !== false) {
+            playSound();
         }
     }
+
+    useEffect(() => {
+        setRecipes((previousRecipes) => {
+            if (!Array.isArray(previousRecipes)
+                || !previousRecipes[recipeGroupIndex]
+                || !previousRecipes[recipeGroupIndex].recipes
+                || !previousRecipes[recipeGroupIndex].recipes[recipeIndex]) {
+                return previousRecipes;
+            }
+
+            const currentRecipe = previousRecipes[recipeGroupIndex].recipes[recipeIndex];
+            if (!Array.isArray(currentRecipe.ingredients) || currentRecipe.ingredients.length === 0) {
+                return previousRecipes;
+            }
+
+            let changed = false;
+            const updatedIngredients = currentRecipe.ingredients.map((ingredientRow) => {
+                if (!Array.isArray(ingredientRow)) return ingredientRow;
+                if (Boolean(ingredientRow[3])) return ingredientRow;
+
+                const { name } = getIngredientDisplayFields(ingredientRow);
+                const normalizedName = String(name || '').trim();
+                if (!normalizedName) return ingredientRow;
+
+                const inventoryState = getCachedInventoryState(normalizedName);
+                const treatUnknownAsInStock = autoCheckUnknownQuantity && Boolean(inventoryState?.unknownQuantity);
+                const shouldAutoCheck = Boolean(inventoryState?.inStock) || treatUnknownAsInStock;
+
+                if (!shouldAutoCheck) {
+                    return ingredientRow;
+                }
+
+                changed = true;
+                const nextRow = [...ingredientRow];
+                nextRow[3] = true;
+                return nextRow;
+            });
+
+            if (!changed) {
+                return previousRecipes;
+            }
+
+            const updatedRecipes = [...previousRecipes];
+            const updatedGroupRecipes = [...updatedRecipes[recipeGroupIndex].recipes];
+            updatedGroupRecipes[recipeIndex] = {
+                ...currentRecipe,
+                ingredients: updatedIngredients
+            };
+            updatedRecipes[recipeGroupIndex] = {
+                ...updatedRecipes[recipeGroupIndex],
+                recipes: updatedGroupRecipes
+            };
+
+            return updatedRecipes;
+        });
+    }, [autoCheckUnknownQuantity, recipeGroupIndex, recipeIndex, setRecipes]);
     const editIngredient = (category, index) => {
         const newRecipes = [...recipes];
         const selectedNewRecipe = newRecipes[recipeGroupIndex].recipes[recipeIndex];
@@ -472,9 +1042,103 @@ const Recipe = ({
         }
     }
 
+    const editSubItem = (category, index, subIndex) => {
+        const newRecipes = [...recipes];
+        const selectedRecipe = newRecipes?.[recipeGroupIndex]?.recipes?.[recipeIndex];
+        if (!selectedRecipe) {
+            return;
+        }
+
+        if (category === 'ingredients' && subIndex === null) {
+            const ingredientRow = selectedRecipe.ingredients?.[index];
+            if (!Array.isArray(ingredientRow)) {
+                return;
+            }
+
+            const currentQuantity = ingredientRow[0] ?? '';
+            const currentUnit = ingredientRow[1] ?? '';
+            const currentName = ingredientRow[2] ?? '';
+
+            const nextQuantityInput = prompt('Edit quantity:', String(currentQuantity));
+            if (nextQuantityInput === null) return;
+
+            const nextUnitInput = prompt('Edit unit:', String(currentUnit));
+            if (nextUnitInput === null) return;
+
+            const nextNameInput = prompt('Edit ingredient name:', String(currentName));
+            if (nextNameInput === null) return;
+
+            const parsedQuantity = Number(nextQuantityInput);
+            selectedRecipe.ingredients[index] = [
+                Number.isNaN(parsedQuantity) ? nextQuantityInput : parsedQuantity,
+                nextUnitInput,
+                nextNameInput,
+                Boolean(ingredientRow[3]),
+                ingredientRow[4] || createListItemId('ingredient')
+            ];
+            setRecipes(newRecipes);
+            return;
+        }
+
+        if (category === 'instructions' && subIndex === null) {
+            const instruction = selectedRecipe.instructions?.[index];
+            if (!instruction) {
+                return;
+            }
+
+            const currentStep = typeof instruction === 'string' ? instruction : (instruction.step ?? '');
+            const nextStep = prompt(`Edit step #${index + 1}:`, String(currentStep));
+            if (nextStep === null) return;
+
+            if (typeof instruction === 'string') {
+                selectedRecipe.instructions[index] = {
+                    id: createListItemId('instruction'),
+                    step: nextStep,
+                    ingredients: []
+                };
+            } else {
+                selectedRecipe.instructions[index] = {
+                    ...instruction,
+                    step: nextStep
+                };
+            }
+            setRecipes(newRecipes);
+            return;
+        }
+
+        if (category === 'instructions' && subIndex !== null) {
+            const ingredientRow = selectedRecipe.instructions?.[index]?.ingredients?.[subIndex];
+            if (!Array.isArray(ingredientRow)) {
+                return;
+            }
+
+            const currentQuantity = ingredientRow[0] ?? '';
+            const currentUnit = ingredientRow[1] ?? '';
+            const currentName = ingredientRow[2] ?? '';
+
+            const nextQuantityInput = prompt('Edit quantity:', String(currentQuantity));
+            if (nextQuantityInput === null) return;
+
+            const nextUnitInput = prompt('Edit unit:', String(currentUnit));
+            if (nextUnitInput === null) return;
+
+            const nextNameInput = prompt('Edit ingredient name:', String(currentName));
+            if (nextNameInput === null) return;
+
+            const parsedQuantity = Number(nextQuantityInput);
+            selectedRecipe.instructions[index].ingredients[subIndex] = [
+                Number.isNaN(parsedQuantity) ? nextQuantityInput : parsedQuantity,
+                nextUnitInput,
+                nextNameInput,
+                Boolean(ingredientRow[3]),
+                ingredientRow[4] || createListItemId('ingredient')
+            ];
+            setRecipes(newRecipes);
+            return;
+        }
+    }
     const deleteSubItem = (category, index, subIndex) => {
         const removeItemByIndex = (array, index) => {
-            //console.log(`removeItemByIndex => array: ${array} index: ${index}`)
             if (index >= 0 && index < array.length) {
                 array.splice(index, 1);
             } else {
@@ -491,12 +1155,37 @@ const Recipe = ({
         setRecipes(newRecipes);
     }
 
-    const recipeHeader = (category, toggleFunction, isEdit) => {
+    const resetCheckboxes = (category) => {
+        const newRecipes = [...recipes];
+        const selectedNewRecipe = newRecipes[recipeGroupIndex].recipes[recipeIndex];
+        
+        if (category.toLowerCase().includes('ingredient')) {
+            // Reset all ingredient checkboxes
+            selectedNewRecipe.ingredients.forEach(ingredient => {
+                ingredient[3] = false;
+            });
+        } else if (category.toLowerCase().includes('instruction')) {
+            // Reset all instruction checkboxes
+            selectedNewRecipe.instructions.forEach(instruction => {
+                instruction.ingredients.forEach(ingredient => {
+                    ingredient[3] = false;
+                });
+            });
+        }
+        setRecipes(newRecipes);
+    };
 
-        return <div className='containerBox flexContainer bg-lite centerVertical'>
-            <div className='flex2Column containerDetail color-yellow bg-tinted pt-10 pb-10 mr-5'>
+    const recipeHeader = (category, toggleFunction, isEdit) => {
+        const showIngredientCount = String(category || '').toLowerCase().includes('ingredients');
+        const ingredientCount = Array.isArray(recipe?.ingredients) ? recipe.ingredients.length : 0;
+        const headerTitle = showIngredientCount
+            ? `${category} ${ingredientCount}`
+            : category;
+
+        return <div className='containerDetail m-5 flexContainer bg-lite centerVertical'>
+            <div className='flex2Column containerDetail color-yellow size20 bg-tinted pt-10 pb-10 mr-5'>
                 <CollapseToggleButton
-                    title={category}
+                    title={headerTitle}
                     isCollapsed={(category.toLowerCase().includes('ingredient')) ? collapseIngredients : collapseInstructions}
                     setCollapse={(category.toLowerCase().includes('ingredient')) ? setCollapseIngredients : setCollapseInstructions}
                     align='left'
@@ -506,7 +1195,7 @@ const Recipe = ({
                 {
                     (edit)
                         ? <div title='save' className='r-10 p-20 bg-lite color-neogreen button bold' onClick={() => setEdit(prev => !prev)}>save</div>
-                        : <div title='edit' className='r-10 pt-20 pb-20 pl-15 pr-15 bg-lite button' onClick={() => setEdit(prev => !prev)}>{icons.edit}</div>
+                        : <div title='edit' className='r-10 pt-20 pb-20 pl-15 pr-15 bg-lite button size25' onClick={() => setEdit(prev => !prev)}>{icons.edit}</div>
                 }
             </div>
             <div className='flexColumn'>
@@ -518,8 +1207,19 @@ const Recipe = ({
                     className='ml-5 r-10 p-20 bg-lite button color-lite centeredContent w-50'
                     onClick={() => addCheckbox(category, null)}
                 >
-                    <div className='text-outline-light size15'>
+                    <div className='text-outline-lite size25'>
                         {icons.plus}
+                    </div>
+                </div>
+            </div>
+            <div className='flexColumn'>
+                <div
+                    title={`reset all ${category.toLowerCase().replace(':', '')}`}
+                    className='ml-5 r-10 p-20 bg-lite button color-lite centeredContent w-50'
+                    onClick={() => resetCheckboxes(category)}
+                >
+                    <div className='size35 mt--5 text-outline-dark'>
+                        ↺
                     </div>
                 </div>
             </div>
@@ -527,7 +1227,8 @@ const Recipe = ({
     }
 
     const getItemQuantityDisplay = (item) => {
-        let quantity = item[0];
+        const fields = getIngredientDisplayFields(item);
+        let quantity = fields.quantity;
         let newQuantity = 0;
         quantity = (quantity === '4/5') ? .8 : quantity;
         quantity = (quantity === '2/3') ? .6 : quantity;
@@ -542,7 +1243,7 @@ const Recipe = ({
         quantity = (quantity === '1/9') ? .11 : quantity;
         quantity = (quantity === '1/10') ? .1 : quantity;
 
-        let units = String(item[1]);
+        let units = String(fields.unit ?? '');
         units = units.toLowerCase();
         if (units === 'stalks' || units === 'stalk') {
             units = 'stalk'; 
@@ -561,12 +1262,10 @@ const Recipe = ({
                 units = 'tablespoon';
                 quantity = (quantity / 3)
             }
-            //console.log(`mls => ${item[2]} quantity: ${quantity}`)
         }
         if (units === 'tablespoons' || units === 'tblsp' || units === 'tblsps' || units === 'tbsp' || units === 'tbsps') {
             units = 'tablespoon';
         }
-        //console.log(`getItemQuantityDisplay => ${item[2]}  ${item[2]} units: ${units} quantity: ${quantity}`)
         if (units === 'g' || units === 'gs' || units === 'gram' || units === 'grams') {
             units = 'teaspoon';
             newQuantity = Number(quantity / 5.69);
@@ -576,26 +1275,19 @@ const Recipe = ({
                 quantity = (quantity / 3)
             }
         }
-        //console.log(`getItemQuantityDisplay => ${item[2]}  ${item[2]} units: ${units} quantity: ${quantity}`)
         if ((units === 'tablespoons' || units === 'tablespoon') && Number(quantity) > 4) {
             units = 'cup';
             newQuantity = Number(quantity / 16);
             quantity = (isNaN(newQuantity)) ? quantity : newQuantity;
-            //console.log(`getItemQuantityDisplay => ${item[2]}  units: ${units} quantity: ${quantity}`)
         }
-        //console.log(`getItemQuantityDisplay => ${item[2]}  ${item[2]} units: ${units} quantity: ${quantity}`)
-
+        
         if (!String(quantity).includes('/')) {
             if (!Number.isInteger(quantity)) {
-                //console.log(`getItemQuantityDisplay => ${item[2]}  ${item[2]} units: ${units} quantity: ${quantity}`)
                 quantity = roundToNearest(quantity);
-                //console.log(`getItemQuantityDisplay => ${item[2]}  ${item[2]} units: ${units} quantity: ${quantity}`)
             }
         }
-        //console.log(`getItemQuantityDisplay => ${item[2]}  ${item[2]} units: ${units} quantity: ${quantity}`)
         
         newQuantity = Number(String(quantity).replace('0.', '.'));
-        //console.log(`getItemQuantityDisplay => item[0]: ${item[0]} quantity: ${quantity} newQuantity: ${newQuantity}`)
         quantity = (isNaN(newQuantity)) ? item[0] : newQuantity;
         units = units.replace('tsp', 'teaspoon');
         units = units.replace('tbsp', 'tablespoon');
@@ -611,24 +1303,33 @@ const Recipe = ({
         }
         return <div className='width-100-percent'>
             {
-                (quantity === 0)
+                (quantity === 0 || quantity === '0' || quantity === '' || quantity === undefined || quantity === null || Number.isNaN(quantity))
                 ? null
                 : <VulgarFractions value={quantity} />
             }
-            <span className='mr-10 fl-left'>{unitsDisplay}</span>
+            <span className='mr-10 fl-left'>
+            {
+                (unitsDisplay === 0 || unitsDisplay === '0' || unitsDisplay === '' || unitsDisplay === undefined || unitsDisplay === null || Number.isNaN(unitsDisplay))
+                    ? null
+                    : unitsDisplay
+            }
+            </span>
         </div>
     }
-    const getIngredientDisplay = (item, index, category) => <div
-        key={getKey(`ingredient${index}`)}
-        className={`containerBox flexContainer centerVertical ${(item[3]) ? 'bg-lite' : ''}`}
+    const getIngredientDisplay = (item, index, category) => {
+        const { name } = getIngredientDisplayFields(item);
+
+        return <div
+        key={item?.[4] || `${category || 'ingredient'}-${String(item?.[2] || 'item')}-${index}`}
+        className={`containerDetail m-5 flexContainer centerVertical ${(item[3]) ? 'bg-lite' : ''}`}
     >
-        <div className='containerBox p-20 flex2Column'>
+        <div className='containerDetail size20 p-25 flex2Column'>
             <div
                 title='edit ingredient'
                 className=''
                 onClick={() => editIngredient(category, index)}
             >
-                {getItemQuantityDisplay(item)} {item[2]}
+                {getItemQuantityDisplay(item)} {name} {getInventoryBadge(name)}
             </div>
         </div>
         <div className='flexColumn contentRight'>
@@ -636,47 +1337,63 @@ const Recipe = ({
                 (!edit)
                     ? <div
                         title='toggle checkbox'
-                        className='containerBox bg-lite p-20 button'
+                        className='containerDetail m-5 bg-lite p-20 button'
                         onClick={() => toggleCheckbox(category, index, 0)}
                     >
                         <input
-                            id='completed'
                             name='completed'
                             className='regular-checkbox button'
                             checked={item[3]}
                             type='checkbox'
-                            onChange={() => console.log(`category: ${category}, index: ${index}`)}
+                            onChange={() => {}}
                         />
                     </div>
-                    : <div
-                        title='delete'
-                        className='containerBox bg-lite p-20 button centeredContent'
-                        onClick={() => deleteSubItem(category, index, null)}
-                    >
-                        {icons.delete}
+                    : <div className='containerDetail flexContainer'>
+                        <div
+                            title='edit'
+                            className='containerDetail flexColumn bg-lite p-20 button centeredContent m-5'
+                            onClick={() => editSubItem(category, index, null)}
+                        >
+                            {icons.edit}
+                        </div>
+                        <div
+                            title='delete'
+                            className='containerDetail flexColumn bg-lite p-20 button centeredContent m-5'
+                            onClick={() => deleteSubItem(category, index, null)}
+                        >
+                            {icons.delete}
+                        </div>
                     </div>
             }
         </div>
     </div>
+    }
     const getStep = (item) => {
+        if (typeof item === 'string') {
+            return item;
+        }
         if (item !== undefined) {
-            console.log(`getStep => item: ${JSON.stringify(item, null, 2)}`);
             return item.step
         }
         return 'noone';
     }
-    const getIngredients = (item) => {
-        if (item !== undefined) {
-            console.log(`getIngredients => item: ${JSON.stringify(item, null, 2)}`);
-            return item.ingredients
+    const playSound = () => {
+        if (typeof Sounds.playSoftBell === 'function') {
+            Sounds.playSoftBell();
+            return;
         }
-        return 'noone';
-    }
+        if (typeof Sounds.softBell === 'function') {
+            Sounds.softBell(250);
+            return;
+        }
+        if (typeof Sounds.boop === 'function') {
+            Sounds.boop(0, 1);
+        }
+    };
     const getInstructionsDisplay = (item, index, category) => {
-
         return (item !== undefined)
-            ? <div key={getKey(`instruction${index}${Math.random() * 100}`)} className=''>
-                <div className='containerBox p-20 flexContainer centerVertical color-yellow bold'>
+            ? <div key={item?.id || `${category || 'instruction'}-${index}`} className=''>
+                <div className='containerDetail m-5 p-20 flexContainer centerVertical color-yellow size20 bold'>
                     <div className='flex2Column'>
                         <div 
                             title='edit ingredient'
@@ -692,61 +1409,334 @@ const Recipe = ({
                                 className='r-10 p-20 bg-lite button color-lite centeredContent w-70 flexContainer'
                                 onClick={() => addCheckbox(category, index)}
                             >
-                                <div className='flex2Column text-outline-light size15'>{icons.plus}</div>
+                                <div className='flex2Column text-outline-lite size15'>{icons.plus}</div>
                                 <div className='ml-5 flex2Column size20'>{icons.chili}</div>
                             </div>
-                            : <div
-                                title='delete'
-                                className='containerBox bg-lite p-20 button centeredContent'
-                                onClick={() => deleteSubItem(category, index, null)}
-                            >
-                                {icons.delete}
+                            : <div className='containerDetail flexContainer'>
+                                <div
+                                    title='edit'
+                                    className='containerDetail flexColumn bg-lite p-20 button centeredContent m-5'
+                                    onClick={() => editSubItem(category, index, null)}
+                                >
+                                    {icons.edit}
+                                </div>
+                                <div
+                                    title='delete'
+                                    className='containerDetail flexColumn bg-lite p-20 button centeredContent m-5'
+                                    onClick={() => deleteSubItem(category, index, null)}
+                                >
+                                    {icons.delete}
+                                </div>
                             </div>
                         }
                     </div>
                 </div>
                 {
                     (item !== undefined)
-                    ? item.ingredients.map((ingredient, ingredientIndex) => <div key={getKey(`ingredient${ingredientIndex}`)} className={`containerBox flexContainer centerVertical ${(ingredient[3]) ? 'bg-lite' : ''}`}>
-                        <div className='flex2Column'>
-                            <div className='containerBox p-20' /* onClick={() => editIngredient(category, ingredientIndex)} */>{ingredient[0]} {ingredient[1]} {ingredient[2]}</div>
-                        </div>
-                        <div className='flexColumn contentRight'>
+                        ? <div className='height-400'>
                             {
-                                (!edit)
-                                ? <div
-                                    title='select'
-                                    className='containerBox bg-lite p-20 button'
-                                    onClick={() => toggleCheckbox(category, index, ingredientIndex)}
-                                >
-                                    <input
-                                        className='regular-checkbox button'
-                                        checked={ingredient[3]}
-                                        type='checkbox'
-                                        id='completed'
-                                        onChange={() => console.log(`category: ${category}, index: ${index}`)}
-                                    />
+                                (Array.isArray(item?.ingredients) ? item.ingredients : []).map((ingredient, ingredientIndex) => {
+                                    const ingredientFields = getIngredientDisplayFields(ingredient);
+                                    return <div key={ingredient?.[4] || `${item?.id || `${category || 'instruction'}-${index}`}-ingredient-${ingredientIndex}-${String(ingredient?.[2] || 'item')}`} className={`containerDetail m-5 flexContainer centerVertical ${(ingredient[3]) ? 'bg-lite' : ''}`}>
+                                    <div className='flex2Column'>
+                                        <div className='containerDetail size20 p-25' /* onClick={() => editIngredient(category, ingredientIndex)} */>
+                                            {getItemQuantityDisplay(ingredient)} {ingredientFields.name} {getInventoryBadge(ingredientFields.name)}
+                                        </div>
+                                    </div>
+                                    <div className='flexColumn contentRight'>
+                                        {
+                                            (!edit)
+                                            ? <div
+                                                title='select'
+                                                className='containerDetail m-5 bg-lite p-20 button'
+                                                onClick={() => toggleCheckbox(category, index, ingredientIndex)}
+                                            >
+                                                <input
+                                                    className='regular-checkbox button'
+                                                    checked={ingredient[3]}
+                                                    type='checkbox'
+                                                    onChange={() => {}}
+                                                />
+                                            </div>
+                                            : <div className='containerDetail flexContainer'>
+                                                <div
+                                                    title='edit'
+                                                    className='containerDetail flexColumn bg-lite p-20 button centeredContent m-5'
+                                                    onClick={() => editSubItem(category, index, ingredientIndex)}
+                                                >
+                                                    {icons.edit}
+                                                </div>
+                                                <div
+                                                    title='delete'
+                                                    className='containerDetail flexColumn bg-lite p-20 button centeredContent m-5'
+                                                    onClick={() => deleteSubItem(category, index,ingredientIndex)}
+                                                >
+                                                    {icons.delete}
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
                                 </div>
-                                : <div
-                                    title='delete'
-                                    className='containerBox bg-lite p-20 button centeredContent'
-                                    onClick={() => deleteSubItem(category, index, ingredientIndex)}
-                                >
-                                    {icons.delete}
-                                </div>
+                                })
                             }
                         </div>
-                    </div>
-                    )
                     : null
                 }
             </div>
             : null
 
     }
+
+    const parseIngredientQuantity = (value) => {
+        if (typeof value === 'number' && Number.isFinite(value)) {
+            return value;
+        }
+
+        const raw = String(value ?? '').trim();
+        if (!raw) {
+            return Number.NaN;
+        }
+
+        if (/^-?\d+(\.\d+)?$/.test(raw)) {
+            return Number(raw);
+        }
+
+        const mixedFractionMatch = raw.match(/^(-?\d+)\s+(\d+)\/(\d+)$/);
+        if (mixedFractionMatch) {
+            const whole = Number(mixedFractionMatch[1]);
+            const numerator = Number(mixedFractionMatch[2]);
+            const denominator = Number(mixedFractionMatch[3]);
+            if (denominator !== 0) {
+                const sign = whole < 0 ? -1 : 1;
+                return whole + sign * (numerator / denominator);
+            }
+        }
+
+        const fractionMatch = raw.match(/^(-?\d+)\/(\d+)$/);
+        if (fractionMatch) {
+            const numerator = Number(fractionMatch[1]);
+            const denominator = Number(fractionMatch[2]);
+            if (denominator !== 0) {
+                return numerator / denominator;
+            }
+        }
+
+        const vulgarMap = {
+            '¼': 1 / 4,
+            '½': 1 / 2,
+            '¾': 3 / 4,
+            '⅓': 1 / 3,
+            '⅔': 2 / 3,
+            '⅛': 1 / 8,
+            '⅜': 3 / 8,
+            '⅝': 5 / 8,
+            '⅞': 7 / 8,
+            '⅕': 1 / 5,
+            '⅖': 2 / 5,
+            '⅗': 3 / 5,
+            '⅘': 4 / 5,
+            '⅙': 1 / 6,
+            '⅚': 5 / 6,
+            '⅐': 1 / 7,
+            '⅑': 1 / 9,
+            '⅒': 1 / 10
+        };
+
+        const vulgarOnlyMatch = raw.match(/^(-?\d+)?([¼½¾⅓⅔⅛⅜⅝⅞⅕⅖⅗⅘⅙⅚⅐⅑⅒])$/);
+        if (vulgarOnlyMatch) {
+            const whole = vulgarOnlyMatch[1] ? Number(vulgarOnlyMatch[1]) : 0;
+            const fraction = vulgarMap[vulgarOnlyMatch[2]];
+            if (typeof fraction === 'number') {
+                const sign = whole < 0 ? -1 : 1;
+                return whole + sign * fraction;
+            }
+        }
+
+        return Number.NaN;
+    };
+
+    const scaleIngredientRowQuantity = (ingredientRow, factor) => {
+        if (!Array.isArray(ingredientRow)) {
+            return ingredientRow;
+        }
+
+        const scaledRow = [...ingredientRow];
+        const parsedQuantity = parseIngredientQuantity(scaledRow[0]);
+        if (Number.isFinite(parsedQuantity)) {
+            const scaledValue = Number((parsedQuantity * factor).toFixed(4));
+            scaledRow[0] = Number.isInteger(scaledValue) ? Math.trunc(scaledValue) : scaledValue;
+        }
+
+        return scaledRow;
+    };
+
+    const getRowScaleKey = (ingredientRow, fallbackKey) => {
+        const rowId = Array.isArray(ingredientRow) ? ingredientRow[4] : '';
+        return rowId ? String(rowId) : fallbackKey;
+    };
+
+    const buildMealScaleBase = (selectedRecipe) => {
+        const ingredientQuantities = {};
+        const instructionIngredientQuantities = {};
+
+        (Array.isArray(selectedRecipe?.ingredients) ? selectedRecipe.ingredients : []).forEach((ingredientRow, index) => {
+            if (!Array.isArray(ingredientRow)) return;
+            const key = getRowScaleKey(ingredientRow, `ingredient-${index}`);
+            ingredientQuantities[key] = ingredientRow[0];
+        });
+
+        (Array.isArray(selectedRecipe?.instructions) ? selectedRecipe.instructions : []).forEach((instruction, instructionIndex) => {
+            if (!instruction || typeof instruction !== 'object') return;
+            const instructionKey = instruction.id || `instruction-${instructionIndex}`;
+            const instructionMap = {};
+
+            (Array.isArray(instruction.ingredients) ? instruction.ingredients : []).forEach((ingredientRow, ingredientIndex) => {
+                if (!Array.isArray(ingredientRow)) return;
+                const key = getRowScaleKey(ingredientRow, `instruction-${instructionIndex}-ingredient-${ingredientIndex}`);
+                instructionMap[key] = ingredientRow[0];
+            });
+
+            instructionIngredientQuantities[String(instructionKey)] = instructionMap;
+        });
+
+        return {
+            ingredientQuantities,
+            instructionIngredientQuantities
+        };
+    };
+
+    const hasMealScaleBase = (selectedRecipe) => {
+        const base = selectedRecipe?.mealScaleBase;
+        return Boolean(base && typeof base === 'object');
+    };
+
+    const applyScaleWithBase = (ingredientRow, factor, baseQuantity) => {
+        if (!Array.isArray(ingredientRow)) {
+            return ingredientRow;
+        }
+
+        const scaledRow = [...ingredientRow];
+        const sourceQuantity = baseQuantity !== undefined ? baseQuantity : scaledRow[0];
+        const parsedQuantity = parseIngredientQuantity(sourceQuantity);
+
+        if (Number.isFinite(parsedQuantity)) {
+            const scaledValue = Number((parsedQuantity * factor).toFixed(4));
+            scaledRow[0] = Number.isInteger(scaledValue) ? Math.trunc(scaledValue) : scaledValue;
+        }
+
+        return scaledRow;
+    };
+
+    const scaleMealIngredients = (factor) => {
+        setFactor(factor);
+        if (!Number.isFinite(factor) || factor <= 0) {
+            return;
+        }
+
+        const newRecipes = [...recipes];
+        const selectedRecipe = newRecipes?.[recipeGroupIndex]?.recipes?.[recipeIndex];
+        if (!selectedRecipe) {
+            return;
+        }
+
+        if (!hasMealScaleBase(selectedRecipe)) {
+            selectedRecipe.mealScaleBase = buildMealScaleBase(selectedRecipe);
+        }
+
+        const mealScaleBase = selectedRecipe.mealScaleBase || { ingredientQuantities: {}, instructionIngredientQuantities: {} };
+
+        selectedRecipe.ingredients = Array.isArray(selectedRecipe.ingredients)
+            ? selectedRecipe.ingredients.map((ingredientRow, ingredientIndex) => {
+                const key = getRowScaleKey(ingredientRow, `ingredient-${ingredientIndex}`);
+                const baseQuantity = mealScaleBase.ingredientQuantities?.[key];
+                return applyScaleWithBase(ingredientRow, factor, baseQuantity);
+            })
+            : selectedRecipe.ingredients;
+
+        selectedRecipe.instructions = Array.isArray(selectedRecipe.instructions)
+            ? selectedRecipe.instructions.map((instruction, instructionIndex) => {
+                if (!instruction || typeof instruction !== 'object') {
+                    return instruction;
+                }
+
+                const instructionKey = String(instruction.id || `instruction-${instructionIndex}`);
+                const instructionBaseQuantities = mealScaleBase.instructionIngredientQuantities?.[instructionKey] || {};
+
+                return {
+                    ...instruction,
+                    ingredients: Array.isArray(instruction.ingredients)
+                        ? instruction.ingredients.map((ingredientRow, ingredientIndex) => {
+                            const key = getRowScaleKey(ingredientRow, `instruction-${instructionIndex}-ingredient-${ingredientIndex}`);
+                            const baseQuantity = instructionBaseQuantities[key];
+                            return applyScaleWithBase(ingredientRow, factor, baseQuantity);
+                        })
+                        : instruction.ingredients
+                };
+            })
+            : selectedRecipe.instructions;
+
+        setRecipes(newRecipes);
+    };
+
     const recipeField = (isEdit, setEdited, edited, data, toggleEdit, category) => {
+        const isValidIngredientItem = (item) => {
+            if (!Array.isArray(item)) return false;
+            const ingredientLabel = item[2];
+            if (validate(ingredientLabel) === null) return false;
+            const normalized = String(ingredientLabel).trim().toLowerCase();
+            return normalized !== '' && normalized !== 'undefined';
+        };
         return <div className=''>
-            <div className='color-soft button'>
+            {
+                (category.toLowerCase().includes('ingredient') && !isEdit)
+                    ? <div className='containerDetail flexContainer m-5'>
+                        <div className='containerDetail p-10 size15 color-yellow mr-5'>Meal Size:</div>
+                        <div
+                            className={`containerDetail bg-lite button p-10 size15 color-lite mr-5 ${factor === 1 ? 'bg-green' : ''} `}
+                            title='Restore ingredient amounts to full meal quantities'
+                            onClick={() => scaleMealIngredients(1)}
+                        >
+                            Full Meal
+                        </div>
+                        <div
+                            className={`containerDetail bg-lite button p-10 size15 color-lite mr-5 ${factor === 0.5 ? 'bg-green' : ''} `}
+                            title='Scale all ingredient amounts to half'
+                            onClick={() => scaleMealIngredients(0.5)}
+                        >
+                            1/2 Meal
+                        </div>
+                        <div
+                            className={`containerDetail bg-lite button p-10 size15 color-lite ${factor === 0.25 ? 'bg-green' : ''} `}
+                            title='Scale all ingredient amounts to quarter'
+                            onClick={() => scaleMealIngredients(0.25)}
+                        >
+                            1/4 Meal
+                        </div>
+                        {
+                            /*
+                            <div
+                                className={`containerDetail bg-lite button p-10 size15 color-lite ml-5 ${autoCheckUnknownQuantity ? 'bg-green' : ''}`}
+                                title='When enabled, quantity unknown ingredients are auto-checked as in stock'
+                                onClick={() => setAutoCheckUnknownQuantity((previous) => !previous)}
+                            >
+                                Unknown Qty: {autoCheckUnknownQuantity ? 'Auto-check ON' : 'Auto-check OFF'}
+                            </div>
+                            */
+                        }
+                    </div>
+                    : null
+            }
+                 <div className='containerDetail p-20 bg-yellow size20 color-lite contentCenter m-5 button' onClick={() => addIngredientsToCart(ifUndefinedArray(data))}>
+                     <div className='size25 color-dark'>➕🛒 {getUncheckedIngredientCount(ifUndefinedArray(data))}</div>
+            </div>
+            {
+                cartFeedback
+                    ? <div className='containerDetail p-10 size15 color-neogreen contentCenter m-5'>
+                        {cartFeedback}
+                    </div>
+                    : null
+            }
+            <div className='color-soft height-400'>
                 {
                     (isEdit)
                         ? <textarea
@@ -760,7 +1750,7 @@ const Recipe = ({
                         : (typeof data === 'string')
                             ? <div onClick={() => toggleEdit()}>
                                 {ifUndefinedArray(data).map((line, index) => (
-                                    <React.Fragment key={getKey(`data${index}`)}>
+                                    <React.Fragment key={`data-${index}`}>
                                         {line}
                                         {<br />}
                                     </React.Fragment>
@@ -769,10 +1759,12 @@ const Recipe = ({
                             : ifUndefinedArray(data).map((item, index) => {
                                 return (category.toLowerCase().includes('ingredient'))
                                     ? (!collapseIngredients)
-                                        ? getIngredientDisplay(item, index, category)
+                                        ? (isValidIngredientItem(item)
+                                            ? getIngredientDisplay(item, index, category)
+                                            : null)
                                         : null
                                     : (!collapseInstructions)
-                                        ? getInstructionsDisplay()
+                                        ? getInstructionsDisplay(item, index, category)
                                         : null
                             })
                 }
@@ -789,13 +1781,36 @@ const Recipe = ({
             setRecipes(newRecipes);
         }
     }
-    const ifUndefinedString = (value) => {
-        let newValue = (validate(value) === null) ? 'empty...' : value;
-        newValue = (value === null) ? 'empty...' : value;
-        return newValue;
+    const scrollToActiveRecipe = (groupIndex, recipeIndex) => {
+        const lastEditedRecipe = localStorage.getItem('lastEditedRecipe');
+        if (lastEditedRecipe) {
+            try {
+                const edited = JSON.parse(lastEditedRecipe);
+                // If this is the recipe that was edited, expand it
+                if (edited.recipeGroupIndex === groupIndex && edited.recipeIndex === recipeIndex) {
+                    setCollapsed(false);
+                    // Scroll to this recipe after a brief delay to allow render
+                    setTimeout(() => {
+                        const recipeElement = document.getElementById(`recipe-${groupIndex}-${recipeIndex}`);
+                        if (recipeElement) {
+                            recipeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }, 300);
+                    // Clear the localStorage flag
+                    localStorage.removeItem('lastEditedRecipe');
+                }
+            } catch (error) {
+                console.error('Error parsing lastEditedRecipe:', error);
+            }
+        }
     }
-    return <div key={`recipe${recipeIndex}`} className='lowerBorder contentLeft'>
-        <div className='containerBox flexContainer bg-lite'>
+    useEffect(() => {
+        // On component mount, check if this recipe was just edited
+        scrollToActiveRecipe(recipeGroupIndex, recipeIndex);
+    }, [recipes, recipeGroupIndex, recipeIndex]);
+
+    return <div key={`recipe${recipeIndex}`} id={`recipe-${recipeGroupIndex}-${recipeIndex}`} className='lowerBorder contentLeft'>
+        <div className='containerDetail m-5 flexContainer bg-lite'>
             <div className='flex1Auto contentLeft'>
                 {
                     (editTitle)
@@ -808,8 +1823,8 @@ const Recipe = ({
                         {recipe.dish}
                     </textarea>
                     : <div>
-                        <div className='containerBox bg-lite centerVertical '>
-                            <div className='containerDetail color-yellow bg-tinted p-20'>
+                        <div className='containerDetail bg-lite'>
+                            <div className='containerDetail color-yellow size20 bg-tinted p-20'>
                                 <CollapseToggleButton
                                     title={recipe.dish}
                                     isCollapsed={collapsed}
@@ -823,12 +1838,18 @@ const Recipe = ({
                             (collapsed)
                             ? null
                             : <div>
-                                <div className='containerBox flexContainer'>
-                                    <div className='flex2Column'>
-                                                <div className='containerDetail pt-10 pb-10 pr-10 pl-20 color-orange size12 flex2Column contentLeft m-5'>
-                                            Use the following headers for easy parsing:
-                                            Ingredients:, Cooking Instructions:, Serving Instructions:, Nutritional Value:
-                                        </div>
+                                <div className='containerDetail flexContainer'>
+                                    <div className='flex2Column contentRight'>
+                                        {
+                                            (help)
+                                            ? <div className='containerDetail pt-10 pb-10 pr-10 pl-20 color-orange size12 flex2Column contentLeft m-5'>
+                                                    Use the following headers for easy parsing:
+                                                    Ingredients:, Cooking Instructions:, Serving Instructions:, Nutritional Value:
+                                                </div>
+                                            : <div className='containerDetail w-100 button p-30 bg-lite size30 ml-auto mr-5 contentCenter' onClick={() => setHelp(true)}>
+                                                ❓
+                                                </div>
+                                        }
                                     </div>
                                     <div
                                         title='delete'
@@ -847,6 +1868,37 @@ const Recipe = ({
                                         setEdited={setEditedRecipe}
                                         edited={editedRecipe}
                                     />
+                                    {
+                                        recipe.description && String(recipe.description).trim()
+                                            ? <div
+                                                title='Split description into numbered instructions'
+                                                className='containerDetail p-10 bg-lite button color-yellow size15 contentCenter m-5'
+                                                onClick={() => {
+                                                    const lines = String(recipe.description)
+                                                        .split(/\n/)
+                                                        .map((line) => line.trim())
+                                                        .filter(Boolean);
+
+                                                    if (lines.length === 0) return;
+
+                                                    const confirmed = window.confirm(
+                                                        `Parse ${lines.length} line${lines.length === 1 ? '' : 's'} from description into instructions?\n\nThis will replace existing instructions.`
+                                                    );
+                                                    if (!confirmed) return;
+
+                                                    const newInstructions = lines.map((line) =>
+                                                        ensureInstructionId({ step: line, ingredients: [] }, 'instruction')
+                                                    );
+
+                                                    const newRecipes = [...recipes];
+                                                    newRecipes[recipeGroupIndex].recipes[recipeIndex].instructions = newInstructions;
+                                                    setRecipes(newRecipes);
+                                                }}
+                                            >
+                                                📋 Parse Description → Instructions
+                                            </div>
+                                            : null
+                                    }
                                     <IngredientDialog
                                         isOpen={isDialogOpen}
                                         dialogType={dialogType}
@@ -883,5 +1935,5 @@ const Recipe = ({
             }
         </div>
     </div>
-}
+};
 export default Recipe;

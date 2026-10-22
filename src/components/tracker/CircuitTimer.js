@@ -24,8 +24,7 @@ const CircuitTimer = ({
         ticker,
         countdown,
         jumpToActive,
-        edit,
-        setEdit
+        
     } = useContext(CircuitContext);
 
     const getInitTime = () => {
@@ -44,6 +43,12 @@ const CircuitTimer = ({
     const isStart = () => (currentTime === time) ? true : false;
     const totalSeconds = (milliseconds) => Math.floor(milliseconds / 1000);
     const id = `${category}index${index}groupIndex${groupIndex}subgroupIndex${subgroupIndex}`;
+
+    useEffect(() => {
+        const localActivated = initializeData('activated', 'false');
+        const shouldRun = activeIndex === id && (activated === true || activated === 'true' || localActivated === 'true');
+        setPause(!shouldRun);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const calculateTimeLeft = () => {
         const millisecondsRemaining = currentTime * 1000;
@@ -72,6 +77,11 @@ const CircuitTimer = ({
         localStorage.setItem('activated', true);
         setPause(false);
     };
+
+    const isAutoPlayEnabled = () => {
+        const localActivated = initializeData('activated', 'false');
+        return activated === true || activated === 'true' || localActivated === 'true';
+    };
     const startManualTimer = () => {
         setActivated(true);
         setActiveIndex(id);
@@ -88,7 +98,6 @@ const CircuitTimer = ({
             updatedCircuits[groupIndex].circuits[subgroupIndex].excersizes[index].restTime = currentTime;
         }
         localStorage.setItem('circuitTracking', JSON.stringify(updatedCircuits));
-        console.log(`localStorage.setItem('circuitTracking')6`)
         localStorage.setItem('activated', false);
         setPause(true);
     };
@@ -102,7 +111,7 @@ const CircuitTimer = ({
     useEffect(() => {
         localStorage.setItem('activated', activated);
         jumpToActive()
-    }, [activated]);
+    }, [activated]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         let timerInterval;
@@ -114,7 +123,7 @@ const CircuitTimer = ({
         }
         return () => clearInterval(timerInterval);
 
-    }, [pause]);
+    }, [pause]); // eslint-disable-line react-hooks/exhaustive-deps
     
     useEffect(() => {
         localStorage.setItem('time', time);
@@ -123,7 +132,21 @@ const CircuitTimer = ({
             startTimer();
             jumpToActive();
         }
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        if (activeIndex === id && pause && isAutoPlayEnabled() && currentTime > 0) {
+            startTimer();
+            jumpToActive();
+        }
+    }, [activeIndex, activated]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        if (activeIndex !== id && !pause) {
+            setPause(true);
+        }
+    }, [activeIndex]); // eslint-disable-line react-hooks/exhaustive-deps
+
     const formatTime = (seconds) => {
         if (activeIndex === id) {
             localStorage.setItem('activeCircuitTime', seconds);

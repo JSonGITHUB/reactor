@@ -1,30 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import AddProjectInterface from './AddProjectInterface';
 import TrackWaves from './TrackWaves';
 import { currentTime, currentDate } from '../utils/CurrentCalendar';
 import initProjects from './initProjects';
 import initWaves from './initWaves';
-import initTasks from './initTasks';
-import initCharges from './initCharges';
-import initEvents from './initEvents';
-import initLinkTracking from './initLinkTracking';
-import initNoteTracking from './initNoteTracking';
-import initJournalTracking from './initJournalTracking';
-import mobileRecipeTracking from './data_mobile';
-import CollapseToggleButton from '../utils/CollapseToggleButton';
-import getKey from '../utils/KeyGenerator';
 import icons from '../site/icons';
 import initializeData from '../utils/InitializeData';
-import validate from '../utils/validate';
 
 const Sets = () => {
 
     const [waves, setWaves] = useState(initializeData('waveTracking', initWaves));
-    const [tracking, setTracking] = useState('waves');
-    const [initialized, setInitialized] = useState(false);
-    const [isCollapsed, setIsCollapsed] = useState();
+    const [tracking] = useState('waves');
     const [newProjectDescription, setNewProjectDescription] = useState('');
-    const [projects, setProjects] = useState(initializeData('projectTracking', initProjects));
+    const [projects] = useState(initializeData('projectTracking', initProjects));
     
     const trackingMap = {
         'waves': [waves, setWaves],
@@ -32,24 +20,8 @@ const Sets = () => {
 
     useEffect(() => {
         if (waves === null) setWaves(initWaves);
-    }, []);
+    }, [waves]);
 
-
-    useEffect(() => {
-
-        if (initialized) {
-            let updatedTrackingData = [...projects];
-            if (tracking === 'waves') {
-                updatedTrackingData = [...waves];
-            }
-            updatedTrackingData.map((group, groupIndex) => group.isCollapsed = isCollapsed);
-            if (tracking === 'waves') {
-                setWaves(updatedTrackingData);
-            }
-        } else {
-            setInitialized(true);
-        }
-    }, [isCollapsed]);
 
     useEffect(() => {
         if (waves !== undefined || waves !== '') {
@@ -60,19 +32,23 @@ const Sets = () => {
     useEffect(() => {
         if (newProjectDescription !== undefined) {
             const searchTerm = newProjectDescription.toLowerCase() || '';
-            if (tracking === 'waves' && waves !== undefined) {
-                const inWaveDescription = (wave) => wave.description.toLowerCase().includes(searchTerm);
-                const filteredWaves = [...waves];
-                filteredWaves.map((wave) => {
-                    wave.display = false;
-                    if (inWaveDescription(wave) || searchTerm === '' || searchTerm === ' ' || searchTerm === null) {
-                        wave.display = true;
+            if (tracking === 'waves') {
+                setWaves((prevWaves) => {
+                    if (prevWaves === undefined) {
+                        return prevWaves;
                     }
+                    const inWaveDescription = (wave) => wave.description.toLowerCase().includes(searchTerm);
+                    return prevWaves.map((wave) => {
+                        const shouldDisplay = inWaveDescription(wave) || searchTerm === '' || searchTerm === ' ' || searchTerm === null;
+                        return {
+                            ...wave,
+                            display: shouldDisplay
+                        };
+                    });
                 });
-                setWaves(filteredWaves);
             }
         }
-    }, [newProjectDescription]);
+    }, [newProjectDescription, tracking]);
 
     const addProject = () => {
         const project = {

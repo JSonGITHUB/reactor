@@ -25,10 +25,14 @@ import medium from '../../assets/images/tide.png';
 const getMatchIcon = ({
     kind,
     status,
-    collapse
+    collapse,
+    compact = false
 }) => {
     //console.log(`getMatchIcon => kind: ${kind}\nstatus:${JSON.stringify(status,null,2)}`)
     const getStarMatchKind = (kind) => {
+        if (compact) {
+            return 'h30w30';
+        }
         //let classes = 'shaka r-20 p-2';
         let classes = `${(collapse)?'h30w30':'h50w50'} ${(kind === 'tide') ? 'pb-5' : ''}`;
         classes = (kind === 'wind') ? (classes + ' r-10 bg-white') : classes; 
@@ -125,6 +129,11 @@ const getMatchIcon = ({
                 </div>
     } else if (kind === 'wind') {
         const windDirection = status.windDirection;
+        if (compact) {
+            return <div className='inlineBlock'>
+                        {getDirectionIcon(windDirection)}
+                    </div>
+        }
         if (collapse) {
             return <div className='w-50 mt-5 size25 columnCenterAlign'>
                         <span className=''>

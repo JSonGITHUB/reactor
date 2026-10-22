@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import getKey from '../utils/KeyGenerator';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
 import Selector from '../forms/FunctionalSelector';
-import initializeData from '../utils/InitializeData';
 
 const DebtCollector = () => {
 
@@ -138,15 +137,6 @@ const DebtCollector = () => {
             )
         );
     };
-    const addDuesNote = (id, note) => {
-        setDues(
-            dues.map((due) =>
-                due.id === id
-                    ? { ...due, note: [...due.note, note] }
-                    : due
-            )
-        );
-    };
     const editNote = (id, index, note) => {
         console.log(`DebtCollector => editNote => note: ${note}`);
         setDebts(
@@ -159,21 +149,6 @@ const DebtCollector = () => {
                             : debt.note.map((n, i) => (i === index ? note : n))
                     }
                     : debt
-            )
-        );
-    };
-    const editDuesNote = (id, index, note) => {
-        console.log(`DebtCollector => editDuesNote => note: ${note}`);
-        setDues(
-            dues.map((due) =>
-                due.id === id
-                    ? {
-                        ...due,
-                        note: note === ''
-                            ? due.note.filter((_, i) => i !== index)
-                            : due.note.map((n, i) => (i === index ? note : n))
-                    }
-                    : due
             )
         );
     };
@@ -190,17 +165,18 @@ const DebtCollector = () => {
     const paidDebts = debts.filter(debt => debt.status === 'paid');
     const unpaidDues = dues.filter(due => due.status !== 'paid');
     const paidDues = dues.filter(due => due.status === 'paid');
-    const getDebt = (debt) => <div key={debt.id} className='containerBox bg-lite'>
+    const getDebt = (debt) => <div key={debt.id} className='containerDetail size20 m-5 color-lite bg-lite'>
         <div className=''>
-            <div className='contentLeft'>
-                <div className='containerBox'>
+            <div className='containerDetail flexContainer'>
+                <div className='flex2Column contentLeft size20 mb-5 p-15 color-lite'>
                     📅 {new Date(debt.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })}
                 </div>
-            </div>
-            <div className='contentLeft'>
-                <div className='containerBox'>
-                    👤 {debt.debtor || debt.payee}
+                <div className='flexColumn contentRight pl-10 pr-10 pb-10'>
+                    💲 {debt.amount}
                 </div>
+            </div>
+            <div className='contentLeft p-20'>
+                👤 {debt.debtor || debt.payee}
             </div>
         </div>
         <div className=''>
@@ -225,9 +201,6 @@ const DebtCollector = () => {
                     </div>
                 </div>
             )}
-            <div className='containerBox centerVertical contentLeft'>
-                💲 {debt.amount}
-            </div>
             <div className='centerVertical contentLeft'>
                 <div className='flexContainer'>
                     {
@@ -235,7 +208,7 @@ const DebtCollector = () => {
                             <div
                                 title='mark as paid'
                                 onClick={() => (debt.debtor) ? markAsPaid(debt.id) : markAsCleared(debt.id)}
-                                className='containerBox flex3Column bg-dark button contentCenter size30'
+                                className='containerDetail size20 mr-5 p-15 color-lite flex3Column bg-dark button contentCenter'
                             >
                                 💰 Collect
                             </div>
@@ -247,14 +220,14 @@ const DebtCollector = () => {
                             const note = prompt('Add note:');
                             if (note) addNote(debt.id, note);
                         }}
-                        className='containerBox bg-dark flex3Column button contentCenter size30'
+                        className='containerDetail size20 mr-5 p-15 color-lite bg-dark flex3Column button contentCenter'
                     >
                         📝
                     </div>
                     <div
                         title='delete debt'
                         onClick={() => (debt.debtor) ? deleteDebt(debt.id) : deleteDues(debt.id)}
-                        className='containerBox bg-dark size30 flex3Column button contentCenter size30'
+                        className='containerDetail size20 p-15 color-lite bg-dark size20 flex3Column button contentCenter'
                     >
                         🗑️
                     </div>
@@ -268,7 +241,7 @@ const DebtCollector = () => {
     }
 
     return (
-        <div className='containerDetail mt--30'>
+        <div className='mt--30'>
             <div className='containerDetail p-20 bg-lite color-lite size30 m-5 contentLeft'>
                 💰 Debt Collection
             </div>
@@ -277,7 +250,7 @@ const DebtCollector = () => {
                     ? <div onClick={() => setCollapseForm(prev => !prev)} className='containerDetail m-5 size25 bg-green p-20 color-yellow contentLeft'>
                     ➕ Add Debt/Due
                 </div>
-                : <div className='containerBox bg-lite'>
+                : <div className='containerDetail size20 m-5 p-10 color-lite bg-lite'>
                     <div>
                         <Selector
                             groupTitle='Collection'
@@ -289,27 +262,27 @@ const DebtCollector = () => {
                             padding='10px'
                             width='100%'
                         />
-                        <div className='containerBox'>
+                        <div className='containerDetail size20 m-5 p-10 color-lite'>
                             📅
                             <input
                                 name='dueDate'
                                 type='date'
                                 value={form.dueDate}
                                 onChange={handleChange}
-                                className='containerBox w-200'
+                                className='containerDetail size20 m-5 p-10 color-lite w-200'
                             />
                         </div>
-                        <div className='containerBox'>
+                        <div className='containerDetail size20 m-5 p-10 color-lite'>
                             👤
                             <input
                                 name={`${(collection === 'debt') ? 'debtor' : 'payee'}`}
                                 placeholder={`${(collection === 'debt') ? 'Debtor Name' : 'Payee'}`}
                                 value={(collection === 'debt') ? form.debtor : form.payee}
                                 onChange={handleChange}
-                                className='containerBox w-200'
+                                className='containerDetail size20 m-5 p-10 color-lite w-200'
                             />
                         </div>
-                        <div className='containerBox'>
+                        <div className='containerDetail size20 m-5 p-10 color-lite'>
                             💲
                             <input
                                 name='amount'
@@ -317,7 +290,7 @@ const DebtCollector = () => {
                                 value={form.amount}
                                 onChange={handleChange}
                                 type='number'
-                                className='containerBox w-200'
+                                className='containerDetail size20 m-5 p-10 color-lite w-200'
                             />
                         </div>
                         <div className='flexContainer'>
@@ -331,7 +304,7 @@ const DebtCollector = () => {
                     </div>
                 </div>
             }
-            <div className='containerDetail bg-blue m-5 p-10 size20'>
+            <div className='containerDetail bg-blue mt-5 mr-5 ml-5 p-10 size20'>
                 <CollapseToggleButton
                     title={<div className='color-yellow flexContainer'><span className='flex2Column'>💲 Paid Debts</span><span className='flex2Column contentRight pr-10'>${getTotalAmount(paidDebts)}</span></div>}
                     isCollapsed={collapseCollect}
@@ -344,7 +317,7 @@ const DebtCollector = () => {
                 ? null
                 : <div>
                     {paidDebts.length === 0 && (
-                        <div className='containerBox color-red'>No paid debts</div>
+                        <div className='containerDetail size20 m-5 p-10 color-lite color-red'>No paid debts</div>
                     )}
                     {paidDebts.length > 0 && (
                         <div className='scroll ht-250'>
@@ -355,7 +328,7 @@ const DebtCollector = () => {
                     )}
                 </div>
             }
-            <div className='containerBox bg-blue'>
+            <div className='containerDetail size20 m-5 p-10 color-lite bg-blue'>
                 <CollapseToggleButton
                     title={<div className='color-yellow flexContainer'><span className='flex2Column'>🤲🏼 Unpaid Debts</span><span className='flex2Column contentRight pr-10'>${getTotalAmount(unpaidDebts)}</span></div>}
                     isCollapsed={collapseDebt}
@@ -368,7 +341,7 @@ const DebtCollector = () => {
                 ? null
                 : <div>
                     {unpaidDebts.length === 0 && (
-                        <div className='containerBox color-red'>No unpaid debts</div>
+                        <div className='containerDetail size20 m-5 p-10 color-lite color-red'>No unpaid debts</div>
                     )}
                     {unpaidDebts.length > 0 && (
                         <div className='scroll ht-250'>
@@ -379,7 +352,7 @@ const DebtCollector = () => {
                     )}
                 </div>
             }
-            <div className='containerBox bg-blue'>
+            <div className='containerDetail size20 m-5 p-10 color-lite bg-blue'>
                 <CollapseToggleButton
                     title={<div className='color-yellow flexContainer'><span className='flex2Column'>💸 Dues</span><span className='flex2Column contentRight pr-10'>${getTotalAmount(unpaidDues)}</span></div>}
                     isCollapsed={collapseDues}
@@ -392,7 +365,7 @@ const DebtCollector = () => {
                 ? null
                 : <div>
                     {unpaidDues.length === 0 && (
-                        <div className='containerBox color-red'>No unpaid dues</div>
+                        <div className='containerDetail size20 m-5 p-10 color-lite color-red'>No unpaid dues</div>
                     )}
                     {unpaidDues.length > 0 && (
                         <div className='scroll ht-250'>
@@ -403,7 +376,7 @@ const DebtCollector = () => {
                     )}
                 </div>
             }
-            <div className='containerBox bg-blue'>
+            <div className='containerDetail size20 m-5 p-10 color-lite bg-blue'>
                 <CollapseToggleButton
                     title={<div className='color-yellow flexContainer'><span className='flex2Column'>💸 Paid Dues</span><span className='flex2Column contentRight pr-10'>${getTotalAmount(paidDues)}</span></div>}
                     isCollapsed={collapsePaidDues}
@@ -416,7 +389,7 @@ const DebtCollector = () => {
                 ? null
                 : <div>
                     {paidDues.length === 0 && (
-                        <div className='containerBox color-red'>No paid dues</div>
+                        <div className='containerDetail size20 m-5 p-10 color-lite color-red'>No paid dues</div>
                     )}
                     {paidDues.length > 0 && (
                         <div className='scroll ht-250'>

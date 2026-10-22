@@ -1,5 +1,4 @@
 // src/components/VotingForm/reducer.js
-import { passwordStrength } from './helpers';
 import { actionTypes } from './actions';
 
 export const initialState = {

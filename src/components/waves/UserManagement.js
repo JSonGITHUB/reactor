@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const UserManagement = () => {
 
@@ -7,6 +7,11 @@ const UserManagement = () => {
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const searchInputIdRef = useRef(null);
+    if (searchInputIdRef.current === null) {
+        searchInputIdRef.current = `name-${Math.random().toString(36).slice(2, 10)}`;
+    }
+    const searchInputId = searchInputIdRef.current;
 
     useEffect(() => {
 
@@ -43,8 +48,8 @@ const UserManagement = () => {
         <div>
             <h1>User Management</h1>
             <input
-                id='name'
-                name='name'
+                id={searchInputId}
+                name={searchInputId}
                 type='text'
                 placeholder='Search by name'
                 value={search}

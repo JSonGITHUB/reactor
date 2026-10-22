@@ -9,10 +9,11 @@ const WavesParent = ({
     children,
     targetElementRef
 }) => {
+    const getStoredEditState = () => initializeData('edit', 'false') === 'true';
 
     const [locations, setLocations] = useState(JSON.parse(localStorage.getItem('locations')));
     const [currentWave, setCurrentWave] = useState();
-    const [edit, setEdit] = useState(false);
+    const [edit, setEdit] = useState(getStoredEditState);
 
     //console.log(`WavesContext => locations: ${JSON.stringify(locations, null, 2)}`);
 
@@ -34,6 +35,7 @@ const WavesParent = ({
         //console.log(`WavesContext => initLocations: ${JSON.stringify(initLocations, null, 2)}`);
         setLocations(initLocations);
         setCurrentWave(localStorage.getItem('currentWave'));
+        setEdit(getStoredEditState());
     }, []);
 
     const handleResetLocations = () => {
@@ -49,7 +51,6 @@ const WavesParent = ({
     const updateLocations = (locations) => {
         //console.log(`updateLocations1 => ${JSON.stringify(locations, null, 2)}`);
         //console.log(`updateLocations2 => ${initializeData('locations', null)}`);
-        setEdit(prev => !prev);
         setLocations(locations);
     }; 
 

@@ -39,7 +39,9 @@ const logTemplateData = {
         Direction: "NW",
         Orientation: "Offshore",
         MPH: "5mph",
-        Surface: "Glassy"
+        Surface: "Glassy",
+        WaterTemp: "",
+        AirTemp: ""
     },
     Conditions: {
         Conditions: "Firing"

@@ -15,7 +15,7 @@ const ScrollingTimePicker = ({
         return Array.from({ length: limit }, (_, i) => String(i).padStart(2, '0'));
     };
 
-    const hoursArray = generateNumbers(90);
+    const hoursArray = generateNumbers(900);
     const minutesArray = generateNumbers(60);
     const secondsArray = generateNumbers(60);
 

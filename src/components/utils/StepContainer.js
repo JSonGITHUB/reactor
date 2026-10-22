@@ -1,7 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { StepContext } from '../context/StepContext';
 import icons from '../site/icons';
-import getKey from './KeyGenerator';
 import validate from './validate';
 import initializeData from './InitializeData';
 
@@ -28,18 +27,8 @@ const StepContainer = React.memo(( {
         getHours,
         getMinutes,
         getSeconds,
-        newStep,
-        setNewStep,
-        newHours,
-        setNewHours,
         editIndex,
         setEditIndex,
-        newMinutes,
-        setNewMinutes,
-        newSeconds,
-        setNewSeconds,
-        setDialog,
-        setNewTimer,
         handleRestartStep,
         toggleTimer,
         timerState,
@@ -157,71 +146,6 @@ const StepContainer = React.memo(( {
         )
         return displaySteps;
     }
-    const getEditDialog = (id) => {
-        const newDialog = <div className='containerBox'>
-            <input
-                id='newStep'
-                name='newStep'
-                type='text'
-                placeholder='Step Description'
-                value={newStep}
-                onChange={(e) => setNewStep(e.target.value)}
-                className='containerDetail width-100-percent'
-            />
-            <br />
-            <input
-                id='hours'
-                name='hours'
-                type='number'
-                placeholder='Hours'
-                value={newHours}
-                onChange={(e) => setNewHours(e.target.value)}
-            />
-            <input
-                id='minutes'
-                name='minutes'
-                type='number'
-                placeholder='Minutes'
-                value={newMinutes}
-                onChange={(e) => setNewMinutes(e.target.value)}
-            />
-            <input
-                id='seconds'
-                name='seconds'
-                type='number'
-                placeholder='Seconds'
-                value={newSeconds}
-                onChange={(e) => setNewSeconds(e.target.value)}
-            />
-            <input
-                id='note'
-                name='note'
-                type='string'
-                placeholder='Add note'
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-            />
-            <button
-                onClick={() => setDialog('')}
-                className='containerBox'
-            >
-                SUBMIT
-            </button>
-            <button
-                onClick={() => setDialog('')}
-                className='containerBox'
-            >
-                CANCEL
-            </button>
-        </div>
-        setNewStep(steps[id].step);
-        setNewHours(getHours(steps[id].timer));
-        setNewMinutes(getMinutes(steps[id].timer));
-        setNewSeconds(getSeconds(steps[id].timer));
-        setNewTimer(steps[id].timer)
-        setDialog(newDialog);
-
-    }
     const moveToSelectedStep = (index) => {
         setCurrentStepIndex(index);
         setTimeLeft(steps[index].timer);
@@ -232,7 +156,7 @@ const StepContainer = React.memo(( {
         const newSchedules = [...schedules];
         newSchedules[schedule].steps[index].note = note;
         //setSteps(newSchedules);
-    }, [note]);
+    }, [note, index, schedule, schedules]);
     useEffect(() => {
         //console.log(`StepContainer => index: ${index}`);
         //console.log(`StepContainer => schedule: ${steps[index].title} step: ${JSON.stringify(steps[index], null, 2)}`);

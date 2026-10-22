@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import CircuitGroup from './CircuitGroup';
-import getKey from '../utils/KeyGenerator';
-import CollapseToggleButton from '../utils/CollapseToggleButton';
 import { CircuitContext } from '../context/CircuitContext';
-import initCircuitTracking from './initCircuitTracking';
 import initializeData from '../utils/InitializeData';
 import icons from '../site/icons';
 import Selector from '../forms/FunctionalSelector';
@@ -13,9 +10,6 @@ const TrackCircuit = () => {
     const {
         circuits,
         setCircuits,
-        sort,
-        setSort,
-        activeIndex,
         setActiveIndex,
         setActivated,
         ticker,
@@ -23,106 +17,64 @@ const TrackCircuit = () => {
         countdown,
         setCountdown,
         jumpToActive,
-        videoId,
-        videoActive,
-        edit,
         setEdit,
-        groupIndex,
-        setGroupIndex,
         group,
-        setGroup,
         groups,
         selectGroup
     } = useContext(CircuitContext);
 
-    const [, forceUpdate] = useState();
     const [collapse, setCollapse] = useState();
     const [initialized, setInitialized] = useState(false);
 
     useEffect(() => {
-        console.log(`TrackCircuit => group: ${group}`);
         if (!initialized) {
             setInitialized(true);
         } else {
             localStorage.setItem('circuitGroup', group);
         }
-    }, [group]);
+    }, [group, initialized]);
+
     useEffect(() => {
-        console.log(`TrackCircuit => groups: ${JSON.stringify(groups, null, 2)}`);
-    }, [groups]);
-    useEffect(() => {
-        console.log(`TrackCircuit => groupIndex: ${groupIndex}`);
-    }, [groupIndex]);
-    useEffect(() => {
-        console.log(`TrackCircuit => circuits update`);
-        //forceUpdate(Math.random());
         localStorage.setItem('circuitTracking', JSON.stringify(circuits));
     }, [circuits]);
-    useEffect(() => {
-    }, [activeIndex]);
-    useEffect(() => {
-        console.log(`TrackCircuit => videoActive: ${videoActive} videoId: ${videoId}`);
-    }, [videoId]);
     
     useEffect(() => {
         if (collapse !== undefined) {
-            const newCircuits = [...circuits];
-            newCircuits.map((circuitGroup) => {
-                    return {
-                        ...circuitGroup,
-                        isCollapsed: collapse,
-                        circuits: circuitGroup.circuits.map((circuit) => {
-                            circuit.isCollapsed = collapse
-                        }) 
-                    }
-            });        
-            //console.log(`Circuits => newCircuits: ${JSON.stringify(newCircuits, null, 2)}`);
+            setCircuits((previousCircuits) => previousCircuits.map((circuitGroup) => ({
+                ...circuitGroup,
+                isCollapsed: collapse,
+                circuits: circuitGroup.circuits.map((circuit) => ({
+                    ...circuit,
+                    isCollapsed: collapse
+                }))
+            })));
             localStorage.setItem('circuitsCollapsed', collapse);
-            setCircuits(newCircuits);
         } else {
             setCollapse(initializeData('circuitsCollapsed', true));
         }
-    }, [collapse]);
+    }, [collapse]); // eslint-disable-line react-hooks/exhaustive-deps
     const toggleEdit = () => {
         setEdit(prev => !prev);
     }
 
     const reset = () => {
-        const newCircuits = [...circuits];
-        console.log(`newCircuits: ${JSON.stringify(newCircuits, null, 2)}`);
-        newCircuits.map((circuitGroup) => {
-            return {
-                ...circuitGroup,
-                circuits: circuitGroup.circuits.map((circuit) => {
-                    return {
-                        ...circuit,
-                        isCollapsed: collapse
-                    };
-                })
-            };
-        });
-        newCircuits.map((circuitGroup) => {
-            return {
-                ...circuitGroup,
-                circuits: circuitGroup.circuits.map((circuit) => {
-                    return {
-                        ...circuit,
-                        display: true,
-                        excersizes: circuit.excersizes.map((excersize) => {
-                            return {
-                                ...excersize,
-                                complete: false,
-                                activated: false,
-                                display: true,
-                                currentTime: circuit.time,
-                                restTime: circuit.restTime,
-                                elapsedTime: 0
-                            };
-                        })
-                    };
-                })
-            };
-        });
+        const newCircuits = circuits.map((circuitGroup) => ({
+            ...circuitGroup,
+            circuits: circuitGroup.circuits.map((circuit) => ({
+                ...circuit,
+                isCollapsed: collapse,
+                display: true,
+                excersizes: circuit.excersizes.map((excersize) => ({
+                    ...excersize,
+                    complete: false,
+                    activated: false,
+                    display: true,
+                    currentTime: circuit.time,
+                    restTime: circuit.restTime,
+                    elapsedTime: 0
+                }))
+            }))
+        }));
         setCircuits(newCircuits);
         setActivated(false);
         setActiveIndex(null)
@@ -191,7 +143,7 @@ const TrackCircuit = () => {
     }
 
     return (
-        <div key={getKey('circuitGroupContainer')} className='pb-100'>
+        <div key='circuit-group-container' className='pb-100'>
             <div className='containerBox pr-20'>
                 <Selector
                     label='Circuit Groups'
@@ -204,7 +156,7 @@ const TrackCircuit = () => {
             {
                 /*
                 circuits.map((circuitGroup, circuitGroupIndex) => (
-                        <div key={getKey('circuitGroups')}>
+                        <div key='circuit-groups'>
                             <CircuitGroup
                                 circuitGroup={circuitGroup}
                                 circuitGroupIndex={circuitGroupIndex}
@@ -215,7 +167,7 @@ const TrackCircuit = () => {
                     ))
                 */
             }
-            <div key={getKey('circuitGroups')}>
+            <div key='circuit-groups'>
                 <CircuitGroup />
             </div>
             <div className={`containerDetail bt-5 ml-5 width--10 bg-tintedMediumDark size12 color-lite`}>

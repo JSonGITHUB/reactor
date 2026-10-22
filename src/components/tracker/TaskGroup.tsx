@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-import getKey from '../utils/KeyGenerator';
 import Task from './Task';
 
 type Session = {
@@ -56,7 +55,6 @@ const TaskGroup: FC<Props> = ({
     setTasks
     
 }) => {
-	console.log('Rendering TaskGroup for tasks:', tasks.length || 0 );
     const project = tasks && tasks[index] || [];
 
 	// compute project total time (sum of runningTime for all sessions of all tasks)
@@ -82,7 +80,7 @@ const TaskGroup: FC<Props> = ({
     }
 
 	return (
-		<div key={getKey(`${project.description}${index}`)} className="task-group m-5">
+		<div key={`task-group-tsx-${index}-${String(project.description || 'group')}`} className="task-group m-5">
 			<div className="containerDetail color-yellow contentLeft p-20">
 				<div className='size30 mb-10'>{project.description}</div>
                 <div className="project-total">Total: {formatDurationTime(getProjectTotalTime(project))}</div>
@@ -91,7 +89,7 @@ const TaskGroup: FC<Props> = ({
 			<div className="tasks-list">
 				{project.tasks.map((task, taskIndex) => (
 					<Task
-						key={getKey(`${task.description}${taskIndex}`)}
+						key={`task-group-tsx-item-${index}-${taskIndex}-${String(task.description || 'task')}`}
 						index={taskIndex}
 						projects={tasks}
                         setProjects={setTasks}

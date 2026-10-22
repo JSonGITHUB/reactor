@@ -1,8 +1,6 @@
 import React, { useContext } from 'react';
 import icons from '../site/icons';
 import { CircuitContext } from '../context/CircuitContext';
-import initCircuitTracking from './initCircuitTracking';
-import initializeData from './initializeData';
 
 const CircuitNavigation = ({
     circuit,
@@ -18,9 +16,7 @@ const CircuitNavigation = ({
         setActiveIndex,
         setActivated,
         setExcersizeTime,
-        setRestTime,
-        edit,
-        setEdit
+        setRestTime
     } = useContext(CircuitContext);
 
     const deleteCircuit = () => {
@@ -42,13 +38,11 @@ const CircuitNavigation = ({
         const newCircuits = [...circuits];
         const totalTime = Number(newCircuits[circuitGroupIndex].circuits[circuitIndex].time);
         const totalRestTime = Number(newCircuits[circuitGroupIndex].circuits[circuitIndex].restTime);
-        console.log(`setExcersizeTime(totalTime: ${totalTime}, circuitGroupIndex: ${circuitGroupIndex}, circuitIndex: ${circuitIndex})`)
         setExcersizeTime(
             totalTime,
             circuitGroupIndex,
             circuitIndex
         )
-        console.log(`setRestTime(totalRestTime: ${totalRestTime}, circuitGroupIndex: ${circuitGroupIndex}, circuitIndex: ${circuitIndex})`)
         setRestTime(
             totalRestTime,
             circuitGroupIndex,

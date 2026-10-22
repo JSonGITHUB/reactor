@@ -17,12 +17,11 @@ const parseSchedule = (rawText, baseStartTime = null) => {
             firstLine.match(
                 /^(?:✅\s*)?(.+?)\s*-\s*(\d+)\s*(min|mins|minutes|hr|hrs|hour|hours|s|sec|secs|seconds)\b/i
         );
-        let title = '', durationStr = '', notes = rest;
+        let title = '', notes = rest;
         let timeInSeconds = 1800; // default 30 min
 
         if (match) {
             title = match[1].trim();
-            durationStr = `${match[2]} ${match[3]}`;
             const num = parseInt(match[2], 10);
             const unit = match[3].toLowerCase();
             if (unit.startsWith('h')) timeInSeconds = num * 60 * 60;
@@ -74,13 +73,31 @@ const Scheduler = () => {
     const intervalRef = useRef(null);
     const [activeTaskId, setActiveTaskId] = useState(null);
 
+    const getPersistedBool = (key, defaultVal) => {
+        const val = localStorage.getItem(key);
+        return val !== null ? val === 'true' : defaultVal;
+    };
+    const [scheduleFormOpen, setScheduleFormOpen] = useState(() => getPersistedBool('schedulerFormOpen', false));
+    const [selectScheduleOpen, setSelectScheduleOpen] = useState(() => getPersistedBool('selectScheduleOpen', false));
+    const [scheduleFormTab, setScheduleFormTab] = useState(() => localStorage.getItem('schedulerFormTab') || 'freeform');
+    const [guidedEntries, setGuidedEntries] = useState([{ title: '', duration: '30', unit: 'min', notes: '' }]);
+
+    const [schedulerLibrary, setSchedulerLibrary] = useState(() => {
+        try { return JSON.parse(localStorage.getItem('schedulerLibrary') || '[]'); } catch { return []; }
+    });
+    const [activeScheduleId, setActiveScheduleId] = useState(() => localStorage.getItem('schedulerActiveId') || null);
+    const [scheduleName, setScheduleName] = useState('');
+    const [libraryOpen, setLibraryOpen] = useState(() => getPersistedBool('schedulerLibraryOpen', true));
+
     const scheduleRef = useRef(null);
 
+    useEffect(() => {
+        setScheduleFormOpen(true);
+    }, [selectScheduleOpen]);
     // Load from localStorage on mount
     useEffect(() => {
         const savedTasks = localStorage.getItem('schedulerTasks');
         const savedMeta = localStorage.getItem('schedulerMeta');
-        console.log(`Scheduler => savedTasks: ${JSON.stringify(savedTasks, null, 2)}`);
         if (savedTasks && savedMeta) {
             try {
                 const parsedTasks = JSON.parse(savedTasks);
@@ -341,6 +358,153 @@ const Scheduler = () => {
         }, 0);
     };
 
+    // --- SAVED SCHEDULES LIBRARY ---
+    const generateScheduleId = () => `sched-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+
+    const persistLibrary = (nextLibrary) => {
+        localStorage.setItem('schedulerLibrary', JSON.stringify(nextLibrary));
+        setSchedulerLibrary(nextLibrary);
+    };
+
+    const toggleLibraryOpen = () => {
+        setLibraryOpen(prev => {
+            const next = !prev;
+            localStorage.setItem('schedulerLibraryOpen', String(next));
+            return next;
+        });
+    };
+    const deleteSchedule = () => {
+        if (!activeScheduleId) return;
+        const nextLibrary = schedulerLibrary.filter(s => s.id !== activeScheduleId);
+        persistLibrary(nextLibrary);
+        setActiveScheduleId(null);
+        localStorage.removeItem('schedulerActiveId');
+        loadScheduleFromLibrary(schedulerLibrary[0])
+        setScheduleFormOpen(true);
+    }
+
+    const saveScheduleToLibrary = () => {
+        const name = scheduleName.trim() || 'Untitled Schedule';
+        const now = new Date().toISOString();
+        const existingIndex = schedulerLibrary.findIndex(s => s.id === activeScheduleId);
+        if (existingIndex >= 0) {
+            const nextLibrary = schedulerLibrary.map((s, i) =>
+                i === existingIndex
+                    ? { ...s, name, rawInput, guidedEntries, updatedAt: now }
+                    : s
+            );
+            persistLibrary(nextLibrary);
+            setScheduleName(name);
+        } else {
+            const newSchedule = { id: generateScheduleId(), name, rawInput, guidedEntries, createdAt: now, updatedAt: now };
+            const nextLibrary = [...schedulerLibrary, newSchedule];
+            persistLibrary(nextLibrary);
+            setActiveScheduleId(newSchedule.id);
+            localStorage.setItem('schedulerActiveId', newSchedule.id);
+            setScheduleName(name);
+        }
+        setScheduleFormOpen(true);
+    };
+
+    const saveScheduleAsNew = () => {
+        const name = (scheduleName.trim() || 'Untitled Schedule') + (schedulerLibrary.length ? ` (${schedulerLibrary.length + 1})` : '');
+        const now = new Date().toISOString();
+        const newSchedule = { id: generateScheduleId(), name, rawInput, guidedEntries, createdAt: now, updatedAt: now };
+        const nextLibrary = [...schedulerLibrary, newSchedule];
+        persistLibrary(nextLibrary);
+        setActiveScheduleId(newSchedule.id);
+        localStorage.setItem('schedulerActiveId', newSchedule.id);
+        setScheduleName(name);
+        setScheduleFormOpen(true);
+    };
+
+    const loadScheduleFromLibrary = (schedule) => {
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            setActiveTaskId(null);
+        }
+        const rawText = schedule.rawInput || '';
+        setRawInput(rawText);
+        setGuidedEntries(schedule.guidedEntries && schedule.guidedEntries.length
+            ? schedule.guidedEntries
+            : [{ title: '', duration: '30', unit: 'min', notes: '' }]
+        );
+        setScheduleName(schedule.name);
+        setActiveScheduleId(schedule.id);
+        localStorage.setItem('schedulerActiveId', schedule.id);
+        if (rawText.trim()) {
+            const now = new Date();
+            setScheduleStart(now);
+            setTasks(parseSchedule(rawText, now));
+        } else {
+            setTasks([]);
+        }
+        setScheduleFormOpen(true);
+    };
+
+    const deleteScheduleFromLibrary = (id) => {
+        const nextLibrary = schedulerLibrary.filter(s => s.id !== id);
+        persistLibrary(nextLibrary);
+        if (activeScheduleId === id) {
+            setActiveScheduleId(null);
+            localStorage.removeItem('schedulerActiveId');
+        }
+    };
+
+    // --- FORM OPEN/TAB PERSISTENCE ---
+    const toggleScheduleForm = () => {
+        setScheduleFormOpen(prev => {
+            const next = !prev;
+            localStorage.setItem('schedulerFormOpen', String(next));
+            return next;
+        });
+    };
+
+    const selectFormTab = (tab) => {
+        setScheduleFormTab(tab);
+        localStorage.setItem('schedulerFormTab', tab);
+    };
+
+    // --- GUIDED ENTRY HELPERS ---
+    const DURATION_UNITS = ['min', 'hr', 'sec'];
+
+    const addGuidedEntry = () => {
+        setGuidedEntries(prev => [...prev, { title: '', duration: '30', unit: 'min', notes: '' }]);
+    };
+
+    const removeGuidedEntry = (index) => {
+        setGuidedEntries(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const updateGuidedEntry = (index, field, value) => {
+        setGuidedEntries(prev => prev.map((entry, i) =>
+            i === index ? { ...entry, [field]: value } : entry
+        ));
+    };
+
+    const buildRawFromGuided = () => {
+        return guidedEntries
+            .filter(e => e.title.trim())
+            .map(e => {
+                const header = `${e.title.trim()} - ${e.duration || '30'} ${e.unit || 'min'}`;
+                return e.notes.trim() ? `${header}\n${e.notes.trim()}` : header;
+            })
+            .join('\n\n');
+    };
+
+    const handleGuidedSubmit = () => {
+        const raw = buildRawFromGuided();
+        if (!raw.trim()) return;
+        setRawInput(raw);
+        const now = new Date();
+        setScheduleStart(now);
+        const parsed = parseSchedule(raw, now);
+        setTasks(parsed);
+        if (intervalRef.current) clearInterval(intervalRef.current);
+        setActiveTaskId(null);
+        setScheduleFormOpen(true);
+    };
+
     const handleParse = () => {
         const now = new Date();
         setScheduleStart(now);
@@ -350,40 +514,319 @@ const Scheduler = () => {
         setActiveTaskId(null);
     };
 
+    const startNewSchedule = () => {
+        toggleScheduleForm();
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            setActiveTaskId(null);
+        }
+        setRawInput('');
+        setGuidedEntries([{ title: '', duration: '30', unit: 'min', notes: '' }]);
+        setScheduleName('');
+        setActiveScheduleId(null);
+        localStorage.removeItem('schedulerActiveId');
+        setTasks([]);
+    };
+
     // UI
     return (
         <div className='mt--30' ref={scheduleRef}>
             <div className='containerDetail m-5 size20 bg-lite bottomBorderMedium'>
-                <div className='containerDetail p-20 contentLeft color-yellow bg-lite'>
-                    🕒 Scheduler
-                </div>
-                <textarea
-                    className='containerDetail p-20 bg-dark width--5 mt-5'
-                    rows={10}
-                    placeholder={`Paste your schedule here...`}
-                    value={rawInput}
-                    onChange={(e) => {
-                        if (intervalRef.current) {
-                            clearInterval(intervalRef.current);
-                            setActiveTaskId(null);
-                            setTasks(prev => prev.map(t => ({ ...t, isActive: false, paused: false })));
-                        }
-                        setRawInput(e.target.value);
-                    }}
-                />
-                <div className='containerDetail color-orange mt-5 pt-10 pb-10 size12 pl-15 pr-15 contentLeft lh-15'>
-                    Each schedule item should be in this format:<br /><br />
-                        ✅ Morning Movement — 30 mins<br />
-                        Light surf<br />
-                        stretch<br />
-                        or bodyweight session<br /> 
-                    – adjust intensity based on how you feel.<br />
 
-                    <br />Separate options and tasks with a blank line.
+                {/* Collapsible header */}
+                <div
+                    className='containerDetail flexContainer p-20 contentLeft color-yellow bg-lite button flexContainer'
+                    onClick={() => setSelectScheduleOpen(prev => {
+                        const next = !prev;
+                        localStorage.setItem('selectScheduleOpen', String(next));
+                        return next;
+                    })}
+                    style={{ userSelect: 'none', alignItems: 'center', gap: '10px' }}
+                >
+                    <div className='flex2Column'>
+                        <div>
+                            🕒 Scheduler
+                        </div>
+                        {activeScheduleId ? (
+                            <div className='size12 color-orange ml-10'>
+                                {scheduleName || 'Untitled Schedule'}
+                            </div>
+                        ) : (
+                            <div className='size12 color-lime ml-10'>
+                                + New Schedule
+                            </div>
+                        )}
+                    </div>
+                    <div className='flex2Column size14 color-yellow size20 contentRight'>
+                        Select Schedule {selectScheduleOpen ? '▲' : '▼'}
+                    </div>
                 </div>
-                <div className='containerDetail p-20 color-lite button bg-green' onClick={handleParse}>
-                    Submit Schedule
-                </div>
+
+                {selectScheduleOpen && (
+                    <div>
+                        {/* Saved Schedules Panel */}
+                        <div className='containerDetail mb-5'>
+                            <div
+                                className='flexContainer button p-10 bg-tintedMedium color-yellow'
+                                onClick={toggleLibraryOpen}
+                                style={{ alignItems: 'center', gap: '8px', userSelect: 'none' }}
+                            >
+                                <span className='size14' style={{ flex: 1 }}>
+                                    📋 Saved Schedules ({schedulerLibrary.length})
+                                </span>
+                                <span className='size12'>{libraryOpen ? '▲' : '▼'}</span>
+                            </div>
+
+                            {libraryOpen && (
+                                <div className='containerDetail bg-dark p-10'>
+                                    {schedulerLibrary.length === 0 ? (
+                                        <div className='size12 color-orange p-10 contentLeft'>No saved schedules yet. Fill in a schedule below and save it.</div>
+                                    ) : (
+                                        schedulerLibrary.map(schedule => {
+                                            const isActive = activeScheduleId === schedule.id;
+                                            return (
+                                                <div
+                                                    key={schedule.id}
+                                                    className={`flexContainer p-10 mb-5 ${isActive ? 'bg-green' : 'bg-tintedMedium'}`}
+                                                    style={{ borderRadius: '6px', alignItems: 'center', gap: '8px' }}
+                                                    onClick={() => loadScheduleFromLibrary(schedule)}
+                                                >
+                                                    <div
+                                                        className={`flex3Column contentLeft size14 ${isActive ? 'color-neogreen' : 'color-yellow'}`}
+                                                    >
+                                                        {schedule.name}
+                                                        {isActive && <span className='size12 color-neogreen'> ● active</span>}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })
+                                    )}
+
+                                    {/* Save / Update controls */}
+                                    <div className='mt-10'>
+                                            {activeScheduleId && schedulerLibrary.some(s => s.id === activeScheduleId) ? (
+                                                <div className='flexContainer mt-10'>
+                                                    <div
+                                                        className='containerDetail flex3Column button bg-green color-yellow p-10 contentCenter size12'
+                                                        onClick={() => setScheduleFormOpen(false)}
+                                                        title='Update the current schedule'
+                                                    >
+                                                        ✏️ Edit
+                                                    </div>
+                                                    <div
+                                                        className='containerDetail ml-5 flex3Column button bg-dkOrange color-yellow p-10 contentCenter size12'
+                                                        onClick={startNewSchedule}
+                                                        title='Start a new blank schedule'
+                                                    >
+                                                        ➕ New
+                                                    </div>
+                                                    <div
+                                                        className='containerDetail ml-5 flex3Column button bg-dkRed color-yellow p-10 contentCenter size12'
+                                                        onClick={deleteSchedule}
+                                                        title='Delete the current schedule'
+                                                    >
+                                                        🗑️ Delete
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <div
+                                                        className='flex2Column button bg-green color-neogreen p-10 contentCenter size12'
+                                                        onClick={saveScheduleToLibrary}
+                                                        title='Save this as a new schedule'
+                                                    >
+                                                        Save
+                                                    </div>
+                                                    <div
+                                                        className='flex2Column button bg-tintedMedium color-orange p-10 contentCenter size12'
+                                                        onClick={startNewSchedule}
+                                                        title='Clear everything for a fresh start'
+                                                    >
+                                                        Add New
+                                                    </div>
+                                                </>
+                                            )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Tab bar */}
+                        {
+                            (scheduleFormOpen)
+                            ? null
+                            : <div className='containerDetail contentLeft'>
+                                <div className='size12 color-orange mb-10 contentLeft pl-10 pt-10'>
+                                    {activeScheduleId && schedulerLibrary.some(s => s.id === activeScheduleId)
+                                        ? '✎ Edit mode: Update existing or Save as new'
+                                        : '+ Create mode: Give your schedule a name and save'}
+                                </div>
+                                <div className='size12 color-yellow mb-5 pl-10'>
+                                    Schedule name
+                                </div>
+                                <input
+                                    className='containerDetail ml-10 mb-20 p-10 bg-tintedMedium color-lite'
+                                    placeholder='e.g. Morning Routine'
+                                    value={scheduleName}
+                                    onChange={e => setScheduleName(e.target.value)}
+                                />
+                                <div className='flexContainer' style={{ gap: '0', borderBottom: '2px solid #333' }}>
+                                    {['freeform', 'guided'].map(tab => (
+                                        <div
+                                            key={tab}
+                                            className={`button p-10 flex1Column contentCenter size14 ${scheduleFormTab === tab ? 'bg-green color-neogreen' : 'bg-tintedMedium color-yellow'}`}
+                                            style={{ borderBottom: scheduleFormTab === tab ? '3px solid #2ec4b6' : '3px solid transparent' }}
+                                            onClick={() => selectFormTab(tab)}
+                                        >
+                                            {tab === 'freeform' ? 'Free Form' : 'Guided Entry'}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Free Form tab */}
+                                {scheduleFormTab === 'freeform' && (
+                                    <div>
+                                        <textarea
+                                            className='containerDetail p-20 bg-dark width--5 mt-5'
+                                            rows={10}
+                                            placeholder={`Paste your schedule here...`}
+                                            value={rawInput}
+                                            onChange={(e) => {
+                                                if (intervalRef.current) {
+                                                    clearInterval(intervalRef.current);
+                                                    setActiveTaskId(null);
+                                                    setTasks(prev => prev.map(t => ({ ...t, isActive: false, paused: false })));
+                                                }
+                                                setRawInput(e.target.value);
+                                            }}
+                                        />
+                                        <div className='containerDetail color-orange mt-5 pt-10 pb-10 size12 pl-15 pr-15 contentLeft lh-15'>
+                                            Each schedule item should be in this format:<br /><br />
+                                            ✅ Morning Movement — 30 mins<br />
+                                            Light surf<br />
+                                            stretch<br />
+                                            or bodyweight session<br />
+                                            – adjust intensity based on how you feel.<br />
+                                            <br />Separate items with a blank line.
+                                        </div>
+                                        <div className='containerDetail p-20 color-lite button bg-green' onClick={handleParse}>
+                                            Submit Schedule
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Guided Entry tab */}
+                                {scheduleFormTab === 'guided' && (
+                                    <div className='containerDetail p-10'>
+                                        <div className='size12 color-orange mb-10 contentLeft lh-15'>
+                                            Add each schedule block below. Title and duration are required. Notes are optional.
+                                        </div>
+
+                                        {guidedEntries.map((entry, index) => (
+                                            <div
+                                                key={index}
+                                                className='containerDetail bg-tintedMedium p-10 mb-10'
+                                                style={{ borderRadius: '8px', border: '1px solid #334' }}
+                                            >
+                                                <div className='flexContainer mb-5' style={{ gap: '8px', alignItems: 'center' }}>
+                                                    <div className='size12 color-yellow flex1Column contentLeft'>Item {index + 1}</div>
+                                                    {guidedEntries.length > 1 && (
+                                                        <div
+                                                            className='button size12 color-orange'
+                                                            onClick={() => removeGuidedEntry(index)}
+                                                        >
+                                                            ✕ Remove
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className='mb-5'>
+                                                    <div className='size12 color-yellow mb-5 contentLeft'>Title</div>
+                                                    <input
+                                                        className='containerDetail p-10 bg-dark color-lite'
+                                                        style={{ width: '100%', boxSizing: 'border-box' }}
+                                                        placeholder='e.g. Morning Movement'
+                                                        value={entry.title}
+                                                        onChange={e => updateGuidedEntry(index, 'title', e.target.value)}
+                                                    />
+                                                </div>
+
+                                                <div className='flexContainer mb-5' style={{ gap: '8px', alignItems: 'flex-end' }}>
+                                                    <div style={{ flex: 2 }}>
+                                                        <div className='size12 color-yellow mb-5 contentLeft'>Duration</div>
+                                                        <input
+                                                            className='containerDetail p-10 bg-dark color-lite'
+                                                            type='number'
+                                                            min='1'
+                                                            placeholder='30'
+                                                            value={entry.duration}
+                                                            onChange={e => updateGuidedEntry(index, 'duration', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div style={{ flex: 1 }}>
+                                                        <div className='size12 color-yellow mb-5 contentLeft'>Unit</div>
+                                                        <select
+                                                            className='containerDetail p-10 bg-dark color-lite'
+                                                            value={entry.unit}
+                                                            onChange={e => updateGuidedEntry(index, 'unit', e.target.value)}
+                                                        >
+                                                            {DURATION_UNITS.map(u => (
+                                                                <option key={u} value={u}>{u}</option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <div className='size12 color-yellow mb-5 contentLeft'>Notes (optional)</div>
+                                                    <textarea
+                                                        className='containerDetail p-10 bg-dark color-lite'
+                                                        style={{ width: '100%', boxSizing: 'border-box' }}
+                                                        rows={3}
+                                                        placeholder='e.g. Light surf, stretch, bodyweight session'
+                                                        value={entry.notes}
+                                                        onChange={e => updateGuidedEntry(index, 'notes', e.target.value)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        ))}
+
+                                        <div className='flexContainer'>
+                                            <div
+                                                className='containerDetail flex2Column button bg-tintedMedium color-yellow p-20 contentCenter'
+                                                onClick={addGuidedEntry}
+                                            >
+                                                + Add Item
+                                            </div>
+                                            <div
+                                                className='containerDetail ml-5 flex2Column button bg-green color-neogreen p-20 contentCenter'
+                                                onClick={handleGuidedSubmit}
+                                            >
+                                                Submit
+                                            </div>
+                                        </div>
+                                            <div className='flexContainer mt-10'>
+                                                <div
+                                                    className='containerDetail flex2Column button bg-green color-yellow p-10 contentCenter size12'
+                                                    onClick={saveScheduleToLibrary}
+                                                    title='Update the current schedule'
+                                                >
+                                                    Update
+                                                </div>
+                                                <div
+                                                    className='containerDetail ml-5 flex2Column button bg-tintedMedium color-yellow p-10 contentCenter size12'
+                                                    onClick={saveScheduleAsNew}
+                                                    title='Save as a new schedule'
+                                                >
+                                                    Save As New
+                                                </div>
+                                            </div>
+                                    </div>
+                                )}
+                            </div>
+                        }
+                    </div>
+                )}
             </div>
             {tasks.map((task) => (
                 <div

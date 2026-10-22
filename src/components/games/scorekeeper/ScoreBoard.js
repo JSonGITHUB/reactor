@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useContext } from 'react';
 import { PlayerContext } from '../../context/PlayerContext';
 import getKey from '../../utils/KeyGenerator';
 import GetAthleteScore from './GetAthleteScore';

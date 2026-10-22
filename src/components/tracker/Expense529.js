@@ -410,7 +410,7 @@ const Expense529 = () => {
                             </label>
                             <label>
                                 <div className='containerBox flexContainer'>
-                                    <div className='containerBox flexColumn contenLeft'>
+                                    <div className='containerBox flexColumn contentLeft'>
                                         Share % (0–100)
                                     </div>
                                     <input
@@ -582,12 +582,6 @@ const Expense529 = () => {
             </div>
         </div>
     );
-};
-
-const td = {
-    padding: '8px 12px',
-    borderBottom: '1px solid #f5f5f5',
-    verticalAlign: 'top',
 };
 
 export default Expense529;

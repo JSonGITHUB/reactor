@@ -13,46 +13,27 @@ const SwellDisplay = ({
 }) => {
 
     const {
-        status,
-        setStatus,
         swell,
-        swellData,
-        setTide,
-        setWind,
-        setWindStatus,
-        handleTideCheck,
-        handleTideSelection,
-        handleWindCheck,
-        handleSwellCheck,
-        handleSwell1Selection,
-        handleSwell2Selection,
-        handleSwell1LiveSelection,
-        handleSwell2LiveSelection,
-        handleSwell1Angle,
-        handleSwell2Angle,
-        handleSwell1Height,
-        handleSwell2Height,
-        handleSwell1Interval,
-        handleSwell2Interval,
-        handleStarSelection,
-        handleDistanceSelection,
-        pause,
         retry
     } = useContext(OceanContext);
 
-    const [dataInit, setDataInit] = useState(false);
     const storedCollapse = initializeData('swellCollapse', null);
     const initialCollapse = storedCollapse ? storedCollapse === 'true' : true;
     const [swellCollapse, setSwellCollapse] = useState(initialCollapse);
-    const getSwellHeight = () => Number(swell.swell_wave_height) ?? 0; //?? Number(status.swell1Height);
-    const getSwellDirection = () => Number(swell.swell_wave_direction);// ?? Number(status.swell1Direction);
-    const getSwellInterval = () => Number(swell.swell_wave_period);// ?? Number(status.swell1Interval);
-    const getWaveHeight = () => Number(swell.wave_height);// ?? Number(status.swell1Height);
-    const getWaveDirection = () => Number(swell.wave_direction);// ?? Number(status.swell1Direction);
-    const getWaveInterval = () => Number(swell.wave_period);// ?? Number(status.swell1Interval);
-    const getWindWaveHeight = () => Number(swell.wind_wave_height);// ?? Number(status.swell2Height);
-    const getWindWaveDirection = () => Number(swell.wind_wave_direction);// ?? Number(status.swell2Direction);
-    const getWindWaveInterval = () => Number(swell.wind_wave_period);// ?? Number(status.swell2Interval);
+    const safeSwell = swell || {};
+    const asNumber = (value) => {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : 0;
+    };
+    const getSwellHeight = () => asNumber(safeSwell.swell_wave_height); //?? Number(status.swell1Height);
+    const getSwellDirection = () => asNumber(safeSwell.swell_wave_direction);// ?? Number(status.swell1Direction);
+    const getSwellInterval = () => asNumber(safeSwell.swell_wave_period);// ?? Number(status.swell1Interval);
+    const getWaveHeight = () => asNumber(safeSwell.wave_height);// ?? Number(status.swell1Height);
+    const getWaveDirection = () => asNumber(safeSwell.wave_direction);// ?? Number(status.swell1Direction);
+    const getWaveInterval = () => asNumber(safeSwell.wave_period);// ?? Number(status.swell1Interval);
+    const getWindWaveHeight = () => asNumber(safeSwell.wind_wave_height);// ?? Number(status.swell2Height);
+    const getWindWaveDirection = () => asNumber(safeSwell.wind_wave_direction);// ?? Number(status.swell2Direction);
+    const getWindWaveInterval = () => asNumber(safeSwell.wind_wave_period);// ?? Number(status.swell2Interval);
     
    /*  useEffect(() => {
         localStorage.setItem('swellData', JSON.stringify(swell));
@@ -61,16 +42,21 @@ const SwellDisplay = ({
         localStorage.setItem('swellCollapse', swellCollapse);
     }, [swellCollapse]);
 
-    const swellHeader = () => <div>{icons.wave} Swell {Number(getSwellHeight()).toFixed(0)}<span className='size12'>ft</span> {getDirection(getSwellDirection(), 'swell1Direction')} {getSwellDirection()} {Number(getSwellInterval()).toFixed(0)}<span className='size12'>sec</span></div>
+    const swellHeader = () => <div>
+                                {icons.wave} Swell {Number(getWaveHeight()).toFixed(0)}
+                                <span className='size12 mr-5'>ft</span>
+                                {getDirection(getWaveDirection(), 'swellDirection')} {getWaveDirection()} {Number(getWaveInterval()).toFixed(0)}
+                                <span className='size12'>sec</span>
+                            </div>;
     return (
         <div>
             {
                 (retry !== '')
-                ? <div className='containerBox p-20 contentLeft bg-lite color-yellow bold'>
+                ? <div className='containerDetail bg-lite mb-5 p-20 contentLeft bg-lite color-yellow'>
                     {icons.wave} Swell: fetching data retry attempt {retry}
                 </div>
-                : <div className=''>
-                    <div className='containerBox bold color-yellow bg-lite p-20'>
+                : <div className='mt-5'>
+                    <div className='containerDetail bg-lite mb-5 color-yellow bg-lite p-20 size20'>
                         <CollapseToggleButton
                             //title={`${icons.wave} SWELL ${Number(getSwellHeight()).toFixed(0)}ft ${getDirection(getSwellDirection())} ${getSwellDirection()} ${Number(getSwellInterval()).toFixed(0)}sec`}
                             title=''
@@ -83,57 +69,51 @@ const SwellDisplay = ({
                     {
                         (swellCollapse)
                             ? null
-                            : <div>
-                                <div className='containerBox flexContainer centerVertical'>
+                                : <div className='containerDetail bg-lite'>
+                                    <div className='containerDetail bg-tintedMedium mb-5 flexContainer centerVertical p-15'>
                                     <div className='flex4Column contentCenter'>
-                                        <span className='size40 mr-30'>{icons.wave}</span>
-                                        {Number(getSwellHeight()).toFixed(0)}ft
-                                    </div>
-                                    <div className='flex10Column pl-10'>
-                                        <div className='r-20 pr-5 pb-4 pt-2 bg-white width30px'>
-                                            <GetDirectionIcon
-                                                id='swell1Direction'
-                                                direction={getSwellDirection()}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className='flex5Column contentLeft'>
-                                        {getSwellDirection()} {getDirection(getSwellDirection(),'swell1Direction')}
-                                    </div>
-                                    <div className='flexColumn contentRight'>
-                                        {icons.track}
-                                    </div>
-                                    <div className='flex5Column contentCenter'>
-                                        {Number(getSwellInterval()).toFixed(0)} sec
-                                    </div>
-                                </div>
-                                <div className='containerBox flexContainer centerVertical'>
-                                    <div className='flex4Column contentCenter'>
-                                        <span className='size30 mr-35'>{icons.wave}</span>
-                                        {Number(getWaveHeight()).toFixed(0)}ft
+                                        <span className='size30 mr-30'>{icons.wave}</span>
+                                            <span className='size25 color-lite'>{Number(getWaveHeight()).toFixed(0)}</span><span className='size15 color-lite'>ft</span>
                                     </div>
                                     <div className='flex10Column pl-10'>
                                             <div className='r-20 pr-5 pb-4 pt-2 bg-white width30px'>
                                             <GetDirectionIcon
-                                                id='swell1Direction'
+                                                id='waveDirection'
                                                 direction={getWaveDirection()}
                                             />
                                         </div>
                                     </div>
-                                    <div className='flex5Column contentLeft'>
-                                        {getWaveDirection()} {getDirection(getWaveDirection(), 'swell1Direction')}
+                                    <div className='flex5Column contentLeft size15 color-lite'>
+                                        {getWaveDirection()} {getDirection(getWaveDirection(), 'waveDirection')}
                                     </div>
-                                    <div className='flexColumn contentRight'>
-                                        {icons.track}
-                                    </div>
-                                    <div className='flex5Column contentCenter'>
+                                        <div className='flex5Column contentCenter size20 color-lite'>
                                         {Number(getWaveInterval()).toFixed(0)} sec
                                     </div>
                                 </div>
-                                <div className='containerBox flexContainer centerVertical'>
+                                <div className='containerDetail bg-tintedMedium mb-5 flexContainer centerVertical p-15'>
                                     <div className='flex4Column contentCenter'>
+                                        <span className='size25 mr-30'>{icons.wave}</span>
+                                        <span className='size25 color-lite'>{Number(getSwellHeight()).toFixed(0)}</span><span className='size15 color-lite'>ft</span>
+                                    </div>
+                                    <div className='flex10Column pl-10'>
+                                        <div className='r-20 pr-5 pb-4 pt-2 bg-white width30px'>
+                                            <GetDirectionIcon
+                                                id='swellDirection'
+                                                direction={getSwellDirection()}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className='flex5Column contentLeft size15 color-lite'>
+                                        {getSwellDirection()} {getDirection(getSwellDirection(), 'swellDirection')}
+                                    </div>
+                                        <div className='flex5Column contentCenter size20 color-lite'>
+                                        {Number(getSwellInterval()).toFixed(0)} sec
+                                    </div>
+                                </div>
+                                    <div className='containerDetail bg-tintedMedium mb-5 flexContainer centerVertical p-15'>
+                                        <div className='flex4Column contentCenter size15 color-lite'>
                                         <span className='mr-30'>{icons.wind} {icons.wave}</span>
-                                        {Number(getWindWaveHeight()).toFixed(0)}ft
+                                        <span className='size25 color-lite'>{Number(getWindWaveHeight()).toFixed(0)}</span><span className='size15 color-lite'>ft</span>
                                     </div>
                                     <div className='flex10Column pl-10'>
                                         <div className='r-20 pr-5 pb-4 pt-2 bg-white width30px'>
@@ -143,13 +123,10 @@ const SwellDisplay = ({
                                             />
                                         </div>
                                     </div>
-                                    <div className='flex5Column contentLeft'>
+                                    <div className='flex5Column contentLeft size15 color-lite'>
                                         {getWindWaveDirection()} {getDirection(getWindWaveDirection(), 'swell2Direction')}
                                     </div>
-                                    <div className='flexColumn contentRight'>
-                                        {icons.track}
-                                    </div>
-                                    <div className='flex5Column contentCenter'>
+                                        <div className='flex5Column contentCenter size20 color-lite'>
                                         {Number(getWindWaveInterval()).toFixed(0)} sec
                                     </div>
                                 </div>

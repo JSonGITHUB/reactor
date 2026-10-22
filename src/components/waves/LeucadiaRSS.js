@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import Parser from 'rss-parser';
 
+const isLocalDev = typeof window !== 'undefined' && window.location?.hostname === 'localhost';
+const NDBC_BASE = isLocalDev ? '/api/ndbc' : 'https://www.ndbc.noaa.gov';
+
 const LeucadiaRSS = () => {
-  const feedUrl = 'https://www.ndbc.noaa.gov/data/latest_obs/46274.rss';
+  const feedUrl = `${NDBC_BASE}/data/latest_obs/46274.rss`;
   const [feedData, setFeedData] = useState(null);
 
   useEffect(() => {
     const parseRSSFeed = async () => {
       try {
         const parser = new Parser();
-        const parsedFeed = await parser.parseURL(feedUrl);
+        const response = await fetch(feedUrl);
+        const xmlText = await response.text();
+        const parsedFeed = await parser.parseString(xmlText);
         setFeedData(parsedFeed);
       } catch (error) {
         console.error('Error parsing RSS feed:', error);

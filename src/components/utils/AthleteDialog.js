@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useContext } from 'react';
 import { PlayerContext } from '../context/PlayerContext';
 import getKey from './KeyGenerator';
 import jerseyColors from '../games/scorekeeper/JerseyColors';
@@ -17,9 +17,6 @@ const AthleteDialog = ({
         editPlayer
     } = useContext(PlayerContext);
     
-    useEffect(() => {
-    }, []);
-
     const getScore = () => {
         window.location.pathname = '/reactor/Scores';
     }
@@ -35,9 +32,7 @@ const AthleteDialog = ({
     const selectJersey = (playerId, selection) => {
         const newPlayers = [...players];
         newPlayers[playerId].surfJerseyColor = (selection);
-        if (newPlayers != []) {
-            setPlayers(newPlayers);
-        }
+        setPlayers(newPlayers);
     }
     const getJerseyColorSelector = (playerId, color, index) => <button className={`bg-${color} ht-45 width50px button r-10`} onClick={() => selectJersey(playerId, index)}></button>;
     

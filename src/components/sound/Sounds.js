@@ -31,15 +31,8 @@ const boop = (winner = 0, score = 1) => {
     // Connect the oscillator to the audio context's destination (your speakers)
     oscillator.connect(audioContext.destination);
 
-    const treeScores = [5, 10, 55, 60, 105, 110, 155, 160];
     const treeTotals = [50, 100, 150, 200];
     const treeClosed = () => treeTotals.includes(score);
-    const isTree = () => treeScores.includes(score);
-    const isTree1 = () => (score > 0 && score < 55);
-    const isTree2 = () => (score > 50 && score < 105);
-    const isTree3 = () => (score > 100 && score < 155);
-    const isTree4 = () => (score > 150);
-    const isTreeComplete = () => (score > 150);
     // Set the oscillator type to 'sine' (you can experiment with other types like 'square', 'sawtooth', 'triangle')
 
     const getType = () => (score === winner || treeClosed()) ? 'sawtooth' : 'triangle';
@@ -59,8 +52,7 @@ const boop = (winner = 0, score = 1) => {
     oscillator.stop(audioContext.currentTime + soundLength);
 }
 
-var audioContext = new AudioContext(),
-    oscillator1;
+var oscillator1;
 
 const siren = (soundLength) => {
 
@@ -441,6 +433,93 @@ const water = (soundLength) => {
        audioContext.close();
      }, soundLength); // Adjust as needed
 }
+const playSoftBell = ({
+  frequency = 1280,   // higher + crisper
+  duration = 1.1,     // shorter tail for sharper feel
+  volume = 0.06
+} = {}) => {
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if (!AudioCtx) return;
+
+  const ctx = new AudioCtx();
+  const now = ctx.currentTime;
+
+  // Master envelope: very fast attack, quicker decay
+  const master = ctx.createGain();
+  master.gain.setValueAtTime(0.0001, now);
+  master.gain.linearRampToValueAtTime(volume, now + 0.008);
+  master.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+  // Core tone
+  const core = ctx.createOscillator();
+  const coreGain = ctx.createGain();
+  core.type = 'triangle';
+  core.frequency.setValueAtTime(frequency, now);
+
+  // Bright partials for crisp edge
+  const partial1 = ctx.createOscillator();
+  const p1Gain = ctx.createGain();
+  partial1.type = 'sine';
+  partial1.frequency.setValueAtTime(frequency * 2.7, now);
+
+  const partial2 = ctx.createOscillator();
+  const p2Gain = ctx.createGain();
+  partial2.type = 'sine';
+  partial2.frequency.setValueAtTime(frequency * 4.1, now);
+
+  coreGain.gain.setValueAtTime(0.0001, now);
+  coreGain.gain.linearRampToValueAtTime(0.55, now + 0.01);
+  coreGain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.85);
+
+  p1Gain.gain.setValueAtTime(0.0001, now);
+  p1Gain.gain.linearRampToValueAtTime(0.2, now + 0.006);
+  p1Gain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.45);
+
+  p2Gain.gain.setValueAtTime(0.0001, now);
+  p2Gain.gain.linearRampToValueAtTime(0.11, now + 0.004);
+  p2Gain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.3);
+
+  // Tiny high "click" for crisp transient
+  const clickBuffer = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.015), ctx.sampleRate);
+  const clickData = clickBuffer.getChannelData(0);
+  for (let i = 0; i < clickData.length; i++) clickData[i] = (Math.random() * 2 - 1) * 0.6;
+
+  const click = ctx.createBufferSource();
+  click.buffer = clickBuffer;
+
+  const clickHP = ctx.createBiquadFilter();
+  clickHP.type = 'highpass';
+  clickHP.frequency.setValueAtTime(3500, now);
+
+  const clickGain = ctx.createGain();
+  clickGain.gain.setValueAtTime(0.18, now);
+  clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.02);
+
+  // Light high-shelf emphasis
+  const shelf = ctx.createBiquadFilter();
+  shelf.type = 'highshelf';
+  shelf.frequency.setValueAtTime(3000, now);
+  shelf.gain.setValueAtTime(3, now);
+
+  core.connect(coreGain).connect(master);
+  partial1.connect(p1Gain).connect(master);
+  partial2.connect(p2Gain).connect(master);
+
+  click.connect(clickHP).connect(clickGain).connect(master);
+
+  master.connect(shelf).connect(ctx.destination);
+
+  core.start(now);
+  partial1.start(now);
+  partial2.start(now);
+  click.start(now);
+
+  const stopAt = now + duration + 0.05;
+  core.stop(stopAt);
+  partial1.stop(stopAt);
+  partial2.stop(stopAt);
+  click.stop(now + 0.03);
+};
 const ping = (soundLength) => {
     // Create AudioContext
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -839,7 +918,6 @@ const machineGun = (soundLength) => {
     // Start the machine gun sound
     const interval = 100; // Time between shots in milliseconds
     const shots = 20; // Number of shots
-    const duration = interval * shots; // Total duration of the machine gun sound
 
     // Function to play a single shot
     const playShot = () => {
@@ -903,7 +981,6 @@ const ak47 = (soundLength) => {
     // Start the AK-47 sound
     const interval = 50; // Time between shots in milliseconds
     const bursts = 10; // Number of bursts
-    const duration = interval * bursts; // Total duration of the AK-47 sound
 
     // Function to play a single shot
     const playShot = () => {
@@ -1082,6 +1159,7 @@ const Sounds = {
     whiteNoise,
     drip,
     water,
+    playSoftBell,
     ping,
     clank,
     tuningUp,
