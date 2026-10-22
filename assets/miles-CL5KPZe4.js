@@ -1,0 +1,1 @@
+const s=t=>t*Math.PI/180,r=(t,a,n,h)=>{if(!t||!a||!n||!h)return null;const e=3958.8,M=s(n-t),c=s(h-a),o=Math.sin(M/2)*Math.sin(M/2)+Math.cos(s(t))*Math.cos(s(n))*Math.sin(c/2)*Math.sin(c/2),i=2*Math.atan2(Math.sqrt(o),Math.sqrt(1-o));return e*i};export{r as m};
