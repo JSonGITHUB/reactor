@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useLayout } from '../../utils/LayoutContext';
 import ScoreCard from './ScoreCard';
 import CricketScore from './CricketScore';
 import Dominos from './Dominos';
@@ -41,6 +42,10 @@ import { WavesContext } from '../../context/WavesContext';
 const SCORES_STATUS_EVENT = 'scoresRecordedGamesChanged';
 
 const PlayerScores = () => {
+    const layout = useLayout();
+    const appBg = layout?.colors?.background;
+    const appPrimaryColor = layout?.colors?.primary;
+    const headerBackground = layout?.colors?.headerBackground;
 
     const {
         players,
@@ -53,8 +58,16 @@ const PlayerScores = () => {
         setCurrentWave
     } = useContext(WavesContext);
 
+    // Helper to get URL parameter
+    const getUrlParam = (param) => {
+        if (typeof window === 'undefined') return null;
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    };
+
+    const urlGame = getUrlParam('game');
     const [allGames, setAllGames] = useState(initializeData('games', games));
-    const [game, setGame] = useState(initializeData('game', 'standard'));
+    const [game, setGame] = useState(urlGame || initializeData('game', 'standard'));
     const defaultWinner = initializeData('winner', 21);
     
     const [winner, setWinner] = useState(
@@ -136,6 +149,13 @@ const PlayerScores = () => {
         }
         setLogData(initializeData(`${game}Games`, []));
     }, [game]);
+
+    // If URL param changes, update game state
+    useEffect(() => {
+        if (urlGame && urlGame !== game) {
+            setGame(urlGame);
+        }
+    }, [urlGame]);
 
     useEffect(() => {
         localStorage.setItem(`${game}Winner`, winner);
@@ -390,7 +410,7 @@ const PlayerScores = () => {
         </div>
         )
         return <div className='containerDetail m-5 bg-lite'>
-            <div className='containerBox size15 mt-5 mb--5 color-yellow'>
+            <div className='containerBox size15 mt-5 mb--5 color-yellow' style={{ background: headerBackground, color: appPrimaryColor }}>
                 <CollapseToggleButton
                     title={'Recorded Heats'}
                     isCollapsed={heatsCollapse}
@@ -460,7 +480,7 @@ const PlayerScores = () => {
         })
 
         return <div className='containerDetail bg-lite m-5'>
-            <div className='containerBox color-yellow'>
+            <div className='containerBox color-yellow' style={{ background: headerBackground, color: appPrimaryColor }}>
                 <CollapseToggleButton
                     title={'Athlete Ranks'}
                     isCollapsed={statsCollapse}
@@ -698,7 +718,7 @@ const PlayerScores = () => {
     /*
     const getScore = () => {
         setDisplayNumberPad(false);
-        window.location.pathname = '/reactor/Scores';
+        window.location = '/reactor/#/Scores';
     }
     
     const resetSurfersScores = (playerId) => {
@@ -1438,7 +1458,7 @@ const PlayerScores = () => {
         {
             (game !== 'surf')
                 ? <div className='containerDetail bg-lite m-5'>
-                    <div className='containerBox size15 mt-5 mb--5 color-yellow'>
+                    <div className='containerBox size15 mt-5 mb--5 color-yellow' style={{ background: headerBackground, color: appPrimaryColor }}>
                         <CollapseToggleButton
                             title={'Recorded Games'}
                             isCollapsed={logCollapse}
@@ -1455,7 +1475,7 @@ const PlayerScores = () => {
             : null
         }
         <div className={`containerDetail bg-lite m-5`}>
-            <div className={`containerBox color-yellow size15 mt-5 mb--5 ${(game === 'surf')?'pr-20':'' }`}>
+            <div className={`containerBox color-yellow size15 mt-5 mb--5 ${(game === 'surf') ? 'pr-20' : ''}`} style={{ background: headerBackground, color: appPrimaryColor }}>
                 <CollapseToggleButton
                     title={'Overall Standings'}
                     isCollapsed={standingsCollapse}
@@ -1474,7 +1494,7 @@ const PlayerScores = () => {
                     </div>
             }
         </div>
-        <div className='containerBox ht-100'></div>
+        <div className='ht-400'></div>
 
     </div>
 }

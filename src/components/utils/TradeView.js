@@ -324,10 +324,11 @@ const mergeStockLists = (lists) => {
 
 const loadStocksList = (signal) => {
     if (stocksListCache) return Promise.resolve(stocksListCache);
+    const publicBase = process.env.PUBLIC_URL || '';
     return Promise.all([
         loadNasdaqStockSource(signal),
-        loadStockSource('/stocks.json', signal),
-        loadStockSource('/stocks-additional.json', signal),
+        loadStockSource(`${publicBase}/stocks.json`, signal),
+        loadStockSource(`${publicBase}/stocks-additional.json`, signal),
     ])
         .then((lists) => mergeStockLists(lists))
         .then((data) => { stocksListCache = data; return data; })

@@ -14,7 +14,8 @@ const MarineChart: React.FC = () => {
     const [data, setData] = useState<MarineDataPoint[]>([]);
 
     useEffect(() => {
-        fetch('/data.json')
+        const dataUrl = `${process.env.PUBLIC_URL || ''}/data.json`;
+        fetch(dataUrl)
             .then((res) => res.json())
             .then((json) => {
                 const times = json.hourly.time;

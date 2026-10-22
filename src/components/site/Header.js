@@ -76,7 +76,8 @@ const headerNoticeRowStyle = {
     height: `${HEADER_NOTICE_HEIGHT}px`,
     scrollSnapAlign: 'start',
     display: 'flex',
-    alignItems: 'center'
+    alignItems: 'center',
+    fontSize: '10px'
 };
 
 const makeHouseTaskKey = (task) => `${task.description || ''}|${task.nextDue || ''}`;
@@ -618,6 +619,15 @@ const parseRecentComponents = () => {
 const getComponentFromPathname = (pathname) => {
     const segment = String(pathname || '').split('/').filter(Boolean).pop() || '';
     return decodeURIComponent(segment).trim();
+};
+
+const getComponentFromLocation = (locationObj) => {
+    const hash = String(locationObj?.hash || '');
+    const hashSegment = hash.replace(/^#\/?/, '').split('?')[0].split('/').filter(Boolean).pop() || '';
+    if (hashSegment) {
+        return decodeURIComponent(hashSegment).trim();
+    }
+    return getComponentFromPathname(locationObj?.pathname);
 };
 
 const getDoseStatus = () => {
@@ -1255,7 +1265,7 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
     const goHome = useCallback(() => {
         collapseDashboards();
         setMenuOpen(false);
-        window.location.pathname = '/reactor/Home';
+        window.location = '/reactor/#/Home';
     }, [collapseDashboards]);
     const handleHomeSelection = useCallback(() => {
         collapseDashboards();
@@ -1286,9 +1296,13 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
     const navClasses = (menuOpen) ? navClassesOpen : closedClasses;
     const getMenuButton = (menuOpen) ? closeButton : burgerButton;
     const path = window.location.pathname.toLocaleLowerCase();
-    const isHomePage = useMemo(() => (path === '/reactor/home'), [path]);
+    const hashPath = String(window.location.hash || '').toLocaleLowerCase();
+    const isHomePage = useMemo(() => {
+        if (hashPath === '#/' || hashPath === '#/home') return true;
+        return path === '/reactor/home' || path === '/reactor/';
+    }, [hashPath, path]);
     const homepageHeader = useMemo(() => (
-        <div className='mt-70 containerBox waveBackground bg-dark pt-200 width-100-20 animated-background'>
+        <div className='mt-70 containerDetail waveBackground pt-200 width-100-20 animated-background'>
             <div className='o-0'>
                 <Loader isMotionOn={isMotionOn} />
             </div>
@@ -1622,7 +1636,7 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
         } else {
             localStorage.removeItem(DOSE_FOCUS_KEY);
         }
-        window.location = '/reactor/Dose';
+        window.location = '/reactor/#/Dose';
     }, []);
 
     const openHouseWithFocus = useCallback((task) => {
@@ -1631,63 +1645,63 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
         } else {
             localStorage.removeItem(HOUSE_FOCUS_TASK_KEY);
         }
-        window.location = '/reactor/House';
+        window.location = '/reactor/#/House';
     }, []);
 
     const openWeather = useCallback(() => {
-        window.location = '/reactor/Weather';
+        window.location = '/reactor/#/Weather';
     }, []);
 
     const openWaves = useCallback(() => {
-        window.location = '/reactor/Waves';
+        window.location = '/reactor/#/Waves';
     }, []);
 
     const openTrainingLog = useCallback(() => {
-        window.location = '/reactor/TrainingLog';
+        window.location = '/reactor/#/TrainingLog';
     }, []);
 
     const openScheduler = useCallback(() => {
-        window.location = '/reactor/Scheduler';
+        window.location = '/reactor/#/Scheduler';
     }, []);
 
     const openTasks = useCallback(() => {
-        window.location = '/reactor/Tasks';
+        window.location = '/reactor/#/Tasks';
     }, []);
 
     const openTodos = useCallback(() => {
-        window.location = '/reactor/Todos';
+        window.location = '/reactor/#/Todos';
     }, []);
 
     const openWorkDay = useCallback(() => {
-        window.location = '/reactor/WorkDay';
+        window.location = '/reactor/#/WorkDay';
     }, []);
 
     const openCircuit = useCallback(() => {
-        window.location = '/reactor/Circuit';
+        window.location = '/reactor/#/Circuit';
     }, []);
 
     const openShop = useCallback(() => {
-        window.location = '/reactor/Shop';
+        window.location = '/reactor/#/Shop';
     }, []);
 
     const openFuel = useCallback(() => {
-        window.location = '/reactor/Fuel';
+        window.location = '/reactor/#/Fuel';
     }, []);
 
     const openScoresWithGame = useCallback((gameName) => {
         if (gameName) {
             localStorage.setItem('game', gameName);
         }
-        window.location = '/reactor/Scores';
+        window.location = '/reactor/#/Scores';
     }, []);
 
     const openComponent = useCallback((componentName) => {
         const safeComponent = String(componentName || '').trim();
         if (!safeComponent || safeComponent.toLowerCase() === 'home') return;
-        window.location = `/reactor/${safeComponent}`;
+        window.location = `/reactor/#/${safeComponent}`;
     }, []);
 
-    const currentComponent = getComponentFromPathname(window.location.pathname);
+    const currentComponent = getComponentFromLocation(window.location);
 
     const lastComponent = useMemo(() => {
         return recentComponents.find((item) => item.toLowerCase() !== currentComponent.toLowerCase()) || '';
@@ -1709,7 +1723,7 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
     }, []);
 
     useEffect(() => {
-        const activeComponent = getComponentFromPathname(window.location.pathname);
+        const activeComponent = getComponentFromLocation(window.location);
         if (!activeComponent || activeComponent.toLowerCase() === 'home') {
             return;
         }
@@ -2169,10 +2183,20 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
             localStorage.setItem('categories', JSON.stringify(newCategories));
         }
         localStorage.setItem('menus', JSON.stringify(newMenus));
-        window.location = `/reactor/${label}`
+        window.location = `/reactor/#/${label}`
     }
+
+    let appBg = undefined;
+    try {
+        const appAppearanceSettings = JSON.parse(localStorage.getItem('appAppearanceSettings'));
+        appBg = appAppearanceSettings?.colors?.background;
+    } catch { }
+
     return (
-        <div className='App-header'>
+        <div 
+            className='App-header'
+            style={{ background: appBg || undefined }}
+        >
             <div className={navClasses}>
                 {hamburgerNav}
             </div>
@@ -2220,9 +2244,11 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
                                             title={notification}
                                             onClick={() => getApp(notification)}
                                             key={getKey(notification)}
-                                            className='containerBox flexColumn'
+                                            className='mt-15 ml-10'
                                         >
-                                            {icons[notification.toLowerCase()]}
+                                            <span className='w-50 m-10'>
+                                                {icons[notification.toLowerCase()]}
+                                            </span>
                                         </div>
                                     ))
                             }

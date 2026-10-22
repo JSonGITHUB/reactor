@@ -46,12 +46,13 @@ class PWAPushManager {
         }
 
         try {
+            const iconPath = `${process.env.PUBLIC_URL || ''}/logo192.png`;
             // Try to use service worker notification first
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.ready.then(reg => {
                     reg.showNotification(title, {
-                        icon: '/favicon.ico',
-                        badge: '/favicon.ico',
+                        icon: iconPath,
+                        badge: iconPath,
                         ...options,
                     });
                 });

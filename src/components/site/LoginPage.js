@@ -13,7 +13,7 @@ const LoginPage = () => {
 
         // Your logic to check password
         if (password === 'admin') {
-            history.push('/reactor/home'); // 👈 this replaces useNavigate
+            history.push('/Home');
         } else if (password === 'user') {
             history.push('/user');
         } else if (password === 'visitor') {
