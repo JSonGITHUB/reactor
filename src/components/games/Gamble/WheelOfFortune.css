@@ -9,7 +9,7 @@
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
-h2 {
+.wheel-container h2 {
     font-size: 2rem;
     margin-bottom: 1rem;
 }
