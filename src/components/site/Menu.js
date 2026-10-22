@@ -37,7 +37,7 @@ const Menu = ({ closeMenu }) => {
             localStorage.setItem('categories', JSON.stringify(newCategories));
         }
         localStorage.setItem('menus', JSON.stringify(newMenus));
-        window.location = `/reactor/${label}`
+        window.location = `/reactor/#/${label}`
     }
     const portraitButton = (label) => <div
                                             title={`${icons[String(label).toLowerCase()]} ${label}`}

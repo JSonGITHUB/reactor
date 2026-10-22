@@ -20,7 +20,7 @@ const ConditionsSelectors = ({
         handleDistanceSelection
     } = useContext(OceanContext);
 
-    const refresh = () => window.location.pathname = '/reactor/Waves';
+    const refresh = () => window.location = '/reactor/#/Waves';
     if (distanceInputIdRef.current === null) {
         distanceInputIdRef.current = `distance-${Math.random().toString(36).slice(2, 10)}`;
     }

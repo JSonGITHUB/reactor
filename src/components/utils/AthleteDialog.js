@@ -18,7 +18,7 @@ const AthleteDialog = ({
     } = useContext(PlayerContext);
     
     const getScore = () => {
-        window.location.pathname = '/reactor/Scores';
+        window.location = '/reactor/#/Scores';
     }
 
     const resetSurfersScores = (playerId) => {

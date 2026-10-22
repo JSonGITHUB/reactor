@@ -387,7 +387,7 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, items }) => {
         localStorage.setItem('lastPostId', recordId);
         localStorage.removeItem('sessionDraftNotes');
         setPostDirectory(newPostDirectory);
-        window.location.href = '/reactor/Sessions';
+        window.location.href = '/reactor/#/Sessions';
     };
 
     const handleSave = () => {
@@ -405,7 +405,7 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, items }) => {
         
         addPost(logId, protectedLog);
         localStorage.removeItem('sessionDraftNotes');
-        window.location.href = '/reactor/Sessions';
+        window.location.href = '/reactor/#/Sessions';
     };
 
     const handleDelete = () => {
@@ -416,12 +416,12 @@ const LogEntry = ({ logId, onChange, getStateLog, title, message, items }) => {
         localStorage.removeItem(id);
         localStorage.setItem('lastPostId', `${newPostDirectory[getLastIndex()]}`);
         setPostDirectory(newPostDirectory);
-        window.location.href = '/reactor/Sessions';
+        window.location.href = '/reactor/#/Sessions';
     };
 
     const handleCancel = () => {
         localStorage.removeItem('sessionDraftNotes');
-        window.location.href = '/reactor/Sessions';
+        window.location.href = '/reactor/#/Sessions';
     };
 
     const onDateChange = (date) => {

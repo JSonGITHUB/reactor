@@ -41,7 +41,7 @@ const WavesParent = ({
     const handleResetLocations = () => {
         setLocations(clearLocalData());
         handleEditToggle();
-        window.location = `/reactor/Waves`;
+        window.location = '/reactor/#/Waves';
     }
     const handleEditToggle = () => {
         const edit = (initializeData('edit', 'false') === 'true') ? false : true;

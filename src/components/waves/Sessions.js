@@ -17,7 +17,7 @@ const Sessions = () => {
     ] = PostDirectory();
 
     const getLog = () => {
-        window.location.href = '/reactor/Session';
+        window.location.href = '/reactor/#/Session';
     };
     const sessionClick = (item, spot) => {
         localStorage.setItem('spot', spot);
@@ -135,7 +135,7 @@ const Sessions = () => {
 
     const logSession = () => {
         localStorage.removeItem('logId');
-        window.location.href = '/reactor/Session?new=1';
+        window.location.href = '/reactor/#/Session?new=1';
     };
 
     return (
