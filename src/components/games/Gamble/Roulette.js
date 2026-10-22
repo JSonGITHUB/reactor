@@ -50,7 +50,7 @@ const Roulette = () => {
     };
 
     return (
-        <div className='containerDetail mt--30 color-lite'>
+        <div className='containerDetail mt--30 color-lite roulette-container'>
             <div className='containerDetail p-20 color-yellow size30 mb-5 bg-lite contentLeft'>
                 <span className='size40 color-red'>✵</span> Roulette
             </div>

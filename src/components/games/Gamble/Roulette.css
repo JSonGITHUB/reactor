@@ -132,7 +132,7 @@
     text-align: center;
 }
 
-button {
+.roulette-container button {
     margin-left: 1rem;
     padding: 0.5rem 1.2rem;
     font-size: 1rem;
@@ -143,7 +143,7 @@ button {
     cursor: pointer;
 }
 
-button:disabled {
+.roulette-container button:disabled {
     background-color: #999;
     cursor: not-allowed;
 }
