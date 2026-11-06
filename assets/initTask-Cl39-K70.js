@@ -1,0 +1,1 @@
+import{c as r}from"./feature-waves-DVF1fX7S.js";const t=(i,n)=>({startTime:r(),endTime:"",description:i,sessions:n,isRunning:!0,runningTime:"0s"});export{t as i};
