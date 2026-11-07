@@ -620,6 +620,18 @@ const Note = ({
                                                     }}
                                                 />
                                             </label>
+                                            {notePhotos.length > 0 && (
+                                                <div className='flex2Column ml-5 flexContainer' style={{ alignItems: 'center', gap: 8 }}>
+                                                    <div
+                                                        className='containerDetail button bg-lite color-yellow p-10 size12'
+                                                        onClick={() => setIsImageEditMode((prev) => !prev)}
+                                                        title={isImageEditMode ? 'Hide remove buttons' : 'Show remove buttons'}
+                                                        style={{ fontWeight: 600, minWidth: 48, textAlign: 'center' }}
+                                                    >
+                                                        ✏️
+                                                    </div>
+                                                </div>
+                                            )}
                                             <div className='flex2Column ml-10 mr-10'>{`Photos (${notePhotos.length})`}</div>
                                         </div>
                                     )}
@@ -977,6 +989,18 @@ const Note = ({
                                                     />
                                                 </label>
                                             </div>
+                                            {noteVideos.length > 0 && (
+                                                <div className='flex2Column ml-5 flexContainer' style={{ alignItems: 'center', gap: 8 }}>
+                                                    <div
+                                                        className='containerDetail button bg-lite color-yellow p-10 size12'
+                                                        onClick={() => setIsVideoEditMode((prev) => !prev)}
+                                                        title={isVideoEditMode ? 'Hide remove buttons' : 'Show remove buttons'}
+                                                        style={{ fontWeight: 600, minWidth: 48, textAlign: 'center' }}
+                                                    >
+                                                        ✏️
+                                                    </div>
+                                                </div>
+                                            )}
                                             <div className='flex2Column ml-10 mr-10'>
                                                 {`Videos (${noteVideos.length})`}
                                             </div>
