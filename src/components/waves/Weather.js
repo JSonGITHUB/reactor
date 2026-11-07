@@ -129,24 +129,48 @@ const Weather = () => {
     // Alert persistence functions
     const saveAlertConfig = async (config) => {
         try {
+            console.log('[Weather] Saving alert config:', config);
             const db = await openIndexedDB();
             const tx = db.transaction(['alerts'], 'readwrite');
             const store = tx.objectStore('alerts');
-            await store.put({ id: 'config', data: config });
+            
+            return new Promise((resolve, reject) => {
+                const request = store.put({ id: 'config', data: config });
+                request.onsuccess = () => {
+                    console.log('[Weather] ✓ Alert config saved to IndexedDB');
+                    resolve();
+                };
+                request.onerror = () => {
+                    console.error('[Weather] ✗ Error saving alert config:', request.error);
+                    reject(request.error);
+                };
+            });
         } catch (err) {
-            console.warn('Failed to save alert config:', err);
+            console.error('[Weather] ✗ Failed to save alert config:', err);
         }
     };
 
     const loadAlertConfig = async () => {
         try {
+            console.log('[Weather] Loading alert config from IndexedDB');
             const db = await openIndexedDB();
             const tx = db.transaction(['alerts'], 'readonly');
             const store = tx.objectStore('alerts');
-            const result = await store.get('config');
-            return result?.data || [];
+            
+            return new Promise((resolve) => {
+                const request = store.get('config');
+                request.onsuccess = () => {
+                    const data = request.result?.data || [];
+                    console.log('[Weather] ✓ Alert config loaded:', data);
+                    resolve(data);
+                };
+                request.onerror = () => {
+                    console.error('[Weather] ✗ Error loading alert config:', request.error);
+                    resolve([]);
+                };
+            });
         } catch (err) {
-            console.warn('Failed to load alert config:', err);
+            console.error('[Weather] ✗ Failed to load alert config:', err);
             return [];
         }
     };
@@ -216,6 +240,7 @@ const Weather = () => {
 
     // Add new alert
     const addAlert = async (type, value, label) => {
+        console.log('[Weather] Adding alert:', { type, value, label });
         const newAlert = {
             id: Date.now(),
             type,
@@ -223,12 +248,15 @@ const Weather = () => {
             label,
         };
         const newConfig = [...alertConfig, newAlert];
+        console.log('[Weather] New config:', newConfig);
         setAlertConfig(newConfig);
-        await saveAlertConfig(newConfig);
+        const saved = await saveAlertConfig(newConfig);
+        console.log('[Weather] Alert saved, returned:', saved);
     };
 
     // Remove alert
     const removeAlert = async (id) => {
+        console.log('[Weather] Removing alert:', id);
         const newConfig = alertConfig.filter((a) => a.id !== id);
         setAlertConfig(newConfig);
         await saveAlertConfig(newConfig);
@@ -341,17 +369,6 @@ const Weather = () => {
                 }));
                 setDaily(days);
 
-                // Check alerts after updating weather
-                if (data.current_weather && alertConfig.length > 0) {
-                    const currentWeather = {
-                        temperature: cToF(data.current_weather.temperature),
-                        windspeed: kmhToMph(data.current_weather.windspeed),
-                        weathercode: data.current_weather.weathercode,
-                        time: data.current_weather.time
-                    };
-                    checkAlerts(currentWeather, hours);
-                }
-
             } catch (err) {
                 setError('Failed to load weather data');
             } finally {
@@ -394,15 +411,25 @@ const Weather = () => {
 
     // Load alert configuration and preferences on mount
     useEffect(() => {
+        console.log('[Weather] Component mounted, loading configuration...');
         const loadConfig = async () => {
             const config = await loadAlertConfig();
+            console.log('[Weather] Setting alertConfig to:', config);
             setAlertConfig(config);
         };
         loadConfig();
 
         const prefs = loadPreferences();
+        console.log('[Weather] Loading preferences:', prefs);
         setShowAlertPanel(prefs.showAlertPanel);
     }, []);
+
+    // Re-check alerts whenever alertConfig changes
+    useEffect(() => {
+        if (current && alertConfig.length > 0) {
+            checkAlerts(current, hourly);
+        }
+    }, [alertConfig]);
 
     if (loading) {
         return <div className='color-yellow'><span className='blinking-fade'>⏳</span> Loading weather…</div>;
