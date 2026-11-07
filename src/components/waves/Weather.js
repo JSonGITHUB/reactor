@@ -4,6 +4,7 @@ const Weather = () => {
     const HOURLY_HOURS_TO_SHOW = 24;
     const REFRESH_INTERVAL_MS = 15 * 60 * 1000;
     const ALERT_DB_NAME = 'kfa-weather-alerts';
+    const PREFERENCES_KEY = 'weather-preferences';
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -233,6 +234,30 @@ const Weather = () => {
         await saveAlertConfig(newConfig);
     };
 
+    // Preferences persistence (localStorage)
+    const savePreferences = (prefs) => {
+        try {
+            localStorage.setItem(PREFERENCES_KEY, JSON.stringify(prefs));
+        } catch (err) {
+            console.warn('Failed to save preferences:', err);
+        }
+    };
+
+    const loadPreferences = () => {
+        try {
+            const stored = localStorage.getItem(PREFERENCES_KEY);
+            return stored ? JSON.parse(stored) : { showAlertPanel: false };
+        } catch (err) {
+            console.warn('Failed to load preferences:', err);
+            return { showAlertPanel: false };
+        }
+    };
+
+    const updateShowAlertPanel = (value) => {
+        setShowAlertPanel(value);
+        savePreferences({ showAlertPanel: value });
+    };
+
     useEffect(() => {
         if (!latitude || !longitude) {
             setError('No coordinates provided');
@@ -367,13 +392,16 @@ const Weather = () => {
         );
     }, []);
 
-    // Load alert configuration on mount
+    // Load alert configuration and preferences on mount
     useEffect(() => {
         const loadConfig = async () => {
             const config = await loadAlertConfig();
             setAlertConfig(config);
         };
         loadConfig();
+
+        const prefs = loadPreferences();
+        setShowAlertPanel(prefs.showAlertPanel);
     }, []);
 
     if (loading) {
@@ -466,7 +494,7 @@ const Weather = () => {
             <div className='containerDetail bg-lite mb-5 size20 contentLeft'>
                 <div
                     className='containerDetail bg-lite mb-5 p-10 color-yellow size20'
-                    onClick={() => setShowAlertPanel(!showAlertPanel)}
+                    onClick={() => updateShowAlertPanel(!showAlertPanel)}
                     style={{ cursor: 'pointer', userSelect: 'none' }}
                 >
                     🔔 Weather Alerts {showAlertPanel ? '▼' : '▶'} ({alertConfig.length})
