@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import icons from '../site/icons';
+import { searchGooglePlacesText } from '../../services/providerApi';
 
 const createLocationId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 
@@ -11,8 +12,6 @@ const MAP_PREFERENCE_APPLE = 'apple';
 const MAP_PREFERENCE_GOOGLE = 'google';
 const LIVE_QUERY_MODE_PRIMO = 'primo';
 const LIVE_QUERY_MODE_GLACIER = 'glacier';
-const GOOGLE_PLACES_API_KEY = process.env.REACT_APP_GOOGLE_PLACES_API_KEY || '';
-
 const OVERPASS_API = 'https://overpass-api.de/api/interpreter';
 
 const amenityIcons = {
@@ -112,41 +111,7 @@ const normalizeGooglePlaceStation = (place) => {
 };
 
 const searchGooglePlacesDirect = async ({ lat, lon, radius, textQuery = 'Primo Water refill' }) => {
-    if (!GOOGLE_PLACES_API_KEY) return [];
-
-    const response = await fetch('https://places.googleapis.com/v1/places:searchText', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Goog-Api-Key': GOOGLE_PLACES_API_KEY,
-            'X-Goog-FieldMask': [
-                'places.id',
-                'places.displayName',
-                'places.formattedAddress',
-                'places.location',
-                'places.regularOpeningHours.openNow',
-                'places.businessStatus',
-                'places.types',
-            ].join(','),
-        },
-        body: JSON.stringify({
-            textQuery,
-            maxResultCount: 20,
-            locationBias: {
-                circle: {
-                    center: { latitude: lat, longitude: lon },
-                    radius,
-                },
-            },
-        }),
-    });
-
-    if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || `Direct Google Places failed: ${response.status}`);
-    }
-
-    const data = await response.json();
+    const data = await searchGooglePlacesText({ lat, lon, radius, textQuery });
     return Array.isArray(data?.places) ? data.places : [];
 };
 

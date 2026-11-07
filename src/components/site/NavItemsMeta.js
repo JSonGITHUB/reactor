@@ -1,6 +1,6 @@
-import News from "../news/News";
-
-const NavItemsMeta = {
+   const NavItemsMeta = {
+    Eat: ['all', 'eat', 'restaurant', 'food', 'dining', 'meal', 'lunch', 'dinner', 'breakfast', 'cafe', 'find', 'location', 'gps', 'spot', 'spots', 'nearby'],
+    TipCalculator: ['all', 'simplify', 'improve', 'tip', 'calculator', 'finance', 'split', 'bill', 'restaurant', 'math', 'percent', 'gratuity'],
     Home: ['all', 'simplify', 'improve', 'home', 'kfa', 'index', 'search', 'all'],
     Circuit: ['all', 'simplify', 'surf', 'improve', 'workout', 'lift', 'excersize', 'exersize', 'circuit', 'dumbell', 'weights', 'stretch', 'yoga', 'training'],
     Tracker: ['all', 'simplify', 'surf', 'improve', 'tracker', 'notes', 'reflect', 'recipes', 'cook', 'ingredients', 'document', 'instructions', 'nutrition', 'season', 'seasoning', 'spices', 'waves', 'sets', 'conditions', 'event', 'time', 'timing', 'charge', 'charges', 'solar', 'links', 'instagram', 'web', 'websites', 'journal', 'journals', 'menu', 'breakfast', 'lunch', 'dinner', 'meal', 'meals', 'dishes', 'dish', 'task', 'tasks'],
@@ -36,6 +36,7 @@ const NavItemsMeta = {
     Dose: ['all', 'simplify', 'improve', 'dose', 'medication', 'schedule', 'plan', 'reflect', 'consume', 'document', 'pills', 'nutrition', 'meals', 'doseage'],
     Fuel: ['all', 'simplify', 'surf', 'improve', 'fuel', 'convert', 'schedule', 'currency', 'gas', 'document', 'gasolene', 'gallons', 'supplies', 'supply', 'trip', 'kilometers', 'miles', 'oil', 'rates', 'price', 'change', 'maintenance', 'auto', 'car', 'distance', 'odometer', 'gallons', 'liters'],
     Parks: ['all', 'simplify', 'improve', 'parks', 'locations', 'nature', 'document', 'reflect', 'explore', 'hike', 'trail', 'wildlife'],
+    City: ['all', 'city', 'san francisco', 'site', 'sites', 'attractions', 'museums', 'car rentals', 'transportation', 'depots', 'trolley', 'trollies', 'train', 'trains', 'travel', 'map', 'nearby'],
     Moon: ['all', 'simplify', 'improve', 'moon', 'phases', 'tides', 'ocean', 'high tide', 'low tide', 'lunar', 'calendar', 'date', 'days', 'next phase', 'full moon', 'new moon'],
     PhotoAssistant: ['all', 'simplify', 'surf', 'improve', 'fuel', 'convert', 'schedule', 'currency', 'gas', 'document', 'gasolene', 'gallons', 'supplies', 'supply', 'trip', 'kilometers', 'miles', 'oil', 'rates', 'price', 'change', 'maintenance', 'auto', 'car', 'distance', 'odometer', 'gallons', 'liters'],
     Expenses: ['all', 'simplify', 'surf', 'improve', 'expense', 'cost', 'expenses', 'category', 'reflect', 'document', 'location', 'gps', 'currency', 'pay', 'buy', 'exchange', 'rates'],
@@ -53,6 +54,9 @@ const NavItemsMeta = {
     Collections: ['all', 'simplify', 'improve', 'debt', 'schedule', 'collect', 'document', 'reflect', 'owe', 'due', 'pay', 'track', 'paid', 'buy', 'purchase', ],
     WorkDay: ['all', 'simplify', 'improve', 'work', 'day', 'schedule', 'document', 'reflect', 'tasks', 'time', 'track', 'hours', 'projects'],
     BusinessTax: ['all', 'simplify', 'improve', 'business', 'tax', 'expense', 'document', 'income', 'reflect', 'notes', 'category', 'track', 'estimate', 'quarterly'],
+    Lumber: ['all', 'simplify', 'improve', 'lumber', 'building', 'materials', 'deck', 'fence', 'concrete', 'stud', 'plywood', 'roofing', 'drywall', 'estimator', 'calculator', 'optimizer', 'store', 'associate', 'construction', 'hardware'],
+    Concrete: ['all', 'simplify', 'improve', 'concrete', 'pallet', 'bags', 'home depot', 'delivery', 'calculator', '90lb', '60lb', '50lb', 'fulfillment', 'masonry', 'construction'],
+    THD: ['all', 'simplify', 'improve', 'thd', 'home depot', 'encinitas', 'offline', 'product finder', 'product lookup', 'lumber', 'building materials', 'stud', 'plywood', 'osb', 'drywall', 'concrete', 'rebar', 'insulation', 'deck', 'fence', 'hardware', 'fasteners', 'aisle', 'bay', 'store'],
     Todos: ['all', 'simplify', 'improve', 'surf', 'todo', 'time', 'countdown', 'document', 'check', 'reflect', 'checkbox', 'list', 'track', 'checklist'],
     Note: ['all', 'simplify', 'improve', 'surf', 'note', 'notes', 'document', 'record', 'edit', 'save', 'reflect', 'journal', 'list', 'write'],
     Garden: ['all', 'simplify', 'improve', 'garden', 'vegetables', 'document', 'schedule', 'grow', 'reflect', 'water', 'harvest', 'fertilizer', 'season', 'seasoning', 'spices'],
@@ -78,6 +82,7 @@ const NavItemsMeta = {
     Photos: ['all', 'simplify', 'improve', 'photos', 'photo', 'search', 'find', 'see', 'reflect', 'research'],
     Videos: ['all', 'simplify', 'improve', 'videos', 'video', 'watch', 'see', 'reflect', 'research', 'search', 'find'],
     TicTacToe: ['all', 'simplify', 'improve', 'tictactoe', 'game', 'games', 'play'],
+    Pacman: ['all', 'simplify', 'improve', 'pacman', 'game', 'games', 'play'],
     //CrosswordPuzzle: ['all', 'simplify', 'improve', 'tictactoe', 'game', 'games', 'play'],
     WheelOfFortune: ['all', 'simplify', 'improve', 'wheel of fortune','wheel', 'of', 'fortune', 'game', 'games', 'play'],
     BlackJack: ['all', 'simplify', 'improve', 'black','jack', 'game', 'games', 'play'],
@@ -94,5 +99,7 @@ const NavItemsMeta = {
     //Snippets: ['all', 'simplify', 'improve', 'code', 'coding', 'program', 'internet', 'develop', 'developer'],
     MenuScreen: ['all', 'simplify', 'improve', 'code', 'coding', 'program', 'internet', 'develop', 'developer', 'admin', 'fix', 'issues'],
     Admin: ['all', 'simplify', 'improve', 'code', 'coding', 'program', 'internet', 'develop', 'developer', 'admin', 'fix', 'issues'],
+    Billiards: ['all', 'play', 'billiards', 'pool', 'bar', 'bars', 'pub', 'venue', 'table', 'game', 'find', 'location', 'nightlife', 'hangout', 'sports', 'recreation', 'entertainment', 'social', 'map', 'nearby', 'search'],
+    Cafe: ['all', 'simplify', 'improve', 'cafe', 'coffee', 'espresso', 'latte', 'americano', 'mocha', 'drink', 'bakery', 'wifi', 'barista', 'shop', 'house', 'starbucks', 'peet', 'dunkin', 'caribou', 'java', 'brew', 'roast', 'beans', 'cappuccino', 'macchiato', 'tea', 'chai', 'cortado', 'caffeine', 'relax', 'meet', 'hangout', 'study', 'work', 'find', 'nearby', 'location', 'gps'],
 };
 export default NavItemsMeta

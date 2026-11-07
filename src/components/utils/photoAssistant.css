@@ -32,61 +32,103 @@
 }
 
 /* Flex helpers */
-.flexRow {
+.shot-summary-card .flexRow,
+.shot-log-card .flexRow,
+.entry-card .flexRow,
+.photo-assistant-container .flexRow {
     display: flex;
     flex-direction: row;
     align-items: center;
 }
 
-.flexColumn {
+.shot-summary-card .flexColumn,
+.shot-log-card .flexColumn,
+.entry-card .flexColumn,
+.photo-assistant-container .flexColumn {
     display: flex;
     flex-direction: column;
 }
 
-.alignCenter {
+.shot-summary-card .alignCenter,
+.shot-log-card .alignCenter,
+.entry-card .alignCenter,
+.photo-assistant-container .alignCenter {
     align-items: center;
 }
 
-.justifyBetween {
+.shot-summary-card .justifyBetween,
+.shot-log-card .justifyBetween,
+.entry-card .justifyBetween,
+.photo-assistant-container .justifyBetween {
     justify-content: space-between;
 }
 
 /* Typography */
-.size12 {
+.shot-summary-card .size12,
+.shot-log-card .size12,
+.entry-card .size12,
+.photo-assistant-container .size12 {
     font-size: 12px;
 }
 
-.size14 {
+.shot-summary-card .size14,
+.shot-log-card .size14,
+.entry-card .size14,
+.photo-assistant-container .size14 {
     font-size: 14px;
 }
 
-.size16 {
+.shot-summary-card .size16,
+.shot-log-card .size16,
+.entry-card .size16,
+.photo-assistant-container .size16 {
     font-size: 16px;
 }
 
-.size18 {
+.shot-summary-card .size18,
+.shot-log-card .size18,
+.entry-card .size18,
+.photo-assistant-container .size18 {
     font-size: 18px;
 }
 
-.bold {
+.shot-summary-card .bold,
+.shot-log-card .bold,
+.entry-card .bold,
+.photo-assistant-container .bold {
     font-weight: 600;
 }
 
-.color-white {
+.shot-summary-card .color-white,
+.shot-log-card .color-white,
+.entry-card .color-white,
+.photo-assistant-container .color-white {
     color: #f5f5f5;
 }
 
-.color-gray {
+.shot-summary-card .color-gray,
+.shot-log-card .color-gray,
+.entry-card .color-gray,
+.photo-assistant-container .color-gray {
     color: #aaaaaa;
 }
 
-.color-yellow {
+.shot-summary-card .color-yellow,
+.shot-log-card .color-yellow,
+.entry-card .color-yellow,
+.photo-assistant-container .color-yellow {
     color: #f1c40f;
 }
 
 /* Buttons and icon buttons */
-button,
-.icon-button {
+.shot-summary-card button,
+.shot-log-card button,
+.entry-card button,
+.photo-assistant-container button,
+.shot-summary-card .icon-button,
+.shot-log-card .icon-button,
+.entry-card .icon-button,
+.photo-assistant-container .icon-button {
     background-color: transparent;
     border: none;
     color: inherit;
@@ -96,8 +138,14 @@ button,
     transition: background 0.2s ease;
 }
 
-button:hover,
-.icon-button:hover {
+.shot-summary-card button:hover,
+.shot-log-card button:hover,
+.entry-card button:hover,
+.photo-assistant-container button:hover,
+.shot-summary-card .icon-button:hover,
+.shot-log-card .icon-button:hover,
+.entry-card .icon-button:hover,
+.photo-assistant-container .icon-button:hover {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
@@ -133,11 +181,17 @@ button:hover,
         padding: 8px 10px;
     }
 
-    .size14 {
+    .shot-summary-card .size14,
+    .shot-log-card .size14,
+    .entry-card .size14,
+    .photo-assistant-container .size14 {
         font-size: 12px;
     }
 
-    .size16 {
+    .shot-summary-card .size16,
+    .shot-log-card .size16,
+    .entry-card .size16,
+    .photo-assistant-container .size16 {
         font-size: 14px;
     }
 }

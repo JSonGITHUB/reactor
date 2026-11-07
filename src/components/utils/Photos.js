@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
+import { requestProvider } from '../../services/providerApi';
 const Photos = () => {
-
-    const KEY = process.env.REACT_APP_UNSPLASH_API_KEY;
-
     const [query, setQuery] = useState('');
     const [photos, setPhotos] = useState([]);
 
     const fetchPhotos = async () => {
         if (!query) return;
-        const response = await fetch(
-            `https://api.unsplash.com/search/photos?query=${query}&client_id=${KEY}`
-        );
-        const data = await response.json();
+        const data = await requestProvider('photos', { query });
         setPhotos(data.results);
     };
 

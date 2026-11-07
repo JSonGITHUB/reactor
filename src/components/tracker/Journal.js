@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useLayout } from '../utils/LayoutContext';
 import { persistAssistantPhoto, getAssistantPhotoBlob, removeAssistantPhoto, isAssistantPhotoDbAvailable } from '../utils/assistantPhotoDb';
 import icons from '../site/icons';
 import EditableTextField from '../utils/EditableTextField';
@@ -113,12 +114,24 @@ const Journal = ({
     const [isVideoRowCollapsed, setIsVideoRowCollapsed] = useState(true);
     const [isPhotoDbAvailable, setIsPhotoDbAvailable] = useState(true);
     const [isVideoDbAvail, setIsVideoDbAvail] = useState(true);
+    const [imageZoom, setImageZoom] = useState(1);
+    const [imageZoomPercentInput, setImageZoomPercentInput] = useState('100');
+    const [imagePan, setImagePan] = useState({ x: 0, y: 0 });
+    const [isImagePanning, setIsImagePanning] = useState(false);
     const imageFileInputRef = useRef(null);
     const videoFileInputRef = useRef(null);
+    const imageViewportRef = useRef(null);
+    const imagePanStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
+    const imagePanRef = useRef({ x: 0, y: 0 });
     const entryImagesRef = useRef([]);
     const entryVideosRef = useRef([]);
 
-    const templateJournal = {
+    const IMAGE_ZOOM_MIN_PERCENT = 25;
+    const IMAGE_ZOOM_MAX_PERCENT = 400;
+    const IMAGE_ZOOM_STEP_PERCENT = 10;
+    const IMAGE_PAN_NUDGE_PX = 40;
+
+    const createTemplateJournal = () => ({
         description: 'Empty...',
         journal: 'Empty...',
         feelings: 'Empty...',
@@ -127,8 +140,11 @@ const Journal = ({
         gratefulFor: 'Empty...',
         entryImages: [],
         entryVideos: [],
+        imageZoom: 1,
+        imagePanX: 0,
+        imagePanY: 0,
         isCollapsed: false
-    };
+    });
 
     const normalizeGoals = (value) => {
         if (!Array.isArray(value)) return [];
@@ -206,22 +222,19 @@ const Journal = ({
 
     const selectedJournalPrimary = journals?.[journalGroupIndex]?.journal?.[journalIndex];
     const selectedJournalMirror = journals?.[journalGroupIndex]?.journals?.[journalIndex];
+    const selectedJournalEntry = selectedJournalMirror || selectedJournalPrimary || journal;
 
     // Memoize image IDs to provide stable dependency for useEffect
     const imageIdsDep = useMemo(() => {
-        const primary = journal?.entryImages?.map(i => i?.id) || [];
-        const mirrorPrimary = selectedJournalPrimary?.entryImages?.map(i => i?.id) || [];
-        const mirrorMirror = selectedJournalMirror?.entryImages?.map(i => i?.id) || [];
-        return `${primary.join('|')}|${mirrorPrimary.join('|')}|${mirrorMirror.join('|')}`;
-    }, [journal?.entryImages, selectedJournalPrimary?.entryImages, selectedJournalMirror?.entryImages]);
+        const current = selectedJournalEntry?.entryImages?.map(i => i?.id) || [];
+        return current.join('|');
+    }, [selectedJournalEntry?.entryImages]);
 
     // Memoize video IDs to provide stable dependency for useEffect
     const videoIdsDep = useMemo(() => {
-        const primary = journal?.entryVideos?.map(v => v?.id) || [];
-        const mirrorPrimary = selectedJournalPrimary?.entryVideos?.map(v => v?.id) || [];
-        const mirrorMirror = selectedJournalMirror?.entryVideos?.map(v => v?.id) || [];
-        return `${primary.join('|')}|${mirrorPrimary.join('|')}|${mirrorMirror.join('|')}`;
-    }, [journal?.entryVideos, selectedJournalPrimary?.entryVideos, selectedJournalMirror?.entryVideos]);
+        const current = selectedJournalEntry?.entryVideos?.map(v => v?.id) || [];
+        return current.join('|');
+    }, [selectedJournalEntry?.entryVideos]);
 
     const updateJournalMedia = (field, value) => {
         const newJournals = [...journals];
@@ -238,6 +251,85 @@ const Journal = ({
         }
 
         setJournals(newJournals);
+    };
+
+    const clampZoomPercent = (value) => {
+        const numericValue = Number(value);
+        if (!Number.isFinite(numericValue)) {
+            return Math.round(imageZoom * 100);
+        }
+        return Math.min(IMAGE_ZOOM_MAX_PERCENT, Math.max(IMAGE_ZOOM_MIN_PERCENT, Math.round(numericValue)));
+    };
+
+    const clampImagePan = (x, y, zoomScale = imageZoom) => {
+        if (zoomScale <= 1) {
+            return { x: 0, y: 0 };
+        }
+
+        const viewport = imageViewportRef.current;
+        if (!viewport) {
+            return { x, y };
+        }
+
+        const rect = viewport.getBoundingClientRect();
+        const maxX = Math.max(0, ((zoomScale - 1) * rect.width) / 2);
+        const maxY = Math.max(0, ((zoomScale - 1) * rect.height) / 2);
+
+        return {
+            x: Math.min(maxX, Math.max(-maxX, x)),
+            y: Math.min(maxY, Math.max(-maxY, y)),
+        };
+    };
+
+    const persistImagePan = (nextPan) => {
+        updateJournalMedia('imagePanX', nextPan.x);
+        updateJournalMedia('imagePanY', nextPan.y);
+    };
+
+    const applyImageZoomPercent = (value) => {
+        const zoomPercent = clampZoomPercent(value);
+        const zoomScale = zoomPercent / 100;
+        setImageZoom(zoomScale);
+        setImageZoomPercentInput(String(zoomPercent));
+        updateJournalMedia('imageZoom', zoomScale);
+
+        const clampedPan = clampImagePan(imagePanRef.current.x, imagePanRef.current.y, zoomScale);
+        imagePanRef.current = clampedPan;
+        setImagePan(clampedPan);
+        persistImagePan(clampedPan);
+    };
+
+    const changeImageZoomByStep = (deltaPercent) => {
+        applyImageZoomPercent(Math.round(imageZoom * 100) + deltaPercent);
+    };
+
+    const nudgeImagePan = (deltaX, deltaY) => {
+        if (imageZoom <= 1) {
+            return;
+        }
+
+        const clampedPan = clampImagePan(
+            imagePanRef.current.x + deltaX,
+            imagePanRef.current.y + deltaY,
+            imageZoom
+        );
+        imagePanRef.current = clampedPan;
+        setImagePan(clampedPan);
+        persistImagePan(clampedPan);
+    };
+
+    const beginImagePan = (event) => {
+        if (imageZoom <= 1) {
+            return;
+        }
+
+        imagePanStartRef.current = {
+            x: event.clientX,
+            y: event.clientY,
+            panX: imagePanRef.current.x,
+            panY: imagePanRef.current.y,
+        };
+        setIsImagePanning(true);
     };
 
     const addEntryImages = async (fileList) => {
@@ -372,7 +464,7 @@ const Journal = ({
 
         // If not an object, initialize it
         if (typeof selectedNewJournal !== 'object' || selectedNewJournal === null) {
-            selectedNewJournal = { ...templateJournal };
+            selectedNewJournal = createTemplateJournal();
             newJournals[journalGroupIndex].journal[journalIndex] = selectedNewJournal;
         }
 
@@ -390,6 +482,10 @@ const Journal = ({
             if (JSON.stringify(normalized) !== JSON.stringify(selectedNewJournal.todaysGoals)) {
                 selectedNewJournal.todaysGoals = normalized;
                 dataUpdated = true;
+            } else {
+                // Ensure each journal owns its own goals array reference.
+                selectedNewJournal.todaysGoals = [...selectedNewJournal.todaysGoals];
+                dataUpdated = true;
             }
         }
         if (validate(selectedNewJournal.futureGoals) === null) {
@@ -400,6 +496,10 @@ const Journal = ({
             if (JSON.stringify(normalized) !== JSON.stringify(selectedNewJournal.futureGoals)) {
                 selectedNewJournal.futureGoals = normalized;
                 dataUpdated = true;
+            } else {
+                // Ensure each journal owns its own goals array reference.
+                selectedNewJournal.futureGoals = [...selectedNewJournal.futureGoals];
+                dataUpdated = true;
             }
         }
         if (validate(selectedNewJournal.gratefulFor) === null) {
@@ -409,13 +509,85 @@ const Journal = ({
         if (!Array.isArray(selectedNewJournal.entryImages)) {
             selectedNewJournal.entryImages = [];
             dataUpdated = true;
+        } else {
+            // Avoid shared media array references across journal entries.
+            selectedNewJournal.entryImages = [...selectedNewJournal.entryImages];
+            dataUpdated = true;
         }
         if (!Array.isArray(selectedNewJournal.entryVideos)) {
             selectedNewJournal.entryVideos = [];
             dataUpdated = true;
+        } else {
+            // Avoid shared media array references across journal entries.
+            selectedNewJournal.entryVideos = [...selectedNewJournal.entryVideos];
+            dataUpdated = true;
+        }
+        if (!Number.isFinite(Number(selectedNewJournal.imageZoom)) || Number(selectedNewJournal.imageZoom) <= 0) {
+            selectedNewJournal.imageZoom = 1;
+            dataUpdated = true;
+        }
+        if (!Number.isFinite(Number(selectedNewJournal.imagePanX))) {
+            selectedNewJournal.imagePanX = 0;
+            dataUpdated = true;
+        }
+        if (!Number.isFinite(Number(selectedNewJournal.imagePanY))) {
+            selectedNewJournal.imagePanY = 0;
+            dataUpdated = true;
         }
         if (dataUpdated) setJournals(newJournals);
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        const storedZoom = Number(selectedJournalEntry?.imageZoom);
+        const normalizedZoom = Number.isFinite(storedZoom) && storedZoom > 0 ? storedZoom : 1;
+        const normalizedPercent = Math.round(normalizedZoom * 100);
+        const storedPanX = Number(selectedJournalEntry?.imagePanX);
+        const storedPanY = Number(selectedJournalEntry?.imagePanY);
+        const normalizedPan = {
+            x: Number.isFinite(storedPanX) ? storedPanX : 0,
+            y: Number.isFinite(storedPanY) ? storedPanY : 0,
+        };
+        setImageZoom(normalizedZoom);
+        setImageZoomPercentInput(String(normalizedPercent));
+        imagePanRef.current = normalizedPan;
+        setImagePan(normalizedPan);
+    }, [selectedJournalEntry?.imageZoom, selectedJournalEntry?.imagePanX, selectedJournalEntry?.imagePanY, journalGroupIndex, journalIndex]);
+
+    useEffect(() => {
+        imagePanRef.current = imagePan;
+    }, [imagePan]);
+
+    useEffect(() => {
+        if (!isImagePanning) {
+            return undefined;
+        }
+
+        const handleMouseMove = (event) => {
+            const deltaX = event.clientX - imagePanStartRef.current.x;
+            const deltaY = event.clientY - imagePanStartRef.current.y;
+            const clampedPan = clampImagePan(
+                imagePanStartRef.current.panX + deltaX,
+                imagePanStartRef.current.panY + deltaY,
+                imageZoom
+            );
+
+            imagePanRef.current = clampedPan;
+            setImagePan(clampedPan);
+        };
+
+        const handleMouseUp = () => {
+            setIsImagePanning(false);
+            persistImagePan(imagePanRef.current);
+        };
+
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', handleMouseUp);
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [isImagePanning, imageZoom]);
 
     useEffect(() => {
         setIsPhotoDbAvailable(isAssistantPhotoDbAvailable());
@@ -433,11 +605,7 @@ const Journal = ({
     useEffect(() => {
         let active = true;
         const restoreImages = async () => {
-            const raw = mergeMediaMeta(
-                journal?.entryImages,
-                selectedJournalPrimary?.entryImages,
-                selectedJournalMirror?.entryImages,
-            );
+            const raw = mergeMediaMeta(selectedJournalEntry?.entryImages);
             if (raw.length === 0) {
                 entryImagesRef.current.forEach((img) => {
                     if (img?.url) URL.revokeObjectURL(img.url);
@@ -513,16 +681,12 @@ const Journal = ({
         return () => {
             active = false;
         };
-    }, [imageIdsDep]);
+    }, [imageIdsDep, selectedJournalEntry]);
 
     useEffect(() => {
         let active = true;
         const restoreVideos = async () => {
-            const raw = mergeMediaMeta(
-                journal?.entryVideos,
-                selectedJournalPrimary?.entryVideos,
-                selectedJournalMirror?.entryVideos,
-            );
+            const raw = mergeMediaMeta(selectedJournalEntry?.entryVideos);
             if (raw.length === 0) {
                 entryVideosRef.current.forEach((vid) => {
                     if (vid?.url) URL.revokeObjectURL(vid.url);
@@ -598,7 +762,7 @@ const Journal = ({
         return () => {
             active = false;
         };
-    }, [videoIdsDep]);
+    }, [videoIdsDep, selectedJournalEntry]);
 
     useEffect(() => {
         return () => {
@@ -624,7 +788,8 @@ const Journal = ({
     // Persist isCollapsed state
     useEffect(() => {
         const newJournals = [...journals];
-        const selectedNewJournal = newJournals[journalGroupIndex].journal[journalIndex] ?? templateJournal;
+        const selectedNewJournal = newJournals?.[journalGroupIndex]?.journal?.[journalIndex];
+        if (!selectedNewJournal) return;
         selectedNewJournal.isCollapsed = !isCollapsed;
         selectedNewJournal.isCollapsed = !isCollapsed;
         localStorage.setItem('journalTracking', JSON.stringify(newJournals));
@@ -844,24 +1009,59 @@ const Journal = ({
         setGoalDialog(false);
         setSelectedGoal(null);
     };
-    const deleteJournal = () => {
-        const toggle = window.confirm(`Are you sure you want to remove journal: ${journal.description}`)
+    const deleteJournal = async () => {
+        const toggle = window.confirm(`Are you sure you want to remove journal: ${journal.description}`);
         const removeItemByIndex = (array, index) => {
-            if (index >= 0 && index < array.length) {
+            if (Array.isArray(array) && index >= 0 && index < array.length) {
                 array.splice(index, 1);
-            } else {
-                console.error('Index out of range');
             }
         };
-        if (toggle) {
-            const newJournals = [...journals];
-            removeItemByIndex(newJournals[journalGroupIndex].journals, journalIndex);
-            setJournals(newJournals);
+
+        if (!toggle) return;
+
+        const entryToDelete = selectedJournalEntry;
+
+        // Best-effort cleanup of persisted media for the journal being removed.
+        if (entryToDelete && Array.isArray(entryToDelete.entryImages) && isPhotoDbAvailable) {
+            await Promise.allSettled(
+                entryToDelete.entryImages
+                    .filter((img) => img && img.id)
+                    .map((img) => removeAssistantPhoto(img.id))
+            );
         }
-    }
+        if (entryToDelete && Array.isArray(entryToDelete.entryVideos) && isVideoDbAvail) {
+            await Promise.allSettled(
+                entryToDelete.entryVideos
+                    .filter((vid) => vid && vid.id)
+                    .map((vid) => removeJournalVideoBlob(vid.id))
+            );
+        }
+
+        const newJournals = [...journals];
+        const group = newJournals[journalGroupIndex];
+        if (!group) return;
+
+        removeItemByIndex(group.journals, journalIndex);
+
+        // Keep mirror arrays in sync without double-removing if they alias the same array.
+        if (group.journal !== group.journals) {
+            removeItemByIndex(group.journal, journalIndex);
+        }
+
+        setJournals(newJournals);
+    };
+
+    const layout = useLayout();
+    const appBg = layout?.colors?.background;
+    const appPrimaryColor = layout?.colors?.primary;
+    const headerBackground = layout?.colors?.headerBackground;
 
     return (
-        <div key={`journal${journalIndex}`} className='containerDetail lowerBorder contentLeft bg-lite'>
+        <div
+            key={`journal${journalIndex}`}
+            className='containerDetail lowerBorder contentLeft bg-lite'
+            style={{ background: appBg }}
+        >
             <GoalDialog
                 goal={selectedGoal}
                 isOpen={goalDialog}
@@ -870,7 +1070,7 @@ const Journal = ({
                 deleteGoal={deleteGoal}
             />
             <div className='containerDetail bg-lite'>
-                <div className='flexContainer'>
+                <div className='containerDetail flexContainer' style={{ background: headerBackground, color: appPrimaryColor }}>
                     <div className='flex1Auto contentLeft'>
                         {
                             (editTitle)
@@ -880,7 +1080,7 @@ const Journal = ({
                                 value={editedJournalTitle !== null ? editedJournalTitle : journal.description}
                                 placeholder={journal.description}
                             />
-                            : <div className='containerDetail bg-lite color-yellow centerVertical p-10 bold'>
+                            : <div className='containerDetail bg-lite color-yellow centerVertical p-10 bold' style={{ color: appPrimaryColor }}>
                                 <CollapseToggleButton
                                     title={journal.description}
                                     isCollapsed={isCollapsed}
@@ -981,67 +1181,171 @@ const Journal = ({
                                     const canGoNext = expandedIndex < entryImages.length - 1;
 
                                     return (
-                                        <div className='containerDetail bg-dark mb-10' style={{ position: 'relative' }}>
-                                            <div
-                                                className='button p-10 size20 color-soft'
-                                                onClick={() => canGoPrev && setExpandedImage(entryImages[expandedIndex - 1])}
-                                                style={{
-                                                    position: 'absolute',
-                                                    top: 0,
-                                                    bottom: 0,
-                                                    left: 8,
-                                                    width: 44,
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    zIndex: 2,
-                                                    opacity: canGoPrev ? 1 : 0.3,
-                                                    pointerEvents: canGoPrev ? 'auto' : 'none',
-                                                }}
-                                                title='Previous'
-                                            >
-                                                ◀
+                                        <div className='containerDetail bg-dark mb-10' style={{ width: '100%', boxSizing: 'border-box' }}>
+                                            <div className='flexContainer centerVertical p-5'>
+                                                <div
+                                                    className='button p-10 size20 color-soft'
+                                                    onClick={() => canGoPrev && setExpandedImage(entryImages[expandedIndex - 1])}
+                                                    style={{
+                                                        opacity: canGoPrev ? 1 : 0.3,
+                                                        pointerEvents: canGoPrev ? 'auto' : 'none',
+                                                        minWidth: 48,
+                                                        textAlign: 'center',
+                                                    }}
+                                                    title='Previous'
+                                                >
+                                                    ◀
+                                                </div>
+                                                <div className='color-soft size12 contentCenter' style={{ flex: 1 }}>
+                                                    {expandedImage.name} ({expandedIndex + 1} / {entryImages.length})
+                                                </div>
+                                                <div
+                                                    className='button p-10 size20 color-soft'
+                                                    onClick={() => canGoNext && setExpandedImage(entryImages[expandedIndex + 1])}
+                                                    style={{
+                                                        opacity: canGoNext ? 1 : 0.3,
+                                                        pointerEvents: canGoNext ? 'auto' : 'none',
+                                                        minWidth: 48,
+                                                        textAlign: 'center',
+                                                    }}
+                                                    title='Next'
+                                                >
+                                                    ▶
+                                                </div>
+                                            </div>
+                                            <div className='flexContainer centerVertical p-5' style={{ gap: 8, flexWrap: 'wrap' }}>
+                                                <button
+                                                    type='button'
+                                                    className='button containerDetail p-10 size12 color-soft bg-lite'
+                                                    onClick={() => changeImageZoomByStep(-IMAGE_ZOOM_STEP_PERCENT)}
+                                                    aria-label='Decrease image zoom'
+                                                    title='Decrease image zoom'
+                                                >
+                                                    -
+                                                </button>
+                                                <label className='color-soft size12 flexContainer centerVertical' style={{ gap: 6 }}>
+                                                    Zoom
+                                                    <input
+                                                        type='number'
+                                                        min={IMAGE_ZOOM_MIN_PERCENT}
+                                                        max={IMAGE_ZOOM_MAX_PERCENT}
+                                                        step={IMAGE_ZOOM_STEP_PERCENT}
+                                                        className='inputField p-5 size12 r-10'
+                                                        style={{ width: 84 }}
+                                                        value={imageZoomPercentInput}
+                                                        aria-label='Image zoom percentage'
+                                                        onChange={(event) => setImageZoomPercentInput(event.target.value)}
+                                                        onBlur={() => applyImageZoomPercent(imageZoomPercentInput)}
+                                                        onKeyDown={(event) => {
+                                                            if (event.key === 'Enter') {
+                                                                applyImageZoomPercent(imageZoomPercentInput);
+                                                            }
+                                                        }}
+                                                    />
+                                                    %
+                                                </label>
+                                                <button
+                                                    type='button'
+                                                    className='button containerDetail p-10 size12 color-soft bg-lite'
+                                                    onClick={() => changeImageZoomByStep(IMAGE_ZOOM_STEP_PERCENT)}
+                                                    aria-label='Increase image zoom'
+                                                    title='Increase image zoom'
+                                                >
+                                                    +
+                                                </button>
+                                                <button
+                                                    type='button'
+                                                    className='button containerDetail p-10 size12 color-soft bg-lite'
+                                                    onClick={() => applyImageZoomPercent(100)}
+                                                    aria-label='Reset image zoom'
+                                                    title='Reset image zoom to 100 percent'
+                                                >
+                                                    Reset Zoom
+                                                </button>
+                                                <button
+                                                    type='button'
+                                                    className='button containerDetail p-10 size12 color-soft bg-lite'
+                                                    onClick={() => nudgeImagePan(-IMAGE_PAN_NUDGE_PX, 0)}
+                                                    aria-label='Pan image left'
+                                                    title='Pan image left'
+                                                >
+                                                    ◀ Pan
+                                                </button>
+                                                <button
+                                                    type='button'
+                                                    className='button containerDetail p-10 size12 color-soft bg-lite'
+                                                    onClick={() => nudgeImagePan(IMAGE_PAN_NUDGE_PX, 0)}
+                                                    aria-label='Pan image right'
+                                                    title='Pan image right'
+                                                >
+                                                    Pan ▶
+                                                </button>
+                                                <button
+                                                    type='button'
+                                                    className='button containerDetail p-10 size12 color-soft bg-lite'
+                                                    onClick={() => nudgeImagePan(0, -IMAGE_PAN_NUDGE_PX)}
+                                                    aria-label='Pan image up'
+                                                    title='Pan image up'
+                                                >
+                                                    ▲ Pan
+                                                </button>
+                                                <button
+                                                    type='button'
+                                                    className='button containerDetail p-10 size12 color-soft bg-lite'
+                                                    onClick={() => nudgeImagePan(0, IMAGE_PAN_NUDGE_PX)}
+                                                    aria-label='Pan image down'
+                                                    title='Pan image down'
+                                                >
+                                                    ▼ Pan
+                                                </button>
+                                                <button
+                                                    type='button'
+                                                    className='button containerDetail p-10 size12 color-soft bg-lite'
+                                                    onClick={() => {
+                                                        const originPan = { x: 0, y: 0 };
+                                                        imagePanRef.current = originPan;
+                                                        setImagePan(originPan);
+                                                        persistImagePan(originPan);
+                                                    }}
+                                                    aria-label='Reset image pan position'
+                                                    title='Reset image pan position'
+                                                >
+                                                    Reset Pan
+                                                </button>
                                             </div>
                                             <div
-                                                className='button p-10 size20 color-soft'
-                                                onClick={() => canGoNext && setExpandedImage(entryImages[expandedIndex + 1])}
+                                                ref={imageViewportRef}
                                                 style={{
-                                                    position: 'absolute',
-                                                    top: 0,
-                                                    bottom: 0,
-                                                    right: 8,
-                                                    width: 44,
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    zIndex: 2,
-                                                    opacity: canGoNext ? 1 : 0.3,
-                                                    pointerEvents: canGoNext ? 'auto' : 'none',
+                                                    width: '100%',
+                                                    overflow: 'hidden',
+                                                    padding: '8px 0 14px 0',
+                                                    cursor: imageZoom > 1 ? (isImagePanning ? 'grabbing' : 'grab') : 'default',
+                                                    userSelect: 'none',
                                                 }}
-                                                title='Next'
+                                                onMouseDown={beginImagePan}
                                             >
-                                                ▶
-                                            </div>
                                             <img
                                                 src={expandedImage.url}
                                                 alt={expandedImage.name}
+                                                className='mb-20 mt-10 width-100-percent'
                                                 style={{
-                                                    width: 'calc(100% - 96px)',
-                                                    maxWidth: 960,
+                                                    width: '100%',
+                                                    maxWidth: '100%',
                                                     height: 'auto',
-                                                    margin: '0 auto',
                                                     display: 'block',
-                                                    borderRadius: 4,
+                                                    margin: '0 auto',
+                                                    transform: `translate(${imagePan.x}px, ${imagePan.y}px) scale(${imageZoom})`,
+                                                    transformOrigin: 'center center',
+                                                    transition: 'transform 140ms ease',
+                                                    pointerEvents: 'none',
                                                 }}
                                             />
-                                            <div className='color-soft size12 p-5 contentCenter'>
-                                                {expandedImage.name} ({expandedIndex + 1} / {entryImages.length})
                                             </div>
                                         </div>
                                     );
                                 })()}
                                 <div
-                                    className='flexContainer mt--15'
+                                    className='flexContainer mt--5'
                                     style={{
                                         flexWrap: (isImageRowCollapsed ?? true) ? 'nowrap' : 'wrap',
                                         gap: 8,
@@ -1165,31 +1469,43 @@ const Journal = ({
                                     const canGoNext = expandedIndex < entryVideos.length - 1;
 
                                     return (
-                                        <div className='containerDetail bg-dark mb-10' style={{ position: 'relative' }}>
-                                            <div
-                                                className='button p-10 size20 color-soft'
-                                                onClick={() => canGoPrev && setExpandedVideo(entryVideos[expandedIndex - 1])}
-                                                style={{ position: 'absolute', top: 0, bottom: 0, left: 8, width: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2, opacity: canGoPrev ? 1 : 0.3, pointerEvents: canGoPrev ? 'auto' : 'none' }}
-                                                title='Previous'
-                                            >
-                                                ◀
-                                            </div>
-                                            <div
-                                                className='button p-10 size20 color-soft'
-                                                onClick={() => canGoNext && setExpandedVideo(entryVideos[expandedIndex + 1])}
-                                                style={{ position: 'absolute', top: 0, bottom: 0, right: 8, width: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2, opacity: canGoNext ? 1 : 0.3, pointerEvents: canGoNext ? 'auto' : 'none' }}
-                                                title='Next'
-                                            >
-                                                ▶
+                                        <div className='containerDetail bg-dark mb-10' style={{ width: '100%', boxSizing: 'border-box' }}>
+                                            <div className='flexContainer centerVertical p-5'>
+                                                <div
+                                                    className='button p-10 size20 color-soft'
+                                                    onClick={() => canGoPrev && setExpandedVideo(entryVideos[expandedIndex - 1])}
+                                                    style={{
+                                                        opacity: canGoPrev ? 1 : 0.3,
+                                                        pointerEvents: canGoPrev ? 'auto' : 'none',
+                                                        minWidth: 48,
+                                                        textAlign: 'center',
+                                                    }}
+                                                    title='Previous'
+                                                >
+                                                    ◀
+                                                </div>
+                                                <div className='color-soft size12 contentCenter' style={{ flex: 1 }}>
+                                                    {expandedVideo.name} ({expandedIndex + 1} / {entryVideos.length})
+                                                </div>
+                                                <div
+                                                    className='button p-10 size20 color-soft'
+                                                    onClick={() => canGoNext && setExpandedVideo(entryVideos[expandedIndex + 1])}
+                                                    style={{
+                                                        opacity: canGoNext ? 1 : 0.3,
+                                                        pointerEvents: canGoNext ? 'auto' : 'none',
+                                                        minWidth: 48,
+                                                        textAlign: 'center',
+                                                    }}
+                                                    title='Next'
+                                                >
+                                                    ▶
+                                                </div>
                                             </div>
                                             <video
                                                 src={expandedVideo.url}
                                                 controls
-                                                style={{ width: 'calc(100% - 96px)', maxWidth: 960, height: 'auto', margin: '0 auto', display: 'block', borderRadius: 4 }}
+                                                style={{ width: '100%', maxWidth: '100%', height: 'auto', display: 'block', borderRadius: 4 }}
                                             />
-                                            <div className='color-soft size12 p-5 contentCenter'>
-                                                {expandedVideo.name} ({expandedIndex + 1} / {entryVideos.length})
-                                            </div>
                                         </div>
                                     );
                                 })()}

@@ -333,62 +333,49 @@ const HistoryPanel = ({ history = [], onOpenLocation, onDelete, onUpdatePhotos }
                                                             const canGoPrev = expandedIdx > 0;
                                                             const canGoNext = expandedIdx < photos.length - 1;
                                                             return expandedPhoto ? (
-                                                                <div className='containerDetail bg-dark mb-10' style={{ position: 'relative' }}>
-                                                                    <div
-                                                                        className='button p-10 size20'
-                                                                        onClick={() => canGoPrev && setExpandedPhotoKey(`${entry.id}:${photos[expandedIdx - 1].id}`)}
-                                                                        style={{
-                                                                            position: 'absolute',
-                                                                            top: 0,
-                                                                            bottom: 0,
-                                                                            left: 8,
-                                                                            width: 44,
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            justifyContent: 'center',
-                                                                            zIndex: 2,
-                                                                            opacity: canGoPrev ? 1 : 0.3,
-                                                                            pointerEvents: canGoPrev ? 'auto' : 'none',
-                                                                        }}
-                                                                        title='Previous'
-                                                                    >
-                                                                        ◀
-                                                                    </div>
-                                                                    <div
-                                                                        className='button p-10 size20'
-                                                                        onClick={() => canGoNext && setExpandedPhotoKey(`${entry.id}:${photos[expandedIdx + 1].id}`)}
-                                                                        style={{
-                                                                            position: 'absolute',
-                                                                            top: 0,
-                                                                            bottom: 0,
-                                                                            right: 8,
-                                                                            width: 44,
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            justifyContent: 'center',
-                                                                            zIndex: 2,
-                                                                            opacity: canGoNext ? 1 : 0.3,
-                                                                            pointerEvents: canGoNext ? 'auto' : 'none',
-                                                                        }}
-                                                                        title='Next'
-                                                                    >
-                                                                        ▶
+                                                                <div className='containerDetail bg-dark mb-10'>
+                                                                    <div className='flexContainer centerVertical p-5'>
+                                                                        <div
+                                                                            className='button p-10 size20 color-soft'
+                                                                            onClick={() => canGoPrev && setExpandedPhotoKey(`${entry.id}:${photos[expandedIdx - 1].id}`)}
+                                                                            style={{
+                                                                                opacity: canGoPrev ? 1 : 0.3,
+                                                                                pointerEvents: canGoPrev ? 'auto' : 'none',
+                                                                                minWidth: 48,
+                                                                                textAlign: 'center',
+                                                                            }}
+                                                                            title='Previous'
+                                                                        >
+                                                                            ◀
+                                                                        </div>
+                                                                        <div className='color-soft size12 contentCenter' style={{ flex: 1 }}>
+                                                                            {expandedPhoto.name} ({expandedIdx + 1} / {photos.length})
+                                                                        </div>
+                                                                        <div
+                                                                            className='button p-10 size20 color-soft'
+                                                                            onClick={() => canGoNext && setExpandedPhotoKey(`${entry.id}:${photos[expandedIdx + 1].id}`)}
+                                                                            style={{
+                                                                                opacity: canGoNext ? 1 : 0.3,
+                                                                                pointerEvents: canGoNext ? 'auto' : 'none',
+                                                                                minWidth: 48,
+                                                                                textAlign: 'center',
+                                                                            }}
+                                                                            title='Next'
+                                                                        >
+                                                                            ▶
+                                                                        </div>
                                                                     </div>
                                                                     <img
                                                                         src={expandedPhoto.url}
                                                                         alt={expandedPhoto.name}
                                                                         style={{
-                                                                            width: 'calc(100% - 96px)',
-                                                                            maxWidth: 960,
+                                                                            width: '100%',
                                                                             height: 'auto',
                                                                             margin: '0 auto',
                                                                             display: 'block',
                                                                             borderRadius: 4,
                                                                         }}
                                                                     />
-                                                                    <div className='color-soft size12 p-5 contentCenter'>
-                                                                        {expandedPhoto.name} ({expandedIdx + 1} / {photos.length})
-                                                                    </div>
                                                                 </div>
                                                             ) : null;
                                                         })()}

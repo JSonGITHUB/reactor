@@ -525,7 +525,7 @@ const Dashboard = () => {
                                         {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                                     </select>
                                 </div>
-                                <div className='containerDetail mt-5 mb-5 scroll height-500'>
+                                <div className='containerDetail mt-5 mb-5 scroll height-200'>
                                 {
                                     filteredInventory.map((item, i) => (
                                         (() => {
@@ -568,51 +568,114 @@ const Dashboard = () => {
                                                     </div>
                                                 </div>
                                                 {itemPhotos.length > 0 && (
-                                                    <div className='containerDetail bg-dark mt-5 mb-5 p-5'>
+                                                    <div className='containerDetail bg-dark mt-5 mb-5 p-5' aria-label={`Photos for ${item.name}`}> 
                                                         <div className='containerDetail flexContainer'>
                                                             <div className='size12 color-soft p-5'>
                                                                 Photos: {itemPhotos.length}
                                                             </div>
                                                             <div className='flex2Column ml-5 flexContainer' style={{ alignItems: 'center', gap: 8 }}>
-                                                                <div
+                                                                <button
                                                                     className='containerDetail button bg-lite color-yellow p-10 size12'
                                                                     onClick={() => setInventoryItemPhotoEditMode((prev) => ({
                                                                         ...prev,
                                                                         [inventoryIndex]: !prev[inventoryIndex],
                                                                     }))}
                                                                     title={isItemPhotoEditMode ? 'Hide remove buttons' : 'Show remove buttons'}
+                                                                    aria-pressed={isItemPhotoEditMode}
                                                                 >
                                                                     ✏️
-                                                                </div>
-                                                                <div
+                                                                </button>
+                                                                <button
                                                                     className='containerDetail button bg-lite color-yellow p-10 size12'
                                                                     onClick={() => setInventoryItemPhotoRowCollapsed((prev) => ({
                                                                         ...prev,
                                                                         [inventoryIndex]: !(prev[inventoryIndex] ?? true),
                                                                     }))}
                                                                     title='Toggle between wrapped grid and single-row horizontal scrolling'
+                                                                    aria-pressed={!isRowCollapsed}
                                                                 >
                                                                     {isRowCollapsed ? 'Expand Grid' : 'Collapse to Row'}
-                                                                </div>
+                                                                </button>
+                                                                {expandedForItem && (
+                                                                    <button
+                                                                        className='containerDetail button bg-lite color-yellow p-8 size12'
+                                                                        onClick={() => setExpandedItemPhoto(null)}
+                                                                        title='Close expanded image'
+                                                                        style={{ marginLeft: 'auto', minWidth: 90, textAlign: 'center', fontWeight: 600 }}
+                                                                    >
+                                                                        Close ✕
+                                                                    </button>
+                                                                )}
                                                             </div>
                                                         </div>
-                                                        {expandedForItem && (
-                                                            <div className='containerDetail bg-dark mb-10'>
-                                                                <img
-                                                                    src={expandedForItem.url}
-                                                                    alt={expandedForItem.name}
-                                                                    style={{
-                                                                        width: '100%',
-                                                                        maxHeight: 220,
-                                                                        objectFit: 'contain',
-                                                                        borderRadius: 4,
-                                                                    }}
-                                                                />
-                                                                <div className='color-soft size12 p-5 contentCenter'>
-                                                                    {expandedForItem.name}
+                                                        {expandedForItem && (() => {
+                                                            const expandedIndex = itemPhotos.findIndex((img) => img.id === expandedForItem.id);
+                                                            const canGoPrev = expandedIndex > 0;
+                                                            const canGoNext = expandedIndex < itemPhotos.length - 1;
+                                                            return (
+                                                                <div className='containerDetail bg-dark mb-10' style={{ position: 'relative' }}>
+                                                                    <button
+                                                                        className='button p-10 size20 color-soft'
+                                                                        onClick={() => canGoPrev && setExpandedItemPhoto({ inventoryIndex, id: itemPhotos[expandedIndex - 1].id })}
+                                                                        style={{
+                                                                            position: 'absolute',
+                                                                            top: 0,
+                                                                            bottom: 0,
+                                                                            left: 8,
+                                                                            width: 44,
+                                                                            display: 'flex',
+                                                                            alignItems: 'center',
+                                                                            justifyContent: 'center',
+                                                                            zIndex: 2,
+                                                                            opacity: canGoPrev ? 1 : 0.3,
+                                                                            pointerEvents: canGoPrev ? 'auto' : 'none',
+                                                                        }}
+                                                                        title='Previous photo'
+                                                                        aria-label='Previous photo'
+                                                                        tabIndex={canGoPrev ? 0 : -1}
+                                                                    >
+                                                                        ◀
+                                                                    </button>
+                                                                    <button
+                                                                        className='button p-10 size20 color-soft'
+                                                                        onClick={() => canGoNext && setExpandedItemPhoto({ inventoryIndex, id: itemPhotos[expandedIndex + 1].id })}
+                                                                        style={{
+                                                                            position: 'absolute',
+                                                                            top: 0,
+                                                                            bottom: 0,
+                                                                            right: 8,
+                                                                            width: 44,
+                                                                            display: 'flex',
+                                                                            alignItems: 'center',
+                                                                            justifyContent: 'center',
+                                                                            zIndex: 2,
+                                                                            opacity: canGoNext ? 1 : 0.3,
+                                                                            pointerEvents: canGoNext ? 'auto' : 'none',
+                                                                        }}
+                                                                        title='Next photo'
+                                                                        aria-label='Next photo'
+                                                                        tabIndex={canGoNext ? 0 : -1}
+                                                                    >
+                                                                        ▶
+                                                                    </button>
+                                                                    <img
+                                                                        src={expandedForItem.url}
+                                                                        alt={expandedForItem.name}
+                                                                        style={{
+                                                                            width: 'calc(100% - 96px)',
+                                                                            maxWidth: 960,
+                                                                            height: 'auto',
+                                                                            margin: '0 auto',
+                                                                            display: 'block',
+                                                                            borderRadius: 4,
+                                                                        }}
+                                                                    />
+                                                                    <div className='color-soft size12 p-5 contentCenter'>
+                                                                        {expandedForItem.name} ({expandedIndex + 1} / {itemPhotos.length})
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        )}
+                                                            );
+                                                        })()}
                                                         <div
                                                             className='flexContainer mt--15'
                                                             style={{
@@ -622,6 +685,8 @@ const Dashboard = () => {
                                                                 overflowY: 'hidden',
                                                                 paddingBottom: isRowCollapsed ? 6 : 0,
                                                             }}
+                                                            role='listbox'
+                                                            aria-label={`Photo thumbnails for ${item.name}`}
                                                         >
                                                             {itemPhotos.map((photo) => (
                                                                 <div key={photo.id} style={{ position: 'relative', width: 64, height: 64, flex: '0 0 auto' }}>
@@ -645,9 +710,12 @@ const Dashboard = () => {
                                                                             cursor: 'pointer',
                                                                             border: expandedForItem?.id === photo.id ? '2px solid #0f0' : '2px solid transparent',
                                                                         }}
+                                                                        tabIndex={0}
+                                                                        role='option'
+                                                                        aria-selected={expandedForItem?.id === photo.id}
                                                                     />
                                                                     {isItemPhotoEditMode && (
-                                                                        <div
+                                                                        <button
                                                                             className='button'
                                                                             onClick={() => removeInventoryPhotoFromItem(inventoryIndex, photo.id)}
                                                                             title='Remove photo'
@@ -666,9 +734,10 @@ const Dashboard = () => {
                                                                                 fontSize: 12,
                                                                                 lineHeight: 1,
                                                                             }}
+                                                                            aria-label='Remove photo'
                                                                         >
                                                                             ✕
-                                                                        </div>
+                                                                        </button>
                                                                     )}
                                                                 </div>
                                                             ))}

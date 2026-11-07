@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import getKey from '../utils/KeyGenerator.js';
 import initializeData from '../utils/InitializeData';
 import Selector from '../forms/FunctionalSelector';
+import ShopReport from './ShopReport';
 
 const SettingsMenu = ({ 
 
@@ -153,9 +154,7 @@ const SettingsMenu = ({
     // --- REPORT INTERFACE ---
     let reportContent = null;
     if (showReport) {
-        // Lazy load the report component
-        const Report = require('./ShopReport').default;
-        reportContent = <Report onClose={() => closeReport()} />;
+        reportContent = <ShopReport onClose={() => closeReport()} />;
     }
 
     const settingsMenu = <div id='shopSettingsMenu' className='containerDetail bg-tintedDark'>

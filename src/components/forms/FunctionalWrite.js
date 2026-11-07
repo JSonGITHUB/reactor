@@ -1,4 +1,4 @@
-var fs = require('fs');
+import fs from 'node:fs';
 console.log(`*STARTING*`);
 const dataTemplate = fs.readFileSync("surfLog.json", "utf8");
 console.log(`Start Data: ${dataTemplate}`);

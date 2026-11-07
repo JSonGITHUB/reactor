@@ -10,13 +10,209 @@ import { currentDate } from './CurrentCalendar.js';
 import CollapseToggleButton from './CollapseToggleButton.js';
 import validate from './validate.js';
 import initializeData from './InitializeData.js';
+import { useLayout } from '../utils/LayoutContext';
+import milesBetween from './miles.js';
+import { searchGooglePlacesNearby } from '../../services/providerApi';
+// --- Google Places API for Fuel ---
 
+const searchGooglePlacesNearbyFuel = async ({ lat, lon, radius = 5000, type = 'gas_station', keyword = 'gas|fuel', maxPages = 2 }) => {
+    return searchGooglePlacesNearby({ lat, lon, radius, type, keyword, maxPages });
+};
+
+// Overpass fallback for gas stations
+const searchOverpassFuelVenues = async ({ lat, lon, radius = 10000 }) => {
+    const query = `
+        [out:json][timeout:25];
+        (
+          node["amenity"="fuel"](around:${radius},${lat},${lon});
+          way["amenity"="fuel"](around:${radius},${lat},${lon});
+          relation["amenity"="fuel"](around:${radius},${lat},${lon});
+        );
+        out center tags;
+    `;
+    const url = 'https://overpass-api.de/api/interpreter';
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `data=${encodeURIComponent(query)}`
+    });
+    if (!response.ok) return [];
+    const data = await response.json();
+    if (!Array.isArray(data?.elements)) return [];
+    return data.elements.map(el => {
+        const lat = el.lat || el.center?.lat;
+        const lon = el.lon || el.center?.lon;
+        const name = el.tags?.name || 'Gas Station';
+        const address = [el.tags?.addr_street, el.tags?.addr_city, el.tags?.addr_state].filter(Boolean).join(', ');
+        return {
+            id: `osm-overpass-${el.type}-${el.id}`,
+            lat,
+            lon,
+            name,
+            address,
+            amenities: ['Gas Station'],
+            source: 'osm-overpass',
+        };
+    }).filter(v => v.lat && v.lon);
+};
+
+const normalizeNearbyFuelPlace = (place) => {
+    const lat = Number(place?.geometry?.location?.lat);
+    const lon = Number(place?.geometry?.location?.lng);
+    const name = String(place?.name || 'Gas Station').trim();
+    const address = String(place?.vicinity || place?.formatted_address || '').trim();
+    return {
+        id: `fuel-nearby-${place?.place_id || `${lat}-${lon}`}`,
+        lat,
+        lon,
+        name,
+        address,
+        amenities: ['Gas Station'],
+        source: 'google-nearby',
+    };
+};
+
+const dedupeFuelVenues = (venueList) => {
+    const seen = new Set();
+    return venueList.filter((venue) => {
+        const key = `${venue.name}-${venue.lat.toFixed(4)}-${venue.lon.toFixed(4)}`.toLowerCase();
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+};
 
 const Fuel = () => {
+
+    // --- Find Fuel Dropdown State ---
+    const [fuelDropdownOpen, setFuelDropdownOpen] = useState(false);
+    const [fuelVenues, setFuelVenues] = useState([]);
+    const [fuelStatus, setFuelStatus] = useState('');
+    const [fuelLoading, setFuelLoading] = useState(false);
+    const [fuelPosition, setFuelPosition] = useState(null);
+
+    const layout = useLayout();
+    const appBg = layout?.colors?.background;
+    const appPrimaryColor = layout?.colors?.primary;
+    const headerBackground = layout?.colors?.headerBackground;
 
     // State for toggling the location dropdown (OR SELECT)
     const [showLocationDropdown, setShowLocationDropdown] = useState(false);
     
+    const locateFuelUser = () => {
+        if (!navigator.geolocation) {
+            setFuelStatus('Geolocation is not supported by this browser.');
+            return;
+        }
+        setFuelStatus('Finding your location...');
+        navigator.geolocation.getCurrentPosition(
+            (coords) => {
+                const newPosition = { lat: coords.coords.latitude, lon: coords.coords.longitude };
+                setFuelPosition(newPosition);
+                setFuelStatus('Location found. Searching for gas stations...');
+                setTimeout(() => {
+                    fetchFuelStationsWithPosition(newPosition);
+                }, 0);
+            },
+            () => setFuelStatus('Unable to access your location. Check browser permissions.'),
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+    };
+
+    // Merge user/cached venues (pattern: Cafe)
+    const FUEL_USER_VENUES_KEY = 'fuel-user-venues-v1';
+    const getUserFuelVenues = () => {
+        try {
+            const stored = localStorage.getItem(FUEL_USER_VENUES_KEY);
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                if (Array.isArray(parsed)) return parsed;
+            }
+        } catch {}
+        return [];
+    };
+
+    const fetchFuelStationsWithPosition = async (pos) => {
+        setFuelLoading(true);
+        setFuelStatus('Loading nearby gas stations...');
+        const { lat, lon } = pos;
+        let results = [];
+        let googleResults = [];
+        let overpassResults = [];
+        try {
+            googleResults = await searchGooglePlacesNearbyFuel({ lat, lon, radius: 5000, type: 'gas_station', keyword: 'gas|fuel', maxPages: 2 });
+            googleResults = googleResults.map(normalizeNearbyFuelPlace);
+        } catch {}
+        try {
+            overpassResults = await searchOverpassFuelVenues({ lat, lon, radius: 10000 });
+        } catch {}
+        results = results.concat(googleResults, overpassResults);
+        // Merge user venues
+        const userVenues = getUserFuelVenues();
+        if (Array.isArray(userVenues) && userVenues.length) {
+            results = results.concat(userVenues);
+        }
+
+
+        // Merge Trip Log and Gas Prices, dedupe by lat/lon/name, prefer Trip Log if duplicate
+        const tripLogVenues = (Array.isArray(trips) ? trips : [])
+            .filter(t => t.category === 'Gas' && t.latitude && t.longitude && t.location)
+            .map(t => ({
+                id: `triplog-${t.location}-${t.latitude}-${t.longitude}`,
+                lat: Number(t.latitude),
+                lon: Number(t.longitude),
+                name: t.location || 'Gas Station',
+                address: t.address || '',
+                amenities: ['Gas Station'],
+                source: 'trip-log',
+                price: t.usdPerGallon,
+                gallons: t.gallons,
+                totalUSD: t.totalUSD,
+                date: t.time || '',
+            }));
+        const gasPriceVenues = (Array.isArray(getBestFuelDeals) ? getBestFuelDeals : [])
+            .filter(t => t.category === 'Gas' && t.lat && t.lon && t.location)
+            .map(t => ({
+                id: `gasprice-${t.location}-${t.lat}-${t.lon}`,
+                lat: Number(t.lat),
+                lon: Number(t.lon),
+                name: t.location || 'Gas Station',
+                address: t.address || '',
+                amenities: ['Gas Station'],
+                source: 'gas-prices',
+                price: t.usdPerGallon,
+                gallons: t.gallons,
+                totalUSD: t.totalUSD,
+                date: t.time || '',
+            }));
+        // Dedupe: prefer Trip Log, then Gas Prices, then others
+        const dedupeMap = new Map();
+        [...tripLogVenues, ...gasPriceVenues].forEach(v => {
+            const key = `${v.name?.toLowerCase() || ''}-${v.lat?.toFixed(4)}-${v.lon?.toFixed(4)}`;
+            if (!dedupeMap.has(key)) dedupeMap.set(key, v);
+        });
+        // Add all other venues (Google, Overpass, User) if not already present
+        [...googleResults, ...overpassResults, ...(userVenues || [])].forEach(v => {
+            const key = `${v.name?.toLowerCase() || ''}-${v.lat?.toFixed(4)}-${v.lon?.toFixed(4)}`;
+            if (!dedupeMap.has(key)) dedupeMap.set(key, v);
+        });
+        // Attach distance to each venue FIRST
+        let venuesWithDistance = Array.from(dedupeMap.values()).map(v => {
+            let distance = null;
+            if (lat && lon && v.lat && v.lon) {
+                distance = milesBetween(lat, lon, v.lat, v.lon);
+            }
+            return { ...v, distance };
+        });
+        // Now sort by distance
+        const haveDistance = venuesWithDistance.filter(v => Number.isFinite(Number(v.distance)));
+        const dontHaveDistance = venuesWithDistance.filter(v => !Number.isFinite(Number(v.distance)));
+        haveDistance.sort((a, b) => Number(a.distance) - Number(b.distance));
+        const sortedVenues = [...haveDistance, ...dontHaveDistance];
+        setFuelVenues(dedupeFuelVenues(sortedVenues));
+        setFuelStatus(sortedVenues.length ? `Found ${sortedVenues.length} gas stations nearby.` : 'No gas stations found nearby.');
+        setFuelLoading(false);
+    };
     const {
         snapshot,
         requestLocation
@@ -3828,6 +4024,71 @@ const Fuel = () => {
                 }
             </div>
 
+    const renderFindFuelDropdown = () => (
+        <div className='containerDetail bg-lite mt-10 mb-10'>
+            <div className='containerDetail bg-lite color-yellow size20 p-10 contentLeft mb-5'>
+                <span className='mr-5'>⛽️</span> Find Fuel Nearby
+            </div>
+            <div className='flexContainer'>
+                <div className='containerDetail p-10 size15 bg-green contentCenter flex3Column button containerDetail mr-5 color-yellow brdr-yellow' onClick={locateFuelUser} tabIndex={0} role='button' aria-label='Use My Location'>
+                    📡 Use My Location
+                </div>
+            </div>
+            <div className='containerDetail color-yellow p-10 mt-5'>{fuelStatus}</div>
+            {fuelLoading && <div className='containerDetail color-yellow p-10 mt-5'>Loading gas stations...</div>}
+            {fuelPosition && (
+                <div className='containerDetail color-yellow p-10 mt-5'>You: {Number(fuelPosition.lat).toFixed(4)}, {Number(fuelPosition.lon).toFixed(4)}</div>
+            )}
+            <div className='containerDetail mt-5 bg-dark'>
+                {fuelVenues.length === 0 ? (
+                    <div className='color-soft size12'>No gas stations found yet. Try "Use My Location".</div>
+                ) : (
+                        <div className='containerDetail bg-lite mt-5 height-400'>
+                            {fuelVenues.map((v, idx) => (
+                                <div key={v.id} className='containerDetail mb-5 color-lite contentLeft'>
+                                    <div
+                                        title='map'
+                                        className='containerDetail bg-lite button flexContainer p-10'
+                                        onClick={() => v.lat && v.lon && window.open(`https://www.google.com/maps/search/?api=1&query=${v.lat},${v.lon}`, '_blank', 'noopener,noreferrer')}
+                                        onKeyDown={event => {
+                                            if (event.key === 'Enter' || event.key === ' ') {
+                                                event.preventDefault();
+                                                v.lat && v.lon && window.open(`https://www.google.com/maps/search/?api=1&query=${v.lat},${v.lon}`, '_blank', 'noopener,noreferrer');
+                                            }
+                                        }}
+                                        role='button'
+                                        tabIndex={0}
+                                        aria-label={`Open ${v.name} in Maps`}
+                                    >
+                                        <div className='flex2Column'>
+                                            <div>
+                                                🌎 {v.name}
+                                            </div>
+                                            <div className='color-yellow mt--5 copyright ml-15'>
+                                                {/* Show date if available and isLogged */}
+                                                {(v.date && (v.source === 'trip-log' || v.source === 'gas-prices')) ? (v.date.split(',')[0]) : ''}
+                                            </div>
+                                        </div>
+                                        <div className='color-yellow flexColumn size20'>
+                                            {/* Show price if available and isLogged */}
+                                            {(v.price && (v.source === 'trip-log' || v.source === 'gas-prices')) ? `⛽ $${Number(v.price).toFixed(2)}/gal` : ''}
+                                        </div>
+                                    </div>
+                                    <div className='flexContainer'>
+                                        <div className='flex2Column contentLeft color-yellow m-10'>
+                                        </div>
+                                        <div className='flex2Column contentRight color-yellow mt-5 pl-10 mb-5 mr-10'>
+                                            🛣️ {v.distance == null ? '--' : `${v.distance.toFixed(1)}`} <span className='copyright'>miles</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                )}
+            </div>
+        </div>
+    );
+
 
     return (
         <div className='containerDetail ml-5 mr-5 bg-lite mt--25'>
@@ -4083,6 +4344,34 @@ const Fuel = () => {
                         ? null
                         : displayLog()
                 }
+            </div>
+            {/* Find Fuel Dropdown Section */}
+            <div className='containerDetail bg-lite'>
+                <div className='containerDetail p-20 bg-lite size20'>
+                    <div 
+                        className='button flexContainer'
+                        onClick={() => setFuelDropdownOpen((open) => !open)}
+                        aria-expanded={fuelDropdownOpen}
+                        aria-controls='find-fuel-dropdown-section'
+                        style={{ color: appPrimaryColor}}
+                    >
+                        
+                        <div className='flex2Column contentLeft'>
+                            <span className='containerDetail size20 mr-10 pt-5 pb-5 pl-15 pr-15 ml--5'>
+                                🔍
+                            </span>
+                            Find ⛽️
+                        </div>
+                        <div className='flex2Column contentRight size25'>
+                            {fuelDropdownOpen ? '🔼' : '🔽'}
+                        </div>
+                    </div>
+                </div>
+                {fuelDropdownOpen && (
+                    <div id='find-fuel-dropdown-section'>
+                        {renderFindFuelDropdown()}
+                    </div>
+                )}
             </div>
             <div className='containerDetail bg-lite mt-5'>
                 <div className='containerDetail bg-lite p-10'>

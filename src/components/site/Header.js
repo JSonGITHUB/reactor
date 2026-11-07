@@ -501,6 +501,7 @@ const DashboardItem = memo(({
     isWorkDay,
     isCircuit,
     isDaylight,
+    isMoonPhase,
     scoreDateLine,
     scoreMatchupLine,
     taskProjectLine,
@@ -516,7 +517,8 @@ const DashboardItem = memo(({
     trainingGoalLabel,
     trainingInitialElapsedSeconds,
     daylightSunsetTimeMs,
-    daylightErrorMessage
+    daylightErrorMessage,
+    moonPhaseData
 }) => (
     <div
         title={title}
@@ -566,7 +568,12 @@ const DashboardItem = memo(({
                                                 sunsetTimeMs={daylightSunsetTimeMs}
                                                 errorMessage={daylightErrorMessage}
                                             />
-                                            : <div className='lh-10'>{label}</div>
+                                            : isMoonPhase
+                                                ? <div className='lh-10'>
+                                                    <div>{moonPhaseData.phaseName}</div>
+                                                    <div className='size11 color-orange'>{moonPhaseData.phasePercentage}% lit</div>
+                                                </div>
+                                                : <div className='lh-10'>{label}</div>
             }
         </div>
     </div>
@@ -582,6 +589,7 @@ const DashboardItem = memo(({
     && previousProps.isWorkDay === nextProps.isWorkDay
     && previousProps.isCircuit === nextProps.isCircuit
     && previousProps.isDaylight === nextProps.isDaylight
+    && previousProps.isMoonPhase === nextProps.isMoonPhase
     && previousProps.scoreDateLine === nextProps.scoreDateLine
     && previousProps.scoreMatchupLine === nextProps.scoreMatchupLine
     && previousProps.taskProjectLine === nextProps.taskProjectLine
@@ -1132,6 +1140,59 @@ const getFuelServiceNoticeStatus = () => {
     };
 };
 
+/**
+ * Get current moon phase for display in notifications
+ * Returns phase name and appropriate icon
+ */
+const getMoonPhaseNotice = () => {
+    const date = new Date();
+    const SYNODIC_MONTH = 29.530588853;
+    const KNOWN_NEW_MOON = new Date(Date.UTC(2000, 0, 6, 18, 14));
+    
+    const daysBetween = (a, b) => (a.getTime() - b.getTime()) / (1000 * 60 * 60 * 24);
+    const normalizePhase = (days) => ((days % SYNODIC_MONTH) + SYNODIC_MONTH) % SYNODIC_MONTH;
+    
+    const days = normalizePhase(daysBetween(date, KNOWN_NEW_MOON));
+    
+    let phaseName = 'New Moon';
+    let phaseIcon = '🌑';
+    
+    if (days < 1.84566) {
+        phaseName = 'New Moon';
+        phaseIcon = '🌑';
+    } else if (days < 5.53699) {
+        phaseName = 'Waxing Crescent';
+        phaseIcon = '🌒';
+    } else if (days < 9.22831) {
+        phaseName = 'First Quarter';
+        phaseIcon = '🌓';
+    } else if (days < 12.91963) {
+        phaseName = 'Waxing Gibbous';
+        phaseIcon = '🌔';
+    } else if (days < 16.61096) {
+        phaseName = 'Full Moon';
+        phaseIcon = '🌕';
+    } else if (days < 20.30228) {
+        phaseName = 'Waning Gibbous';
+        phaseIcon = '🌖';
+    } else if (days < 23.99361) {
+        phaseName = 'Last Quarter';
+        phaseIcon = '🌗';
+    } else if (days < 27.68493) {
+        phaseName = 'Waning Crescent';
+        phaseIcon = '🌘';
+    }
+    
+    const phasePercentage = ((days / SYNODIC_MONTH) * 100).toFixed(0);
+    
+    return {
+        phaseName,
+        phaseIcon,
+        phasePercentage,
+        label: `${phaseName} (${phasePercentage}%)`
+    };
+};
+
 const normalizeTideType = (value) => {
     const text = String(value || '').trim().toUpperCase();
     if (text === 'H' || text === 'HIGH') return 'HIGH';
@@ -1265,7 +1326,7 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
     const goHome = useCallback(() => {
         collapseDashboards();
         setMenuOpen(false);
-        window.location = '/reactor/#/Home';
+        window.location = '/reactor/Home';
     }, [collapseDashboards]);
     const handleHomeSelection = useCallback(() => {
         collapseDashboards();
@@ -1298,7 +1359,7 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
     const path = window.location.pathname.toLocaleLowerCase();
     const hashPath = String(window.location.hash || '').toLocaleLowerCase();
     const isHomePage = useMemo(() => {
-        if (hashPath === '#/' || hashPath === '#/home') return true;
+        if (hashPath === 'Home#/' || hashPath === '#/home' || hashPath === 'reactor#/' ) return true;
         return path === '/reactor/home' || path === '/reactor/';
     }, [hashPath, path]);
     const homepageHeader = useMemo(() => (
@@ -1636,7 +1697,7 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
         } else {
             localStorage.removeItem(DOSE_FOCUS_KEY);
         }
-        window.location = '/reactor/#/Dose';
+        window.location = '/reactor/Dose';
     }, []);
 
     const openHouseWithFocus = useCallback((task) => {
@@ -1645,60 +1706,60 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
         } else {
             localStorage.removeItem(HOUSE_FOCUS_TASK_KEY);
         }
-        window.location = '/reactor/#/House';
+        window.location = '/reactor/House';
     }, []);
 
     const openWeather = useCallback(() => {
-        window.location = '/reactor/#/Weather';
+        window.location = '/reactor/Weather';
     }, []);
 
     const openWaves = useCallback(() => {
-        window.location = '/reactor/#/Waves';
+        window.location = '/reactor/Waves';
     }, []);
 
     const openTrainingLog = useCallback(() => {
-        window.location = '/reactor/#/TrainingLog';
+        window.location = '/reactor/TrainingLog';
     }, []);
 
     const openScheduler = useCallback(() => {
-        window.location = '/reactor/#/Scheduler';
+        window.location = '/reactor/Scheduler';
     }, []);
 
     const openTasks = useCallback(() => {
-        window.location = '/reactor/#/Tasks';
+        window.location = '/reactor/Tasks';
     }, []);
 
     const openTodos = useCallback(() => {
-        window.location = '/reactor/#/Todos';
+        window.location = '/reactor/Todos';
     }, []);
 
     const openWorkDay = useCallback(() => {
-        window.location = '/reactor/#/WorkDay';
+        window.location = '/reactor/WorkDay';
     }, []);
 
     const openCircuit = useCallback(() => {
-        window.location = '/reactor/#/Circuit';
+        window.location = '/reactor/Circuit';
     }, []);
 
     const openShop = useCallback(() => {
-        window.location = '/reactor/#/Shop';
+        window.location = '/reactor/Shop';
     }, []);
 
     const openFuel = useCallback(() => {
-        window.location = '/reactor/#/Fuel';
+        window.location = '/reactor/Fuel';
     }, []);
 
     const openScoresWithGame = useCallback((gameName) => {
         if (gameName) {
             localStorage.setItem('game', gameName);
         }
-        window.location = '/reactor/#/Scores';
+        window.location = '/reactor/Scores';
     }, []);
 
     const openComponent = useCallback((componentName) => {
         const safeComponent = String(componentName || '').trim();
         if (!safeComponent || safeComponent.toLowerCase() === 'home') return;
-        window.location = `/reactor/#/${safeComponent}`;
+        window.location = `/reactor/${safeComponent}`;
     }, []);
 
     const currentComponent = getComponentFromLocation(window.location);
@@ -1890,6 +1951,18 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
             });
         }
 
+        // Add moon phase notice
+        const moonPhaseNotice = getMoonPhaseNotice();
+        notices.push({
+            key: 'moon-phase',
+            icon: moonPhaseNotice.phaseIcon,
+            title: `Moon Phase: ${moonPhaseNotice.label}`,
+            label: moonPhaseNotice.phaseName,
+            isMoonPhase: true,
+            moonPhaseData: moonPhaseNotice,
+            onClick: () => {} // No navigation for moon phase
+        });
+
         const tideNotices = [
             {
                 key: 'tide-low',
@@ -1994,6 +2067,7 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
             isWorkDay={notice.isWorkDay}
             isCircuit={notice.isCircuit}
             isDaylight={notice.isDaylight}
+            isMoonPhase={notice.isMoonPhase}
             scoreDateLine={notice.scoreDateLine}
             scoreMatchupLine={notice.scoreMatchupLine}
             taskProjectLine={notice.taskProjectLine}
@@ -2010,6 +2084,7 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
             trainingInitialElapsedSeconds={notice.trainingInitialElapsedSeconds}
             daylightSunsetTimeMs={notice.daylightSunsetTimeMs}
             daylightErrorMessage={notice.daylightErrorMessage}
+            moonPhaseData={notice.moonPhaseData}
         />
     ), []);
 
@@ -2183,7 +2258,7 @@ const Header = ({ company, width, isMotionOn, isSignedIn, setSignIn }) => {
             localStorage.setItem('categories', JSON.stringify(newCategories));
         }
         localStorage.setItem('menus', JSON.stringify(newMenus));
-        window.location = `/reactor/#/${label}`
+        window.location = `/reactor/${label}`
     }
 
     let appBg = undefined;

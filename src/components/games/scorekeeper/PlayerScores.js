@@ -718,7 +718,7 @@ const PlayerScores = () => {
     /*
     const getScore = () => {
         setDisplayNumberPad(false);
-        window.location = '/reactor/#/Scores';
+        window.location = '/reactor/Scores';
     }
     
     const resetSurfersScores = (playerId) => {

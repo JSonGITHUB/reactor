@@ -16,6 +16,7 @@ import Cams from './Cams';
 import WaterTemp from './WaterTemp';
 import WindDirection from './WindDirection';
 import SurfDashboard from './SurfDashboard';
+import { requestProvider } from '../../services/providerApi';
 //import BuoyReadingsChart from './BuoyReadingsChart';
 //import MarineDataChart from './MarineDataChart';
 //import MarineChart from './MarineChart';
@@ -42,14 +43,6 @@ const {
     const [buoyData, setBuoyData] = useState(buoysTemplateData);
     const [isBuoyFallbackActive, setIsBuoyFallbackActive] = useState(false);
     const [range] = useState(0.05);
-    const SURFLINE_BASE_URL = process.env.REACT_APP_SURFLINE_BASE_URL;
-    const SURFLINE_TOKEN = process.env.REACT_APP_SURFLINE_TOKEN;
-    const hasValidSurflineConfig = Boolean(
-        SURFLINE_BASE_URL
-        && SURFLINE_TOKEN
-        && SURFLINE_TOKEN !== 'your_surfline_token_here'
-    );
-    const localBuoyReadings = () => `${SURFLINE_BASE_URL}/bounds?north=${Number(localStorage.getItem('latitude')) - range}&south=${Number(localStorage.getItem('latitude')) + range}&east=${Number(localStorage.getItem('longitude')) + 1}&west=${Number(localStorage.getItem('longitude')) - 1}&accesstoken=${SURFLINE_TOKEN}`;
     const getCachedBuoyData = () => initializeData('buoyData', buoysTemplateData);
     const setBuoyDataSafely = (payload) => {
         if (payload && Array.isArray(payload.data)) {
@@ -79,21 +72,11 @@ const {
     }, [buoyCollapse]);
 
     const fetchAndSetBuoyData = (controller, isMountedRef) => {
-        if (!hasValidSurflineConfig) {
-            if (!isMountedRef.current) return;
-            const cached = getCachedBuoyData();
-            setBuoyData(cached);
-            warnBuoyFallbackOnce();
-            return;
-        }
-
-        fetch(localBuoyReadings(), { signal: controller.signal })
-            .then((res) => {
-                if (!res.ok) {
-                    throw new Error(`HTTP ${res.status}`);
-                }
-                return res.json();
-            })
+        requestProvider('surfline', {
+            lat: Number(localStorage.getItem('latitude')),
+            lon: Number(localStorage.getItem('longitude')),
+            range,
+        }, { signal: controller.signal })
             .then((data) => {
                 if (!isMountedRef.current) return;
                 if (!setBuoyDataSafely(data)) {

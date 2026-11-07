@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import icons from '../site/icons';
 import Recipe from './Recipe';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
-import validate from '../utils/validate';
 
 const RecipeGroup = ({
     
@@ -18,51 +17,17 @@ const RecipeGroup = ({
 
 }) => {
     
-    const [collapsed, setCollapsed] = useState(recipeGroup.isCollapsed ?? true);
+    const [collapsed, setCollapsed] = useState(() => recipeGroup.isCollapsed ?? recipeGroup.collapsed ?? true);
     const [edit, setEdit] = useState(false);
     const isEditedRecipeGroupTitle = () => (edit) ? true : false;
     const [editedRecipeGroupTitle, setEditedRecipeGroupTitle] = useState(null);
 
     useEffect(() => {
-        let dataUpdated = false;
-        const newRecipes = [...recipes];
-        const selectedNewRecipeGroup = newRecipes[recipeGroupIndex];
-        //if (selectedNewRecipeGroup.recipes === undefined) {
-        if (validate(selectedNewRecipeGroup.recipes) === null) {
-            selectedNewRecipeGroup.recipes = [];
-            dataUpdated = true;
+        const nextCollapsed = recipeGroup.isCollapsed ?? recipeGroup.collapsed ?? true;
+        if (nextCollapsed !== collapsed) {
+            setCollapsed(nextCollapsed);
         }
-        setCollapsed(recipeGroup.isCollapsed ?? false)
-        if (dataUpdated) {
-            setRecipes(newRecipes);
-        }
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-    useEffect(() => {
-        setCollapsed(recipeGroup.isCollapsed ?? recipeGroup.collapsed ?? true);
     }, [recipeGroup.isCollapsed, recipeGroup.collapsed]);
-
-    useEffect(() => {
-        setRecipes((previousRecipes) => {
-            if (!Array.isArray(previousRecipes) || !previousRecipes[recipeGroupIndex]) {
-                return previousRecipes;
-            }
-
-            const currentGroup = previousRecipes[recipeGroupIndex];
-            if (currentGroup.isCollapsed === collapsed && currentGroup.collapsed === collapsed) {
-                return previousRecipes;
-            }
-
-            const updatedRecipes = [...previousRecipes];
-            updatedRecipes[recipeGroupIndex] = {
-                ...currentGroup,
-                isCollapsed: collapsed,
-                collapsed: collapsed
-            };
-            localStorage.setItem('recipeTracking', JSON.stringify(updatedRecipes));
-            return updatedRecipes;
-        });
-    }, [collapsed, recipeGroupIndex, setRecipes]);
     
     const toggleEdit = () => {
         const toggle = (edit)
@@ -80,10 +45,23 @@ const RecipeGroup = ({
     }
     const toggleCollapse = () => {
         const collapse = !collapsed;
+        if (!Array.isArray(recipes) || !recipes[recipeGroupIndex]) {
+            setCollapsed(collapse);
+            return;
+        }
+
+        const currentGroup = recipes[recipeGroupIndex];
+        if (currentGroup.isCollapsed === collapse && currentGroup.collapsed === collapse) {
+            setCollapsed(collapse);
+            return;
+        }
+
         const newRecipes = [...recipes];
-        const selectedNewRecipeGroup = newRecipes[recipeGroupIndex];
-        selectedNewRecipeGroup.isCollapsed = collapse;
-        selectedNewRecipeGroup.collapsed = collapse;
+        newRecipes[recipeGroupIndex] = {
+            ...currentGroup,
+            isCollapsed: collapse,
+            collapsed: collapse
+        };
         setRecipes(newRecipes);
         setCollapsed(collapse);
         setCollapseAll(undefined);
@@ -113,9 +91,12 @@ const RecipeGroup = ({
             setRecipes(newRecipes);
         }
     }
-    const visibleRecipeCount = Array.isArray(recipeGroup.recipes)
-        ? recipeGroup.recipes.filter((recipe) => recipe?.display === true || recipe?.display === 'true').length
-        : 0;
+    const visibleRecipes = useMemo(() => (
+        Array.isArray(recipeGroup.recipes)
+            ? recipeGroup.recipes.filter((recipe) => recipe?.display === true || recipe?.display === 'true')
+            : []
+    ), [recipeGroup.recipes]);
+    const visibleRecipeCount = visibleRecipes.length;
     const recipeGroupTitle = (recipeGroup.category) ? <>{recipeGroup.category} <span className='copyright color-lite'>{visibleRecipeCount}</span></> : 'New Category';
 
     if (visibleRecipeCount === 0) {
@@ -191,22 +172,19 @@ const RecipeGroup = ({
                             {
                                 (collapsed)
                                 ? null
-                                : (recipeGroup.recipes && recipeGroup.recipes.length > 0)
-                                    ? recipeGroup.recipes.map((recipe, recipeIndex) => {
-                                        if (recipe?.display === true || recipe?.display === 'true') {
-                                            return <div key={`${recipe?.dish || 'recipe'}-${recipeIndex}`} ref={(el) => (recipeIndex === 0 ? targetElementRef : null)}>
-                                                <Recipe
-                                                    recipes={recipes}
-                                                    setRecipes={setRecipes}
-                                                    recipeGroupIndex={recipeGroupIndex}
-                                                    recipeIndex={recipeIndex}
-                                                    recipe={recipe}
-                                                    setCollapseAll={setCollapseAll}
-                                                />
-                                            </div>
-                                        }
-                                        return null;
-                                    })
+                                : (visibleRecipes.length > 0)
+                                    ? visibleRecipes.map((recipe, recipeIndex) => (
+                                        <div key={`${recipe?.dish || 'recipe'}-${recipeIndex}`} ref={(el) => (recipeIndex === 0 ? targetElementRef : null)}>
+                                            <Recipe
+                                                recipes={recipes}
+                                                setRecipes={setRecipes}
+                                                recipeGroupIndex={recipeGroupIndex}
+                                                recipeIndex={recipeIndex}
+                                                recipe={recipe}
+                                                setCollapseAll={setCollapseAll}
+                                            />
+                                        </div>
+                                    ))
                                     : null
                             }
                         </div>
@@ -215,4 +193,16 @@ const RecipeGroup = ({
                 </div>
         </div>
 }
-export default RecipeGroup;
+const areRecipeGroupPropsEqual = (prevProps, nextProps) => (
+    prevProps.recipeGroup === nextProps.recipeGroup
+    && prevProps.recipeGroupIndex === nextProps.recipeGroupIndex
+    && prevProps.recipes === nextProps.recipes
+    && prevProps.setRecipes === nextProps.setRecipes
+    && prevProps.setCollapseAll === nextProps.setCollapseAll
+    && prevProps.deleteGroup === nextProps.deleteGroup
+    && prevProps.addRecipe === nextProps.addRecipe
+    && prevProps.targetElementRef === nextProps.targetElementRef
+    && prevProps.scrollToBottom === nextProps.scrollToBottom
+);
+
+export default React.memo(RecipeGroup, areRecipeGroupPropsEqual);

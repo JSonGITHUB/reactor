@@ -10,6 +10,7 @@ import {
 } from 'recharts';
 import getMatchIcon from './GetMatchIcon';
 import fetchCurrentWaterTemp from './waterTempService';
+import fetchWaterQuality from './waterQualityService';
 
 const NOAA_BASE = '/api/prod/datagetter';
 const NOAA_STATION_ID = '9410230';
@@ -390,6 +391,8 @@ const Dive = ({ coreMetricsOnly = false }) => {
     const [swell, setSwell] = useState(null);
     const [beachStatus, setBeachStatus] = useState(null);
     const [visibilitySource, setVisibilitySource] = useState('No public numeric visibility feed available');
+    const [waterQuality, setWaterQuality] = useState(null);
+    const [backupVisibility, setBackupVisibility] = useState(null);
 
     useEffect(() => {
         let isMounted = true;
@@ -399,7 +402,7 @@ const Dive = ({ coreMetricsOnly = false }) => {
             setError('');
             setWarning('');
 
-            const [visibilityResult, waterResult, windResult, swellResult, beachStatusResult] = await Promise.allSettled([
+            const [visibilityResult, waterResult, windResult, swellResult, beachStatusResult, qualityResult] = await Promise.allSettled([
                 fetchVisibilityPayload(),
                 fetchCurrentWaterTemp({
                     noaaStationId: NOAA_STATION_ID,
@@ -408,6 +411,9 @@ const Dive = ({ coreMetricsOnly = false }) => {
                 fetchNoaaProduct('wind'),
                 fetchNdbcStationData(NDBC_SWELL_STATION_ID),
                 fetchSdBeachStatus(),
+                fetchWaterQuality({
+                    noaaStationId: NOAA_STATION_ID,
+                }),
             ]);
 
             const normalizedRows = visibilityResult.status === 'fulfilled'
@@ -447,10 +453,30 @@ const Dive = ({ coreMetricsOnly = false }) => {
             const resolvedWaterTimestamp = currentWaterReading?.timestamp ?? null;
             const resolvedWaterSource = currentWaterReading?.source || null;
 
+            // Extract water quality data
+            const qualityData = qualityResult.status === 'fulfilled' ? qualityResult.value : null;
+
+            // If primary visibility fails, use backup from water quality service
+            let finalVisibilitySource = resolvedVisibilitySource;
+            let finalRows = normalizedRows;
+            if (normalizedRows.length === 0 && qualityData?.visibility) {
+                // Use backup visibility from quality service
+                finalRows = [{
+                    timestamp: qualityData.visibility.timestamp || new Date(),
+                    visibility: qualityData.visibility.feet,
+                }];
+                finalVisibilitySource = qualityData.visibility.method === 'estimated'
+                    ? `${qualityData.visibility.source} (Low confidence)`
+                    : `${qualityData.visibility.source}`;
+                setBackupVisibility(true);
+            } else {
+                setBackupVisibility(false);
+            }
+
             const dataSourcesFailed = [visibilityResult, waterResult, windResult, swellResult, beachStatusResult].some((item) => item.status === 'rejected');
 
             if (isMounted) {
-                setRows(normalizedRows);
+                setRows(finalRows);
                 setWaterTrendRows(
                     ndbcRows.filter((row) => Number.isFinite(row.waterTempF))
                 );
@@ -482,9 +508,10 @@ const Dive = ({ coreMetricsOnly = false }) => {
                         }
                 );
                 setBeachStatus(parsedBeachStatus);
-                setVisibilitySource(resolvedVisibilitySource);
+                setVisibilitySource(finalVisibilitySource);
+                setWaterQuality(qualityData);
 
-                const hasAnyData = normalizedRows.length || resolvedWaterValue !== null || windSpeedKnots !== null || swellFeet !== null || parsedBeachStatus !== null;
+                const hasAnyData = finalRows.length || resolvedWaterValue !== null || windSpeedKnots !== null || swellFeet !== null || parsedBeachStatus !== null;
                 if (!hasAnyData) {
                     setError('Unable to load La Jolla Cove marine data right now.');
                 } else if (dataSourcesFailed) {
@@ -636,6 +663,7 @@ const Dive = ({ coreMetricsOnly = false }) => {
                                         }
                                         <div className='containerDetail bg-lite mb-5 p-10'>
                                             <span className='color-yellow'>Visibility source:</span> {visibilitySource}
+                                            {backupVisibility ? <span className='color-orange ml-5'>(Backup)</span> : null}
                                         </div>
                                         {
                                             visibilitySource.includes('NDBC station')
@@ -652,6 +680,35 @@ const Dive = ({ coreMetricsOnly = false }) => {
                                                 ? <div className='containerDetail bg-lite mb-5 p-10'>
                                                     <span className='color-yellow'>Water source:</span> {waterTemp.source}
                                                 </div>
+                                                : null
+                                        }
+                                        {
+                                            waterQuality?.salinity
+                                                ? <div className='containerDetail bg-lite mb-5 p-10'>
+                                                    <span className='color-yellow'>Salinity (Water Quality):</span> {waterQuality.salinity.value.toFixed(2)} {waterQuality.salinity.unit}
+                                                </div>
+                                                : null
+                                        }
+                                        {
+                                            waterQuality?.qualityAssessment
+                                                ? (
+                                                    <div className='containerDetail bg-lite mb-5 p-10'>
+                                                        <span className='color-yellow'>Water Quality Assessment:</span>
+                                                        <div className={`mt-5 p-5 size15 ${
+                                                            waterQuality.qualityAssessment.rating === 'excellent' ? 'color-green' :
+                                                            waterQuality.qualityAssessment.rating === 'good' ? 'color-yellow' :
+                                                            waterQuality.qualityAssessment.rating === 'fair' ? 'color-orange' :
+                                                            'color-red'
+                                                        }`}>
+                                                            {waterQuality.qualityAssessment.rating.toUpperCase()}
+                                                        </div>
+                                                        {waterQuality.qualityAssessment.assessments.map((assessment, idx) => (
+                                                            <div key={idx} className='mt-5 size14'>
+                                                                <span className='color-yellow'>{assessment.factor}:</span> {assessment.status} ({assessment.value.toFixed(2)})
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )
                                                 : null
                                         }
                                         {
@@ -692,17 +749,17 @@ const Dive = ({ coreMetricsOnly = false }) => {
                                         <div className='containerDetail bg-lite'>
                                             {
                                                 waterTemp?.timestamp
-                                                ? <div className='containerDetail mb-5 pl-10'><span className='color-yellow'>Water updated:</span> {formatDateTime(waterTemp.timestamp)}</div>
+                                                ? <div className='containerDetail mb-5 pl-10'><span className='color-yellow'>Water {waterTemp.value.toFixed(1)} °F updated:</span> {formatDateTime(waterTemp.timestamp)}</div>
                                                     : null
                                             }
                                             {
                                                 !showCoreOnly && wind?.timestamp
-                                                ? <div className='containerDetail mb-5 pl-10'><span className='color-yellow'>Wind updated:</span> {formatDateTime(wind.timestamp)}</div>
+                                                ? <div className='containerDetail mb-5 pl-10'><span className='color-yellow'>Wind {wind.speedMph.toFixed(0)} mph {wind.directionLabel} updated:</span> {formatDateTime(wind.timestamp)}</div>
                                                     : null
                                             }
                                             {
                                                 !showCoreOnly && swell?.timestamp
-                                                    ? <div className='containerDetail pl-10'><span className='color-yellow'>Swell updated:</span> {formatDateTime(swell.timestamp)}</div>
+                                                    ? <div className='containerDetail pl-10'><span className='color-yellow'>Swell {swell.value.toFixed(1)} ft updated:</span> {formatDateTime(swell.timestamp)}</div>
                                                     : null
                                             }
                                         </div>

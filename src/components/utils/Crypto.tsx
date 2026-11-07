@@ -619,12 +619,12 @@ export default function Crypto(): JSX.Element {
                             <div className={`bg-tinted pt-5 pb-5 pr-10 mt-5 mb-5 ml-5 flex3Column contentRight ${portfolioMetrics.totalValue >= portfolioMetrics.totalCost ? 'color-neogreen' : 'color-red'}`}>${portfolioMetrics.totalValue.toFixed(2)}</div>
                             <div className={`bg-tinted flex3Column p-10 m-5 contentRight ${portfolioPnl >= 0 ? 'color-neogreen' : 'color-red'}`}></div>
                         </div>
-                        <div className='color-lite flexContainer mt--5'>
+                        <div className='color-lite flexContainer '>
                             <div className='bg-tinted color-yellow flex3Column contentRight mt-5 mb-5 ml-5 pt-5 pb-5 pr-10'>Cost: </div>
                             <div className='bg-tinted pt-5 pb-5 pr-10 mt-5 mb-5 ml-5 flex3Column contentRight color-red'>${portfolioMetrics.totalCost.toFixed(2)}</div>
                             <div className={`bg-tinted flex3Column p-10 m-5 contentRight ${portfolioPnl >= 0 ? 'color-neogreen' : 'color-red'}`}></div>
                         </div>
-                        <div className='color-lite flexContainer mt--5'>
+                        <div className='color-lite flexContainer '>
                             <div className='bg-tinted color-yellow flex3Column contentRight mt-5 mb-5 ml-5 pt-5 pb-5 pr-10'>P/L: </div>
                             <div className={`bg-tinted pt-5 pb-5 pr-10 mt-5 mb-5 ml-5 flex3Column contentRight ${portfolioPnl >= 0 ? 'color-neogreen' : 'color-red'}`}>{portfolioPnl >= 0 ? '+' : ''}${portfolioPnl.toFixed(2)}</div>
                             <div className={`bg-tinted flex3Column p-5 m-5 contentCenter ${portfolioPnl >= 0 ? 'color-neogreen' : 'color-red'}`}>({portfolioPnlPct.toFixed(2)}%)</div>
@@ -733,7 +733,7 @@ export default function Crypto(): JSX.Element {
                     return (
                         <div
                             key={pair}
-                            className='containerDetail size20 p-10 m-5 color-yellow bg-tinted contentLeft'
+                            className='containerDetail p-10 m-5 color-yellow bg-tinted contentLeft'
                         >
                             <div className='contentLeft'>
                                 <div className='flexContainer'>
@@ -755,11 +755,11 @@ export default function Crypto(): JSX.Element {
                                             </div>
                                             <div className='flexColumn contentRight'>
                                                 {recentAlertAgeSec != null && recentAlertAgeSec <= 600 ? (
-                                                    <div className='size10 color-yellow mt--10'>
+                                                    <div className='size10 color-yellow '>
                                                         Priority: recent alert {recentAlertAgeSec}s ago
                                                     </div>
                                                 ) : null}
-                                                <div className={`size10 mt--10 ${isStale ? 'color-red' : 'color-lite'}`}>
+                                                <div className={`size10  ${isStale ? 'color-red' : 'color-lite'}`}>
                                                     Tick age: {tickAgeSec != null ? `${tickAgeSec}s` : '—'}
                                                     {isStale ? ' (stale)' : ''}
                                                 </div>
@@ -771,11 +771,11 @@ export default function Crypto(): JSX.Element {
                                                         ? 'Connecting…'
                                                         : 'Waiting for tick…'}
                                                 </div>
-                                                <div className='size10 mt--10 contentRight'>
+                                                <div className='size10  contentRight'>
                                                     <div style={{ color: '#00c853' }}>
                                                         MA5: {latestPoint ? `$${latestPoint.ma5.toFixed(2)}` : '—'}
                                                     </div>
-                                                    <div style={{ color: '#42a5f5', marginTop: -10 }}>
+                                                    <div style={{ color: '#42a5f5', marginTop: -5 }}>
                                                         MA12: {latestPoint ? `$${latestPoint.ma12.toFixed(2)}` : '—'}
                                                     </div>
                                                 </div>
@@ -790,17 +790,17 @@ export default function Crypto(): JSX.Element {
                                         title={<div className='color-yellow size12'>
                                             Position { 
                                                 isPositionCollapsed 
-                                                ? <div className='mt--5'>
-                                                    <span className={`color-lite contentLeft mt--5`}>
+                                                ? <div className=''>
+                                                    <span className={`color-lite contentLeft `}>
                                                         <div className={`flexContainer width-300`}>
                                                             <div className='flexColumn contentRight w-30'>Qty</div> 
                                                                 <div className='flex2Column contentLeft pl-10 color-neogreen'>{quantity.toFixed(4)}</div>
                                                         </div>
-                                                        <div className={`flexContainer mr-5 mt--5`}>
+                                                        <div className={`flexContainer mr-5 `}>
                                                             <div className='flexColumn contentRight w-30'>Avg</div>
                                                             <div className='flex2Column color-yellow contentLeft pl-10'>${avgCost.toFixed(2)}</div>
                                                         </div>
-                                                        <div className={`flexContainer mt--5`}>
+                                                        <div className={`flexContainer `}>
                                                             <div className='flexColumn contentRight w-30'>Value</div>
                                                                 <div className={`flex2Column contentLeft pl-10 ${avgCost < marketValue ? 'color-neogreen' : 'color-red'}`}>{`${(avgCost < marketValue) ? '▲' : '▼'} $${marketValue.toFixed(2)}`}</div>
                                                         </div>
@@ -812,7 +812,7 @@ export default function Crypto(): JSX.Element {
                                         component={null}
                                         description={ 
                                                 isPositionCollapsed 
-                                                ? <div className='color-lite contentLeft size12 mt--5'>
+                                                ? <div className='color-lite contentLeft size12 '>
                                                     <span className={pnl >= 0 ? 'color-neogreen' : 'color-red'}>P/L {pnl >= 0 ? '+' : ''}${pnl.toFixed(2)} <span className={`${pnlPct > 0 ? 'color-neogreen' : 'color-red'} `}>({pnlPct.toFixed(2)}%)</span></span>
                                                     </div>
                                                 : null
@@ -960,7 +960,7 @@ export default function Crypto(): JSX.Element {
                                                 title={<span className='size10 color-yellow'>Alert Behavior</span>}
                                                 component={null}
                                                 description={
-                                                    <div className='size10 color-lite contentLeft mt--5'>
+                                                    <div className='size10 color-lite contentLeft '>
                                                         Cooldown {cooldownSec}s | Re-arm band +/-{hysteresisPctDisplay.toFixed(2)}%
                                                     </div>
                                                 }

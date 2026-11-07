@@ -1,40 +1,6 @@
 import React, { FC } from 'react';
 import Task from './Task';
-
-type Session = {
-	// original code has mixed formats; keep flexible types
-	startDate: string | number;
-	startTime: string | number;
-	endDate?: string | number;
-	endTime?: string | number;
-	runningTime?: number;
-	reason?: string;
-	breakTime?: boolean;
-	startEpoch?: number;
-	// any other fields are allowed
-	[key: string]: any;
-};
-
-type TaskType = {
-	description: string;
-	sessions: Session[];
-	isRunning?: boolean;
-	timerId?: any;
-	runningTimeDisplay?: string;
-	totalTime?: number;
-	isCollapsed?: boolean;
-	breakTime?: number;
-	// any other fields
-	[key: string]: any;
-};
-
-type Project = {
-	description: string;
-	tasks: TaskType[];
-	totalTime?: number;
-	// any other fields
-	[key: string]: any;
-};
+import type { Project } from './Task';
 
 interface Props {
 	tasks: Project[];
@@ -90,14 +56,13 @@ const TaskGroup: FC<Props> = ({
 				{project.tasks.map((task, taskIndex) => (
 					<Task
 						key={`task-group-tsx-item-${index}-${taskIndex}-${String(task.description || 'task')}`}
-						index={taskIndex}
 						projects={tasks}
                         setProjects={setTasks}
                         taskIndex={taskIndex}
                         task={task}
                         projectIndex={index}
                         getProjectTotalTime={getProjectTotalTime}
-                        tracking={tracking}
+						tracking={tracking || 'projects'}
 					/>
 				))}
 			</div>

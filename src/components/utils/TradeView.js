@@ -492,6 +492,7 @@ const TradeViewStockList = React.memo(function TradeViewStockList({
 const POSITION_STORAGE_KEY = 'tradeViewPositions';
 const ALERT_THRESHOLD_STORAGE_KEY = 'tradeViewAlertThresholds';
 const ALERT_BEHAVIOR_STORAGE_KEY = 'tradeViewAlertBehavior';
+const ALERT_HISTORY_STORAGE_KEY = 'tradeViewAlertHistory';
 const BUY_QTY_STORAGE_KEY = 'tradeViewBuyQty';
 const SELL_QTY_STORAGE_KEY = 'tradeViewSellQty';
 const CUSTOM_STOCKS_STORAGE_KEY = 'tradeViewCustomStocks';
@@ -596,7 +597,10 @@ const TradeView = () => {
     const [quoteStatus, setQuoteStatus] = useState('connecting');
     const [quoteSource, setQuoteSource] = useState('');
     const [quoteIssueReason, setQuoteIssueReason] = useState('');
-    const [alerts, setAlerts] = useState([]);
+    const [alerts, setAlerts] = useState(() => {
+        const stored = loadJson(ALERT_HISTORY_STORAGE_KEY, []);
+        return Array.isArray(stored) ? stored.slice(0, 50) : [];
+    });
     const [positions, setPositions] = useState(() =>
         mergeWithDefaults(DEFAULT_POSITIONS, loadJson(POSITION_STORAGE_KEY, DEFAULT_POSITIONS))
     );
@@ -802,6 +806,10 @@ const TradeView = () => {
         behaviorRef.current = alertBehavior;
         localStorage.setItem(ALERT_BEHAVIOR_STORAGE_KEY, JSON.stringify(alertBehavior));
     }, [alertBehavior]);
+
+    useEffect(() => {
+        localStorage.setItem(ALERT_HISTORY_STORAGE_KEY, JSON.stringify(alerts));
+    }, [alerts]);
 
     useEffect(() => {
         localStorage.setItem(BUY_QTY_STORAGE_KEY, JSON.stringify(buyQtyBySymbol));
@@ -2211,7 +2219,7 @@ const TradeView = () => {
                         <div className='containerDetail color-yellow p-20 size20 m-5 bg-lite'>
                             Favorites
                         </div>
-                        <div className='containerDetail p-10 m-5 size20 color-lite bg-dark'>
+                        <div className='containerDetail p-10 m-5 size20 color-lite bg-dark ht-200'>
                             {favorites.length === 0 && <div className='color-soft'>No favorites selected.</div>}
                             {favorites.map(symbol => {
                                 const stock = allStocks.find(s => s.symbol === symbol);

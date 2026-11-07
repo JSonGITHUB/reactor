@@ -8,7 +8,7 @@ import validate from '../utils/validate';
 
 type MaybeNumberString = number | string;
 
-interface Session {
+export interface Session {
   startDate: string;
   startTime: MaybeNumberString;
   endDate: string;
@@ -19,7 +19,7 @@ interface Session {
   breakTime?: boolean;
 }
 
-interface TaskType {
+export interface TaskType {
   description?: string;
   isCollapsed?: boolean;
   isRunning?: boolean;
@@ -31,7 +31,7 @@ interface TaskType {
   breakTime?: number;
 }
 
-interface Project {
+export interface Project {
   description?: string;
   tasks: TaskType[];
   totalTime?: number;
@@ -372,9 +372,14 @@ export const Task: React.FC<TaskProps> = ({
           <div className='containerDetail color-yellow bg-tinted p-20'>
             <CollapseToggleButton
               title={`${task.description || ''}`}
+              description={undefined}
+              component={undefined}
               isCollapsed={collapse}
               setCollapse={setCollapse}
               align='left'
+              bold={undefined}
+              editTitle={undefined}
+              icon={undefined}
             />
           </div>
         </div>

@@ -37,7 +37,10 @@ const TrackNote = ({
         const newNote = {
             description: noteDescription,
             //note: note
-            note: ''
+            note: '',
+            photos: [],
+            videos: [],
+            isCollapsed: false
         }
         if (isGood(noteDescription)/* || isGood(note)*/) {
             updatedNotes[noteGroupIndex].notes.push(newNote)

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 const Weather = () => {
     const HOURLY_HOURS_TO_SHOW = 24;
     const REFRESH_INTERVAL_MS = 15 * 60 * 1000;
+    const ALERT_DB_NAME = 'kfa-weather-alerts';
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -11,16 +12,20 @@ const Weather = () => {
     const [daily, setDaily] = useState([]);
     const [latitude, setLatitude] = useState(null);
     const [longitude, setLongitude] = useState(null);
+    const [alerts, setAlerts] = useState([]);
+    const [alertConfig, setAlertConfig] = useState([]);
+    const [showAlertPanel, setShowAlertPanel] = useState(false);
+    const [triggeredAlerts, setTriggeredAlerts] = useState([]);
 
     const WEATHER_CODE_LABEL = {
-        0: '☀️ Clear sky',
-        1: '🌤️ Mainly clear',
-        2: '⛅️ Partly cloudy',
+        0: '☀️ Sunny',
+        1: '🌤️ Clear',
+        2: '⛅️ Cloudy',
         3: '☁️ Overcast',
         45: '😶‍🌫️ Fog',
-        48: '😶‍🌫️ Depositing rime fog',
-        51: '🌦️ Light drizzle',
-        53: '🌦️ Moderate drizzle',
+        48: '😶‍🌫️ Heavy fog',
+        51: '🌦️ Sprinkles',
+        53: '🌦️ Drizzle',
         55: '🌦️ Dense drizzle',
         56: '🥶🌦️ Light freezing drizzle',
         57: '🥶🌦️ Dense freezing drizzle',
@@ -69,6 +74,164 @@ const Weather = () => {
         96: { icon: '⛈️', desc: 'Thunderstorm with hail' },
         99: { icon: '🌩️', desc: 'Severe thunderstorm with hail' },
     };
+    // Map temperature to color spectrum for better UX
+    const getTempColor = (tempF) => {
+        if (tempF === null || tempF === undefined) return '#888888';
+        
+        // Color spectrum based on temperature
+        // 0°F and below: deep blue
+        // 32°F: light blue (freezing)
+        // 50°F: cyan
+        // 70°F: green
+        // 85°F: orange
+        // 100°F+: red
+        
+        if (tempF <= 0) return '#001a4d'; // Deep blue
+        if (tempF < 32) {
+            const ratio = (tempF) / 32;
+            return `hsl(220, 100%, ${20 + ratio * 40}%)`; // Blue to light blue
+        }
+        if (tempF < 50) {
+            const ratio = (tempF - 32) / 18;
+            return `hsl(${220 - ratio * 80}, 100%, ${60 - ratio * 20}%)`; // Light blue to cyan
+        }
+        if (tempF < 70) {
+            const ratio = (tempF - 50) / 20;
+            return `hsl(${140 - ratio * 60}, 100%, ${40 + ratio * 10}%)`; // Cyan to green
+        }
+        if (tempF < 85) {
+            const ratio = (tempF - 70) / 15;
+            return `hsl(${80 - ratio * 40}, 100%, ${40 + ratio * 10}%)`; // Green to yellow-orange
+        }
+        if (tempF < 100) {
+            const ratio = (tempF - 85) / 15;
+            return `hsl(${40 - ratio * 20}, 100%, ${50 - ratio * 10}%)`; // Orange to red-orange
+        }
+        // 100°F+: deep red
+        return '#cc0000';
+    };
+
+    // Get contrasting text color based on background brightness
+    const getTextColor = (bgColor) => {
+        // For very dark or very light backgrounds, use white or dark text
+        if (bgColor.includes('hsl')) {
+            const match = bgColor.match(/(\d+)%\)/);
+            if (match) {
+                const lightness = parseInt(match[1]);
+                return lightness > 50 ? '#333333' : '#333333';
+            }
+        }
+        // Default for hex colors
+        return '#ffffff';
+    };
+
+    // Alert persistence functions
+    const saveAlertConfig = async (config) => {
+        try {
+            const db = await openIndexedDB();
+            const tx = db.transaction(['alerts'], 'readwrite');
+            const store = tx.objectStore('alerts');
+            await store.put({ id: 'config', data: config });
+        } catch (err) {
+            console.warn('Failed to save alert config:', err);
+        }
+    };
+
+    const loadAlertConfig = async () => {
+        try {
+            const db = await openIndexedDB();
+            const tx = db.transaction(['alerts'], 'readonly');
+            const store = tx.objectStore('alerts');
+            const result = await store.get('config');
+            return result?.data || [];
+        } catch (err) {
+            console.warn('Failed to load alert config:', err);
+            return [];
+        }
+    };
+
+    const openIndexedDB = () => {
+        return new Promise((resolve, reject) => {
+            const req = indexedDB.open(ALERT_DB_NAME, 1);
+            req.onerror = () => reject(req.error);
+            req.onsuccess = () => resolve(req.result);
+            req.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('alerts')) {
+                    db.createObjectStore('alerts', { keyPath: 'id' });
+                }
+            };
+        });
+    };
+
+    // Check alerts against current weather data
+    const checkAlerts = (currentWeather, hourlyData) => {
+        const triggered = [];
+        
+        alertConfig.forEach((alert) => {
+            let isTriggered = false;
+            let message = '';
+
+            if (alert.type === 'wind_below' && currentWeather) {
+                if (currentWeather.windspeed < alert.value) {
+                    isTriggered = true;
+                    message = `💨 Wind speed dropped to ${currentWeather.windspeed} mph (below ${alert.value} mph)`;
+                }
+            } else if (alert.type === 'wind_above' && currentWeather) {
+                if (currentWeather.windspeed > alert.value) {
+                    isTriggered = true;
+                    message = `💨 Wind speed increased to ${currentWeather.windspeed} mph (above ${alert.value} mph)`;
+                }
+            } else if (alert.type === 'temp_above' && currentWeather) {
+                if (currentWeather.temperature > alert.value) {
+                    isTriggered = true;
+                    message = `🌡️ Temperature is ${currentWeather.temperature}°F (above ${alert.value}°F)`;
+                }
+            } else if (alert.type === 'temp_below' && currentWeather) {
+                if (currentWeather.temperature < alert.value) {
+                    isTriggered = true;
+                    message = `🌡️ Temperature dropped to ${currentWeather.temperature}°F (below ${alert.value}°F)`;
+                }
+            } else if (alert.type === 'weather_code' && currentWeather) {
+                if (currentWeather.weathercode === alert.value) {
+                    const weatherLabel = WEATHER_CODE_LABEL[alert.value] || 'Unknown weather';
+                    isTriggered = true;
+                    message = `${weatherLabel}`;
+                }
+            }
+
+            if (isTriggered) {
+                triggered.push({
+                    id: alert.id,
+                    type: alert.type,
+                    message,
+                    timestamp: new Date().toLocaleTimeString(),
+                });
+            }
+        });
+
+        setTriggeredAlerts(triggered);
+    };
+
+    // Add new alert
+    const addAlert = async (type, value, label) => {
+        const newAlert = {
+            id: Date.now(),
+            type,
+            value,
+            label,
+        };
+        const newConfig = [...alertConfig, newAlert];
+        setAlertConfig(newConfig);
+        await saveAlertConfig(newConfig);
+    };
+
+    // Remove alert
+    const removeAlert = async (id) => {
+        const newConfig = alertConfig.filter((a) => a.id !== id);
+        setAlertConfig(newConfig);
+        await saveAlertConfig(newConfig);
+    };
 
     useEffect(() => {
         if (!latitude || !longitude) {
@@ -83,8 +246,8 @@ const Weather = () => {
             }
             setError('');
             try {
-                // Example endpoint for Open-Meteo: gets current + hourly + daily forecast
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,precipitation,weathercode&daily=temperature_2m_max,temperature_2m_min,weathercode&current_weather=true&timezone=auto`;
+                // Example endpoint for Open-Meteo: gets current + hourly + daily forecast + waves
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,precipitation,weathercode,windspeed_10m,winddirection_10m,wave_height,wave_direction&daily=temperature_2m_max,temperature_2m_min,weathercode&current_weather=true&timezone=auto`;
                 const resp = await fetch(url);
                 if (!resp.ok) {
                     throw new Error(`Weather request failed: ${resp.status}`);
@@ -95,6 +258,15 @@ const Weather = () => {
                 const cToF = c => (c === null || c === undefined) ? null : +(c * 9 / 5 + 32).toFixed(1);
                 const kmhToMph = k => (k === null || k === undefined) ? null : +(k * 0.621371).toFixed(1);
                 const mmToInches = mm => (mm === null || mm === undefined) ? null : +(mm / 25.4).toFixed(2);
+                const mToFeet = m => (m === null || m === undefined) ? null : +(m * 3.28084).toFixed(2);
+
+                // Convert wind angle (0-360°) to cardinal/intercardinal direction
+                const getWindDirection = (angle) => {
+                    if (angle === null || angle === undefined) return 'N/A';
+                    const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+                    const index = Math.round(angle / 45) % 8;
+                    return directions[index];
+                };
 
                 // convert current weather
                 if (data.current_weather) {
@@ -114,6 +286,12 @@ const Weather = () => {
                     tempF: cToF(data.hourly.temperature_2m[idx]),
                     precipIn: mmToInches(data.hourly.precipitation[idx]),
                     code: data.hourly.weathercode[idx],
+                    windMph: kmhToMph(data.hourly.windspeed_10m[idx]),
+                    windAngle: data.hourly.winddirection_10m[idx],
+                    windDir: getWindDirection(data.hourly.winddirection_10m[idx]),
+                    swellFeet: mToFeet(data.hourly.wave_height[idx]),
+                    swellAngle: data.hourly.wave_direction[idx],
+                    swellDir: getWindDirection(data.hourly.wave_direction[idx]),
                 }));
 
                 const nowMs = Date.now();
@@ -137,6 +315,17 @@ const Weather = () => {
                     code: data.daily.weathercode[idx],
                 }));
                 setDaily(days);
+
+                // Check alerts after updating weather
+                if (data.current_weather && alertConfig.length > 0) {
+                    const currentWeather = {
+                        temperature: cToF(data.current_weather.temperature),
+                        windspeed: kmhToMph(data.current_weather.windspeed),
+                        weathercode: data.current_weather.weathercode,
+                        time: data.current_weather.time
+                    };
+                    checkAlerts(currentWeather, hours);
+                }
 
             } catch (err) {
                 setError('Failed to load weather data');
@@ -178,6 +367,15 @@ const Weather = () => {
         );
     }, []);
 
+    // Load alert configuration on mount
+    useEffect(() => {
+        const loadConfig = async () => {
+            const config = await loadAlertConfig();
+            setAlertConfig(config);
+        };
+        loadConfig();
+    }, []);
+
     if (loading) {
         return <div className='color-yellow'><span className='blinking-fade'>⏳</span> Loading weather…</div>;
     }
@@ -203,6 +401,16 @@ const Weather = () => {
         });
     };
 
+    const formatDateWithNumber = (dateStr) => {
+        if (!dateStr) return '';
+        const d = new Date(dateStr.length === 10 ? `${dateStr}T00:00:00` : dateStr);
+        if (Number.isNaN(d.getTime())) return dateStr;
+        const weekday = d.toLocaleDateString(undefined, { weekday: 'short' });
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${weekday} ${month}/${day}`;
+    };
+
     const mostCurrentHourlyIndex = hourly.reduce((closestIndex, hourEntry, index, all) => {
         const entryMs = new Date(hourEntry.time).getTime();
         if (!Number.isFinite(entryMs)) {
@@ -224,54 +432,179 @@ const Weather = () => {
     }, -1);
 
     return (
-        <div className='containerDetail bg-lite color-lite size20 contentLeft ml-5 mr-5 mt--20'>
+        <div className='containerDetail bg-lite color-lite size20 contentLeft ml-5 mr-5 mt--25 mb-10'>
             <div className='containerDetail bg-lite mb-5 p-20 color-yellow size20'>
                 Weather
             </div>
+
+            {/* Alert Triggered Display */}
+            {triggeredAlerts.length > 0 && (
+                <div className='containerDetail bg-lite mb-5 size20 contentLeft'>
+                    <div className='containerDetail bg-lite mb-5 p-10 color-red size20'>
+                        🚨 Active Alerts ({triggeredAlerts.length})
+                    </div>
+                    {triggeredAlerts.map((alert) => (
+                        <div
+                            key={alert.id}
+                            className='containerDetail bg-tintedMedium p-10 mb-5 size20 color-red'
+                            style={{ borderLeft: '4px solid #ff0000' }}
+                        >
+                            <div className='flexContainer'>
+                                <div className='flexColumn contentLeft' style={{ flex: 1 }}>
+                                    {alert.message}
+                                </div>
+                                <div className='flexColumn contentRight size14 copyright color-yellow'>
+                                    {alert.timestamp}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* Alert Configuration Panel */}
             <div className='containerDetail bg-lite mb-5 size20 contentLeft'>
-                <div className='containerDetail bg-lite p-10 mb-5 color-yellow size20'>
-                    Temperature:
+                <div
+                    className='containerDetail bg-lite mb-5 p-10 color-yellow size20'
+                    onClick={() => setShowAlertPanel(!showAlertPanel)}
+                    style={{ cursor: 'pointer', userSelect: 'none' }}
+                >
+                    🔔 Weather Alerts {showAlertPanel ? '▼' : '▶'} ({alertConfig.length})
                 </div>
-                <div className='containerDetail bg-tintedMedium p-10 size20'>
-                    🌡️ {current ? `${current.temperature}°F` : 'N/A'}
-                </div>
+
+                {showAlertPanel && (
+                    <div className='containerDetail bg-tintedMedium p-10 mb-5'>
+                        <div className='mb-10'>
+                            <h4 className='color-yellow mb-5'>Alert Types:</h4>
+                            <div className='flexContainer' style={{ flexWrap: 'wrap', gap: '10px' }}>
+                                <button
+                                    className='button bg-dark color-yellow p-10'
+                                    onClick={() => {
+                                        const value = prompt('Wind speed threshold (mph):', '5');
+                                        if (value) addAlert('wind_below', parseFloat(value), `Wind below ${value} mph`);
+                                    }}
+                                >
+                                    💨 Wind Below
+                                </button>
+                                <button
+                                    className='button bg-dark color-yellow p-10'
+                                    onClick={() => {
+                                        const value = prompt('Wind speed threshold (mph):', '20');
+                                        if (value) addAlert('wind_above', parseFloat(value), `Wind above ${value} mph`);
+                                    }}
+                                >
+                                    💨 Wind Above
+                                </button>
+                                <button
+                                    className='button bg-dark color-yellow p-10'
+                                    onClick={() => {
+                                        const value = prompt('Temperature threshold (°F):', '80');
+                                        if (value) addAlert('temp_above', parseFloat(value), `Temp above ${value}°F`);
+                                    }}
+                                >
+                                    🌡️ Temp Above
+                                </button>
+                                <button
+                                    className='button bg-dark color-yellow p-10'
+                                    onClick={() => {
+                                        const value = prompt('Temperature threshold (°F):', '32');
+                                        if (value) addAlert('temp_below', parseFloat(value), `Temp below ${value}°F`);
+                                    }}
+                                >
+                                    🌡️ Temp Below
+                                </button>
+                                <button
+                                    className='button bg-dark color-yellow p-10'
+                                    onClick={() => addAlert('weather_code', 0, 'Sunny weather')}
+                                >
+                                    ☀️ Sunny (Code 0)
+                                </button>
+                                <button
+                                    className='button bg-dark color-yellow p-10'
+                                    onClick={() => addAlert('weather_code', 1, 'Clear weather')}
+                                >
+                                    🌤️ Clear (Code 1)
+                                </button>
+                            </div>
+                        </div>
+
+                        {alertConfig.length > 0 && (
+                            <div className='containerDetail bg-lite p-10'>
+                                <h4 className='color-yellow mb-5'>Active Alert Rules:</h4>
+                                {alertConfig.map((alert) => (
+                                    <div
+                                        key={alert.id}
+                                        className='containerDetail bg-dark p-10 mb-5 flexContainer'
+                                        style={{ alignItems: 'center', justifyContent: 'space-between' }}
+                                    >
+                                        <div className='flexColumn contentLeft color-yellow'>
+                                            {alert.label}
+                                        </div>
+                                        <button
+                                            className='button bg-red color-dark p-5'
+                                            onClick={() => removeAlert(alert.id)}
+                                        >
+                                            ✕ Remove
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
-            <div className='containerDetail bg-lite mb-5 size20 contentLeft'>
-                <div className='containerDetail bg-lite mb-5 p-10 color-yellow size20'>
-                    Wind Speed:
-                </div>
-                <div className='containerDetail bg-tintedMedium p-10 size20'>
-                    💨 {current ? `${current.windspeed} mph` : 'N/A'}
-                </div>
-            </div>
+
             <div className='containerDetail bg-lite mb-5 size20 contentLeft'>
                 <div className='containerDetail bg-lite mb-5 p-10 color-yellow size20'>
                     Current Weather:
                 </div>
-                <div className='containerDetail bg-tintedMedium p-10 size20'>
-                    {current ? WEATHER_CODE_LABEL[current.weathercode] : 'N/A'}
+                <div className='flexContainer containerDetail bg-tintedMedium p-10 size20'>
+                    <div className='flexColumn'>
+                        {current ? (WEATHER_CODE_LABEL[current.weathercode] || ''): 'N/A'}
+                    </div>
+                    <div className='flexColumn'>
+                        💨 {current ? `${current.windspeed} mph` : 'N/A'}
+                    </div>
+                    <div className='flexColumn'>
+                        🌡️ {current ? `${current.temperature}°F` : 'N/A'}
+                    </div>
                 </div>
             </div>
             <div className='containerDetail bg-lite mb-5 size20'>
                 <div className='containerDetail bg-lite mb-5 p-10 color-yellow size20 contentLeft'>
                     Hourly Forecast
                 </div>
-                <div className='containerDetail bg-lite size20'>
+                <div className='containerDetail bg-tintedMedium size20 ht-200'>
                     {hourly.map((h, idx) => {
                         const w = weatherCodeMap[h.code] || { };
                         const isMostCurrentHour = idx === mostCurrentHourlyIndex;
-                        return <div key={idx} className={`containerDetail flexContainer ${isMostCurrentHour ? 'bg-yellow color-dark bold' : 'bg-tintedMedium'} ${(idx === hourly.length - 1)?'':'mb-5'} p-10 size20`}>
-                                    <div className='flex6Column color-yellow contentRight pr-10'>
-                                        {formatHourAmPm(h.time)}
-                                    </div>
-                                    <div className='flexColumn contentCenter mr-10'>
-                                        {isMostCurrentHour ? 'Now' : ''}
-                                    </div>
-                                    <div className='flex2Column contentLeft pl-5'>
-                                        {w.icon || '❔'} {w.desc || 'Unknown'}
-                                    </div>
-                                    <div className='flex6Column contentLeft pl-10'>
-                                        {(typeof h.tempF === 'number') ? `${h.tempF.toFixed(0)}°F` : 'N/A'}
+                        const bgColor = getTempColor(h.tempF);
+                        const textColor = getTextColor(bgColor);
+                        return <div key={idx} style={{backgroundColor: bgColor, color: textColor}} className={`containerDetail ${isMostCurrentHour ? '' : ''} ${(idx === hourly.length - 1)?'':'mb-5'} pt-5 pb-5 pr-5 pl-10`}>
+                                    <div className='flexContainer'>
+                                        <div className='flexColumn contentRight'>
+                                            ⏰ {formatHourAmPm(h.time).split(' ')[0]}:00
+                                            <span className='copyright'>
+                                                {formatHourAmPm(h.time).split(' ')[1]}
+                                            </span>
+                                        </div>
+                                        <div className='flexContainer flexColumn'>
+                                            <div className='flexColumn mr-5 mt--5'>
+                                                💨
+                                            </div>
+                                            <div className='flexColumn mr-5 mt--5 contentCenter'>
+                                                {h.windDir}
+                                            </div>
+                                            <div className='flexColumn mr-5 mt-5 contentRight'>
+                                                {(typeof h.windMph === 'number') ? `${h.windMph.toFixed(0)}` : 'N/A'}<span className='copyright'>mph</span>
+                                            </div>
+                                        </div>
+                                        <div className='flexColumn contentLeft'>
+                                            {w.icon || '❔'} {w.desc.split(' ')[0] || 'Unknown'}
+                                        </div>
+                                        <div className='flexColumn contentLeft ' style={{fontSize: '1.2em', fontWeight: ''}}>
+                                            🌡️ {(typeof h.tempF === 'number') ? `${h.tempF.toFixed(0)}°F` : 'N/A'}
+                                        </div>
                                     </div>
                                 </div>
                     })}
@@ -281,18 +614,20 @@ const Weather = () => {
                 <div className='containerDetail bg-lite mb-5 p-10 color-yellow size20 contentLeft'>
                     Daily Forecast
                 </div>
-                <div className='containerDetail bg-lite size20'>
+                <div className='containerDetail bg-tintedMedium size20'>
                     {daily.map((d, idx) => {
                         const w = weatherCodeMap[d.code] || {};
-                        return <div key={idx} className={`containerDetail flexContainer bg-tintedMedium ${(idx === daily.length - 1)?'':'mb-5'} p-10 size20`}>
-                                    <div className='color-yellow flex6Column'>
-                                        {formatToWeekday(d.date).substring(0,3)}
+                        const bgColor = getTempColor(d.maxF);
+                        const textColor = getTextColor(bgColor);
+                        return <div key={idx} style={{backgroundColor: bgColor, color: textColor}} className={`containerDetail flexContainer  ${(idx === daily.length - 1)?'':'mb-5'} pt-10 pb-10 size20`}>
+                                    <div className='flexColumn contentLeft'>
+                                        📆 {formatDateWithNumber(d.date)}
                                     </div>
-                                    <div className='flex2Column'>
+                                    <div className='flexColumn'>
                                         {w.icon || '❔'} {w.desc || 'Unknown'}
                                     </div>
-                                    <div className='flex6Column contentRight ml-20'>
-                                        {d.maxF.toFixed(0)}°F
+                                    <div className='flexColumn contentRight ml-20 ' style={{fontSize: '1.1em', fontWeight: ''}}>
+                                        🌡️ {d.maxF.toFixed(0)}°F
                                     </div>
                                 </div>
                 })}

@@ -1584,7 +1584,7 @@ const Poker = () => {
     </>;
 
     return (
-        <div className='containerDetail color-lite bg-lite mt--25'>
+        <div className='containerDetail color-lite bg-lite mt--25 poker-scope'>
             {/* Initial Dialog */}
             {showInitDialog && (
                 <div className='poker-modal-overlay'>

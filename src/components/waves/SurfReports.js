@@ -2,25 +2,31 @@ import React, { useState } from 'react';
 import BuoysDisplay from './BuoysDisplay';
 import report from './Abreojos';
 //import cheerio from 'cheerio';
-//import got from 'got';
 
 const SurfReports = () => {
     // eslint-disable-next-line
     const [oSideBuoyData, setOSideBuoyData] = useState({});
     // eslint-disable-next-line
-    const getSwellData = () => {
-        const unirest = require("unirest");
-        const req = unirest("GET", "https://stormglass.p.rapidapi.com/forecast");
-        req.headers({
-            "x-rapidapi-host": "stormglass.p.rapidapi.com",
-            "x-rapidapi-key": "cd590b7832msheb65a284b1083a6p112e16jsn24ac4a11b813",
-            "useQueryString": true
-        });
-        req.end(function (res) {
-            if (res.error) throw new Error(res.error);
-            console.log(`getSwellData => ${res.body}`);
-        });
+    const getSwellData = async () => {
+        try {
+            const response = await fetch("https://stormglass.p.rapidapi.com/forecast", {
+                method: "GET",
+                headers: {
+                    "x-rapidapi-host": "stormglass.p.rapidapi.com",
+                    "x-rapidapi-key": "cd590b7832msheb65a284b1083a6p112e16jsn24ac4a11b813",
+                    "useQueryString": "true"
+                }
+            });
 
+            if (!response.ok) {
+                throw new Error(`Request failed with status ${response.status}`);
+            }
+
+            const body = await response.text();
+            console.log(`getSwellData => ${body}`);
+        } catch (error) {
+            console.error("getSwellData error:", error);
+        }
     }
     // eslint-disable-next-line
     const getRapidData = () => {

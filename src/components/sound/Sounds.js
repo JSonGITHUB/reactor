@@ -1,6 +1,14 @@
 import { isIOS } from '../utils/iOSChecker';
 
-var audioContext = new AudioContext(),
+const getAudioContext = () => {
+    if (typeof window === 'undefined') {
+        return null;
+    }
+    const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
+    return AudioContextConstructor ? new AudioContextConstructor() : null;
+};
+
+var audioContext = getAudioContext(),
     oscillator;
 
 var audioClank = new Audio();
@@ -24,6 +32,9 @@ var audioTuningDown = new Audio();
 //audioTuningDown.preload = 'auto';
 
 const boop = (winner = 0, score = 1) => {
+    if (!audioContext) {
+        return;
+    }
 
     // Create an oscillator node
     oscillator = audioContext.createOscillator();

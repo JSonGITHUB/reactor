@@ -105,6 +105,10 @@ const Pay = () => {
 
         const grossDaily = effectiveHourly * dailyHours;
         const netDaily = grossDaily - (grossDaily * (federalTaxRate + stateTaxRate));
+        const grossMonthly = grossAnnual / 12;
+        const totalAnnualTax = totalTax * (52 / selectedPayWeeks);
+        const netAnnual = grossAnnual - totalAnnualTax;
+        const netMonthly = netAnnual / 12;
 
         return {
             selectedPayWeeks,
@@ -116,7 +120,9 @@ const Pay = () => {
             netPaycheck,
             effectiveHourly,
             grossDaily,
-            netDaily
+            netDaily,
+            grossMonthly,
+            netMonthly
         };
     }, [
         annualSalary,
@@ -238,22 +244,11 @@ const Pay = () => {
                 </div>
                 <div className='containerDetail mb-5'>
                     <div className='containerDetail pr-10 pt-10 pb-10 color-lite contentLeft mb-5 pl-20 pl-10'><span className='color-yellow'>Gross annual:</span> {formatMoney(summary.grossAnnual)}</div>
+                    <div className='containerDetail pr-10 pt-10 pb-10 color-lite contentLeft mb-5 pl-20 pl-10'><span className='color-yellow'>Gross monthly:</span> {formatMoney(summary.grossMonthly)}</div>
                     <div className='containerDetail pr-10 pt-10 pb-10 color-lite contentLeft mb-5 pl-20 pl-10'><span className='color-yellow'>Gross paycheck ({summary.selectedPayWeeks} week):</span> {formatMoney(summary.grossPaycheck)}</div>
                     <div className='containerDetail pr-10 pt-10 pb-10 color-lite contentLeft mb-5 pl-20 pl-10'><span className='color-yellow'>Federal tax:</span> -{formatMoney(summary.federalTax)}</div>
                     <div className='containerDetail pr-10 pt-10 pb-10 color-lite contentLeft mb-5 pl-20 pl-10'><span className='color-yellow'>State tax:</span> -{formatMoney(summary.stateTax)}</div>
                     <div className='containerDetail pr-10 pt-10 pb-10 color-lite contentLeft mb-5 pl-20 pl-10'><span className='color-yellow'>Total tax:</span> -{formatMoney(summary.totalTax)}</div>
-                </div>
-                <div className='containerDetail p-20 color-lite contentLeft mb-5'>
-                    <span className='color-yellow mr-5'>
-                        Effective hourly:
-                    </span> 
-                    {formatMoney(summary.effectiveHourly)}
-                </div>
-                <div className='containerDetail p-20 color-lite contentLeft mb-5 size20 bg-green'>
-                    <span className='color-yellow mr-5'>
-                        Take-home paycheck:
-                    </span> 
-                    {formatMoney(summary.netPaycheck)}
                 </div>
                 <div className='containerDetail mb-5'>
                     <div className='containerDetail pr-10 pt-10 pb-10 color-lite contentLeft mb-5 pl-20'>
@@ -267,11 +262,19 @@ const Pay = () => {
                         {formatMoney(summary.grossDaily)}
                     </div>
                 </div>
-                <div className='containerDetail p-20 color-lite contentLeft size20 bg-blue'>
+                <div className='containerDetail p-20 color-lite contentLeft size20 bg-blue mb-5'>
                     <span className='color-yellow mr-5'>
                         Take-home per day:
                     </span>
                     {formatMoney(summary.netDaily)}</div>
+            
+                <div className='containerDetail p-20 color-dark contentLeft mb-5 pl-20 pl-10 bg-yellow size20'><span className='color-green'>Take-home monthly:</span> {formatMoney(summary.netMonthly)}</div>
+                <div className='containerDetail p-20 color-lite contentLeft mb-5 size20 bg-green'>
+                    <span className='color-yellow mr-5'>
+                        Take-home paycheck:
+                    </span>
+                    {formatMoney(summary.netPaycheck)}
+                </div>
             </div>
         </div>
     );

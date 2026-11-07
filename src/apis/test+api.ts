@@ -1,4 +1,8 @@
 export function GET(request: Request) {
     console.log('!!!!')
-    return Response.json({hello: 'world'})
+    return new Response(JSON.stringify({ hello: 'world' }), {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
 }

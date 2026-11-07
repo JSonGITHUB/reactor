@@ -11,6 +11,7 @@ import initializeData from '../utils/InitializeData';
 //import FullWidthButton from '../utils/FullWidthButton';
 import { WavesContext } from '../context/WavesContext';
 import validate from '../utils/validate';
+import InterfaceData from './InterfaceData';
 
 // Debounced state hook
 function useDebouncedState(initialValue, delay = 300) {
@@ -695,7 +696,7 @@ const SurfLocation = ({
                                 value={safeRender(sessionData.Surf.Height)} 
                                 onChange={e => updateSessionField('Surf', 'Height', e.target.value)}
                             >
-                                {require('./InterfaceData').default.find(d => d.description === 'Surf').group.find(g => g.description === 'Height').selections.map(opt => (
+                                {InterfaceData.find(d => d.description === 'Surf').group.find(g => g.description === 'Height').selections.map(opt => (
                                     <option key={opt} value={opt}>{opt}</option>
                                 ))}
                             </select>
@@ -712,7 +713,7 @@ const SurfLocation = ({
                                 value={safeRender(sessionData.Swell1.Height)} 
                                 onChange={e => updateSessionField('Swell1', 'Height', e.target.value)}
                             >
-                                {require('./InterfaceData').default.find(d => d.description === 'Swell1').group.find(g => g.description === 'Height').selections.map(opt => (
+                                {InterfaceData.find(d => d.description === 'Swell1').group.find(g => g.description === 'Height').selections.map(opt => (
                                     <option key={opt} value={opt}>{opt}</option>
                                 ))}
                             </select>
@@ -721,7 +722,7 @@ const SurfLocation = ({
                                 value={safeRender(sessionData.Swell1.Direction)} 
                                 onChange={e => updateSessionField('Swell1', 'Direction', e.target.value)}
                             >
-                                {require('./InterfaceData').default.find(d => d.description === 'Swell1').group.find(g => g.description === 'Direction').selections.map(opt => (
+                                {InterfaceData.find(d => d.description === 'Swell1').group.find(g => g.description === 'Direction').selections.map(opt => (
                                     <option key={opt} value={opt}>{opt}</option>
                                 ))}
                             </select>
@@ -730,7 +731,7 @@ const SurfLocation = ({
                                 value={safeRender(sessionData.Swell1.Angle)} 
                                 onChange={e => updateSessionField('Swell1', 'Angle', e.target.value)}
                             >
-                                {require('./InterfaceData').default.find(d => d.description === 'Swell1').group.find(g => g.description === 'Angle').selections.map(opt => (
+                                {InterfaceData.find(d => d.description === 'Swell1').group.find(g => g.description === 'Angle').selections.map(opt => (
                                     <option key={opt} value={opt}>{opt}</option>
                                 ))}
                             </select>
@@ -739,7 +740,7 @@ const SurfLocation = ({
                                 value={safeRender(sessionData.Swell1.Interval)} 
                                 onChange={e => updateSessionField('Swell1', 'Interval', e.target.value)}
                             >
-                                {require('./InterfaceData').default.find(d => d.description === 'Swell1').group.find(g => g.description === 'Interval').selections.map(opt => (
+                                {InterfaceData.find(d => d.description === 'Swell1').group.find(g => g.description === 'Interval').selections.map(opt => (
                                     <option key={opt} value={opt}>{opt}</option>
                                 ))}
                             </select>
@@ -756,7 +757,7 @@ const SurfLocation = ({
                                 value={safeRender(sessionData.Swell2.Height)} 
                                 onChange={e => updateSessionField('Swell2', 'Height', e.target.value)}
                             >
-                                {require('./InterfaceData').default.find(d => d.description === 'Swell2').group.find(g => g.description === 'Height').selections.map(opt => (
+                                {InterfaceData.find(d => d.description === 'Swell2').group.find(g => g.description === 'Height').selections.map(opt => (
                                     <option key={opt} value={opt}>{opt}</option>
                                 ))}
                             </select>
@@ -765,7 +766,7 @@ const SurfLocation = ({
                                 value={safeRender(sessionData.Swell2.Direction)} 
                                 onChange={e => updateSessionField('Swell2', 'Direction', e.target.value)}
                             >
-                                {require('./InterfaceData').default.find(d => d.description === 'Swell2').group.find(g => g.description === 'Direction').selections.map(opt => (
+                                {InterfaceData.find(d => d.description === 'Swell2').group.find(g => g.description === 'Direction').selections.map(opt => (
                                     <option key={opt} value={opt}>{opt}</option>
                                 ))}
                             </select>
@@ -774,7 +775,7 @@ const SurfLocation = ({
                                 value={safeRender(sessionData.Swell2.Angle)} 
                                 onChange={e => updateSessionField('Swell2', 'Angle', e.target.value)}
                             >
-                                {require('./InterfaceData').default.find(d => d.description === 'Swell2').group.find(g => g.description === 'Angle').selections.map(opt => (
+                                {InterfaceData.find(d => d.description === 'Swell2').group.find(g => g.description === 'Angle').selections.map(opt => (
                                     <option key={opt} value={opt}>{opt}</option>
                                 ))}
                             </select>
@@ -783,7 +784,7 @@ const SurfLocation = ({
                                 value={safeRender(sessionData.Swell2.Interval)} 
                                 onChange={e => updateSessionField('Swell2', 'Interval', e.target.value)}
                             >
-                                {require('./InterfaceData').default.find(d => d.description === 'Swell2').group.find(g => g.description === 'Interval').selections.map(opt => (
+                                {InterfaceData.find(d => d.description === 'Swell2').group.find(g => g.description === 'Interval').selections.map(opt => (
                                     <option key={opt} value={opt}>{opt}</option>
                                 ))}
                             </select>
@@ -800,7 +801,7 @@ const SurfLocation = ({
                                 value={tidePhase} 
                                 onChange={e => updateSessionField('Tide', 'Phase', e.target.value)}
                             >
-                                {require('./InterfaceData').default.find(d => d.description === 'Tide').group.find(g => g.description === 'Phase').selections.map(opt => (
+                                {InterfaceData.find(d => d.description === 'Tide').group.find(g => g.description === 'Phase').selections.map(opt => (
                                     <option key={opt} value={opt}>{opt}</option>
                                 ))}
                             </select>
@@ -809,7 +810,7 @@ const SurfLocation = ({
                                 value={safeRender(sessionData.Tide.Height)} 
                                 onChange={e => updateSessionField('Tide', 'Height', e.target.value)}
                             >
-                                {require('./InterfaceData').default.find(d => d.description === 'Tide').group.find(g => g.description === 'Height').selections.map(opt => (
+                                {InterfaceData.find(d => d.description === 'Tide').group.find(g => g.description === 'Height').selections.map(opt => (
                                     <option key={opt} value={opt}>{opt}</option>
                                 ))}
                             </select>
@@ -826,7 +827,7 @@ const SurfLocation = ({
                                 value={safeRender(sessionData.Wind.Direction)} 
                                 onChange={e => updateSessionField('Wind', 'Direction', e.target.value)}
                             >
-                                {require('./InterfaceData').default.find(d => d.description === 'Wind').group.find(g => g.description === 'Direction').selections.map(opt => (
+                                {InterfaceData.find(d => d.description === 'Wind').group.find(g => g.description === 'Direction').selections.map(opt => (
                                     <option key={opt} value={opt}>{opt}</option>
                                 ))}
                             </select>
@@ -835,7 +836,7 @@ const SurfLocation = ({
                                 value={safeRender(sessionData.Wind.Orientation)} 
                                 onChange={e => updateSessionField('Wind', 'Orientation', e.target.value)}
                             >
-                                {require('./InterfaceData').default.find(d => d.description === 'Wind').group.find(g => g.description === 'Orientation').selections.map(opt => (
+                                {InterfaceData.find(d => d.description === 'Wind').group.find(g => g.description === 'Orientation').selections.map(opt => (
                                     <option key={opt} value={opt}>{opt}</option>
                                 ))}
                             </select>
@@ -843,7 +844,7 @@ const SurfLocation = ({
                                 value={safeRender(sessionData.Wind.MPH)} 
                                 onChange={e => updateSessionField('Wind', 'MPH', e.target.value)}
                             >
-                                {require('./InterfaceData').default.find(d => d.description === 'Wind').group.find(g => g.description === 'MPH').selections.map(opt => (
+                                {InterfaceData.find(d => d.description === 'Wind').group.find(g => g.description === 'MPH').selections.map(opt => (
                                     <option key={opt} value={opt}>{opt}</option>
                                 ))}
                             </select>
@@ -859,7 +860,7 @@ const SurfLocation = ({
                                 value={safeRender(sessionData.Wind.Surface)} 
                                 onChange={e => updateSessionField('Wind', 'Surface', e.target.value)}
                             >
-                                {require('./InterfaceData').default.find(d => d.description === 'Wind').group.find(g => g.description === 'Surface').selections.map(opt => (
+                                {InterfaceData.find(d => d.description === 'Wind').group.find(g => g.description === 'Surface').selections.map(opt => (
                                     <option key={opt} value={opt}>{opt}</option>
                                 ))}
                             </select>

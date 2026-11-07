@@ -32,6 +32,12 @@ const defaultChecklist = {
         'Share itinerary with trusted contact',
         'Confirm route and backup route',
     ],
+    coolSetup: [
+        'Dry ice in paper bag on bottom.',
+        'Ice packs on top of dry ice',
+        'Frozen food on top of ice packs',
+        "All other items on top with items that you don't want frozen last",
+    ],
     setup: [
         'Pitch shelter before dark',
         'Set kitchen and safe food zone',
@@ -44,6 +50,35 @@ const defaultChecklist = {
         'Final gear sweep',
         'Leave site cleaner than found',
     ],
+};
+
+const defaultCollapseState = {
+    tripProfileCollapsed: true,
+    travelPlanCollapsed: true,
+    packBuilderCollapsed: true,
+    checklistsCollapsed: true,
+    foodWaterCollapsed: true,
+    itineraryCollapsed: true,
+    safetyCollapsed: true,
+    coolSetupCollapsed: true,
+};
+
+const normalizeChecklistItems = (value) => {
+    const normalized = { ...defaultChecklist };
+    if (!value || typeof value !== 'object') return normalized;
+    Object.entries(value).forEach(([sectionKey, items]) => {
+        if (Array.isArray(items)) {
+            normalized[sectionKey] = items.filter(item => typeof item === 'string' && item.trim());
+        }
+    });
+    return normalized;
+};
+
+const getChecklistSectionTitle = (sectionKey) => {
+    if (sectionKey === 'preTrip') return 'Pre-Trip';
+    if (sectionKey === 'setup') return 'Camp Setup';
+    if (sectionKey === 'coolSetup') return 'Cooler Setup';
+    return 'Breakdown';
 };
 
 const defaultProfile = {
@@ -88,15 +123,12 @@ const Camp = () => {
     // Collapsed state persistence
     const [collapseState, setCollapseState] = useState(() => {
         const stored = localStorage.getItem(CAMP_COLLAPSE_KEY);
-        return stored ? JSON.parse(stored) : {
-            tripProfileCollapsed: true,
-            travelPlanCollapsed: true,
-            packBuilderCollapsed: true,
-            checklistsCollapsed: true,
-            foodWaterCollapsed: true,
-            itineraryCollapsed: true,
-            safetyCollapsed: true,
-        };
+        if (!stored) return defaultCollapseState;
+        try {
+            return { ...defaultCollapseState, ...JSON.parse(stored) };
+        } catch {
+            return defaultCollapseState;
+        }
     });
     const setCollapsed = (key, valueOrUpdater) =>
         setCollapseState(prev => {
@@ -131,96 +163,101 @@ const Camp = () => {
     });
     const [showAddCategoryDialog, setShowAddCategoryDialog] = useState(false);
     const [newCategory, setNewCategory] = useState('');
-                // Add Category dialog logic
-                const handleAddCategoryOpen = () => {
-                    setNewCategory('');
-                    setShowAddCategoryDialog(true);
-                };
+    // Add Category dialog logic
+    const handleAddCategoryOpen = () => {
+        setNewCategory('');
+        setShowAddCategoryDialog(true);
+    };
 
-                const handleAddCategorySubmit = (e) => {
-                    e.preventDefault();
-                    if (!newCategory.trim()) return;
-                    // Add a dummy item to ensure the category appears in the filter
-                    setCampPackItems(prev => ([...prev, {
-                        id: 'cat-' + newCategory.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.random().toString(36).slice(2, 7),
-                        icon: '',
-                        label: '(New Category)',
-                        category: newCategory,
-                        baseQty: 0,
-                        perPerson: false,
-                        isCategoryOnly: true,
-                    }]));
-                    setShowAddCategoryDialog(false);
-                    setPackFilter(newCategory);
-                };
+    const handleAddCategorySubmit = (e) => {
+        e.preventDefault();
+        if (!newCategory.trim()) return;
+        // Add a dummy item to ensure the category appears in the filter
+        setCampPackItems(prev => ([...prev, {
+            id: 'cat-' + newCategory.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.random().toString(36).slice(2, 7),
+            icon: '',
+            label: '(New Category)',
+            category: newCategory,
+            baseQty: 0,
+            perPerson: false,
+            isCategoryOnly: true,
+        }]));
+        setShowAddCategoryDialog(false);
+        setPackFilter(newCategory);
+    };
 
-                const handleAddCategoryCancel = () => {
-                    setShowAddCategoryDialog(false);
-                };
-            // Persist campPackItems
-            useEffect(() => {
-                localStorage.setItem(CAMP_PACK_ITEMS_KEY, JSON.stringify(campPackItems));
-            }, [campPackItems]);
+    const handleAddCategoryCancel = () => {
+        setShowAddCategoryDialog(false);
+    };
+    // Persist campPackItems
+    useEffect(() => {
+        localStorage.setItem(CAMP_PACK_ITEMS_KEY, JSON.stringify(campPackItems));
+    }, [campPackItems]);
 
-            // Persist packFilter
-            useEffect(() => {
-                localStorage.setItem(CAMP_PACK_FILTER_KEY, packFilter);
-            }, [packFilter]);
+    // Persist packFilter
+    useEffect(() => {
+        localStorage.setItem(CAMP_PACK_FILTER_KEY, packFilter);
+    }, [packFilter]);
 
-            // Persist collapseState
-            useEffect(() => {
-                localStorage.setItem(CAMP_COLLAPSE_KEY, JSON.stringify(collapseState));
-            }, [collapseState]);
-        // Edit Item dialog logic
-        const handleEditItemOpen = (item, idx) => {
-            setEditItemIndex(idx);
-            setNewItem({
-                label: item.label,
-                icon: item.icon,
-                category: item.category,
-                baseQty: item.baseQty,
-                perPerson: !!item.perPerson,
-            });
-            setShowEditItemDialog(true);
-        };
+    // Persist collapseState
+    useEffect(() => {
+        localStorage.setItem(CAMP_COLLAPSE_KEY, JSON.stringify(collapseState));
+    }, [collapseState]);
+    // Edit Item dialog logic
+    const handleEditItemOpen = (item, idx) => {
+        setEditItemIndex(idx);
+        setNewItem({
+            label: item.label,
+            icon: item.icon,
+            category: item.category,
+            baseQty: item.baseQty,
+            perPerson: !!item.perPerson,
+        });
+        setShowEditItemDialog(true);
+    };
 
-        const handleEditItemSubmit = (e) => {
-            e.preventDefault();
-            if (!newItem.label || !newItem.category || editItemIndex === null) return;
-            setCampPackItems((prev) => prev.map((item, idx) => idx === editItemIndex ? {
-                ...item,
-                label: newItem.label,
-                icon: newItem.icon || '➕',
-                category: newItem.category,
-                baseQty: Math.max(1, Number(newItem.baseQty) || 1),
-                perPerson: !!newItem.perPerson,
-            } : item));
-            setShowEditItemDialog(false);
-            setEditItemIndex(null);
-        };
+    const handleEditItemSubmit = (e) => {
+        e.preventDefault();
+        if (!newItem.label || !newItem.category || editItemIndex === null) return;
+        setCampPackItems((prev) => prev.map((item, idx) => idx === editItemIndex ? {
+            ...item,
+            label: newItem.label,
+            icon: newItem.icon || '➕',
+            category: newItem.category,
+            baseQty: Math.max(1, Number(newItem.baseQty) || 1),
+            perPerson: !!newItem.perPerson,
+        } : item));
+        setShowEditItemDialog(false);
+        setEditItemIndex(null);
+    };
 
-        const handleEditItemCancel = () => {
-            setShowEditItemDialog(false);
-            setEditItemIndex(null);
-        };
+    const handleEditItemCancel = () => {
+        setShowEditItemDialog(false);
+        setEditItemIndex(null);
+    };
 
-        const handleDeleteItem = (idx) => {
-            setCampPackItems((prev) => prev.filter((_, i) => i !== idx));
-        };
+    const handleDeleteItem = (idx) => {
+        setCampPackItems((prev) => prev.filter((_, i) => i !== idx));
+    };
     const CHECKLIST_ITEMS_KEY = 'campChecklistItems';
     const [checklistItems, setChecklistItems] = useState(() => {
         const stored = localStorage.getItem(CHECKLIST_ITEMS_KEY);
-        return stored ? JSON.parse(stored) : defaultChecklist;
+        if (!stored) return defaultChecklist;
+        try {
+            return normalizeChecklistItems(JSON.parse(stored));
+        } catch {
+            return defaultChecklist;
+        }
     });
     const [checklistProgressById, setChecklistProgressById] = useState({});
     const [showChecklistDialog, setShowChecklistDialog] = useState(false);
     const [checklistDialogSection, setChecklistDialogSection] = useState('');
     const [checklistDialogValue, setChecklistDialogValue] = useState('');
     const [editChecklistIndex, setEditChecklistIndex] = useState(null);
-        // Persist checklist items
-        useEffect(() => {
-            localStorage.setItem(CHECKLIST_ITEMS_KEY, JSON.stringify(checklistItems));
-        }, [checklistItems]);
+    // Persist checklist items
+    useEffect(() => {
+        localStorage.setItem(CHECKLIST_ITEMS_KEY, JSON.stringify(checklistItems));
+    }, [checklistItems]);
     const [planNotes, setPlanNotes] = useState(defaultPlanNotes);
 
     useEffect(() => {
@@ -377,6 +414,61 @@ const Camp = () => {
         setChecklistProgressById((prev) => ({ ...prev, [id]: !prev[id] }));
     };
 
+    const orderedChecklistSections = ['preTrip', 'coolSetup', 'setup', 'breakdown'];
+
+    const renderChecklistSection = (sectionKey, list) => (
+        <div key={sectionKey} className='containerDetail m-5 mt-10'>
+            <div className='color-yellow size20 flexContainer mt-10 p-10'>
+                {getChecklistSectionTitle(sectionKey)}
+                <button className='containerDetail p-10 button bg-green mt--5 color-yellow ml-10' onClick={() => { setChecklistDialogSection(sectionKey); setChecklistDialogValue(''); setEditChecklistIndex(null); setShowChecklistDialog(true); }}>➕ Add</button>
+            </div>
+            {list.map((item, idx) => {
+                const id = `${sectionKey}:${item}`;
+                const done = Boolean(checklistProgressById[id]);
+                return (
+                    <div key={id} className={`containerDetail flexContainer align-center m-5${done ? ' bg-dkGreen brdr-green' : ' bg-lite'}`}>
+                        <label className={`flex2Column p-10 mt-5 button`} style={{ flex: 1 }}>
+                            <input
+                                type='checkbox'
+                                checked={done}
+                                onChange={() => toggleChecklistItem(id)}
+                                style={{ marginLeft: 10, marginTop: 30, width: 35, height: 35 }}
+                            />
+                        </label>
+                        <span className='flex2Column pt-40'>{item}</span>
+                        <div className='flexColumn'>
+                            <div>
+                                <button
+                                    className='containerDetail button color-dark bg-tinted ml-5 p-20'
+                                    onClick={() => { setChecklistDialogSection(sectionKey); setChecklistDialogValue(item); setEditChecklistIndex(idx); setShowChecklistDialog(true); }}
+                                >
+                                    ✏️
+                                </button>
+                            </div>
+                            <div>
+                                <button className='containerDetail button color-lite bg-tinted ml-5 mt-5 p-20'
+                                    onClick={() => {
+                                        setChecklistItems(prev => ({
+                                            ...prev,
+                                            [sectionKey]: prev[sectionKey].filter((_, i) => i !== idx)
+                                        }));
+                                        setChecklistProgressById(prev => {
+                                            const newObj = { ...prev };
+                                            delete newObj[id];
+                                            return newObj;
+                                        });
+                                    }}
+                                >
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            })}
+        </div>
+    );
+
     // Add Item dialog logic
     const handleAddItemOpen = () => {
         setNewItem({
@@ -434,57 +526,57 @@ const Camp = () => {
                 {collapseState.tripProfileCollapsed ? null : (
                     <div className='containerDetail bg-lite mt-5 p-10'>
                         <>
-                        <input className='containerDetail m-5 color-lite width--10' value={profile.tripName} onChange={(e) => updateProfileField('tripName', e.target.value)} placeholder='Trip name' />
-                        <input className='containerDetail m-5 color-lite width--10' value={profile.destination} onChange={(e) => updateProfileField('destination', e.target.value)} placeholder='Destination / campground' />
-                        <div className='containerDetail bg-tinted p-10'>
-                            <div className='color-yellow size20'>
-                                Progress: <span className='color-lite'>{packProgress.packed}/{packProgress.total}</span> packed ({packProgress.percent}%)
+                            <input className='containerDetail m-5 color-lite width--10' value={profile.tripName} onChange={(e) => updateProfileField('tripName', e.target.value)} placeholder='Trip name' />
+                            <input className='containerDetail m-5 color-lite width--10' value={profile.destination} onChange={(e) => updateProfileField('destination', e.target.value)} placeholder='Destination / campground' />
+                            <div className='containerDetail bg-tinted p-10'>
+                                <div className='color-yellow size20'>
+                                    Progress: <span className='color-lite'>{packProgress.packed}/{packProgress.total}</span> packed ({packProgress.percent}%)
+                                </div>
+                                <div className='mt-10'>
+                                    <select className='containerDetail mt-5 color-lite width-100-percent' value={packFilter} onChange={(e) => setPackFilter(e.target.value)}>
+                                        {categories.map((category) => (
+                                            <option key={category} value={category}>{category === 'all' ? 'All' : category}</option>
+                                        ))}
+                                    </select>
+                                    <div
+                                        className='button containerDetail bg-green p-10 mt-5 w--5'
+                                        onClick={() => { setPackedById({}); setQtyById({}); }}
+                                    >
+                                        Reset Builder
+                                    </div>
+                                    <div
+                                        className='button containerDetail bg-orange color-dark p-10 mt-5'
+                                        onClick={() => setPackedById({})}
+                                    >
+                                        Reset Checkboxes
+                                    </div>
+                                    <div
+                                        className='button containerDetail bg-blue p-10 mt-5'
+                                        onClick={handleAddItemOpen}
+                                    >
+                                        <span role='img' aria-label='add'>➕</span> Add Item
+                                    </div>
+                                </div>
                             </div>
-                            <div className='mt-10'>
-                                <select className='containerDetail mt-5 color-lite width-100-percent' value={packFilter} onChange={(e) => setPackFilter(e.target.value)}>
-                                    {categories.map((category) => (
-                                        <option key={category} value={category}>{category === 'all' ? 'All' : category}</option>
-                                    ))}
-                                </select>
-                                <div 
-                                    className='button containerDetail bg-green p-10 mt-5 w--5' 
-                                    onClick={() => { setPackedById({}); setQtyById({}); }}
-                                >
-                                    Reset Builder
-                                </div>
-                                <div 
-                                    className='button containerDetail bg-orange color-dark p-10 mt-5' 
-                                    onClick={() => setPackedById({})}
-                                >
-                                    Reset Checkboxes
-                                </div>
-                                <div 
-                                    className='button containerDetail bg-blue p-10 mt-5' 
-                                    onClick={handleAddItemOpen}
-                                >
-                                    <span role='img' aria-label='add'>➕</span> Add Item
-                                </div>
+                            <div className='containerDetail m-5 p-10 color-yellow'>
+                                Vehicles
+                                <input
+                                    type='number'
+                                    min='1'
+                                    className='containerDetail color-lite mt-10 mb-5 width-100-percent'
+                                    value={profile.vehicles} onChange={(e) => updateProfileField('vehicles', Math.max(1, Number(e.target.value) || 1))}
+                                />
                             </div>
-                        </div>
-                        <div className='containerDetail m-5 p-10 color-yellow'>
-                            Vehicles
-                            <input 
-                                type='number' 
-                                min='1' 
-                                className='containerDetail color-lite mt-10 mb-5 width-100-percent' 
-                                value={profile.vehicles} onChange={(e) => updateProfileField('vehicles', Math.max(1, Number(e.target.value) || 1))} 
+                            <textarea
+                                className='containerDetail m-5 color-lite width--10'
+                                rows='3'
+                                value={profile.notes}
+                                onChange={(e) => updateProfileField('notes', e.target.value)}
+                                placeholder='Trip notes, permits, gate codes, meetup details...'
                             />
-                        </div>
-                        <textarea 
-                            className='containerDetail m-5 color-lite width--10' 
-                            rows='3' 
-                            value={profile.notes} 
-                            onChange={(e) => updateProfileField('notes', e.target.value)} 
-                            placeholder='Trip notes, permits, gate codes, meetup details...' 
-                        />
-                        <div className='containerDetail m-5 bg-dark color-yellow p-10 mt-5'>
-                            {profile.tripName} • {totalTripDays} day trip ({nights} night{nights === 1 ? '' : 's'})
-                        </div>
+                            <div className='containerDetail m-5 bg-dark color-yellow p-10 mt-5'>
+                                {profile.tripName} • {totalTripDays} day trip ({nights} night{nights === 1 ? '' : 's'})
+                            </div>
                         </>
                     </div>
                 )}
@@ -510,7 +602,7 @@ const Camp = () => {
                                 value={profile.oneWayMiles} onChange={(e) => updateProfileField('oneWayMiles', Math.max(0, Number(e.target.value) || 0))}
                             />
                         </div>
-                        
+
                         <div className='containerDetail m-5 p-10 color-yellow'>
                             MPG
                             <input
@@ -598,54 +690,54 @@ const Camp = () => {
                             <div className='color-yellow size20 p-10'>
                                 Progress: <span className='color-lite'>{packProgress.packed}/{packProgress.total}</span> packed ({packProgress.percent}%)
                             </div>
-                                <select className='containerDetail mt-5 color-lite width-100-percent' value={packFilter} onChange={(e) => setPackFilter(e.target.value)}>
-                                    {categories.map((category) => (
-                                        <option key={category} value={category}>{category === 'all' ? 'All' : category}</option>
-                                    ))}
-                                </select>
-                                <div 
-                                    className='button containerDetail bg-blue p-10 mt-5' 
-                                    onClick={handleAddCategoryOpen}
-                                >
-                                    <span role='img' aria-label='add'>➕</span> Add Category
+                            <select className='containerDetail mt-5 color-lite width-100-percent' value={packFilter} onChange={(e) => setPackFilter(e.target.value)}>
+                                {categories.map((category) => (
+                                    <option key={category} value={category}>{category === 'all' ? 'All' : category}</option>
+                                ))}
+                            </select>
+                            <div
+                                className='button containerDetail bg-blue p-10 mt-5'
+                                onClick={handleAddCategoryOpen}
+                            >
+                                <span role='img' aria-label='add'>➕</span> Add Category
+                            </div>
+                            {showAddCategoryDialog && (
+                                <div className='containerDetail'>
+                                    <div className='containerDetail bg-dark p-10 fixed t-50 brdr-green width--60' style={{ margin: '50px -5px', zIndex: 1000 }}>
+                                        <form onSubmit={handleAddCategorySubmit}>
+                                            <div className='color-yellow size20 p-10 mb-10'>Add Category</div>
+                                            <div className='mb-10'>
+                                                <div className='p-10'>
+                                                    <label className='color-lite'>Category Name</label>
+                                                </div>
+                                                <input
+                                                    className='containerDetail ml-5 mb-10 color-lite width--5'
+                                                    value={newCategory}
+                                                    onChange={e => setNewCategory(e.target.value)}
+                                                    required
+                                                />
+                                            </div>
+                                            <div className='containerDetail flexContainer mt-10'>
+                                                <button type='submit' className='button bg-green color-lite p-10 mr-10 flex2Column m-5'>Add</button>
+                                                <button type='button' className='button bg-yellow color-dark p-10 flex2Column m-5' onClick={handleAddCategoryCancel}>Cancel</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div className='dialog-backdrop' style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 999 }} onClick={handleAddCategoryCancel}></div>
                                 </div>
-                                                    {showAddCategoryDialog && (
-                                                        <div className='containerDetail'>
-                                                            <div className='containerDetail bg-dark p-10 fixed t-50 brdr-green width--60' style={{ margin: '50px -5px', zIndex: 1000 }}>
-                                                                <form onSubmit={handleAddCategorySubmit}>
-                                                                    <div className='color-yellow size20 p-10 mb-10'>Add Category</div>
-                                                                    <div className='mb-10'>
-                                                                        <div className='p-10'>
-                                                                            <label className='color-lite'>Category Name</label>
-                                                                        </div>
-                                                                        <input
-                                                                            className='containerDetail ml-5 mb-10 color-lite width--5'
-                                                                            value={newCategory}
-                                                                            onChange={e => setNewCategory(e.target.value)}
-                                                                            required
-                                                                        />
-                                                                    </div>
-                                                                    <div className='containerDetail flexContainer mt-10'>
-                                                                        <button type='submit' className='button bg-green color-lite p-10 mr-10 flex2Column m-5'>Add</button>
-                                                                        <button type='button' className='button bg-yellow color-dark p-10 flex2Column m-5' onClick={handleAddCategoryCancel}>Cancel</button>
-                                                                    </div>
-                                                                </form>
-                                                            </div>
-                                                            <div className='dialog-backdrop' style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 999 }} onClick={handleAddCategoryCancel}></div>
-                                                        </div>
-                                                    )}
-                                <div 
-                                    className='button containerDetail bg-green p-10 mt-5 w--5' 
-                                    onClick={() => { setPackedById({}); setQtyById({}); }}
-                                >
-                                    Reset Builder
-                                </div>
-                                <div 
-                                    className='button containerDetail bg-blue p-10 mt-5' 
-                                    onClick={handleAddItemOpen}
-                                >
-                                    <span role='img' aria-label='add'>➕</span> Add Item
-                                </div>
+                            )}
+                            <div
+                                className='button containerDetail bg-green p-10 mt-5 w--5'
+                                onClick={() => { setPackedById({}); setQtyById({}); }}
+                            >
+                                Reset Builder
+                            </div>
+                            <div
+                                className='button containerDetail bg-blue p-10 mt-5'
+                                onClick={handleAddItemOpen}
+                            >
+                                <span role='img' aria-label='add'>➕</span> Add Item
+                            </div>
                         </div>
 
                         {showAddItemDialog && (
@@ -656,12 +748,12 @@ const Camp = () => {
                                         <div className='mb-10'>
                                             <label className='color-lite'>Label</label>
                                             <div>
-                                            <input
-                                                className='containerDetail mt-10 color-lite width-100-percent'
-                                                value={newItem.label}
-                                                onChange={e => handleAddItemChange('label', e.target.value)}
-                                                required
-                                            />
+                                                <input
+                                                    className='containerDetail mt-10 color-lite width-100-percent'
+                                                    value={newItem.label}
+                                                    onChange={e => handleAddItemChange('label', e.target.value)}
+                                                    required
+                                                />
                                             </div>
                                         </div>
                                         <div className='mb-10'>
@@ -754,19 +846,19 @@ const Camp = () => {
                                                             <div className='flexColumn color-lite'>
                                                                 Qty:
                                                             </div>
-                                                            <div 
-                                                                className='flex4Column button containerDetail m-5 bg-lite p-10 mr-5' 
+                                                            <div
+                                                                className='flex4Column button containerDetail m-5 bg-lite p-10 mr-5'
                                                                 onClick={() => adjustQty(item.id, currentQty - 1)}
                                                             >
                                                                 -
                                                             </div>
-                                                            <div 
+                                                            <div
                                                                 className='flex4Column containerDetail m-5 bg-dark p-10 mr-5 color-yellow'
                                                             >
                                                                 {currentQty}
                                                             </div>
-                                                            <div 
-                                                                className='flex4Column button containerDetail m-5 bg-lite p-10' 
+                                                            <div
+                                                                className='flex4Column button containerDetail m-5 bg-lite p-10'
                                                                 onClick={() => adjustQty(item.id, currentQty + 1)}
                                                             >
                                                                 +
@@ -776,16 +868,16 @@ const Camp = () => {
                                                 </div>
                                             </div>
                                             <div className='flexColumn w-50'>
-                                                <button 
-                                                    className='containerDetail button p-10 color-lite p-5' 
-                                                    onClick={() => handleEditItemOpen(item, idx)} 
+                                                <button
+                                                    className='containerDetail button p-10 color-lite p-5'
+                                                    onClick={() => handleEditItemOpen(item, idx)}
                                                     type='button'
                                                 >
                                                     ✏️
                                                 </button>
-                                                <button 
-                                                    className='containerDetail button p-10 color-lite p-5 mt-5' 
-                                                    onClick={() => handleDeleteItem(idx)} 
+                                                <button
+                                                    className='containerDetail button p-10 color-lite p-5 mt-5'
+                                                    onClick={() => handleDeleteItem(idx)}
                                                     type='button'
                                                 >
                                                     🗑️
@@ -796,72 +888,72 @@ const Camp = () => {
                                 );
                             })}
                         </div>
-                                            {showEditItemDialog && (
-                                                <div className='containerDetail'>
-                                                    <div className='containerDetail bg-dark p-20 brdr-green fixed t-50 width--50' style={{ margin: '40px auto', zIndex: 1000 }}>
-                                                        <form onSubmit={handleEditItemSubmit}>
-                                                            <div className='color-yellow size20 mb-10'>Edit Pack Item</div>
-                                                            <div className='mb-10'>
-                                                                <label className='color-lite'>Label</label>
-                                                                <input
-                                                                    className='containerDetail m-5 color-lite w-100'
-                                                                    value={newItem.label}
-                                                                    onChange={e => handleAddItemChange('label', e.target.value)}
-                                                                    required
-                                                                />
-                                                            </div>
-                                                            <div className='mb-10'>
-                                                                <label className='color-lite'>Icon (emoji or text)</label>
-                                                                <input
-                                                                    className='containerDetail m-5 color-lite w-100'
-                                                                    value={newItem.icon}
-                                                                    onChange={e => handleAddItemChange('icon', e.target.value)}
-                                                                    maxLength={2}
-                                                                />
-                                                            </div>
-                                                            <div className='mb-10'>
-                                                                <label className='color-lite'>Category</label>
-                                                                <select
-                                                                    className='containerDetail m-5 color-lite w-100'
-                                                                    value={newItem.category}
-                                                                    onChange={e => handleAddItemChange('category', e.target.value)}
-                                                                    required
-                                                                >
-                                                                    <option value='' disabled>Select category</option>
-                                                                    {categories.filter(c => c !== 'all').map(category => (
-                                                                        <option key={category} value={category}>{category}</option>
-                                                                    ))}
-                                                                </select>
-                                                            </div>
-                                                            <div className='mb-10'>
-                                                                <label className='color-lite'>Base Qty</label>
-                                                                <input
-                                                                    type='number'
-                                                                    min='1'
-                                                                    className='containerDetail m-5 color-lite w-100'
-                                                                    value={newItem.baseQty}
-                                                                    onChange={e => handleAddItemChange('baseQty', e.target.value)}
-                                                                    required
-                                                                />
-                                                            </div>
-                                                            <div className='mb-10'>
-                                                                <label className='color-lite'>Per Person</label>
-                                                                <input
-                                                                    type='checkbox'
-                                                                    checked={!!newItem.perPerson}
-                                                                    onChange={e => handleAddItemChange('perPerson', e.target.checked)}
-                                                                    style={{ margin: 10, width: 50, height: 50 }}
-                                                                />
-                                                            </div>
-                                                            <div className='flexContainer mt-10'>
-                                                                <button type='submit' className='button bg-green color-lite p-10 mr-10'>Save</button>
-                                                                <button type='button' className='button bg-dark color-lite p-10' onClick={handleEditItemCancel}>Cancel</button>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                    <div className='dialog-backdrop' style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 999 }} onClick={handleEditItemCancel}></div>
-                                                </div>
-                                            )}
+                        {showEditItemDialog && (
+                            <div className='containerDetail'>
+                                <div className='containerDetail bg-dark p-20 brdr-green fixed t-50 width--50' style={{ margin: '40px auto', zIndex: 1000 }}>
+                                    <form onSubmit={handleEditItemSubmit}>
+                                        <div className='color-yellow size20 mb-10'>Edit Pack Item</div>
+                                        <div className='mb-10'>
+                                            <label className='color-lite'>Label</label>
+                                            <input
+                                                className='containerDetail m-5 color-lite w-100'
+                                                value={newItem.label}
+                                                onChange={e => handleAddItemChange('label', e.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                        <div className='mb-10'>
+                                            <label className='color-lite'>Icon (emoji or text)</label>
+                                            <input
+                                                className='containerDetail m-5 color-lite w-100'
+                                                value={newItem.icon}
+                                                onChange={e => handleAddItemChange('icon', e.target.value)}
+                                                maxLength={2}
+                                            />
+                                        </div>
+                                        <div className='mb-10'>
+                                            <label className='color-lite'>Category</label>
+                                            <select
+                                                className='containerDetail m-5 color-lite w-100'
+                                                value={newItem.category}
+                                                onChange={e => handleAddItemChange('category', e.target.value)}
+                                                required
+                                            >
+                                                <option value='' disabled>Select category</option>
+                                                {categories.filter(c => c !== 'all').map(category => (
+                                                    <option key={category} value={category}>{category}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div className='mb-10'>
+                                            <label className='color-lite'>Base Qty</label>
+                                            <input
+                                                type='number'
+                                                min='1'
+                                                className='containerDetail m-5 color-lite w-100'
+                                                value={newItem.baseQty}
+                                                onChange={e => handleAddItemChange('baseQty', e.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                        <div className='mb-10'>
+                                            <label className='color-lite'>Per Person</label>
+                                            <input
+                                                type='checkbox'
+                                                checked={!!newItem.perPerson}
+                                                onChange={e => handleAddItemChange('perPerson', e.target.checked)}
+                                                style={{ margin: 10, width: 50, height: 50 }}
+                                            />
+                                        </div>
+                                        <div className='flexContainer mt-10'>
+                                            <button type='submit' className='button bg-green color-lite p-10 mr-10'>Save</button>
+                                            <button type='button' className='button bg-dark color-lite p-10' onClick={handleEditItemCancel}>Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div className='dialog-backdrop' style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 999 }} onClick={handleEditItemCancel}></div>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
@@ -879,105 +971,72 @@ const Camp = () => {
                     <div className='containerDetail bg-lite mt-5 p-10'>
                         <div className='containerDetail m-5 bg-dark color-yellow p-10 flexContainer'>
                             <span>Checklist Progress: {completedChecklistItems}/{totalChecklistItems} ({checklistPercent}%)</span>
-                            <button className='button bg-orange color-dark ml-10' style={{fontSize:'0.9em'}} onClick={() => setChecklistProgressById({})}>Reset </button>
+                            <button className='button bg-orange color-dark ml-10' style={{ fontSize: '0.9em' }} onClick={() => setChecklistProgressById({})}>Reset </button>
                         </div>
-                        {Object.entries(checklistItems).map(([sectionKey, list]) => (
-                            <div key={sectionKey} className='containerDetail m-5 mt-10'>
-                                <div className='color-yellow size20 flexContainer mt-10 p-10'>
-                                    {sectionKey === 'preTrip' ? 'Pre-Trip' : sectionKey === 'setup' ? 'Camp Setup' : 'Breakdown'}
-                                    <button className='containerDetail p-10 button bg-green mt--5 color-yellow ml-10' onClick={() => { setChecklistDialogSection(sectionKey); setChecklistDialogValue(''); setEditChecklistIndex(null); setShowChecklistDialog(true); }}>➕ Add</button>
-                                </div>
-                                {list.map((item, idx) => {
-                                    const id = `${sectionKey}:${item}`;
-                                    const done = Boolean(checklistProgressById[id]);
-                                    return (
-                                        <div key={id} className={`containerDetail flexContainer align-center m-5${done ? ' bg-dkGreen brdr-green' : ' bg-lite'}`}>
-                                            <label className={`flex2Column p-10 mt-5 button`} style={{flex:1}}>
-                                                <input 
-                                                    type='checkbox' 
-                                                    checked={done} 
-                                                    onChange={() => toggleChecklistItem(id)} 
-                                                    style={{ marginLeft: 10, marginTop: 30, width: 35, height: 35 }} 
-                                                />
+                        {orderedChecklistSections.map((sectionKey) => {
+                            if (sectionKey === 'coolSetup') {
+                                return (
+                                    <div key='coolSetup' className='containerDetail mt-10'>
+                                        <CollapseToggleButton
+                                            title='Cooler Setup'
+                                            isCollapsed={collapseState.coolSetupCollapsed}
+                                            setCollapse={v => setCollapsed('coolSetupCollapsed', v)}
+                                            align='left'
+                                        />
+                                        {collapseState.coolSetupCollapsed ? null : (
+                                            <div className='containerDetail bg-lite mt-5 p-10'>
+                                                {renderChecklistSection('coolSetup', checklistItems.coolSetup || [])}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            }
+                            return renderChecklistSection(sectionKey, checklistItems[sectionKey] || []);
+                        })}
+                        {showChecklistDialog && (
+                            <div className='contentDetail'>
+                                <div className='containerDetail fixed t-50 bg-dark p-10 brdr-green width--60' style={{ margin: '40px auto', zIndex: 1000 }}>
+                                    <form onSubmit={e => {
+                                        e.preventDefault();
+                                        if (!checklistDialogValue.trim()) return;
+                                        setChecklistItems(prev => {
+                                            const updated = normalizeChecklistItems(prev);
+                                            if (editChecklistIndex === null) {
+                                                // Add
+                                                updated[checklistDialogSection] = [...updated[checklistDialogSection], checklistDialogValue.trim()];
+                                            } else {
+                                                // Edit
+                                                updated[checklistDialogSection] = updated[checklistDialogSection].map((v, i) => i === editChecklistIndex ? checklistDialogValue.trim() : v);
+                                            }
+                                            return updated;
+                                        });
+                                        setShowChecklistDialog(false);
+                                        setChecklistDialogValue('');
+                                        setEditChecklistIndex(null);
+                                    }}>
+                                        <div className='color-yellow size20 p-10 mb-10'>{editChecklistIndex === null ? 'Add Checklist Item' : 'Edit Checklist Item'}</div>
+                                        <div className='mb-10'>
+                                            <label className='color-lite p-10 mb-5'>
+                                                Item
                                             </label>
-                                            <span className='flex2Column pt-40'>{item}</span>
-                                            <div className='flexColumn'>
-                                                <div>
-                                                    <button 
-                                                        className='containerDetail button color-dark bg-tinted ml-5 p-20' 
-                                                        onClick={() => { setChecklistDialogSection(sectionKey); setChecklistDialogValue(item); setEditChecklistIndex(idx); setShowChecklistDialog(true); }}
-                                                    >
-                                                        ✏️
-                                                    </button>
-                                                </div>
-                                                <div>
-                                                    <button className='containerDetail button color-lite bg-tinted ml-5 mt-5 p-20' 
-                                                        onClick={() => {
-                                                            setChecklistItems(prev => ({
-                                                                ...prev,
-                                                                [sectionKey]: prev[sectionKey].filter((_, i) => i !== idx)
-                                                            }));
-                                                            // Remove progress for deleted item
-                                                            setChecklistProgressById(prev => {
-                                                                const newObj = { ...prev };
-                                                                delete newObj[id];
-                                                                return newObj;
-                                                            });
-                                                        }}
-                                                    >
-                                                        🗑️
-                                                    </button>
-                                                </div>
+                                            <div className='mt-5'>
+                                                <input
+                                                    className='containerDetail m-5 color-lite width--10'
+                                                    value={checklistDialogValue}
+                                                    onChange={e => setChecklistDialogValue(e.target.value)}
+                                                    required
+                                                />
                                             </div>
                                         </div>
-                                    );
-                                })}
+                                        <div className='containerDetail bg-lite p-10 flexContainer mt-20'>
+                                            <button type='submit' className='button flex2Column bg-green color-lite ml--5 p-10 mr-10'>{editChecklistIndex === null ? 'Add' : 'Save'}</button>
+                                            <button type='button' className='button flex2Column bg-yellow color-dark mr--5 ml--5 p-10' onClick={() => { setShowChecklistDialog(false); setChecklistDialogValue(''); setEditChecklistIndex(null); }}>Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div className='dialog-backdrop' style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 999 }} onClick={() => { setShowChecklistDialog(false); setChecklistDialogValue(''); setEditChecklistIndex(null); }}></div>
                             </div>
-                        ))}
-                                            {showChecklistDialog && (
-                                                <div className='contentDetail'>
-                                                    <div className='containerDetail fixed t-50 bg-dark p-10 brdr-green width--60' style={{ margin: '40px auto', zIndex: 1000 }}>
-                                                        <form onSubmit={e => {
-                                                            e.preventDefault();
-                                                            if (!checklistDialogValue.trim()) return;
-                                                            setChecklistItems(prev => {
-                                                                const updated = { ...prev };
-                                                                if (editChecklistIndex === null) {
-                                                                    // Add
-                                                                    updated[checklistDialogSection] = [...updated[checklistDialogSection], checklistDialogValue.trim()];
-                                                                } else {
-                                                                    // Edit
-                                                                    updated[checklistDialogSection] = updated[checklistDialogSection].map((v, i) => i === editChecklistIndex ? checklistDialogValue.trim() : v);
-                                                                }
-                                                                return updated;
-                                                            });
-                                                            setShowChecklistDialog(false);
-                                                            setChecklistDialogValue('');
-                                                            setEditChecklistIndex(null);
-                                                        }}>
-                                                            <div className='color-yellow size20 p-10 mb-10'>{editChecklistIndex === null ? 'Add Checklist Item' : 'Edit Checklist Item'}</div>
-                                                            <div className='mb-10'>
-                                                                <label className='color-lite p-10 mb-5'>
-                                                                    Item
-                                                                </label>
-                                                                <div className='mt-5'>
-                                                                    <input
-                                                                        className='containerDetail m-5 color-lite width--10'
-                                                                        value={checklistDialogValue}
-                                                                        onChange={e => setChecklistDialogValue(e.target.value)}
-                                                                        required
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                            <div className='containerDetail bg-lite p-10 flexContainer mt-20'>
-                                                                <button type='submit' className='button flex2Column bg-green color-lite ml--5 p-10 mr-10'>{editChecklistIndex === null ? 'Add' : 'Save'}</button>
-                                                                <button type='button' className='button flex2Column bg-yellow color-dark mr--5 ml--5 p-10' onClick={() => { setShowChecklistDialog(false); setChecklistDialogValue(''); setEditChecklistIndex(null); }}>Cancel</button>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                    <div className='dialog-backdrop' style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 999 }} onClick={() => { setShowChecklistDialog(false); setChecklistDialogValue(''); setEditChecklistIndex(null); }}></div>
-                                                </div>
-                                            )}
+                        )}
                     </div>
                 )}
             </div>
@@ -995,7 +1054,7 @@ const Camp = () => {
                     <div className='containerDetail bg-lite mt-5 p-10'>
                         <div className='flexContainer'>
                             <div className='containerDetail m-5 flex2Column p-10  color-yellow'>
-                                <div>Water/day</div>    
+                                <div>Water/day</div>
                                 <div className='color-orange copyright mt--5 mb-5 ml-5'>
                                     <span>{profile.waterLitersPerPersonPerDay} L</span>
                                     <span className='ml-10'>({waterLitersPerPersonPerDayGallons} gal)</span>

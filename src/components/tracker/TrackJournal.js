@@ -63,16 +63,25 @@ const TrackJournal = ({
     const addJournal = (journalGroupIndex, journalIndex) => {
         const updatedJournals = [...journals];
         const journalDescription = prompt('Journal description:', '');
-        const newJournal = {
-            description: journalDescription,
-            journal: ''
-        }
         if (isGood(journalDescription)) {
-            updatedJournals[journalGroupIndex].journals.push(newJournal)
-            updatedJournals[journalGroupIndex].journal.push(newJournal)
+            const newEntry = {
+                description: journalDescription,
+                journal: '',
+                entryImages: [],
+                entryVideos: []
+            };
+            const group = updatedJournals[journalGroupIndex];
+            // Push the same object reference to both arrays so they always stay in sync.
+            // If journal and journals are aliased to the same array (happens after normalization
+            // when only one existed), only push once to avoid a double entry.
+            if (Array.isArray(group.journals)) {
+                group.journals.push(newEntry);
+            }
+            if (Array.isArray(group.journal) && group.journal !== group.journals) {
+                group.journal.push(newEntry);
+            }
             setJournals(normalizeJournalGroups(updatedJournals));
         }
-
     };
     const deleteGroup = (journalGroupIndex) => {
         const toggle = window.confirm(`Are you sure you want to remove journal group ${journals[journalGroupIndex].title}`)

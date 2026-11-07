@@ -51,9 +51,10 @@ const parseSchedule = (rawText, baseStartTime = null) => {
 };
 
 const formatTime = (seconds) => {
-    const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
-    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-    const s = (seconds % 60).toString().padStart(2, '0');
+    const safeSeconds = Math.max(0, Math.floor(Number(seconds) || 0));
+    const h = Math.floor(safeSeconds / 3600).toString().padStart(2, '0');
+    const m = Math.floor((safeSeconds % 3600) / 60).toString().padStart(2, '0');
+    const s = (safeSeconds % 60).toString().padStart(2, '0');
     //if (s === '00') return <div>{m}<span className='copyright'>min</span></div>;
     return <div>{h}:{m}:{s}</div>;
 };

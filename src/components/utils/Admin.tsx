@@ -36,6 +36,7 @@ const localDataItems = [
     'elapsedTime',
     'stopwatchStartTime',
     'stopwatchPause',
+    'range',
     'distance',
     'latitude',
     'longitude',

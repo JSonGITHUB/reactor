@@ -201,13 +201,15 @@ const Train = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
-        if (recipes !== undefined) {
-            const ingredients = getIngredients();
-            if ((validate(ingredients) !== null) && (ingredients !== undefined)) {
-                localStorage.setItem('ingredients', JSON.stringify(ingredients));
-            }
+        if (tracking !== 'recipes' || recipes === undefined || !Array.isArray(recipes)) {
+            return;
         }
-    }, [recipes]); // eslint-disable-line react-hooks/exhaustive-deps
+
+        const ingredients = getIngredients();
+        if ((validate(ingredients) !== null) && (ingredients !== undefined)) {
+            localStorage.setItem('ingredients', JSON.stringify(ingredients));
+        }
+    }, [recipes, tracking]);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
@@ -340,185 +342,204 @@ const Train = () => {
     }, [tracking]);
 
     useEffect(() => {
-        if (newProjectDescription !== undefined) {
-            const searchTerm = newProjectDescription.toLowerCase() || '';
-            localStorage.setItem('WorkOutSearch', searchTerm);
-            if (tracking === 'recipes' && recipes !== undefined) {
-                const inRecipeTitle = (recipe) => recipe.dish.toLowerCase().includes(searchTerm);
-                const inDescription = (recipe) => recipe.description.toLowerCase().includes(searchTerm);
-                const inIngredients = (recipe) => {
-                    if (recipe.ingredients && recipe.ingredients.length > 0) {
-                        return recipe.ingredients.some((ingredient) => {
-                            return ingredient[2] && ingredient[2].toLowerCase().includes(searchTerm);
-                        });
-                    }
-                    return false;
-                };
-                const inInstructions = (recipe) => {
-                    if (recipe.instructions && recipe.instructions.length > 0) {
-                        return recipe.instructions.some((instruction) => {
-                            if (instruction.step && instruction.step.toLowerCase().includes(searchTerm)) {
-                                return true;
-                            }
-                            if (instruction.ingredients && instruction.ingredients.length > 0) {
-                                return instruction.ingredients.some((ingredient) =>
-                                    ingredient[2] && ingredient[2].toLowerCase().includes(searchTerm)
-                                );
-                            }
-                            return false;
-                        });
-                    }
-                    return false;
-                };
-                const category = localStorage.getItem('recipeCategory') || 'all';
-                const filteredRecipes = [...recipes];
-                filteredRecipes.forEach((recipeGroup) => {
-                    recipeGroup.display = false;
-                    recipeGroup.recipes.forEach((recipe) => {
-                        if ((inInstructions(recipe) || inIngredients(recipe) || inDescription(recipe) || inRecipeTitle(recipe) || searchTerm === '' || searchTerm === ' ' || searchTerm === null) && (category === 'all' || recipeGroup.category === category)) {
-                            recipe.display = true;
-                            recipeGroup.display = true;
-                        } else {
-                            recipe.display = false;
-                        }
-                    });
-                });
-                setRecipes(filteredRecipes);
-            } else if (tracking === 'tasks' && tasks !== undefined) {
-                const inTaskGoupDescription = (taskGroup) => {
-                    const result = taskGroup.description.toLowerCase().includes(searchTerm);
-                    return result;
-                }
-                const inTaskDescription = (task) => {
-                    const result = task.description.toLowerCase().includes(searchTerm);
-                    return result;
-                }
-                const inTaskSessionDescription = (task) => {
-                    if (task.sessions && task.sessions.length > 0) {
-                        return task.sessions.some(
-                            (session) =>
-                                session.description &&
-                                session.description.toLowerCase().includes(searchTerm)
-                        );
-                    }
-                    return false;
-                };
-                const category = localStorage.getItem('tasksCategory') || 'all';
-                const filteredTasks = [...tasks];
+        if (newProjectDescription === undefined) {
+            return;
+        }
 
-                filteredTasks.forEach((taskGroup) => {
-                    taskGroup.display = inTaskGoupDescription(taskGroup);
-                    taskGroup.tasks.forEach((task) => {
-                        if ((inTaskGoupDescription(taskGroup) || inTaskDescription(task) || inTaskSessionDescription(task) || searchTerm === '' || searchTerm === ' ' || searchTerm === null) && (category === 'all' || taskGroup.category === category)) {
-                            task.display = true;
-                            taskGroup.display = true;
-                        }
-                    });
-                });
-                setTasks(filteredTasks);
-            } else if (tracking === 'waves' && waves !== undefined) {
-                const inWaveDescription = (wave) => wave.description.toLowerCase().includes(searchTerm);
-                const filteredWaves = [...waves];
-                filteredWaves.forEach((wave) => {
-                    wave.display = false;
-                    if (inWaveDescription(wave) || searchTerm === '' || searchTerm === ' ' || searchTerm === null) {
-                        wave.display = true;
-                    }
-                });
-                setWaves(filteredWaves);
-            } else if (tracking === 'charges' && charges !== undefined) {
-                const inChargeGoupDescription = (chargeGroup) => String(chargeGroup.description).toLowerCase().includes(searchTerm);
-                const inChargeDescription = (charge) => {
-                    const result = charge.description.toLowerCase().includes(searchTerm);
-                    return result;
-                }
-                const filteredCharges = [...charges];
-                filteredCharges.forEach((chargeGroup) => {
-                    chargeGroup.display = false;
-                    chargeGroup.tasks.forEach((task) => {
-                        if ((inChargeGoupDescription(chargeGroup) || inChargeDescription(task) || searchTerm === '' || searchTerm === ' ' || searchTerm === null)) {
-                            task.display = true;
-                            chargeGroup.display = true;
-                        }
-                    });
-                });
-                setCharges(filteredCharges);
-            } else if (tracking === 'links' && links !== undefined) {
-                const inLinkGroupTitle = (linkGroup) => linkGroup.title.toLowerCase().includes(searchTerm);
-                const inLinkDescription = (link) => {
-                    const result = link.description.toLowerCase().includes(searchTerm);
-                    return result;
-                }
-                const filteredLinks = [...links];
-                filteredLinks.forEach((linkGroup) => {
-                    linkGroup.display = false;
-                    if (linkGroup.links !== undefined) {
-                        linkGroup.links.forEach((link) => {
-                            if ((inLinkGroupTitle(linkGroup) || inLinkDescription(link) || searchTerm === '' || searchTerm === ' ' || searchTerm === null)) {
-                                link.display = true;
-                                linkGroup.display = true;
-                            }
-                        });
-                    }
-                });
-                setLinks(filteredLinks);
-            } else if (tracking === 'notes' && notes !== undefined) {
-                const inNoteGroupTitle = (noteGroup) => noteGroup.title.toLowerCase().includes(searchTerm);
-                const inNotes = (noteGroup) => {
-                    if (noteGroup.notes && noteGroup.notes.length > 0) {
-                        return noteGroup.notes.some((note) => {
-                            return (
-                                (note.description && note.description.toLowerCase().includes(searchTerm)) ||
-                                (note.note && note.note.toLowerCase().includes(searchTerm))
-                            );
-                        });
-                    }
-                    return false;
-                };
-                const filteredNotes = [...notes];
-                filteredNotes.forEach((noteGroup) => {
-                    noteGroup.display = false;
-                    if ((inNoteGroupTitle(noteGroup) || inNotes(noteGroup) || searchTerm === '' || searchTerm === ' ' || searchTerm === null)) {
-                        noteGroup.display = true;
-                    }
-                });
-                setNotes(filteredNotes);
-            } else if (tracking === 'journals' && journals !== undefined) {
-                const inJournalGroupTitle = (journal) => journal.title.toLowerCase().includes(searchTerm);
-                const inJournalDescription = (journal) => journal.description.toLowerCase().includes(searchTerm);
-                const inJournal = (journal) => journal.journal.toLowerCase().includes(searchTerm);
-                const inFeelings = (journal) => journal.feelings.toLowerCase().includes(searchTerm);
-                const inTodaysGoals = (journal) => {
-                    if (journal.todaysGoals && journal.todaysGoals.length > 0) {
-                        return journal.todaysGoals.some((goal) => {
-                            return goal[0].toLowerCase().includes(searchTerm);
-                        });
-                    }
-                    return false;
-                }
-                const inFutureGoals = (journal) => {
-                    if (journal.futureGoals && journal.futureGoals.length > 0) {
-                        return journal.futureGoals.some((goal) => {
-                            return goal[0].toLowerCase().includes(searchTerm);
-                        });
-                    }
-                    return false;
-                }
-                const inGratefulFor = (journal) => journal.gratefulFor.toLowerCase().includes(searchTerm);
-                const filteredJournals = [...journals];
-                filteredJournals.forEach((journalGroup) => {
-                    if (journalGroup.journals && journalGroup?.journals.length > 0) {
-                        journalGroup.display = false;
-                        journalGroup.journals.forEach((journal) => {
-                            if (inJournalGroupTitle(journalGroup) || inJournalDescription(journal) || inJournal(journal) || inFeelings(journal) || inTodaysGoals(journal) || inFutureGoals(journal) || inGratefulFor(journal) || searchTerm === '' || searchTerm === ' ' || searchTerm === null) {
-                                journal.display = true;
-                                journalGroup.display = true;
-                            }
-                        });
-                    }
-                });
-                setJournals(filteredJournals);
+        const searchTerm = String(newProjectDescription || '').trim().toLowerCase();
+        localStorage.setItem('WorkOutSearch', searchTerm);
+
+        if (tracking === 'recipes' && Array.isArray(recipes)) {
+            if (searchTerm === '') {
+                return;
             }
+
+            const inRecipeTitle = (recipe) => String(recipe?.dish || '').toLowerCase().includes(searchTerm);
+            const inDescription = (recipe) => String(recipe?.description || '').toLowerCase().includes(searchTerm);
+            const inIngredients = (recipe) => {
+                if (recipe.ingredients && recipe.ingredients.length > 0) {
+                    return recipe.ingredients.some((ingredient) => {
+                        return ingredient[2] && String(ingredient[2]).toLowerCase().includes(searchTerm);
+                    });
+                }
+                return false;
+            };
+            const inInstructions = (recipe) => {
+                if (recipe.instructions && recipe.instructions.length > 0) {
+                    return recipe.instructions.some((instruction) => {
+                        if (instruction.step && instruction.step.toLowerCase().includes(searchTerm)) {
+                            return true;
+                        }
+                        if (instruction.ingredients && instruction.ingredients.length > 0) {
+                            return instruction.ingredients.some((ingredient) =>
+                                ingredient[2] && String(ingredient[2]).toLowerCase().includes(searchTerm)
+                            );
+                        }
+                        return false;
+                    });
+                }
+                return false;
+            };
+            const category = localStorage.getItem('recipeCategory') || 'all';
+            const filteredRecipes = recipes.map((recipeGroup) => {
+                if (!recipeGroup || !Array.isArray(recipeGroup.recipes)) {
+                    return recipeGroup;
+                }
+
+                const nextRecipes = recipeGroup.recipes.map((recipe) => {
+                    const matches = (inInstructions(recipe) || inIngredients(recipe) || inDescription(recipe) || inRecipeTitle(recipe))
+                        && (category === 'all' || recipeGroup.category === category);
+                    return {
+                        ...recipe,
+                        display: matches,
+                    };
+                });
+
+                return {
+                    ...recipeGroup,
+                    display: nextRecipes.some((recipe) => recipe.display === true),
+                    recipes: nextRecipes,
+                };
+            });
+
+            setRecipes(filteredRecipes);
+            return;
+        }
+
+        if (tracking === 'tasks' && tasks !== undefined) {
+            const inTaskGoupDescription = (taskGroup) => {
+                const result = taskGroup.description.toLowerCase().includes(searchTerm);
+                return result;
+            };
+            const inTaskDescription = (task) => {
+                const result = task.description.toLowerCase().includes(searchTerm);
+                return result;
+            };
+            const inTaskSessionDescription = (task) => {
+                if (task.sessions && task.sessions.length > 0) {
+                    return task.sessions.some(
+                        (session) =>
+                            session.description &&
+                            session.description.toLowerCase().includes(searchTerm)
+                    );
+                }
+                return false;
+            };
+            const category = localStorage.getItem('tasksCategory') || 'all';
+            const filteredTasks = [...tasks];
+
+            filteredTasks.forEach((taskGroup) => {
+                taskGroup.display = inTaskGoupDescription(taskGroup);
+                taskGroup.tasks.forEach((task) => {
+                    if ((inTaskGoupDescription(taskGroup) || inTaskDescription(task) || inTaskSessionDescription(task) || searchTerm === '' || searchTerm === ' ' || searchTerm === null) && (category === 'all' || taskGroup.category === category)) {
+                        task.display = true;
+                        taskGroup.display = true;
+                    }
+                });
+            });
+            setTasks(filteredTasks);
+        } else if (tracking === 'waves' && waves !== undefined) {
+            const inWaveDescription = (wave) => wave.description.toLowerCase().includes(searchTerm);
+            const filteredWaves = [...waves];
+            filteredWaves.forEach((wave) => {
+                wave.display = false;
+                if (inWaveDescription(wave) || searchTerm === '' || searchTerm === ' ' || searchTerm === null) {
+                    wave.display = true;
+                }
+            });
+            setWaves(filteredWaves);
+        } else if (tracking === 'charges' && charges !== undefined) {
+            const inChargeGoupDescription = (chargeGroup) => String(chargeGroup.description).toLowerCase().includes(searchTerm);
+            const inChargeDescription = (charge) => {
+                const result = charge.description.toLowerCase().includes(searchTerm);
+                return result;
+            };
+            const filteredCharges = [...charges];
+            filteredCharges.forEach((chargeGroup) => {
+                chargeGroup.display = false;
+                chargeGroup.tasks.forEach((task) => {
+                    if ((inChargeGoupDescription(chargeGroup) || inChargeDescription(task) || searchTerm === '' || searchTerm === ' ' || searchTerm === null)) {
+                        task.display = true;
+                        chargeGroup.display = true;
+                    }
+                });
+            });
+            setCharges(filteredCharges);
+        } else if (tracking === 'links' && links !== undefined) {
+            const inLinkGroupTitle = (linkGroup) => linkGroup.title.toLowerCase().includes(searchTerm);
+            const inLinkDescription = (link) => {
+                const result = link.description.toLowerCase().includes(searchTerm);
+                return result;
+            };
+            const filteredLinks = [...links];
+            filteredLinks.forEach((linkGroup) => {
+                linkGroup.display = false;
+                if (linkGroup.links !== undefined) {
+                    linkGroup.links.forEach((link) => {
+                        if ((inLinkGroupTitle(linkGroup) || inLinkDescription(link) || searchTerm === '' || searchTerm === ' ' || searchTerm === null)) {
+                            link.display = true;
+                            linkGroup.display = true;
+                        }
+                    });
+                }
+            });
+            setLinks(filteredLinks);
+        } else if (tracking === 'notes' && notes !== undefined) {
+            const inNoteGroupTitle = (noteGroup) => noteGroup.title.toLowerCase().includes(searchTerm);
+            const inNotes = (noteGroup) => {
+                if (noteGroup.notes && noteGroup.notes.length > 0) {
+                    return noteGroup.notes.some((note) => {
+                        return (
+                            (note.description && note.description.toLowerCase().includes(searchTerm)) ||
+                            (note.note && note.note.toLowerCase().includes(searchTerm))
+                        );
+                    });
+                }
+                return false;
+            };
+            const filteredNotes = [...notes];
+            filteredNotes.forEach((noteGroup) => {
+                noteGroup.display = false;
+                if ((inNoteGroupTitle(noteGroup) || inNotes(noteGroup) || searchTerm === '' || searchTerm === ' ' || searchTerm === null)) {
+                    noteGroup.display = true;
+                }
+            });
+            setNotes(filteredNotes);
+        } else if (tracking === 'journals' && journals !== undefined) {
+            const inJournalGroupTitle = (journal) => journal.title.toLowerCase().includes(searchTerm);
+            const inJournalDescription = (journal) => journal.description.toLowerCase().includes(searchTerm);
+            const inJournal = (journal) => journal.journal.toLowerCase().includes(searchTerm);
+            const inFeelings = (journal) => journal.feelings.toLowerCase().includes(searchTerm);
+            const inTodaysGoals = (journal) => {
+                if (journal.todaysGoals && journal.todaysGoals.length > 0) {
+                    return journal.todaysGoals.some((goal) => {
+                        return goal[0].toLowerCase().includes(searchTerm);
+                    });
+                }
+                return false;
+            };
+            const inFutureGoals = (journal) => {
+                if (journal.futureGoals && journal.futureGoals.length > 0) {
+                    return journal.futureGoals.some((goal) => {
+                        return goal[0].toLowerCase().includes(searchTerm);
+                    });
+                }
+                return false;
+            };
+            const inGratefulFor = (journal) => journal.gratefulFor.toLowerCase().includes(searchTerm);
+            const filteredJournals = [...journals];
+            filteredJournals.forEach((journalGroup) => {
+                if (journalGroup.journals && journalGroup?.journals.length > 0) {
+                    journalGroup.display = false;
+                    journalGroup.journals.forEach((journal) => {
+                        if (inJournalGroupTitle(journalGroup) || inJournalDescription(journal) || inJournal(journal) || inFeelings(journal) || inTodaysGoals(journal) || inFutureGoals(journal) || inGratefulFor(journal) || searchTerm === '' || searchTerm === ' ' || searchTerm === null) {
+                            journal.display = true;
+                            journalGroup.display = true;
+                        }
+                    });
+                }
+            });
+            setJournals(filteredJournals);
         }
     }, [newProjectDescription]); // eslint-disable-line react-hooks/exhaustive-deps
 

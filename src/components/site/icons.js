@@ -1,4 +1,5 @@
 const icons = {
+    eat: '🍽️',
     edit: '✏️',
     checkbox: '✅',
     delete: '🗑️',
@@ -30,6 +31,7 @@ const icons = {
     camp: '⛺️',
     fuel: '⛽️',
     parks: '🏞️',
+    city: '🌆',
     moon: '🌕',
     photoassistant: '📸',
     scrabble:'🔤',
@@ -66,6 +68,9 @@ const icons = {
     circuit: '🏋🏽',
     conditions: '🌤️',
     journals: '📓',
+    lumber: '🪵',
+    concrete: '🧱',
+    thd: '🧰',
     cook: '👨‍🍳',
     note: '🧻',
     notes: '🗒️',
@@ -215,12 +220,14 @@ const icons = {
     media: '🎞️',
     tictactoe: '❌⭕️',
     crosswordpuzzle: '🧩',
+    pacman: '👻',
     alarmOn: '🔔',
     alarmOff: '🔕',
     searchLeft: '🔍',
     searchRight: '🔎',
     settings: '⚙️',
     gps: '📡',
+    tipcalculator: '💵',
     bowling: '🎳',
     dice: '🎲',
     run: '🏃🏽',
@@ -327,6 +334,7 @@ const icons = {
     news: '📰',
 
     grocery: '🛒',
+    cafe: '☕️',
 }
 
 export default icons;

@@ -1,30 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './News.css';
+import { requestProvider } from '../../services/providerApi';
 
 
 const API_OPTIONS = [
-/*
-  {
-    label: 'Currents',
-    value: 'currents',
-    url: 'https://api.currentsapi.services/v1/latest-news',
-    key: process.env.REACT_APP_CURRENTS_API_KEY,
-    keyName: 'apiKey',
-  },
-  {
-    label: 'GNews',
-    value: 'gnews',
-    url: 'https://gnews.io/api/v4/top-headlines',
-    key: process.env.REACT_APP_GNEWS_API_KEY,
-    keyName: 'token',
-  },
-  */
   {
     label: 'Mediastack',
     value: 'mediastack',
-    url: 'https://api.mediastack.com/v1/news',
-    key: process.env.REACT_APP_MEDIASTACK_API_KEY,
-    keyName: 'access_key',
   },
 ];
 
@@ -59,58 +41,9 @@ const News = () => {
   const fetchNews = async () => {
     setLoading(true);
     setError('');
-    const api = API_OPTIONS.find(a => a.value === selectedApi);
-    if (!api.key) {
-      setError(`Missing API key for ${api.label}. Please set it in your .env file.`);
-      setLoading(false);
-      return;
-    }
-    let url = api.url;
-    let params = {};
-    if (api.value === 'currents') {
-      params = {
-        [api.keyName]: api.key,
-        language: 'en',
-        category: category,
-        country: country,
-        keywords: search,
-      };
-    } else if (api.value === 'gnews') {
-      params = {
-        [api.keyName]: api.key,
-        lang: 'en',
-        topic: category,
-        country: country,
-        q: search,
-        max: 20,
-      };
-    } else if (api.value === 'mediastack') {
-      params = {
-        [api.keyName]: api.key,
-        languages: 'en',
-        categories: category,
-        countries: country,
-        keywords: search,
-        limit: 20,
-      };
-    }
-    // Build query string
-    const query = Object.entries(params)
-      .filter(([_, v]) => v && v !== 'all')
-      .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
-      .join('&');
-    url = url + (url.includes('?') ? '&' : '?') + query;
     try {
-      const res = await fetch(url);
-      const data = await res.json();
-      let articles = [];
-      if (api.value === 'currents') {
-        articles = data.news || [];
-      } else if (api.value === 'gnews') {
-        articles = data.articles || [];
-      } else if (api.value === 'mediastack') {
-        articles = data.data || [];
-      }
+      const data = await requestProvider('news', { category, country, search });
+      const articles = data.data || [];
       setArticles(articles);
       setTrending(getTrendingTopics(articles));
     } catch (e) {

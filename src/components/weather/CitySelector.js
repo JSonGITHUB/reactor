@@ -3,6 +3,7 @@ import getKey from '../utils/KeyGenerator.js';
 import getDirectionIcon from './GetDirectionIcon.js';
 import getDirection from './GetDirection.js';
 import weekday from './Weekday.js';
+import { requestProvider } from '../../services/providerApi';
 
 const CitySelector = () => {
     //api.openweathermap.org/data/2.5/forecast?q=London,us&appid={APIKEY}
@@ -10,12 +11,8 @@ const CitySelector = () => {
     //api.openweathermap.org/data/2.5/forecast?q=London,us&appid={APIKEY}&units=metric
     //Image Source
     //http://openweathermap.org/img/wn/10d@2x.png
-    const key = process.env.openweatherAPI_KEY;
-    const baseUrl = process.env.openweatherAPI_BASE_URL;
-
     const [city, setCity] = useState('Carlsbad, CA');
     const [results, setResults] = useState('');
-    const urlEnd = `/data/2.5/forecast?q=${city},us&appid=`;
 
     const displayResults = (results) => {
 
@@ -120,11 +117,13 @@ const CitySelector = () => {
         setResults(list)
     }
 
-    const onSearch = () => {
-        fetch(`${baseUrl}${urlEnd}${key}`)
-        .then((response) => response.json())
-//        .then((result) => console.log(`${JSON.stringify(result,null, 2)}`))
-        .then((results) => displayResults(results));
+    const onSearch = async () => {
+        try {
+            const weather = await requestProvider('weather', { city });
+            displayResults(weather);
+        } catch (error) {
+            console.error('Weather request failed:', error);
+        }
     };
     const onKeyDown = (event) => {
         if (event.keyCode === 13) {

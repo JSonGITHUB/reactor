@@ -10,14 +10,14 @@ const quietProxyErrorHandler = (err) => {
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
+  const publicPath = mode === 'netlify' ? '' : '/reactor';
   const processEnv = {
-    ...env,
-    NODE_ENV: mode,
-    PUBLIC_URL: '/reactor',
+    NODE_ENV: mode === 'netlify' ? 'production' : mode,
+    PUBLIC_URL: publicPath,
   };
 
   return {
-    base: '/reactor/',
+    base: publicPath ? `${publicPath}/` : '/',
     assetsInclude: ['**/*.MP4'],
     build: {
       rollupOptions: {
@@ -183,7 +183,7 @@ export default defineConfig(({ mode }) => {
               return next();
             }
 
-            const apiKey = process.env.REACT_APP_GOOGLE_PLACES_API_KEY;
+            const apiKey = env.REACT_APP_GOOGLE_PLACES_API_KEY;
             if (!apiKey) {
               res.statusCode = 500;
               res.setHeader('Content-Type', 'application/json');

@@ -8,8 +8,39 @@ import defaultGoalData from './defaultGoalData';
 import { secondsToTime, timeToSeconds } from './TimeConversions';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
 import initializeData from '../utils/InitializeData';
+import { useLayout } from '../utils/LayoutContext';
 
 const TRAINING_STATUS_EVENT = 'trainingTimerStatusChanged';
+const TRAINING_LOGS_STORAGE_KEY = 'trainingLogsCollection';
+const TRAINING_LOG_SELECTED_KEY = 'trainingLogSelectedId';
+
+const cloneActivities = (items = []) => items.map((item) => ({ ...item }));
+
+const createTrainingLog = (name, trainingData, goalData) => ({
+    id: `training-log-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    name,
+    trainingData: cloneActivities(trainingData),
+    goalData: cloneActivities(goalData),
+});
+
+const parseStoredLogs = () => {
+    try {
+        const raw = localStorage.getItem(TRAINING_LOGS_STORAGE_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        return parsed.filter((log) => (
+            log
+            && typeof log.id === 'string'
+            && typeof log.name === 'string'
+            && Array.isArray(log.trainingData)
+            && Array.isArray(log.goalData)
+        ));
+    } catch {
+        return [];
+    }
+};
+
 const TrainingLog = () => {
     const categories = ['SKILL', 'TIME', 'percentage'];
     const colors = [
@@ -42,6 +73,8 @@ const TrainingLog = () => {
     const [currentTime, setCurrentTime] = useState(0);
     const [activeTimers, setActiveTimers] = useState();
     const [admin, setAdmin] = useState(false);
+    const [trainingLogs, setTrainingLogs] = useState([]);
+    const [selectedLogId, setSelectedLogId] = useState('');
 
     const convertSecondsToTime = (totalSeconds) => {
         const hours = Math.floor(totalSeconds / 3600);
@@ -63,6 +96,23 @@ const TrainingLog = () => {
     const setGoals = () => setGoalData(trainingData);
     const toggleAdmin = () => setAdmin(prev => !prev);
     const toggleActiveTimer = () => setActiveTimers(prev => !prev);
+
+    const syncSelectedLogData = (nextTrainingData, nextGoalData) => {
+        if (!selectedLogId) return;
+        setTrainingLogs((prev) => {
+            let changed = false;
+            const updated = prev.map((log) => {
+                if (log.id !== selectedLogId) return log;
+                changed = true;
+                return {
+                    ...log,
+                    trainingData: cloneActivities(nextTrainingData),
+                    goalData: cloneActivities(nextGoalData),
+                };
+            });
+            return changed ? updated : prev;
+        });
+    };
 
     const convertTimeToSeconds = (timeString) => {
         const [hours, minutes, seconds] = timeString.split(':').map(Number);
@@ -133,6 +183,12 @@ const TrainingLog = () => {
         }
     }, [activeTimers]);
 
+    useEffect(() => {
+        if (!Array.isArray(trainingLogs) || !trainingLogs.length) return;
+        localStorage.setItem(TRAINING_LOGS_STORAGE_KEY, JSON.stringify(trainingLogs));
+        if (selectedLogId) localStorage.setItem(TRAINING_LOG_SELECTED_KEY, selectedLogId);
+    }, [trainingLogs, selectedLogId]);
+
     const resetGoals = () => {
         localStorage.setItem('trainingData', JSON.stringify(defaultTrainingData));
         localStorage.setItem('goalData', JSON.stringify(defaultGoalData));
@@ -159,9 +215,24 @@ const TrainingLog = () => {
         
         const localData = initializeData('trainingData', defaultTrainingData);
         const localGoalData = initializeData('goalData', defaultGoalData);
-        //setTrainingData(localData);
-        restart(localData);
-        calculatePercentages(localData, 'training');
+
+        const normalizedTrainingData = Array.isArray(localData) ? localData : defaultTrainingData;
+        const normalizedGoalData = Array.isArray(localGoalData) ? localGoalData : defaultGoalData;
+
+        let initialLogs = parseStoredLogs();
+        if (!initialLogs.length) {
+            initialLogs = [createTrainingLog('Primary Log', normalizedTrainingData, normalizedGoalData)];
+        }
+
+        const storedSelectedLogId = localStorage.getItem(TRAINING_LOG_SELECTED_KEY);
+        const hasStoredSelected = initialLogs.some((log) => log.id === storedSelectedLogId);
+        const initialSelectedLogId = hasStoredSelected ? storedSelectedLogId : initialLogs[0].id;
+        const selectedLog = initialLogs.find((log) => log.id === initialSelectedLogId) || initialLogs[0];
+
+        setTrainingLogs(initialLogs);
+        setSelectedLogId(initialSelectedLogId);
+        restart(selectedLog.trainingData);
+        calculatePercentages(selectedLog.trainingData, 'training');
         
         const storedActiveTimers = initializeData('activeTimers', false);
         setActiveTimers(storedActiveTimers === 'true');
@@ -171,20 +242,20 @@ const TrainingLog = () => {
         if (storedActiveIndex && storedStartTime) {
 
             //setStartTime(new Date(parseInt(storedStartTime, 10)));
-            setCurrentTime(convertTimeToSeconds(localData[storedActiveIndex].time));
+            setCurrentTime(convertTimeToSeconds(selectedLog.trainingData[storedActiveIndex].time));
             setTiming({
                 index: storedActiveIndex,
-                goal: localData[storedActiveIndex].skill,
-                time: localData[storedActiveIndex].time
+                goal: selectedLog.trainingData[storedActiveIndex].skill,
+                time: selectedLog.trainingData[storedActiveIndex].time
             });
             setTimer(true);
         }
-        if (localGoalData === null || localGoalData === 'null') {
+        if (!Array.isArray(selectedLog.goalData) || selectedLog.goalData === null || selectedLog.goalData === 'null') {
             setGoalData(defaultGoalData);
             calculatePercentages(defaultGoalData, 'goal');
         } else {
-            setGoalData(localGoalData);
-            calculatePercentages(localGoalData, 'goal');
+            setGoalData(selectedLog.goalData);
+            calculatePercentages(selectedLog.goalData, 'goal');
         }
         const timer = setTimeout(() => {
             setCollapseTraining(false);
@@ -220,6 +291,11 @@ const TrainingLog = () => {
             localStorage.setItem('goalData', JSON.stringify(goalData));
         }
     }, [goalData]);
+
+    useEffect(() => {
+        if (!selectedLogId || !Array.isArray(trainingData) || !Array.isArray(goalData)) return;
+        syncSelectedLogData(trainingData, goalData);
+    }, [trainingData, goalData, selectedLogId]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
     }, [editIndex]);
@@ -382,12 +458,113 @@ const TrainingLog = () => {
         }
     }
 
+    const applyTrainingLogSelection = (targetLog) => {
+        if (!targetLog) return;
+        setSelectedLogId(targetLog.id);
+        setTimer(false);
+        setTiming(null);
+        setCurrentTime(0);
+        localStorage.removeItem('trainingStartTime');
+        localStorage.removeItem('trainingActiveIndex');
+        localStorage.removeItem('trainingElapsedTime');
+
+        const nextTrainingData = calculatePercentages(cloneActivities(targetLog.trainingData), 'training');
+        const nextGoalData = calculatePercentages(cloneActivities(targetLog.goalData), 'goal');
+        setTrainingData(nextTrainingData);
+        setGoalData(nextGoalData);
+        window.dispatchEvent(new Event(TRAINING_STATUS_EVENT));
+    };
+
+    const selectTrainingLog = (logId) => {
+        const targetLog = trainingLogs.find((log) => log.id === logId);
+        applyTrainingLogSelection(targetLog);
+    };
+
+    const addTrainingLog = () => {
+        const newName = prompt('New training log name', 'New Training Log');
+        if (validate(newName) === null) return;
+        const nextLog = createTrainingLog(newName, defaultTrainingData, defaultGoalData);
+        setTrainingLogs((prev) => [...prev, nextLog]);
+        applyTrainingLogSelection(nextLog);
+    };
+
+    const renameTrainingLog = () => {
+        const selectedLog = trainingLogs.find((log) => log.id === selectedLogId);
+        if (!selectedLog) return;
+        const nextName = prompt('Rename training log', selectedLog.name);
+        if (validate(nextName) === null) return;
+        setTrainingLogs((prev) => prev.map((log) => (
+            log.id === selectedLogId ? { ...log, name: nextName } : log
+        )));
+    };
+
+    const deleteTrainingLog = () => {
+        if (!Array.isArray(trainingLogs) || trainingLogs.length <= 1) {
+            alert('At least one training log is required.');
+            return;
+        }
+        const selectedLog = trainingLogs.find((log) => log.id === selectedLogId);
+        if (!selectedLog) return;
+        const check = window.confirm(`Delete training log: ${selectedLog.name}?`);
+        if (!check) return;
+
+        const remainingLogs = trainingLogs.filter((log) => log.id !== selectedLogId);
+        const replacementLog = remainingLogs[0];
+        setTrainingLogs(remainingLogs);
+        applyTrainingLogSelection(replacementLog);
+    };
+
+    const layout = useLayout();
+    const appBg = layout?.colors?.background;
+    const appPrimaryColor = layout?.colors?.primary;
+    const headerBackground = layout?.colors?.headerBackground;
+
     return (
         <div className='mt--30 color-lite size20'>
+            <div className='containerDetail bg-lite m-5 p-10'>
+                <div className='containerDetail size20 color-yellow contentLeft p-10'>
+                    Training Logs
+                </div>
+                <div className='flexContainer mt-5'>
+                    <div className='flex2Column contentLeft'>
+                        <select
+                            className='containerDetail p-10 bg-tintedMedium color-lite width-100-percent mt--1'
+                            value={selectedLogId}
+                            onChange={(e) => selectTrainingLog(e.target.value)}
+                            aria-label='Select training log'
+                        >
+                            {trainingLogs.map((log) => (
+                                <option key={log.id} value={log.id}>{log.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className='flex2Column ml-5'>
+                        <div className='containerDetail flexContainer'>
+                            <button type='button' className='containerDetail button bg-dkGreen color-lite p-10 flex3Column' onClick={addTrainingLog} aria-label='Add training log'>
+                                {icons.plus}
+                            </button>
+                            <button type='button' className='containerDetail button bg-oceanblue color-lite p-10 flex3Column ml-5' onClick={renameTrainingLog} aria-label='Rename selected training log'>
+                                {icons.edit || '✏️'}
+                            </button>
+                            <button type='button' className='containerDetail button bg-dkRed color-lite p-10 flex3Column ml-5' onClick={deleteTrainingLog} aria-label='Delete selected training log'>
+                                {icons.delete}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div className='containerDetail bg-lite m-5'>
-                <div className='containerDetail bg-lite'>
+                <div 
+                    className='containerDetail bg-lite'
+                    style={{
+                        color: appPrimaryColor,
+                        background: headerBackground,
+                    }}
+                >
                     <CollapseToggleButton
-                        title={<div className='ml--30 color-yellow size20 contentLeft'>⚙️ Goal Settings</div>}
+                        title={<div className='ml--30 color-yellow size20 contentLeft' style={{
+                            color: appPrimaryColor
+                        }}>⚙️ Goal Settings</div>}
                         isCollapsed={collapseGoals}
                         setCollapse={setCollapseGoals}
                     />
@@ -418,12 +595,12 @@ const TrainingLog = () => {
                         <div className='flexContainer'>
                             {
                                 (categories && goalData !== null)
-                                ? categories.map((category, i) => <div key={`training-goal-category-${i}-${String(category)}`} className='flex3Column'>
-                                    <div className={`containerDetail mt-5 ${(i === 1) ? 'ml-5 mr-5 ': null}pt-10 pb-10 color-lite size20 bg-lite`}>
+                                ? categories.map((category, i) => <div key={`training-goal-category-${i}-${String(category)}`} className='flex3Column mr-5'>
+                                    <div className={`containerDetail mt-5 ${(i === 1) ? '': null} pt-5 pb-5 color-lite size20 bg-lite`}>
                                         {(category === 'TIME') ? secondsToTime(goalTime) : (category === 'percentage') ? '%' : category}
                                     </div>
                                     {
-                                        goalData.map((training, index) => <div key={`training-goal-row-${i}-${index}-${String(training?.skill || 'training')}`} className={`containerDetail mt-5 ${(index === 1) ? 'ml-5 mr-5 ': null}pt-10 pb-10 flexContainer button size20`} style={categoryStyle(index)}>
+                                        goalData.map((training, index) => <div key={`training-goal-row-${i}-${index}-${String(training?.skill || 'training')}`} className={`containerDetail mt-5 ${(index === 1) ? '': null} pt-10 pb-10 flexContainer button size20`} style={categoryStyle(index)}>
                                             <div className='flex3Column'>
                                                 {
                                                     (category === 'TIME')
@@ -502,9 +679,17 @@ const TrainingLog = () => {
                 }
             </div>
             <div className='containerDetail bg-lite m-5'>
-                <div className='containerDetail bg-lite'>
+                <div 
+                    className='containerDetail bg-lite'
+                    style={{
+                        color: appPrimaryColor,
+                        background: headerBackground,
+                    }}
+                >
                     <CollapseToggleButton
-                        title={<div className='ml--30 color-yellow size20 contentLeft'>🏋 Training Log</div>}
+                        title={<div className='ml--30 color-yellow size20 contentLeft' style={{
+                            color: appPrimaryColor
+                        }}>🏋 Training Log</div>}
                         isCollapsed={collapseTraining}
                         setCollapse={setCollapseTraining}
                     />
@@ -512,7 +697,7 @@ const TrainingLog = () => {
                 {
                     (collapseTraining)
                     ? null
-                        : <div className='containerDetail flexContainer bg-tintedMedium mr-5 ml-5'>
+                        : <div className='containerDetail flexContainer bg-tintedMedium mt-5'>
                             <div className='flexColumn'>
                             </div>
                             <div className='flexColumn'>

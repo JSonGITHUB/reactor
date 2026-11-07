@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { requestProvider } from '../../services/providerApi';
 //import VideoDetail from './VideoDetail';
-
-//const KEY = config.youtubeAPI_KEY;
-//const api = config.youtubeAPI_BASE_URL;
-const YOUTUBE_API_KEY = process.env.REACT_APP_YOUTUBE_API_KEY;
 
 const PLAYLISTS_KEY = 'video_playlists_v1';
 
@@ -107,10 +104,9 @@ const Videos = () => {
       } else {
         videoId = url.split('/').pop().split('?')[0];
       }
-      if (videoId && YOUTUBE_API_KEY) {
+      if (videoId) {
         try {
-          const resp = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${YOUTUBE_API_KEY}`);
-          const data = await resp.json();
+          const data = await requestProvider('youtubeVideo', { id: videoId });
           videoName = data?.items?.[0]?.snippet?.title || '';
         } catch {}
       }
@@ -169,12 +165,7 @@ const Videos = () => {
     if (!searchTerm) return;
 
     try {
-      const response = await fetch(
-        `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
-          searchTerm
-        )}&type=video&maxResults=10&key=${YOUTUBE_API_KEY}`
-      );
-      const data = await response.json();
+      const data = await requestProvider('youtubeSearch', { query: searchTerm });
       setVideos(data.items || []);
     } catch (error) {
       console.error('Error fetching YouTube videos:', error);

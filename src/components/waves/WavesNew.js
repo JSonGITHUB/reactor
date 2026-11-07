@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
+import { useLayout } from '../utils/LayoutContext';
 import getKey from '../utils/KeyGenerator';
 import WaveUtils from '../wavefinder/WaveUtils';
 import calculateDistance from '../location/CalculateDistance';
@@ -176,9 +177,6 @@ const WavesNew = () => {
         return matches;
     }
     // eslint-disable-next-line
-    const statusClass = (status) => (status === true) ? 'color-neogreen' : 'color-yellow';
-    // eslint-disable-next-line
-    const subStatusClass = (status) => (status === true) ? 'color-orange' : 'color-yellow';
     const swell1Confirm = (matches) => ((status.isSwell1 && matches.includes('swell1')) || status.isSwell1 === false) ? true : false;
     const swell2Confirm = (matches) => ((status.isSwell2 && matches.includes('swell2')) || status.isSwell2 === false) ? true : false;
     const tideConfirm = (matches) => ((status.isTide && matches.includes('tide')) || status.isTide === false) ? true : false;
@@ -364,6 +362,11 @@ const WavesNew = () => {
     }
 
     const { count: visibleWaveCount, content: visibleWaveSpots } = sortedSpots();
+    
+    const layout = useLayout();
+    const appBg = layout?.colors?.background;
+    const appPrimaryColor = layout?.colors?.primary;
+    const headerBackground = layout?.colors?.headerBackground;
 
     return (
         (retry !== '')
@@ -371,12 +374,27 @@ const WavesNew = () => {
             WATER TEMP: Error fetching data retry attempt {retry}
         </div>
         : <>
-            <div className='containerDetail bg-lite mt--25'>
-                <div className='containerDetail color-yellow bg-lite p-20 size20 contentLeft mb-5'>
+            <div 
+                className='containerDetail mt--25'
+                style={{ background: appBg || undefined }}
+            >
+                <div 
+                    className='containerDetail color-yellow p-20 size20 contentLeft mb-5'
+                    style={{
+                        color: appPrimaryColor,
+                        background: headerBackground,
+                    }}
+                >
                     <span className='size30 m-5'>🌊</span> Waves
                 </div>
                 <SurfDashboard />
-                <div className='containerDetail size20 mb-5 mt-5 color-yellow bg-lite p-20'>
+                <div 
+                    className='containerDetail size20 mb-5 mt-5 color-yellow p-20'
+                    style={{ 
+                        color: appPrimaryColor,
+                        background: headerBackground,
+                    }}
+                >
                     <CollapseToggleButton
                         title={`${icons.earth1} Current Conditions`}
                         isCollapsed={conditionsCollapse}

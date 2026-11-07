@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLayout } from '../utils/LayoutContext';
 import AddProjectInterface from './AddProjectInterface';
 import TrackJournal from './TrackJournal';
 import { currentTime, currentDate } from '../utils/CurrentCalendar';
@@ -209,9 +210,17 @@ const Journals = () => {
     };
     // ...existing code...
     
+    const layout = useLayout();
+    const appBg = layout?.colors?.background;
+    const appPrimaryColor = layout?.colors?.primary;
+    const headerBackground = layout?.colors?.headerBackground;
+
     return (
-        <div className='mt--30'>
-            <div className='containerDetail color-yellow p-20 m-5 size25 bg-lite contentLeft'>
+        <div className='mt--30' style={{ background: appBg }}>
+            <div
+                className='containerDetail color-yellow p-20 m-5 size25 bg-lite contentLeft'
+                style={{ background: headerBackground, color: appPrimaryColor }}
+            >
                 {icons.journals} Journals
             </div>
             <div className='containerDetail m-5 bg-lite'>

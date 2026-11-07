@@ -281,10 +281,26 @@ export default function SurfDashboard() {
     const getDashboardTitle = <div className='color-yellow size20 mt--5'>
                 🌊 Surf Dashboard
             </div>;
-
+    
+    let appBg = undefined;
+    let appPrimaryColor = undefined;
+    let headerBackground = undefined;
+    try {
+        const appAppearanceSettings = JSON.parse(localStorage.getItem('appAppearanceSettings'));
+        appBg = appAppearanceSettings?.colors?.background;
+        appPrimaryColor = appAppearanceSettings?.colors?.primary;
+        headerBackground = appAppearanceSettings?.colors?.headerBackground;
+    } catch { }
+    
     return (
             <React.Fragment>
-                <div className='containerDetail bg-lite mb-5 p-20'>
+                <div 
+                    className='containerDetail bg-lite mb-5 p-20'
+                    style={{
+                        color: appPrimaryColor,
+                        background: headerBackground,
+                    }}
+                >
                     <CollapseToggleButton
                         title={getDashboardTitle}
                         description={bestTimeSummary ? (

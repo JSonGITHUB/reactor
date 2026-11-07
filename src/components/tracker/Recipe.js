@@ -1936,4 +1936,13 @@ const Recipe = ({
         </div>
     </div>
 };
-export default Recipe;
+const areRecipePropsEqual = (prevProps, nextProps) => (
+    prevProps.recipe === nextProps.recipe
+    && prevProps.recipes === nextProps.recipes
+    && prevProps.recipeGroupIndex === nextProps.recipeGroupIndex
+    && prevProps.recipeIndex === nextProps.recipeIndex
+    && prevProps.setRecipes === nextProps.setRecipes
+    && prevProps.setCollapseAll === nextProps.setCollapseAll
+);
+
+export default React.memo(Recipe, areRecipePropsEqual);

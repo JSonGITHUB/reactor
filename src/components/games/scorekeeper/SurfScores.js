@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useLayout } from '../../utils/LayoutContext';
 import getKey from '../../utils/KeyGenerator';
 import { newDate } from '../../utils/Dates';
 import { losePriority } from './SurfPriority';
@@ -19,6 +20,11 @@ const SurfScores = ({
     setPriorityCollapse,
     getSurfScore
 }) => {
+
+    const layout = useLayout();
+    const appBg = layout?.colors?.background;
+    const appPrimaryColor = layout?.colors?.primary;
+    const headerBackground = layout?.colors?.headerBackground;
 
     const {
         players,
@@ -77,17 +83,29 @@ const SurfScores = ({
     
     const GetPriorityItem = ({
         index
-    }) => <div 
-            title={(String(getPriorityAthlete(index)).replace(/,/g, '') === '') ? `priority ${index}` : `lose priority ${index} - ${players[Number(String(getPriorityAthlete(index)).replace(/,/g, ''))].name}`}
-            className={`button width-100-percent r-10 m-5 w-75 size40 pt-20 pb-20 bg-${String(getPriorityColor(index)).replace(/,/g, '')}`} 
-            key={getKey(`priorityFlag`)} 
-            onClick={() => losePriority(index, players, setPlayers)}
-        >
-            {index/*players[Number(String(getPriorityAthlete(index)).replace(/,/g, ''))].name*/}
-        </div>
+    }) => {
+        // Get the index of the player with this priority
+        const athleteIndexes = getPriorityAthlete(index).filter((i) => i !== null && i !== undefined);
+        const athleteIndex = athleteIndexes.length > 0 ? athleteIndexes[0] : null;
+        const player = athleteIndex !== null ? players[athleteIndex] : null;
+        const title = player
+            ? `lose priority ${index} - ${player.name}`
+            : `priority ${index}`;
+        const color = String(getPriorityColor(index)).replace(/,/g, '');
+        return (
+            <div
+                title={title}
+                className={`button width-100-percent r-10 m-5 w-75 size40 pt-20 pb-20 bg-${color}`}
+                key={getKey(`priorityFlag`)}
+                onClick={() => losePriority(index, players, setPlayers)}
+            >
+                {index}
+            </div>
+        );
+    }
        
     const GetPriorityDisplay = () => <div className='containerDetail bg-lite ml-5 mr-5'>
-                     <div className='containerBox color-yellow'>
+                     <div className='containerDetail size20 color-yellow' style={{ background: headerBackground, color: appPrimaryColor }}>
                         <CollapseToggleButton
                             title={'Priority:'}
                             isCollapsed={priorityCollapse}
@@ -125,8 +143,8 @@ const SurfScores = ({
     }
         
     const getScoreDisplay = () => {
-        return <div className='containerDetail bg-lite m-5'>
-                        <div className='containerBox color-yellow'>
+        return <div className='containerDetail bg-lite ml-5 mr-5'>
+                        <div className='containerDetail size20 color-yellow' style={{ background: headerBackground, color: appPrimaryColor }}>
                             <CollapseToggleButton
                                 title={`Scoreboard - ${newDate()}`}
                                 isCollapsed={scoreboardCollapse}
@@ -136,7 +154,7 @@ const SurfScores = ({
                         </div>
                         {/*
                             (!scoreboardCollapse)
-                            ? <div className='containerBox flexContainer h-scroll'>
+                            ? <div className='containerDetail p-10 m-5 size20 color-yellow flexContainer h-scroll'>
                                     {players.map((player, index) => <div 
                                                                         key={getKey(`SurfAthlete${index}`)}
                                                                         className={` button flex${players.length}Column`} 

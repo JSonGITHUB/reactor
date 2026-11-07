@@ -6,8 +6,8 @@ import ModeSelector from './ModeSelector';
 import ConditionSelectors from './ConditionSelectors';
 import PhotoSettingResults from './PhotoSettingResults';
 import VideoSettingResults from './VideoSettingResults';
-import calculatePhotoSettings from './calculatePhotoSettings';
 import calculateVideoSettings from './calculateVideoSettings';
+import calculatePhotoSettings from './calculatePhotoSettings';
 import useLocation from './useLocation';
 import { persistAssistantPhoto, getAssistantPhotoBlob, removeAssistantPhoto, isAssistantPhotoDbAvailable } from './assistantPhotoDb';
 //import './photoAssistant.css';
@@ -449,62 +449,49 @@ const PhotoAssistant = () => {
                                         const canGoPrev = expandedIndex > 0;
                                         const canGoNext = expandedIndex < entryPhotos.length - 1;
                                         return (
-                                            <div className='containerDetail bg-dark mb-10' style={{ position: 'relative' }}>
-                                                <div
-                                                    className='button p-10 size20'
-                                                    onClick={() => canGoPrev && setExpandedPhoto(entryPhotos[expandedIndex - 1])}
-                                                    style={{
-                                                        position: 'absolute',
-                                                        top: 0,
-                                                        bottom: 0,
-                                                        left: 8,
-                                                        width: 44,
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        zIndex: 2,
-                                                        opacity: canGoPrev ? 1 : 0.3,
-                                                        pointerEvents: canGoPrev ? 'auto' : 'none',
-                                                    }}
-                                                    title='Previous'
-                                                >
-                                                    ◀
-                                                </div>
-                                                <div
-                                                    className='button p-10 size20'
-                                                    onClick={() => canGoNext && setExpandedPhoto(entryPhotos[expandedIndex + 1])}
-                                                    style={{
-                                                        position: 'absolute',
-                                                        top: 0,
-                                                        bottom: 0,
-                                                        right: 8,
-                                                        width: 44,
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        zIndex: 2,
-                                                        opacity: canGoNext ? 1 : 0.3,
-                                                        pointerEvents: canGoNext ? 'auto' : 'none',
-                                                    }}
-                                                    title='Next'
-                                                >
-                                                    ▶
+                                            <div className='containerDetail bg-dark mb-10'>
+                                                <div className='flexContainer centerVertical p-5'>
+                                                    <div
+                                                        className='button p-10 size20 color-soft'
+                                                        onClick={() => canGoPrev && setExpandedPhoto(entryPhotos[expandedIndex - 1])}
+                                                        style={{
+                                                            opacity: canGoPrev ? 1 : 0.3,
+                                                            pointerEvents: canGoPrev ? 'auto' : 'none',
+                                                            minWidth: 48,
+                                                            textAlign: 'center',
+                                                        }}
+                                                        title='Previous'
+                                                    >
+                                                        ◀
+                                                    </div>
+                                                    <div className='color-soft size12 contentCenter' style={{ flex: 1 }}>
+                                                        {expandedPhoto.name} ({expandedIndex + 1} / {entryPhotos.length})
+                                                    </div>
+                                                    <div
+                                                        className='button p-10 size20 color-soft'
+                                                        onClick={() => canGoNext && setExpandedPhoto(entryPhotos[expandedIndex + 1])}
+                                                        style={{
+                                                            opacity: canGoNext ? 1 : 0.3,
+                                                            pointerEvents: canGoNext ? 'auto' : 'none',
+                                                            minWidth: 48,
+                                                            textAlign: 'center',
+                                                        }}
+                                                        title='Next'
+                                                    >
+                                                        ▶
+                                                    </div>
                                                 </div>
                                                 <img
                                                     src={expandedPhoto.url}
                                                     alt={expandedPhoto.name}
                                                     style={{
-                                                        width: 'calc(100% - 96px)',
-                                                        maxWidth: 960,
+                                                        width: '100%',
                                                         height: 'auto',
                                                         margin: '0 auto',
                                                         display: 'block',
                                                         borderRadius: 4,
                                                     }}
                                                 />
-                                                <div className='color-soft size12 p-5 contentCenter'>
-                                                    {expandedPhoto.name} ({expandedIndex + 1} / {entryPhotos.length})
-                                                </div>
                                             </div>
                                         );
                                     })()}

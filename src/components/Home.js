@@ -1,3 +1,4 @@
+// import TipCalculator from './finance/TipCalculator';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import Selector from './forms/FunctionalSelector';
@@ -21,6 +22,7 @@ const MENUS_INIT = {
     "SurfDasboard",
     "Sets",
     "TicTacToe",
+    "Pacman",
     //"CrosswordPuzzle",
     "Roulette",
     "BlackJack",
@@ -30,8 +32,13 @@ const MENUS_INIT = {
     "WheelOfFortune",
     "News", // Added News to play menu
     "Water",
+    "Cafe",
+    "Eat",
     "Music",
-    "Grocery"
+    "Grocery",
+    "Lumber",
+    "Concrete",
+    "THD",
   ],
   train: [
     "TrainingLog",
@@ -45,6 +52,7 @@ const MENUS_INIT = {
     "Fuel",
     "Camp",
     "Parks",
+    "City",
     "Moon",
     "PhotoAssistant",
     "Notes",
@@ -72,6 +80,7 @@ const MENUS_INIT = {
     "TrainingLog",
     "Fuel",
     "Parks",
+    "City",
     "PhotoAssistant",
     "Expenses",
     "Interest",
@@ -119,6 +128,7 @@ const MENUS_INIT = {
     "Scores",
     "Fuel",
     "Parks",
+    "City",
     "PhotoAssistant",
     "Notes",
     "Links",
@@ -135,9 +145,12 @@ const MENUS_INIT = {
     "Tide",
     "Buoys",
     "Camp",
+    "City",
     "Scheduler",
     "Mortgage",
     "Shop",
+    "Concrete",
+    "THD",
     "Vote",
     "House",
     "Cook",
@@ -312,7 +325,7 @@ const Home = () => {
     }
     // If no menus found, set to default
     if (Object.keys(mergedMenus).length === 0)
-    setMenus();
+      setMenus();
     setShowCalc(false);
     // Redirect to /reactor/home if needed
     const timer = setTimeout(() => {
@@ -486,112 +499,123 @@ const Home = () => {
     setSelectedApps([]);
   };
 
+  // Get background color from appAppearanceSettings in localStorage
+  let appBg = undefined;
+  try {
+    const appAppearanceSettings = JSON.parse(localStorage.getItem('appAppearanceSettings'));
+    appBg = appAppearanceSettings?.colors?.background;
+  } catch { }
+
   return (
-    <div>
-      {!firstTime 
+    <div style={{ background: appBg || undefined }}>
+      {!firstTime
         ? (
-        <div className='containerDetail p-10 color-lite bg-lite mt-5 ml-10 mr-10'>
-          <div className='relative containerDetail p-10 m-5 flexContainer bg-dark h-scroll'>
-            {quickMenuButtons}
-          </div>
-          <div className='containerBox mr-10 pr-10'>
-            <div className='pl-10 pr-10 pb-10 size30 bold color-yellow'>Let's Go!</div>
-            <div className='pl-10 pr-10 size20'>Personal goals tools</div>
-            <div className='pl-10 pr-10 size12 i'>
-              play, train, track, convert, schedule, document, reflect, simplify and improve
+          <div className='containerDetail p-10 mt-10 color-lite ml-10 mr-10'>
+            <div className='relative containerDetail p-10 m-5 flexContainer bg-dark h-scroll'>
+              {quickMenuButtons}
+            </div>
+            <div className='containerBox mr-10 pr-10'>
+              <div className='pl-10 pr-10 pb-10 size30 bold color-yellow'>
+                Let's Go!
+              </div>
+              <div className='pl-10 pr-10 size20'>
+                Personal goals tools
+              </div>
+              <div className='pl-10 pr-10 size12 i'>
+                play, train, track, convert, schedule, document, reflect, simplify and improve
+              </div>
+            </div>
+            <input
+              id='home-app-search'
+              name='home-app-search'
+              className='containerBox color-lite bg-dark width--10'
+              type='text'
+              placeholder={'Find an app...'}
+              value={appSearch}
+              onChange={(e) => setAppSearch(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && e.preventDefault()}
+            />
+            <div className='containerBox'>
+              {addCategoryDialog && (
+                <div className='containerBox bg-lite color-dark'>
+                  <div className='containerDetail mb-5 contentLeft p-15 color-yellow'>
+                    {editCategory ? 'Edit category' : 'Add category'}
+                  </div>
+                  <input
+                    id='category'
+                    name='category'
+                    className='containerDetail columnLeftAlign width-100-percent color-lite p-10 mt-5'
+                    type='text'
+                    placeholder='Category'
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                  />
+                  <div className='containerDetail mt-5  mb-5 contentLeft p-15 color-yellow'>
+                    Activate apps for {newCategory}
+                  </div>
+                  <div className='containerDetail ht-120 x-scroll-only'>
+                    <div className='content-width-fit'>
+                      {selectableAppButtons}
+                    </div>
+                  </div>
+                  <div className='containerBox flexContainer'>
+                    <div className='flex3Column button containerBox bg-green' onClick={editCategory ? saveEditedCategory : addNewCategory}>
+                      save
+                    </div>
+                    <div className='flex3Column button containerBox bg-dkYellow' onClick={() => setAddCategoryDialog(false)}>
+                      cancel
+                    </div>
+                    <div className='flex3Column button containerBox bg-dkRed' onClick={() => deleteCategory()}>
+                      🗑️
+                    </div>
+                  </div>
+                </div>
+              )}
+              {!addCategoryDialog && (
+                <div className='flexContainer mr-10 pr-10'>
+                  <div className='flex2Column pr-10'>
+                    <Selector
+                      groupTitle='sort'
+                      label='sort:'
+                      items={categories}
+                      selected={categorySort}
+                      onChange={selectSort}
+                    />
+                  </div>
+                  <div className='containerDetail p-15 m-5 size30 flexColumn button bg-lite' onClick={() => setEditCategory(prev => !prev)}>
+                    ✏️
+                  </div>
+                  <div className='containerDetail p-15 m-5 size30 flexColumn button bg-green' onClick={() => setAddCategoryDialog(true)}>
+                    ➕
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-          <input
-            id='home-app-search'
-            name='home-app-search'
-            className='containerBox color-lite bg-dark width--10'
-            type='text'
-            placeholder={'Find an app...'}
-            value={appSearch}
-            onChange={(e) => setAppSearch(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && e.preventDefault()}
-          />
-          <div className='containerBox'>
-            {addCategoryDialog && (
-              <div className='containerBox bg-lite color-dark'>
-                <div className='containerDetail mb-5 contentLeft p-15 color-yellow'>
-                  {editCategory ? 'Edit category' : 'Add category'}
-                </div>
-                <input
-                  id='category'
-                  name='category'
-                  className='containerDetail columnLeftAlign width-100-percent color-lite p-10 mt-5'
-                  type='text'
-                  placeholder='Category'
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                />
-                <div className='containerDetail mt-5  mb-5 contentLeft p-15 color-yellow'>
-                  Activate apps for {newCategory}
-                </div>
-                <div className='containerDetail ht-120 x-scroll-only'>
-                  <div className='content-width-fit'>
-                    {selectableAppButtons}
-                  </div>
-                </div>
-                <div className='containerBox flexContainer'>
-                  <div className='flex3Column button containerBox bg-green' onClick={editCategory ? saveEditedCategory : addNewCategory}>
-                    save
-                  </div>
-                  <div className='flex3Column button containerBox bg-dkYellow' onClick={() => setAddCategoryDialog(false)}>
-                    cancel
-                  </div>
-                  <div className='flex3Column button containerBox bg-dkRed' onClick={() => deleteCategory()}>
-                    🗑️
-                  </div>
-                </div>
-              </div>
-            )}
-            {!addCategoryDialog && (
-              <div className='flexContainer mr-10 pr-10'>
-                <div className='flex2Column pr-10'>
-                  <Selector
-                    groupTitle='sort'
-                    label='sort:'
-                    items={categories}
-                    selected={categorySort}
-                    onChange={selectSort}
-                  />
-                </div>
-                  <div className='containerDetail p-15 m-5 size30 flexColumn button bg-lite' onClick={() => setEditCategory(prev => !prev)}>
-                  ✏️
-                </div>
-                <div className='containerDetail p-15 m-5 size30 flexColumn button bg-green' onClick={() => setAddCategoryDialog(true)}>
-                  ➕
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      ) : (
-        <div className='containerBox size20 bold'>
-          {/* 
+        ) : (
+          <div className='containerBox size20 bold'>
+            {/* 
           <Geolocator
             currentPositionExists='false'
             returnCurrentPosition={updateCurrentLocation}
           /> 
           */}
-          <div className='containerDetail p-10 m-5 flexContainer bg-dark h-scroll'>
-            {firstTimeButtons}
+            <div className='containerDetail p-10 m-5 flexContainer bg-dark h-scroll'>
+              {firstTimeButtons}
+            </div>
+            <div className='containerBox bg-green'>
+              <Timer />
+            </div>
           </div>
-          <div className='containerBox bg-green'>
-            <Timer />
-          </div>
-        </div>
-      )}
+        )}
       <div className='containerBoxNoPad waveBackground bg-dark width-100-20 mt-10'>
         <div className='containerFade'>
           <div className='menu-container containerBox'>
             {
               //NavItems
               (filteredMenuItems.length > 0)
-              ? portraitMenuButtons
-              : 'No apps found'
+                ? portraitMenuButtons
+                : 'No apps found'
             }
           </div>
         </div>

@@ -235,6 +235,10 @@ const CookMenu = ({ recipes }) => {
     }, [searchFilteredItems, getInventoryStateByName]);
 
     const filteredItems = useMemo(() => {
+        if (isMenuCollapsed) {
+            return [];
+        }
+
         let visible = [...menuWithAvailability];
 
         if (showMakeableOnly) {
@@ -248,13 +252,17 @@ const CookMenu = ({ recipes }) => {
 
             return left.dish.localeCompare(right.dish);
         });
-    }, [menuWithAvailability, showMakeableOnly]);
+    }, [isMenuCollapsed, menuWithAvailability, showMakeableOnly]);
 
     const summary = useMemo(() => {
+        if (isMenuCollapsed) {
+            return { total: 0, makeable: 0 };
+        }
+
         const total = searchFilteredItems.length;
         const makeable = menuWithAvailability.filter((item) => item.isMakeable).length;
         return { total, makeable };
-    }, [menuWithAvailability, searchFilteredItems]);
+    }, [isMenuCollapsed, menuWithAvailability, searchFilteredItems]);
 
     const isIngredientsCollapsed = (itemId) => ingredientsCollapsedById[itemId] !== false;
 

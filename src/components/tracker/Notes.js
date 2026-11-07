@@ -2,11 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import AddProjectInterface from './AddProjectInterface';
 import TrackNote from './TrackNote';
 import initNoteTracking from './initNoteTracking';
-import mobileRecipeTracking from './data_mobile';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
 import icons from '../site/icons';
 import initializeData from '../utils/InitializeData';
-import validate from '../utils/validate';
 
 const Notes = () => {
 
@@ -14,8 +12,7 @@ const Notes = () => {
     const [initialized, setInitialized] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState();
     const [newProjectDescription, setNewProjectDescription] = useState('');
-    const [recipes] = useState(initializeData('recipeTracking', mobileRecipeTracking));
-
+    
     const targetElementRef = useRef(null);
 
     const scrollToBottom = () => {
@@ -24,145 +21,6 @@ const Notes = () => {
             //targetElementRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
     };
-    const getIngredients = () => {
-        const newIngredients = [];
-        recipes.forEach((recipeGroup) => {
-            if (!recipeGroup.isCollapsed) {
-                recipeGroup.recipes.forEach((recipe) => {
-                    if (!recipe.isCollapsed && recipe.ingredients && recipe.ingredients.length > 0) {
-                        recipe.ingredients.forEach((ingredient) => {
-                            newIngredients.push(ingredient);
-                        });
-                    }
-                });
-            }
-        });
-        const removeDuplicates = (array) => [...new Set(array)];
-        //const getAllIngredients = () => initializeData('ingredients', [['salt', 'salt', 'salt']]);
-        const removeables = [
-            'peeled',
-            'for',
-            'halved',
-            'garnish',
-            'optional',
-            'seeded',
-            //' and ', 
-            'sliced',
-            'warm',
-            'bruised',
-            'chopped',
-            'minced',
-            'boiling',
-            'thinly',
-            'sliced',
-            'head of',
-            'of ',
-            'or ',
-            'into ',
-            'chunks',
-            'mashed',
-            'crushed',
-            'crumbled',
-            'creamy',
-            'cooked',
-            'juiced',
-            'ribs removed',
-            'to your taste',
-            'leaves',
-            'stemmed',
-            'to taste',
-            'finely',
-            'take',
-            'whitesoft',
-            'part',
-            'squeezed its water',
-            'rinsed',
-            'pitted',
-            'and diced',
-            'diced',
-            'freshly',
-            'fresh',
-            '(grated)',
-            'grated',
-            'shredded)',
-            'shredded',
-            'quartered',
-            '(cut in half)',
-            'divided',
-            'adjust',
-            'head',
-            ':',
-            'ground',
-            '( )',
-            ' ()',
-            '()',
-            ',',
-            ' ,'
-        ]
-        const removeIt = (ingredient, extraWord) => {
-            return String(ingredient).replace(extraWord, '');
-        }
-        const removeExtraStuff = (ingredient) => {
-            const cleanIngredient = removeables.reduce((acc, word) => removeIt(acc, word), ingredient);
-            return cleanIngredient;
-        }
-        const ingredientLabel = (ingredient, index) => (ingredient[index] && (ingredient[index] !== '') && (ingredient[index] !== undefined)) ? String(ingredient[index]).toLowerCase() : '';
-        //const allIngredients = newIngredients.map(ingredient => (ingredientLabel(ingredient, 2) !== null) ? ingredientLabel(ingredient, 2) : (ingredientLabel(ingredient, 1) !== null) ? ingredientLabel(ingredient, 1) : (ingredientLabel(ingredient, 0) !== null) ? ingredientLabel(ingredient, 0) : 'salt');
-        const allIngredients = newIngredients.map(ingredient => `${ingredientLabel(ingredient, 2)} ${ingredientLabel(ingredient, 0)} ${ingredientLabel(ingredient, 1)}`);
-        const cleanedUpIngredients = allIngredients.map(ingredient => removeExtraStuff(ingredient));
-        const whiteSpace = cleanedUpIngredients.map(ingredient => ingredient.trim());
-        const sterilIngredients = removeDuplicates(whiteSpace);
-        const removeAndItems = (arr) => {
-            return arr.filter(item => !item.toLowerCase().startsWith('and'));
-        };
-        const removeParenthesisStart = (arr) => {
-            return arr.filter(item => !item.toLowerCase().startsWith('('));
-        };
-        const remove1InBeginning = (arr) => {
-            return arr.filter(item => !item.startsWith('1'));
-        };
-        const removeAInBeginning = (arr) => {
-            return arr.filter(item => !item.startsWith('a '));
-        };
-        const removeEmpty = (arr) => {
-            return arr.filter(item => item !== '');
-        };
-        const removeSingularIfPluralExists = (words) => {
-            const wordSet = new Set(words);
-            return words.filter(word => {
-                const pluralForm = word.endsWith('s') ? word : word + 's';
-                return !(wordSet.has(pluralForm) && !word.endsWith('s'));
-            });
-        };
-        const pluralPriority = removeSingularIfPluralExists(sterilIngredients);
-        const noAnd = removeAndItems(pluralPriority);
-        const sortAlphabetically = (arr) => {
-            return arr.sort((a, b) => a.localeCompare(b));
-        };
-        const parenthesisStart = removeParenthesisStart(noAnd);
-        const empty = removeEmpty(parenthesisStart)
-        const number1 = remove1InBeginning(empty)
-        const aStart = removeAInBeginning(number1)
-        const sorted = sortAlphabetically(aStart);
-        //setIngredients(sorted);
-        //localStorage.setItem('ingredients', JSON.stringify(ingredients));
-        //setIngredients(ingredients);
-        return sorted;
-    }
-
-    useEffect(() => {
-        if (recipes !== undefined) {
-            const ingredients = getIngredients();
-            if ((validate(ingredients) !== null) && (ingredients !== undefined)) {
-                localStorage.setItem('ingredients', JSON.stringify(ingredients));
-            }
-        }
-    }, [recipes]); // eslint-disable-line react-hooks/exhaustive-deps
-
-    useEffect(() => {
-        setNotes(initNoteTracking);
-    }, []);
-
     useEffect(() => {
         if (initialized) {
             const updatedTrackingData = Array.isArray(notes)

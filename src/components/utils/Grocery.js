@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import icons from '../site/icons';
+import { searchGooglePlacesText } from '../../services/providerApi';
 
 const GROCERY_PREFS_KEY = 'groceries-preferences-v1';
 const GROCERY_CACHE_KEY = 'groceries-cached-stores-v1';
 const MAP_PREFERENCE_AUTO = 'auto';
 const MAP_PREFERENCE_APPLE = 'apple';
 const MAP_PREFERENCE_GOOGLE = 'google';
-const GOOGLE_PLACES_API_KEY = process.env.REACT_APP_GOOGLE_PLACES_API_KEY || '';
 const OVERPASS_API = 'https://overpass-api.de/api/interpreter';
 
 const toRad = (value) => (value * Math.PI) / 180;
@@ -89,50 +89,22 @@ const Grocery = () => {
         const { lat, lon } = position;
         let foundStores = [];
         // Try Google Places API first
-        if (GOOGLE_PLACES_API_KEY) {
-            try {
-                const response = await fetch('https://places.googleapis.com/v1/places:searchText', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Goog-Api-Key': GOOGLE_PLACES_API_KEY,
-                        'X-Goog-FieldMask': [
-                            'places.id',
-                            'places.displayName',
-                            'places.formattedAddress',
-                            'places.location',
-                            'places.regularOpeningHours.openNow',
-                            'places.businessStatus',
-                            'places.types',
-                        ].join(','),
-                    },
-                    body: JSON.stringify({
-                        textQuery: 'grocery store',
-                        maxResultCount: 20,
-                        locationBias: {
-                            circle: {
-                                center: { latitude: lat, longitude: lon },
-                                radius: radiusMeters,
-                            },
-                        },
-                    }),
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    foundStores = (data?.places || []).map((place) => ({
-                        id: `google-${place.id}`,
-                        lat: Number(place?.location?.latitude),
-                        lon: Number(place?.location?.longitude),
-                        name: String(place?.displayName?.text || 'Grocery Store').trim(),
-                        address: String(place?.formattedAddress || '').trim(),
-                        openNow: Boolean(place?.regularOpeningHours?.openNow),
-                        types: place?.types || [],
-                        source: 'Google',
-                    }));
-                }
-            } catch (e) {
-                setStatus('Google Places API failed, trying OpenStreetMap...');
-            }
+        try {
+            const data = await searchGooglePlacesText({
+                textQuery: 'grocery store', lat, lon, radius: radiusMeters,
+            });
+            foundStores = (data?.places || []).map((place) => ({
+                id: `google-${place.id}`,
+                lat: Number(place?.location?.latitude),
+                lon: Number(place?.location?.longitude),
+                name: String(place?.displayName?.text || 'Grocery Store').trim(),
+                address: String(place?.formattedAddress || '').trim(),
+                openNow: Boolean(place?.regularOpeningHours?.openNow),
+                types: place?.types || [],
+                source: 'Google',
+            }));
+        } catch (e) {
+            setStatus('Google Places API failed, trying OpenStreetMap...');
         }
         // Fallback to Overpass API (OpenStreetMap)
         if (!foundStores.length) {

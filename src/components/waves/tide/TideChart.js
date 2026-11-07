@@ -8,7 +8,8 @@ import Spline from 'cubic-spline';
 import getKey from '../../utils/KeyGenerator';
 import Moon from '../../utils/Moon';
 import { getNearestTideStation } from '../api';
-
+import TideLocationSelector from './TideLocationSelector';
+import { requestProvider } from '../../../services/providerApi';
 const TideChart = ({
     standalone,
     lat,
@@ -20,20 +21,31 @@ const TideChart = ({
     const [tideData, setTideData] = useState(null);
     const [currentTide, setCurrentTide] = useState([0, 'up']);
     const [stationName, setStationName] = useState('');
+    const [location, setLocation] = useState({
+        station: null,
+        lat: lat || 32.87,
+        lon: lon || -117.26,
+        isCustom: false
+    });
     const time = useCurrentTime();
     const startTime = time[0].startTime;
     const endTime = time[0].endTime;
     const tideStartTime = time[0].tideStartTime;
     const tideEndTime = time[0].tideEndTime;
 
-    const hiloStation = useMemo(() => getNearestTideStation(lat || 32.87, lon || -117.26), [lat, lon]);
-    const waterLevelStation = useMemo(() => getNearestTideStation(lat || 32.87, lon || -117.26), [lat, lon]);
+    // Use selected station or nearest
+    const hiloStation = useMemo(() => location.isCustom ? { id: null, name: 'Custom', lat: location.lat, lon: location.lon } : (location.station || getNearestTideStation(location.lat, location.lon)), [location]);
+    const waterLevelStation = useMemo(() => location.isCustom ? { id: null, name: 'Custom', lat: location.lat, lon: location.lon } : (location.station || getNearestTideStation(location.lat, location.lon)), [location]);
 
     const tideNowLink = useMemo(() => (
-        `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${tideStartTime}&end_date=${tideEndTime}&station=${waterLevelStation.id}&product=water_level&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`
+        waterLevelStation.id
+            ? `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${tideStartTime}&end_date=${tideEndTime}&station=${waterLevelStation.id}&product=water_level&datum=mllw&units=english&time_zone=lst_ldt&application=web_services&format=json`
+            : null
     ), [tideStartTime, tideEndTime, waterLevelStation.id]);
     const significantTides = useMemo(() => (
-        `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=NOS.COOPS.TAC.WL&begin_date=${startTime}&end_date=${endTime}&datum=MLLW&station=${hiloStation.id}&time_zone=lst_ldt&units=english&interval=hilo&format=json`
+        hiloStation.id
+            ? `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=NOS.COOPS.TAC.WL&begin_date=${startTime}&end_date=${endTime}&datum=MLLW&station=${hiloStation.id}&time_zone=lst_ldt&units=english&interval=hilo&format=json`
+            : null
     ), [startTime, endTime, hiloStation.id]);
     
     console.log(`TideChart => time: ${JSON.stringify(time, null, 2)}`);
@@ -76,7 +88,40 @@ const TideChart = ({
         return interpolatedData;
     }, []);
     useEffect(() => {
-
+        // If custom coordinates, use WorldTides API
+        if (location.isCustom && location.lat && location.lon) {
+            const fetchWorldTides = async () => {
+                try {
+                    const data = await requestProvider('worldTides', {
+                        lat: location.lat,
+                        lon: location.lon,
+                    });
+                    // Convert WorldTides data to NOAA-like format for charting
+                    const predictions = (data.heights || []).map(h => ({
+                        t: h.date.replace('T', ' ').slice(0, 16),
+                        v: h.height.toFixed(2),
+                        type: ''
+                    }));
+                    const extremes = (data.extremes || []).map(e => ({
+                        t: e.date.replace('T', ' ').slice(0, 16),
+                        v: e.height.toFixed(2),
+                        type: e.type
+                    }));
+                    setTideNow({ predictions: extremes });
+                    setTideChart({ predictions });
+                    setStationName(`Lat: ${location.lat}, Lon: ${location.lon}`);
+                    localStorage.setItem('tideNow', JSON.stringify({ data, timestamp: new Date().getTime() }));
+                    localStorage.setItem('tideChart', JSON.stringify({ predictions, timestamp: new Date().getTime() }));
+                } catch (error) {
+                    setTideChart(null);
+                    setTideNow(null);
+                }
+            };
+            fetchWorldTides();
+            return;
+        }
+        // Default: NOAA for US stations
+        if (!significantTides) return;
         const fetchData = async () => {
             try {
                 const response = await fetch(significantTides);
@@ -100,7 +145,7 @@ const TideChart = ({
             }
         };
         fetchData();
-    }, [significantTides, interpolateTides]);
+    }, [significantTides, interpolateTides, location]);
 
     useEffect(() => {
         localStorage.setItem('currentTide', currentTide[0]);
@@ -140,8 +185,7 @@ const TideChart = ({
     }, []);
 
     useEffect(() => {
-        if (validate(tideChart) !== null) {
-
+        if (validate(tideChart) !== null && tideNowLink) {
             const fetchData = async () => {
                 try {
                     const response = await fetch(tideNowLink);
@@ -157,7 +201,6 @@ const TideChart = ({
                 }
             };
             fetchData();
-
         }
     }, [tideChart, tideNowLink, getClosestValue]);
     const getNextTideIndex = () => {
@@ -184,6 +227,7 @@ const TideChart = ({
     
     return (
         <div className='containerDetail color-lite mt--30'>
+            <TideLocationSelector onSelect={setLocation} />
             {
                 (tideChart && tideData && tideNow)
                 ? <div className='containerDetail p-5 bg-lite r-10 size20'>

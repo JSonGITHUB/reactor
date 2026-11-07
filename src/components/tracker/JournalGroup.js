@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLayout } from '../utils/LayoutContext';
 import icons from '../site/icons';
 import Journal from './Journal';
 import CollapseToggleButton from '../utils/CollapseToggleButton';
@@ -67,9 +68,19 @@ const JournalGroup = ({
         //setScroll(journalGroupIndex * 50);
         scrollToBottom(elementRef);
     }
-    return <div key={`journal-group-${journalGroupIndex}-${String(journalGroup?.title || 'group')}`} className='mt-5' ref={targetElementRef}>
+    const layout = useLayout();
+    const appBg = layout?.colors?.background;
+    const appPrimaryColor = layout?.colors?.primary;
+    const headerBackground = layout?.colors?.headerBackground;
+
+    return <div 
+                key={`journal-group-${journalGroupIndex}-${String(journalGroup?.title || 'group')}`} 
+                className='mt-5' 
+                ref={targetElementRef} 
+                style={{ background: appBg }}
+            >
                 {/*<div className='containerDetail'>*/}
-                    <div className='containerDetail flexContainer'>
+                    <div className='containerDetail flexContainer' style={{ background: headerBackground, color: appPrimaryColor }}>
                         <div className='flex1Auto'>
                             {
                                 (isEditedJournalGroupTitle())
@@ -96,7 +107,7 @@ const JournalGroup = ({
                                         </span>
                                     </div>
                                 </div>
-                                : <div className='centerVertical color-yellow'>
+                                : <div className='centerVertical color-yellow' style={{ color: appPrimaryColor }}>
                                     <CollapseToggleButton
                                         title={journalGroup?.title}
                                         isCollapsed={isCollapsed}
@@ -142,17 +153,20 @@ const JournalGroup = ({
                             (isCollapsed) 
                             ? null
                             : (sort)
-                                ? journalGroup.journal.slice().reverse().map((journal, journalIndex, array) => (
-                                        <div key={`journal-container-sorted-${journalGroupIndex}-${array.length - 1 - journalIndex}-${String(journal?.description || 'journal')}`}>
-                                            <Journal
-                                                journals={journals}
-                                                setJournals={setJournals}
-                                                journalGroupIndex={journalGroupIndex} 
-                                                journalIndex={journalIndex}
-                                                journal={journal}
-                                            />
-                                        </div>
-                                    ))
+                                ? journalGroup.journal.slice().reverse().map((journal, visualIndex, array) => {
+                                        const actualIndex = array.length - 1 - visualIndex;
+                                        return (
+                                            <div key={`journal-container-sorted-${journalGroupIndex}-${actualIndex}-${String(journal?.description || 'journal')}`}>
+                                                <Journal
+                                                    journals={journals}
+                                                    setJournals={setJournals}
+                                                    journalGroupIndex={journalGroupIndex}
+                                                    journalIndex={actualIndex}
+                                                    journal={journal}
+                                                />
+                                            </div>
+                                        );
+                                    })
                                 : journalGroup.journals.map((journal, journalIndex) => (
                                     <div key={`journal-container-${journalGroupIndex}-${journalIndex}-${String(journal?.description || 'journal')}`}>
                                         <Journal

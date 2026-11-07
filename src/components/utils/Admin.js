@@ -3,8 +3,10 @@ import { useHistory } from 'react-router-dom';
 import initializeData from '../utils/InitializeData';
 import LocalStorageImporter from './LocalStorageImporter';
 import NavItems from '../site/NavItems';
+import AppAppearanceDialog from './AppAppearanceDialog';
 
 const Admin = () => {
+
     const history = useHistory();
     const demoActiveKey = 'reactorAdminDemoActive';
     const demoTimerKey = '__reactorAdminDemoTimer';
@@ -16,9 +18,11 @@ const Admin = () => {
     const [message, setMessage] = useState(null);
     const [editableData, setEditableData] = useState('');
     const [isDemoRunning, setIsDemoRunning] = useState(false);
+    const [showDataInterface, setShowDataInterface] = useState(false);
+    const placeholderKey = 'Select a key';
 
     const localDataItems = [
-        'Select a key',
+        placeholderKey,
         'tideChart',
         'wind',
         'isWind',
@@ -50,6 +54,7 @@ const Admin = () => {
         'elapsedTime',
         'stopwatchStartTime',
         'stopwatchPause',
+        'range',
         'distance',
         'latitude',
         'longitude',
@@ -202,24 +207,17 @@ const Admin = () => {
             const displayData = (startsWithBracket(storedData))
             ? JSON.stringify(storedData, null, 2)
             : storedData;
-            //const formattedData = storedData
-            /*const formattedData = displayData
-                .replace(/,/g, ',\n')
-                .replace(/}/g, '\n}')
-                .replace(/{/g, '\n{\n')
-                .replace(/]/g, ']\n')
-                .replace(/\[/g, '[\n');
-            */
-            //setData(formattedData);
             setMessage(null);
             setData(displayData);
         } else {
+            setData('');
             setMessage(`No data found for ${key}.`);
         }
     };
     const handleNew = () => {
         const storedData = initializeData(key, null);
         if (storedData) {
+            setData('');
             setMessage(`Data already exists for ${key}.`);
         } else {
             const displayData = JSON.stringify(defaultData, null, 2);
@@ -231,7 +229,7 @@ const Admin = () => {
     const handleRemove = () => {
         localStorage.removeItem(key);
         setMessage(`Data for key '${key}' has been removed.`);
-        setData(null);
+        setData('');
         setEditableData('');
     };
     
@@ -240,19 +238,19 @@ const Admin = () => {
         localStorage.removeItem('NavItemsMeta');
         localStorage.removeItem('menuItems');
         setMessage(`Data for menus, NavItemsMeta, and menuItems has been removed.`);
-        setData(null);
+        setData('');
         setEditableData('');
     };
 
     const handleEdit = () => {
         localStorage.setItem(key, data);
-        setData(null);
+        setData('');
         setEditableData('');
         setMessage(`Changes have been saved to ${key}`);
     };
     const handleAdd = () => {
         localStorage.setItem(key, data);
-        setData(null);
+        setData('');
         setEditableData('');
         setMessage(`${key} has been added to localStorage`);
     };
@@ -270,10 +268,16 @@ const Admin = () => {
         setEditableData('');
     };
 
+    const isValidKey = (value) => {
+        const normalized = String(value || '').trim();
+        return normalized !== '' && normalized !== placeholderKey;
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (key.trim() === '') {
-            alert('Please enter a localStorage key.');
+        if (!isValidKey(key)) {
+            setData('');
+            setMessage('Please select or enter a localStorage key.');
             return;
         }
         if (action === 'view') {
@@ -288,113 +292,157 @@ const Admin = () => {
     };
     return (
         <div className='mt--30'>
-            <form className='containerBox' onSubmit={handleSubmit}>
-                <div className='containerBox bg-lite'>
-                    <h2>Admin Tool</h2>
+            <form className='containerDetail' onSubmit={handleSubmit}>
+                <div className='containerDetail bg-lite contentLeft p-20 size20 color-yellow mb-5'>
+                    Admin Tool
                 </div>
-                <div>
-                    <div className='containerBox p-20 bold'>LocalStorage</div>
-                    <label>
-                        <select
-                            className='containerBox width--10'
-                            value={key}
-                            onChange={handleKeyChange}
-                        >
-                            {
-                                localDataItems.map((itemKey, index) => (
-                                    <option key={`${itemKey}-${index}`} value={itemKey}>{itemKey}</option>
-                                ))
-                            }
-                        </select>
-                        <div className='flexContainer'>
-                            <div className='containerBox flex9Column contentRight'>
-                                Key:
+                <AppAppearanceDialog 
+                    open={true}
+                    onClose={() => console.log('AppAppearanceDialog closed')}
+                    onApply={() => console.log('AppAppearanceDialog apply')}
+                />
+                <div
+                    className='containerDetail button color-lite contentLeft mt-5 bg-blue p-20 size20'
+                    aria-expanded={showDataInterface}
+                    aria-controls='data-interface-section'
+                    onClick={() => setShowDataInterface((prev) => !prev)}
+                >
+                    {showDataInterface ? '▼' : '►'} Data Interface
+                </div>
+                {showDataInterface && (
+                    <div id='data-interface-section' className='containerDetail contentLeft bg-lite p-10 mt-5'>
+                        <div>
+                            <div className='containerDetail p-20 bold color-lite size20 bg-lite'>
+                                LocalStorage
                             </div>
-                            <input
-                                id='key'
-                                name='key'
-                                className='containerBox flex2Column'
-                                type='text'
-                                value={key}
-                                onChange={(e) => setKey(e.target.value)}
-                            />
+                            <label>
+                                <select
+                                    className='containerDetail width-100-percent width--5 color-lite p-20 size20 mb-5'
+                                    value={key}
+                                    onChange={handleKeyChange}
+                                    aria-label='Select a localStorage key'
+                                >
+                                    {
+                                        localDataItems.map((itemKey, index) => (
+                                            <option key={`${itemKey}-${index}`} value={itemKey === placeholderKey ? '' : itemKey}>{itemKey}</option>
+                                        ))
+                                    }
+                                </select>
+                                <div className='flexContainer mt-5'>
+                                    <div className='containerDetail flex9Column contentRight bg-lite color-lite p-20 size20'>
+                                        Key:
+                                    </div>
+                                    <input
+                                        id='key'
+                                        name='key'
+                                        className='containerDetail flex2Column color-lite p-20 size20 ml-5'
+                                        type='text'
+                                        value={key}
+                                        onChange={(e) => setKey(e.target.value)}
+                                        aria-label='LocalStorage key'
+                                    />
+                                </div>
+                            </label>
                         </div>
-                    </label>
-                </div>
-                <label className='flexContainer'>
-                    <div className='containerBox flex9Column contentRight'>
-                        Action:
+                        <label className='flexContainer mt-10'>
+                            <div className='containerDetail flex9Column contentRight bg-lite color-lite p-20 size20 mt--5'>
+                                Action:
+                            </div>
+                            <select
+                                className='containerDetail flex2Column color-lite p-20 size20 mt--5'
+                                value={action}
+                                onChange={handleActionChange}
+                                aria-label='Choose data action'
+                            >
+                                <option value='view'>View</option>
+                                <option value='edit'>Edit</option>
+                                <option value='add'>Add</option>
+                                <option value='remove'>Remove</option>
+                            </select>
+                        </label>
+                        <button
+                            type='submit'
+                            className='containerDetail button width--5 ml-2 bg-green contentLeft color-lite p-20 size20 mt-10'
+                            aria-label='Run selected Admin action'
+                        >
+                            Select
+                        </button>
                     </div>
-                    <select
-                        className='containerBox flex2Column'
-                        value={action}
-                        onChange={handleActionChange}
-                    >
-                        <option value='view'>View</option>
-                        <option value='edit'>Edit</option>
-                        <option value='add'>Add</option>
-                        <option value='remove'>Remove</option>
-                    </select>
-                </label>
-                <button className='containerBox button width-100-percent bg-green' type='submit'>Select</button>
-                <button className='containerBox button width-100-percent bg-red' type='button' onClick={handleRemoveMenuSystem}>🗑️ Remove Menu System Data</button>
+                )}
+                {/* Data display and edit/add UI, only show if Data Interface is open */}
+                {showDataInterface && action === 'view' && data !== null && (
+                    <div className='containerDetail width-100-percent contentLeft' >
+                        <h3 className='pt-10 color-yellow ml-10'>View Data</h3>
+                        <textarea
+                            className='containerDetail width-100-percent'
+                            rows='10'
+                            cols='50'
+                            value={data}
+                            readOnly
+                            aria-label='View localStorage data'
+                        />
+                    </div>
+                )}
+
+                {showDataInterface && action === 'edit' && data !== null && (
+                    <div className='containerDetail width-100-percent contentLeft' >
+                        <h3 className='pt-10 color-yellow ml-10'>Edit Data</h3>
+                        <textarea
+                            className='containerDetail width-100-percent'
+                            rows='10'
+                            cols='50'
+                            value={data}
+                            onChange={(e) => setData(e.target.value)}
+                            aria-label='Edit localStorage data'
+                        />
+                        <br />
+                        <button type='button' className='containerDetail button width--10 ml-5 mr-5 bg-green size20 p-20 mt-10' onClick={handleEdit}>
+                            Save Changes
+                        </button>
+                    </div>
+                )}
+                {showDataInterface && action === 'add' && data !== null && (
+                    <div className='containerDetail width-100-percent contentLeft' >
+                        <h3 className='pt-10 color-yellow ml-10'>Add Data</h3>
+                        <textarea
+                            className='containerDetail width-100-percent'
+                            rows='10'
+                            cols='50'
+                            value={data}
+                            onChange={(e) => setData(e.target.value)}
+                            aria-label='Add localStorage data'
+                        />
+                        <br />
+                        <button type='button' className='containerDetail button width-100-percent bg-green' onClick={handleAdd}>Add Data</button>
+                    </div>
+                )}
+                {/* Always visible controls */}
+                <button
+                    type='button'
+                    className='containerDetail button bg-red color-lite contentLeft p-20 size20 mt-5 mb-5 width--5 ml--5 mr--5'
+                    onClick={handleRemoveMenuSystem}
+                >
+                    🗑️ Remove Menu System Data
+                </button>
                 {isDemoRunning
                     ? <button
-                        className='containerBox button width-100-percent bg-red'
+                        className='containerDetail button width--5 ml--5 mr--5 bg-red color-lite contentLeft p-20 size20'
                         type='button'
                         onClick={() => { stopDemo(); setMessage('⏹️ Demo stopped.'); }}
                     >
                         ⏹️ Stop Demo
                     </button>
                     : <button
-                        className='containerBox button width-100-percent bg-green'
                         type='button'
+                        className='containerDetail button bg-green color-lite contentLeft p-20 size20 width--5 ml--5 mr--5'
                         onClick={startDemo}
                     >
                         ▶️ Demo
                     </button>
                 }
             </form>
-
-            {action === 'view' && data && (
-                <div className='containerBox width-100-percent'>
-                    <h3>View Data</h3>
-                    <pre className='containerBox width-100-percent contentLeft'>
-                        {data}
-                    </pre>
-                </div>
-            )}
-
-            {action === 'edit' && data && (
-                <div className='containerBox width-100-percent'>
-                    <h3>Edit Data</h3>
-                    <textarea
-                        className='containerBox width-100-percent' 
-                        rows='10'
-                        cols='50'
-                        value={data}
-                        onChange={(e) => setData(e.target.value)}
-                    />
-                    <br />
-                    <div className='containerBox button width-100-percent bg-green' onClick={handleEdit}>Save Changes</div>
-                </div>
-            )}
-            {action === 'add' && data && (
-                <div className='containerBox width-100-percent' >
-                    <h3>Add Data</h3>
-                    <textarea
-                        className='containerBox width-100-percent' 
-                        rows='10'
-                        cols='50'
-                        value={data}
-                        onChange={(e) => setData(e.target.value)}
-                    />
-                    <br />
-                    <div className='containerBox button width-100-percent bg-green'  onClick={handleAdd}>Add Data</div>
-                </div>
-            )}
             {message && (
-                <div className='containerBox width-100-percent color-neogreen'>
+                <div className='containerDetail width-100-percent color-neogreen'>
                     <h3>{message}</h3>
                 </div>
             )}

@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import icons from '../site/icons';
+import { requestProvider } from '../../services/providerApi';
 
 const E_STATION_PREFS_KEY = 'estation-preferences-v1';
 const E_STATION_CACHE_KEY = 'estation-cached-stations-v1';
 const MAP_PREFERENCE_AUTO = 'auto';
 const MAP_PREFERENCE_APPLE = 'apple';
 const MAP_PREFERENCE_GOOGLE = 'google';
+const OVERPASS_API = 'https://overpass-api.de/api/interpreter';
 
 const stations = [
 ];
@@ -63,6 +65,32 @@ const dedupeStations = (stationList) => {
     });
 };
 
+const fetchJsonWithTimeout = async (url, options = {}, timeoutMs = 12000) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+        const response = await fetch(url, { ...options, signal: controller.signal });
+        if (!response.ok) {
+            throw new Error(`Request failed with ${response.status}`);
+        }
+        return response.json();
+    } finally {
+        clearTimeout(timer);
+    }
+};
+
+const withRetry = async (fn, retries = 1) => {
+    let lastError;
+    for (let attempt = 0; attempt <= retries; attempt++) {
+        try {
+            return await fn();
+        } catch (error) {
+            lastError = error;
+        }
+    }
+    throw lastError;
+};
+
 const isIPhoneDevice = () => {
     if (typeof navigator === 'undefined') return false;
     return /iphone/i.test(navigator.userAgent || '');
@@ -79,9 +107,8 @@ const EStation = () => {
     const [liveStations, setLiveStations] = useState([]);
     const [cachedLiveStations, setCachedLiveStations] = useState([]);
     const [isLoadingStations, setIsLoadingStations] = useState(false);
-    const openChargeMapApiKey = process.env.REACT_APP_OCM_API_KEY;
-    const nrelApiKey = process.env.REACT_APP_NREL_API_KEY || 'DEMO_KEY';
-
+    const [dataSourceLabel, setDataSourceLabel] = useState('');
+    const [fetchAttemptSummary, setFetchAttemptSummary] = useState('');
     useEffect(() => {
         try {
             const stored = localStorage.getItem(E_STATION_PREFS_KEY);
@@ -190,144 +217,202 @@ const EStation = () => {
         };
     };
 
-    const fetchFromOpenChargeMap = async (lat, lon) => {
-        const query = new URLSearchParams({
-            output: 'json',
-            countrycode: 'US',
-            latitude: String(lat),
-            longitude: String(lon),
-            distance: '50',
-            distanceunit: 'KM',
-            maxresults: '30',
-            compact: 'true',
-            verbose: 'false'
-        });
+    const toLocalStationFromOverpass = (element) => {
+        const lat = Number(element?.lat || element?.center?.lat) || 0;
+        const lon = Number(element?.lon || element?.center?.lon) || 0;
+        const tags = element?.tags || {};
+        const socketFields = Object.keys(tags).filter((key) => key.startsWith('socket:') && !key.includes(':output'));
+        const parsedConnectors = socketFields
+            .filter((key) => String(tags[key] || '').toLowerCase() !== 'no')
+            .map((key) => key.replace('socket:', '').replace(/_/g, ' '));
+        const connectors = parsedConnectors.length > 0 ? parsedConnectors : ['Unknown'];
 
-        const headers = openChargeMapApiKey
-            ? { 'X-API-Key': openChargeMapApiKey }
-            : undefined;
-        const response = await fetch(`https://api.openchargemap.io/v3/poi/?${query.toString()}`, { headers });
-        if (!response.ok) {
-            throw new Error(`Open Charge Map request failed with ${response.status}`);
-        }
-        const payload = await response.json();
+        const outputText = [
+            tags['socket:output'],
+            tags['socket:type2:output'],
+            tags['socket:chademo:output'],
+            tags['socket:tesla_supercharger:output'],
+            tags['socket:ccs:output'],
+            tags['max_power']
+        ].filter(Boolean).join(' ').toLowerCase();
+
+        let powerKw = 0;
+        const outputMatch = outputText.match(/(\d+(?:\.\d+)?)\s*kw/);
+        if (outputMatch) powerKw = Number(outputMatch[1]) || 0;
+
+        const fastCharge = powerKw >= 100 || /fast|rapid|ultra|supercharger|dc/.test(outputText);
+
+        return {
+            id: `osm-${element?.type || 'node'}-${element?.id || Math.random()}`,
+            name: tags?.name || 'Charging Station',
+            network: tags?.operator || tags?.brand || 'Unknown Network',
+            lat,
+            lon,
+            powerKw,
+            connectors,
+            open24h: /24\/?7|24 hours|24h/i.test(String(tags?.opening_hours || '')),
+            amenities: inferAmenityTags([
+                tags?.name,
+                tags?.operator,
+                tags?.brand,
+                tags?.amenity,
+                tags?.description,
+                tags?.access
+            ].filter(Boolean).join(' ')),
+            fastCharge
+        };
+    };
+
+    const fetchFromOpenChargeMap = async (lat, lon) => {
+        const payload = await withRetry(
+            () => requestProvider('openChargeMap', { lat, lon }),
+            1
+        );
         return Array.isArray(payload)
             ? payload.map(toLocalStation).filter((station) => station.lat && station.lon)
             : [];
     };
 
-    const fetchFromNrelNearest = async (lat, lon) => {
-        const query = new URLSearchParams({
-            api_key: nrelApiKey,
-            fuel_type: 'ELEC',
-            latitude: String(lat),
-            longitude: String(lon),
-            radius: '50',
-            limit: '40',
-            status: 'E'
-        });
-        const response = await fetch(`https://developer.nrel.gov/api/alt-fuel-stations/v1/nearest.json?${query.toString()}`);
-        if (!response.ok) {
-            throw new Error(`NREL nearest request failed with ${response.status}`);
-        }
-        const payload = await response.json();
+    const fetchFromNrelNearest = async (lat, lon, radiusMiles = 50, limit = 40) => {
+        const payload = await withRetry(
+            () => requestProvider('nrel', { lat, lon, radius: radiusMiles }),
+            1
+        );
         const stationsPayload = Array.isArray(payload?.fuel_stations) ? payload.fuel_stations : [];
         return stationsPayload.map(toLocalStationFromNrel).filter((station) => station.lat && station.lon);
     };
 
-    const fetchFromNrelState = async (stateCode) => {
-        const query = new URLSearchParams({
-            api_key: nrelApiKey,
-            fuel_type: 'ELEC',
-            state: stateCode,
-            limit: '80',
-            status: 'E'
-        });
-        const response = await fetch(`https://developer.nrel.gov/api/alt-fuel-stations/v1.json?${query.toString()}`);
-        if (!response.ok) {
-            throw new Error(`NREL state request failed with ${response.status}`);
+    const fetchFromOverpass = async (lat, lon) => {
+        const radiusMeters = 25000;
+        const query = `
+[out:json][timeout:25];
+(
+  node["amenity"="charging_station"](around:${radiusMeters},${lat},${lon});
+  way["amenity"="charging_station"](around:${radiusMeters},${lat},${lon});
+  relation["amenity"="charging_station"](around:${radiusMeters},${lat},${lon});
+);
+out center tags;
+`;
+
+        const payload = await withRetry(
+            () => fetchJsonWithTimeout(OVERPASS_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain' },
+                body: query,
+                cache: 'no-store'
+            }, 15000),
+            1
+        );
+
+        const elements = Array.isArray(payload?.elements) ? payload.elements : [];
+        return elements
+            .map(toLocalStationFromOverpass)
+            .filter((station) => station.lat && station.lon);
+    };
+
+    const applyStationResults = (list, sourceLabel) => {
+        const deduped = dedupeStations(list);
+        setLiveStations(deduped);
+        setCachedLiveStations(deduped);
+        setDataSourceLabel(sourceLabel);
+        try {
+            localStorage.setItem(E_STATION_CACHE_KEY, JSON.stringify(deduped));
+        } catch (cacheError) {
+            // Ignore storage failures.
         }
-        const payload = await response.json();
-        const stationsPayload = Array.isArray(payload?.fuel_stations) ? payload.fuel_stations : [];
-        return stationsPayload.map(toLocalStationFromNrel).filter((station) => station.lat && station.lon);
+        setStatus(`Live charging stations loaded (${sourceLabel}).`);
     };
 
     const fetchLiveStations = async (lat, lon) => {
         setIsLoadingStations(true);
+        setStatus('Searching nearby charging stations (up to 50 miles)...');
+        setFetchAttemptSummary('');
         try {
             let mapped = [];
+            const attemptLog = [];
 
             try {
                 mapped = await fetchFromOpenChargeMap(lat, lon);
                 if (mapped.length > 0) {
-                    const deduped = dedupeStations(mapped);
-                    setLiveStations(deduped);
-                    setCachedLiveStations(deduped);
-                    try {
-                        localStorage.setItem(E_STATION_CACHE_KEY, JSON.stringify(deduped));
-                    } catch (cacheError) {
-                        // Ignore storage failures.
-                    }
-                    setStatus('Live charging stations loaded (Open Charge Map).');
+                    attemptLog.push(`Open Charge Map: success (${mapped.length})`);
+                    setFetchAttemptSummary(attemptLog.join(' -> '));
+                    applyStationResults(mapped, 'Open Charge Map');
                     return;
                 }
+                attemptLog.push('Open Charge Map: no results');
             } catch (error) {
+                attemptLog.push('Open Charge Map: failed');
                 // Continue to secondary providers if Open Charge Map is unavailable.
             }
 
             try {
                 mapped = await fetchFromNrelNearest(lat, lon);
                 if (mapped.length > 0) {
-                    const deduped = dedupeStations(mapped);
-                    setLiveStations(deduped);
-                    setCachedLiveStations(deduped);
-                    try {
-                        localStorage.setItem(E_STATION_CACHE_KEY, JSON.stringify(deduped));
-                    } catch (cacheError) {
-                        // Ignore storage failures.
-                    }
-                    setStatus('Live charging stations loaded (NREL).');
+                    attemptLog.push(`NREL nearest (50 mi): success (${mapped.length})`);
+                    setFetchAttemptSummary(attemptLog.join(' -> '));
+                    applyStationResults(mapped, 'NREL nearest');
                     return;
                 }
+                attemptLog.push('NREL nearest (50 mi): no results');
             } catch (error) {
+                attemptLog.push('NREL nearest (50 mi): failed');
                 // Continue to state-level fallback feeds.
             }
 
             try {
-                const [caStations, ncStations] = await Promise.all([
-                    fetchFromNrelState('CA'),
-                    fetchFromNrelState('NC')
-                ]);
-                const statewide = dedupeStations([...caStations, ...ncStations]);
-                if (statewide.length > 0) {
-                    setLiveStations(statewide);
-                    setCachedLiveStations(statewide);
-                    try {
-                        localStorage.setItem(E_STATION_CACHE_KEY, JSON.stringify(statewide));
-                    } catch (cacheError) {
-                        // Ignore storage failures.
-                    }
-                    setStatus('Live charging stations loaded (NREL California + North Carolina feeds).');
+                setStatus('No nearby results yet. Expanding search to 150 miles...');
+                mapped = await fetchFromNrelNearest(lat, lon, 150, 80);
+                if (mapped.length > 0) {
+                    attemptLog.push(`NREL nearest (150 mi): success (${mapped.length})`);
+                    setFetchAttemptSummary(attemptLog.join(' -> '));
+                    applyStationResults(mapped, 'NREL nearest (extended radius)');
                     return;
                 }
+                attemptLog.push('NREL nearest (150 mi): no results');
             } catch (error) {
+                attemptLog.push('NREL nearest (150 mi): failed');
+                // Continue to OpenStreetMap fallback.
+            }
+
+            try {
+                setStatus('Trying OpenStreetMap fallback near your location...');
+                mapped = await fetchFromOverpass(lat, lon);
+                if (mapped.length > 0) {
+                    attemptLog.push(`OpenStreetMap Overpass: success (${mapped.length})`);
+                    setFetchAttemptSummary(attemptLog.join(' -> '));
+                    applyStationResults(mapped, 'OpenStreetMap Overpass');
+                    return;
+                }
+                attemptLog.push('OpenStreetMap Overpass: no results');
+            } catch (error) {
+                attemptLog.push('OpenStreetMap Overpass: failed');
                 // Falls through to cache/sample data message below.
             }
 
             if (cachedLiveStations.length > 0) {
                 setLiveStations(cachedLiveStations);
+                setDataSourceLabel('Cached');
+                attemptLog.push(`Cache: used (${cachedLiveStations.length})`);
+                setFetchAttemptSummary(attemptLog.join(' -> '));
                 setStatus('APIs unavailable. Showing previously cached stations.');
             } else {
                 setLiveStations([]);
-                setStatus('Unable to load live station data from Open Charge Map or NREL. Showing sample stations.');
+                setDataSourceLabel('');
+                attemptLog.push('Final: no results available');
+                setFetchAttemptSummary(attemptLog.join(' -> '));
+                setStatus('Unable to load live station data from Open Charge Map, NREL, or OpenStreetMap right now.');
             }
         } catch (error) {
             if (cachedLiveStations.length > 0) {
                 setLiveStations(cachedLiveStations);
+                setDataSourceLabel('Cached');
+                setFetchAttemptSummary('Unexpected fetch flow error. Using cached stations.');
                 setStatus('APIs unavailable. Showing previously cached stations.');
             } else {
                 setLiveStations([]);
-                setStatus('Unable to load live station data from Open Charge Map or NREL. Showing sample stations.');
+                setDataSourceLabel('');
+                setFetchAttemptSummary('Unexpected fetch flow error. No stations available.');
+                setStatus('Unable to load live station data from Open Charge Map, NREL, or OpenStreetMap right now.');
             }
         } finally {
             setIsLoadingStations(false);
@@ -563,6 +648,11 @@ const EStation = () => {
                     {status}
                 </div>
                 {
+                    fetchAttemptSummary
+                        ? <div className='containerDetail color-lite p-10 size12 mt-2'>Attempt summary: {fetchAttemptSummary}</div>
+                        : null
+                }
+                {
                     isLoadingStations
                         ? <div className='containerDetail color-yellow p-10 mt-5'>Loading live station feed...</div>
                         : null
@@ -574,7 +664,7 @@ const EStation = () => {
                 : <div className='containerDetail color-lite size20 bg-lite mb-5 mt-10'>
                     {
                         liveStations.length > 0
-                            ? <div className='containerDetail color-neogreen brdr-green p-10 bg-dkGreen'>⚡️ Data source: Live API</div>
+                            ? <div className='containerDetail color-neogreen brdr-green p-10 bg-dkGreen'>⚡️ Data source: {dataSourceLabel || 'Live API'}</div>
                             : null
                     }
                     <div className='containerDetail mt-5'>
@@ -600,13 +690,13 @@ const EStation = () => {
                                 </div>
 
                                 <div className='containerDetail bg-lite flexContainer mt-5 size10'>
-                                    <div className={`containerDetail p-10 mr-5 ${station.fastCharge ? 'bg-dkGreen brdr-green color-yellow' : 'bg-lite color-orange'}`}>
+                                    <div className={`containerDetail  size10 p-10 mr-5 ${station.fastCharge ? 'bg-dkGreen brdr-green color-yellow' : 'bg-lite color-orange'}`}>
                                         {station.fastCharge ? '⚡️ Fast Charge' : '🐌 Standard Charge'}
                                     </div>
-                                    <div className='containerDetail p-10 mr-5 bg-lite color-lite'>
+                                    <div className='containerDetail size10 p-10 mr-5 bg-lite color-lite'>
                                         {station.open24h ? '🕛 24/7' : '🕘🕔 Limited Hours'}
                                     </div>
-                                    <div className='containerDetail p-10 bg-lite color-lite'>
+                                    <div className='containerDetail size10 p-10 bg-lite color-lite'>
                                         🔌{station.connectors.join(' | ')}
                                     </div>
                                 </div>

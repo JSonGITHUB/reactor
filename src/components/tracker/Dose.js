@@ -13,11 +13,11 @@ const makeDoseKey = (dose) => `${dose.medicationId}-${new Date(dose.time).getTim
 
 const DoseContent = () => {
     // Use context hook for state
-    const { 
-        timeline, 
-        setTimeline, 
-        meds, 
-        setMeds 
+    const {
+        timeline,
+        setTimeline,
+        meds,
+        setMeds
     } = useSchedule();
 
     const scheduleRef = useRef(null);
@@ -43,7 +43,7 @@ const DoseContent = () => {
         repeat: 'none', // none, weekly, bi-weekly, monthly
         weekdays: [], // ['Mon', 'Tue', ...]
         totalDoses: 10
-      });
+    });
     const [edit, setEdit] = useState(false);
     const [editForm, setEditForm] = useState({});
     const [pushMinutes] = useState(30);
@@ -120,7 +120,7 @@ const DoseContent = () => {
             localStorage.setItem('doseCollapsed', JSON.stringify(doseCollapsed));
         }
     }, [doseCollapsed]);
-    
+
     useEffect(() => {
         if (form.name !== '' && formCollapsed !== false) {
             setFormCollapsed(false);
@@ -320,7 +320,7 @@ const DoseContent = () => {
             repeat: 'none', // none, weekly, bi-weekly, monthly
             weekdays: [], // ['Mon', 'Tue', ...]
             totalDoses: 10
-          });
+        });
         if (edit) {
             setEdit(false)
         }
@@ -390,11 +390,11 @@ const DoseContent = () => {
                 💊 Substance:
             </div>
             <div className='flex2Column contentLeft'>
-                <input 
-                    className='containerDetail p-10 width--5 color-lite' 
-                    placeholder='Substance' 
-                    value={form.name} 
-                    onChange={(e) => setForm({ ...form, name: e.target.value })} 
+                <input
+                    className='containerDetail p-10 width--5 color-lite'
+                    placeholder='Substance'
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
                 />
             </div>
         </div>
@@ -402,10 +402,10 @@ const DoseContent = () => {
             <div className='p-10 flexColumn contentRight color-yellow'>📋 Instructions:</div>
             <div className='flex2Column contentLeft'>
                 <input
-                    className='containerDetail p-10 width--5 color-lite' 
-                    placeholder='Instruction' 
-                    value={form.instruction} 
-                    onChange={(e) => setForm({ ...form, instruction: e.target.value })} 
+                    className='containerDetail p-10 width--5 color-lite'
+                    placeholder='Instruction'
+                    value={form.instruction}
+                    onChange={(e) => setForm({ ...form, instruction: e.target.value })}
                 />
             </div>
         </div>
@@ -413,24 +413,24 @@ const DoseContent = () => {
             <div className='p-10 flexColumn contentRight color-yellow'>⚠️ Warnings:</div>
             <div className='flex2Column contentLeft'>
                 <input
-                    className='containerDetail p-10 width--5 color-lite' 
-                    placeholder='Warnings (optional)' 
-                    value={form.warning} 
-                    onChange={(e) => setForm({ ...form, warning: e.target.value })} 
+                    className='containerDetail p-10 width--5 color-lite'
+                    placeholder='Warnings (optional)'
+                    value={form.warning}
+                    onChange={(e) => setForm({ ...form, warning: e.target.value })}
                 />
             </div>
         </div>
         <div className='flexContainer containerDetail mb-5 p-10'>
             <div className='p-15 flexColumn contentRight color-yellow'>Start:</div>
             <div className='flex2Column contentLeft'>
-                <input 
-                    type='datetime-local' 
-                    className='containerDetail p-10 width--10 color-lite' 
-                    value={form.startTime} 
-                    onChange={(e) => setForm({ ...form, startTime: e.target.value })} 
+                <input
+                    type='datetime-local'
+                    className='containerDetail p-10 width--10 color-lite'
+                    value={form.startTime}
+                    onChange={(e) => setForm({ ...form, startTime: e.target.value })}
                 />
             </div>
-            
+
         </div>
         <div className='flexContainer containerDetail mb-5 p-10'>
             <div className='p-10 flexColumn contentRight color-yellow'>Mode:</div>
@@ -464,7 +464,7 @@ const DoseContent = () => {
         <div className='flexContainer containerDetail mb-5 p-10'>
             <div className='p-10 flexColumn contentRight color-yellow'>⏱️ Interval:</div>
             <div className='flex2Column contentLeft'>
-                <input 
+                <input
                     type='number'
                     className='containerDetail p-10 width--5 color-lite'
                     placeholder='Interval (hrs)'
@@ -477,7 +477,7 @@ const DoseContent = () => {
         <div className='flexContainer containerDetail mb-5 p-10'>
             <div className='color-yellow p-10'>💊💊💊 Doses:</div>
             <div className='flex2Column contentLeft'>
-                <input 
+                <input
                     type='number'
                     className='containerDetail p-10 width--5 color-lite'
                     placeholder='Total Doses'
@@ -510,7 +510,7 @@ const DoseContent = () => {
                 </div>
                 <div className='flexContainer containerDetail'>
                     {ALL_DAYS.map(day => (
-                        <label key={`dose-day-${day}`} className={`flex7Column size15 color-lite containerDetail m-1 ${((form.weekdays && form.weekdays.includes(day)) || false)? 'bg-blue': 'bg-lite'} contentCenter`}>
+                        <label key={`dose-day-${day}`} className={`flex7Column size15 color-lite containerDetail m-1 ${((form.weekdays && form.weekdays.includes(day)) || false) ? 'bg-blue' : 'bg-lite'} contentCenter`}>
                             <input
                                 className='m-5'
                                 type='checkbox'
@@ -534,8 +534,8 @@ const DoseContent = () => {
         <div className='flexContainer'>
             <div className='containerDetail flex2Column button p-20 bg-green color-lite' onClick={addMed}>
                 {
-                    
-                        (edit)
+
+                    (edit)
                         ? 'Save'
                         : 'Add'
                 }
@@ -549,147 +549,149 @@ const DoseContent = () => {
     </div>
 
     return (
-            <div className='mt--30 width--10'>
-                <div className='containerDetail p-20 color-yellow bg-lite size30 m-5 contentLeft'>
-                    💊 Dose Reminder
+        <div className='mt--30 width--10'>
+            <div className='containerDetail p-20 color-yellow bg-lite size30 m-5 contentLeft'>
+                💊 Dose Reminder
+            </div>
+            <div className='containerDetail bg-lite m-5 size20'>
+                <div className='containerDetail bg-lite size20'>
+                    <CollapseToggleButton
+                        title={<span className='color-yellow'>Add Medication</span>}
+                        isCollapsed={formCollapsed}
+                        setCollapse={setFormCollapsed}
+                        align='left'
+                    />
                 </div>
-                <div className='containerDetail bg-lite m-5 size20'>
-                    <div className='containerDetail bg-lite size20'>
-                        <CollapseToggleButton
-                            title={<span className='color-yellow'>Add Medication</span>}
-                            isCollapsed={formCollapsed}
-                            setCollapse={setFormCollapsed}
-                            align='left'
-                        />
-                    </div>
-                    {
-                        (formCollapsed)
+                {
+                    (formCollapsed)
                         ? null
                         : displayAddForm()
-                    }
-                </div>
-                <div className='containerDetail bg-lite m-5 size20'>
-                    <div className='containerDetail bg-lite size20'>
-                        <CollapseToggleButton
-                            title={<span className='color-yellow'>Medications</span>}
-                            isCollapsed={doseCollapsed}
-                            setCollapse={setDoseCollapsed}
-                            align='left'
-                        />
-                    </div>
-                    {
-                        (doseCollapsed)
-                            ? null
-                            : meds.map((med) => (
-                                <div key={`dose-med-${String(med.id)}`} className='containerDetail mb-5'>
-                                    {(() => {
-                                        const isContinuous = (typeof med.continuous === 'boolean')
-                                            ? med.continuous
-                                            : !med.totalDoses;
-                                        return (
-                                    <>
-                                        <div className='containerDetail contentLeft p-10 color-yellow mb-5'>
-                                            {
-                                                ((med.dosingMode === 'perDay') || (med.dosingMode === 'daily') || Number(med.dosesPerDay) > 0)
-                                                    ? `${med.name} ${Number(med.dosesPerDay) || 1} per day${med.dayEnd ? ` (to ${med.dayEnd})` : ''} ${med.totalDoses ? `for ${med.totalDoses} doses` : '(ongoing)'}`
-                                                    : `${med.name} every ${med.interval} hrs ${med.totalDoses ? `for ${med.totalDoses} doses` : '(ongoing)'}`
-                                            }
-                                        </div>
-                                        <div className='containerDetail flexContainer mb-5'>
-                                            <label className='flexContainer color-lite'>
-                                                <input
-                                                    className='m-5'
-                                                    type='checkbox'
-                                                    checked={isContinuous}
-                                                    onChange={(e) => handleToggleContinuous(med.id, e.target.checked)}
-                                                />
-                                                <span>Continuous</span>
-                                            </label>
-                                        </div>
-                                    </>
-                                        );
-                                    })()}
-                                    <div className='flexContainer'>
-                                        <div className='containerDetail flex2Column button bg-lite mr-5' onClick={() => setEditForm(med)}>✏️</div>
-                                        <div className='containerDetail flex2Column button bg-lite' onClick={() => handleDelete(med.id)}>🗑️</div>
-                                    </div>
-                                </div>
-                            ))
-                    }
+                }
+            </div>
+            <div className='containerDetail bg-lite m-5 size20'>
+                <div className='containerDetail bg-lite size20'>
+                    <CollapseToggleButton
+                        title={<span className='color-yellow'>Medications</span>}
+                        isCollapsed={doseCollapsed}
+                        setCollapse={setDoseCollapsed}
+                        align='left'
+                    />
                 </div>
                 {
-                    (undoStack.length > 0)
-                        ? <div className='containerDetail button bg-red m-5' onClick={handleUndo}>
-                            Undo Last Push
+                    (doseCollapsed)
+                        ? null
+                        : meds.map((med) => (
+                            <div key={`dose-med-${String(med.id)}`} className='containerDetail mb-5'>
+                                {(() => {
+                                    const isContinuous = (typeof med.continuous === 'boolean')
+                                        ? med.continuous
+                                        : !med.totalDoses;
+                                    return (
+                                        <>
+                                            <div className='containerDetail contentLeft p-10 color-yellow mb-5'>
+                                                {
+                                                    ((med.dosingMode === 'perDay') || (med.dosingMode === 'daily') || Number(med.dosesPerDay) > 0)
+                                                        ? `${med.name} ${Number(med.dosesPerDay) || 1} per day${med.dayEnd ? ` (to ${med.dayEnd})` : ''} ${med.totalDoses ? `for ${med.totalDoses} doses` : '(ongoing)'}`
+                                                        : `${med.name} every ${med.interval} hrs ${med.totalDoses ? `for ${med.totalDoses} doses` : '(ongoing)'}`
+                                                }
+                                            </div>
+                                            <div className='containerDetail flexContainer mb-5'>
+                                                <label className='flexContainer color-lite'>
+                                                    <input
+                                                        className='m-5'
+                                                        type='checkbox'
+                                                        checked={isContinuous}
+                                                        onChange={(e) => handleToggleContinuous(med.id, e.target.checked)}
+                                                    />
+                                                    <span>Continuous</span>
+                                                </label>
+                                            </div>
+                                        </>
+                                    );
+                                })()}
+                                <div className='flexContainer'>
+                                    <div className='containerDetail flex2Column button bg-lite mr-5' onClick={() => setEditForm(med)}>✏️</div>
+                                    <div className='containerDetail flex2Column button bg-lite' onClick={() => handleDelete(med.id)}>🗑️</div>
+                                </div>
                             </div>
+                        ))
+                }
+            </div>
+            {
+                (undoStack.length > 0)
+                    ? <div className='containerDetail button bg-red m-5' onClick={handleUndo}>
+                        Undo Last Push
+                    </div>
+                    : null
+            }
+
+            <div className='containerDetail m-5' ref={scheduleRef}>
+                {
+                    (filteredTimeline && filteredTimeline.length !== 0)
+                        ? Object.entries(grouped()).map(([date, times], i) => (
+                            <div key={`dose-date-group-${i}-${String(date)}`} className='mb-5'>
+                                <div key={`dose-date-header-${i}-${String(date)}`} className={`containerDetail p-10 mb-5 bg-${(date === today) ? 'green color-lite' : 'lite'}`}>
+                                    <CollapseToggleButton
+                                        title={<div className={`${(date === today) ? 'color-yellow' : 'color-lite'} size20`}>{date}</div>}
+                                        isCollapsed={isCollapsed[i]}
+                                        setCollapse={() => {
+                                            const newCollapsed = [...isCollapsed];
+                                            newCollapsed[i] = !newCollapsed[i];
+                                            setCollapsed(newCollapsed);
+                                        }}
+                                        align='left'
+                                    />
+                                </div>
+                                {
+                                    (!isCollapsed[i])
+                                        ? <div className='ht-300 scroll'>
+                                            {Object.entries(times).map(([time, doses], j) => {
+                                                const now = new Date();
+                                                // Parse time string to Date for accurate comparison
+                                                const intervalDate = new Date(`${date} ${time}`);
+                                                const display =
+                                                    intervalDate < now
+                                                        ? 'missed'
+                                                        : (intervalDate - now < 60 * 60 * 1000 ? 'upcoming' : '');
+
+                                                return (
+                                                    <div key={`dose-time-${i}-${j}-${String(time)}`} className={`containerDetail mb-5 bg-${display === 'missed' ? 'dkYellow' : display === 'upcoming' ? 'green' : 'lite'}`}>
+                                                        <div className={`containerDetail size20 p-10 color-${display === 'missed' ? 'red' : display === 'upcoming' ? 'yellow' : 'lite'}`}>
+                                                            {display} - {time}
+                                                        </div>
+                                                        {doses.map((dose, idx) => {
+                                                            const doseTime = new Date(dose.time);
+                                                            const status = doseTime < now ? 'missed' : (doseTime - now < 60 * 60 * 1000 ? 'upcoming' : '');
+                                                            return (
+                                                                <div key={`dose-item-${i}-${j}-${idx}-${makeDoseKey(dose)}`}>
+                                                                    <CheckBoxTimer
+                                                                        idx={idx}
+                                                                        dose={dose}
+                                                                        status={status}
+                                                                        pushDose={() => pushDose(idx, pushMinutes, false)}
+                                                                        doseTime={doseTime}
+                                                                        doseKey={makeDoseKey(dose)}
+                                                                    />
+                                                                </div>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                )
+                                            })}
+                                        </div>
+                                        : null
+                                }
+                            </div>
+                        ))
                         : null
                 }
-
-                <div className='containerDetail m-5' ref={scheduleRef}>
-                {
-                    (filteredTimeline && filteredTimeline.length !== 0) 
-                    ? Object.entries(grouped()).map(([date, times], i) => (
-                        <div key={`dose-date-group-${i}-${String(date)}`} className='mb-5'>
-                            <div key={`dose-date-header-${i}-${String(date)}`} className={`containerDetail p-10 mb-5 bg-${(date === today) ? 'green color-lite' : 'lite'}`}>
-                            <CollapseToggleButton
-                                title={<div className={`${(date === today) ? 'color-yellow' : 'color-lite'} size20`}>{date}</div>}
-                                isCollapsed={isCollapsed[i]}
-                                setCollapse={() => {
-                                    const newCollapsed = [...isCollapsed];
-                                    newCollapsed[i] = !newCollapsed[i];
-                                    setCollapsed(newCollapsed);
-                            }}
-                            align='left'
-                        />
-                        </div>
-                        {
-                            (!isCollapsed[i])
-                            ? Object.entries(times).map(([time, doses], j) => {
-                                const now = new Date();
-                                // Parse time string to Date for accurate comparison
-                                const intervalDate = new Date(`${date} ${time}`);
-                                const display =
-                                    intervalDate < now
-                                        ? 'missed'
-                                        : (intervalDate - now < 60 * 60 * 1000 ? 'upcoming' : '');
-
-                                return (
-                                    <div key={`dose-time-${i}-${j}-${String(time)}`} className={`containerDetail mb-5 bg-${display === 'missed' ? 'dkYellow' : display === 'upcoming' ? 'green' : 'lite'}`}>
-                                        <div className={`containerDetail size20 p-10 color-${display === 'missed' ? 'red' : display === 'upcoming' ? 'yellow' : 'lite'}`}>
-                                            {display} - {time}
-                                        </div>
-                                        {doses.map((dose, idx) => {
-                                            const doseTime = new Date(dose.time);
-                                            const status = doseTime < now ? 'missed' : (doseTime - now < 60 * 60 * 1000 ? 'upcoming' : '');
-                                            return (
-                                                <div key={`dose-item-${i}-${j}-${idx}-${makeDoseKey(dose)}`}>
-                                                    <CheckBoxTimer
-                                                        idx={idx}
-                                                        dose={dose}
-                                                        status={status}
-                                                        pushDose={() => pushDose(idx, pushMinutes, false)}
-                                                        doseTime={doseTime}
-                                                        doseKey={makeDoseKey(dose)}
-                                                    />
-                                                </div>
-                                            )
-                                        })}
-                                    </div>
-                                )
-                            })
-                            : null
-                        }
-                        </div>
-                    ))
-                    : null
-                }
-                </div>
-                <div className={`z1 bt-10 r-10 width-50-percent ml-5`}>
-                    <div className='containerDetail button p-10 color-yellow size20 bg-green ml-5 width--20 mt-5' onClick={handleResetTimeline}>
-                        Reset Timeline
-                    </div>
+            </div>
+            <div className={`z1 bt-10 r-10 width-50-percent ml-5`}>
+                <div className='containerDetail button p-10 color-yellow size20 bg-green ml-5 width--20 mt-5' onClick={handleResetTimeline}>
+                    Reset Timeline
                 </div>
             </div>
+        </div>
     );
 };
 

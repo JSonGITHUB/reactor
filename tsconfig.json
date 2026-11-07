@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2020",
     "lib": [
       "dom",
       "dom.iterable",
@@ -14,14 +14,15 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
-    "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "ignoreDeprecations": "6.0" // Suppress deprecation warnings for TypeScript 6.0
+    "ignoreDeprecations": "6.0",
+    "moduleResolution": "node"
   },
   "include": [
-    "src"
-, "scripts"  ]
+    "src",
+    "scripts"
+  ]
 }
