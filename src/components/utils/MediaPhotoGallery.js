@@ -57,19 +57,36 @@ const MediaPhotoGallery = ({
             await Promise.all(
                 photos.map(async (photo) => {
                     // Skip if already loaded, has inline URL, or no callback
-                    if (loaded.has(photo.id) || photo.url || !onGetPhotoBlob) return;
+                    if (loaded.has(photo.id)) {
+                        console.log(`[MediaPhotoGallery] Photo ${photo.id} already loaded, skipping`);
+                        return;
+                    }
+                    if (photo.url) {
+                        console.log(`[MediaPhotoGallery] Photo ${photo.id} has inline URL, skipping blob load`);
+                        loaded.add(photo.id);
+                        return;
+                    }
+                    if (!onGetPhotoBlob) {
+                        console.log(`[MediaPhotoGallery] Photo ${photo.id} has no onGetPhotoBlob callback, skipping`);
+                        return;
+                    }
 
+                    console.log(`[MediaPhotoGallery] Attempting to load blob for photo ${photo.id}`);
                     try {
                         const blob = await onGetPhotoBlob(photo.id);
                         if (blob) {
+                            console.log(`[MediaPhotoGallery] Successfully retrieved blob for photo ${photo.id}, creating URL`);
                             const blobUrl = URL.createObjectURL(blob);
                             cache.set(photo.id, blobUrl);
                             hasNewUrls = true;
+                        } else {
+                            console.warn(`[MediaPhotoGallery] onGetPhotoBlob returned null/falsy for photo ${photo.id}`);
                         }
                         // Mark as loaded regardless of success (prevent retry loop)
                         loaded.add(photo.id);
+                        console.log(`[MediaPhotoGallery] Marked photo ${photo.id} as loaded`);
                     } catch (error) {
-                        console.error(`Failed to load photo ${photo.id}:`, error);
+                        console.error(`[MediaPhotoGallery] Failed to load photo ${photo.id}:`, error);
                         // Still mark as attempted to avoid infinite retry
                         loaded.add(photo.id);
                     }
@@ -78,10 +95,12 @@ const MediaPhotoGallery = ({
 
             // Trigger re-render if new URLs were loaded
             if (hasNewUrls) {
+                console.log('[MediaPhotoGallery] Triggering re-render due to new URLs');
                 setRefresh((prev) => prev + 1);
             }
         };
 
+        console.log(`[MediaPhotoGallery] useEffect triggered, photos count: ${photos.length}`);
         loadPhotoUrls();
 
         // Cleanup: revoke URLs for photos that no longer exist
