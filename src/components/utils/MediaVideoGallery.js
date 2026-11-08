@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 /**
  * MediaVideoGallery - Reusable video gallery component with edit mode and delete
@@ -36,34 +36,54 @@ const MediaVideoGallery = ({
     const [isEditMode, setIsEditMode] = useState(false);
     const [expandedVideo, setExpandedVideo] = useState(null);
     const [isRowCollapsed, setIsRowCollapsed] = useState(true);
-    const [videosWithUrls, setVideosWithUrls] = React.useState([]);
+    const blobUrlCacheRef = useRef(new Map()); // Cache blob URLs by video ID
+    const [, setRefresh] = useState(0); // Force re-render when URLs are loaded
 
-    // Load blob URLs for persisted videos
-    React.useEffect(() => {
+    // Load blob URLs for persisted videos and cache them
+    useEffect(() => {
         const loadVideoUrls = async () => {
-            const updated = await Promise.all(
+            const cache = blobUrlCacheRef.current;
+            let hasNewUrls = false;
+
+            await Promise.all(
                 videos.map(async (video) => {
-                    if (video.url) return video;
-                    if (!onGetVideoBlob) return video;
+                    // Skip if URL already cached or video has inline URL
+                    if (video.url || cache.has(video.id)) return;
+                    if (!onGetVideoBlob) return;
+
                     try {
                         const blob = await onGetVideoBlob(video.id);
                         if (blob) {
-                            return {
-                                ...video,
-                                url: safeCreateObjectUrl(blob),
-                                blob,
-                            };
+                            const blobUrl = URL.createObjectURL(blob);
+                            cache.set(video.id, blobUrl);
+                            hasNewUrls = true;
                         }
                     } catch (error) {
                         console.error(`Failed to load video ${video.id}:`, error);
                     }
-                    return video;
                 })
             );
-            setVideosWithUrls(updated);
+
+            // Trigger re-render if new URLs were loaded
+            if (hasNewUrls) {
+                setRefresh((prev) => prev + 1);
+            }
         };
 
         loadVideoUrls();
+
+        // Cleanup: revoke URLs for videos that no longer exist
+        return () => {
+            const cache = blobUrlCacheRef.current;
+            const currentVideoIds = new Set(videos.map((v) => v.id));
+            
+            for (const [videoId, blobUrl] of cache.entries()) {
+                if (!currentVideoIds.has(videoId)) {
+                    URL.revokeObjectURL(blobUrl);
+                    cache.delete(videoId);
+                }
+            }
+        };
     }, [videos, onGetVideoBlob]);
 
     const safeCreateObjectUrl = (file) => {
@@ -169,11 +189,15 @@ const MediaVideoGallery = ({
         }
     };
 
-    const displayVideos = videosWithUrls.length > 0 ? videosWithUrls : videos;
+    const getVideoUrl = (video) => {
+        if (video.url) return video.url;
+        return blobUrlCacheRef.current.get(video.id) || '';
+    };
+
     const hasVideos = videos.length > 0;
-    const expandedIndex = expandedVideo ? displayVideos.findIndex((video) => video.id === expandedVideo.id) : -1;
+    const expandedIndex = expandedVideo ? videos.findIndex((video) => video.id === expandedVideo.id) : -1;
     const canGoPrev = expandedIndex > 0;
-    const canGoNext = expandedIndex < displayVideos.length - 1;
+    const canGoNext = expandedIndex < videos.length - 1;
 
     return (
         <div className='containerDetail mt-10 bg-lite'>
@@ -215,7 +239,7 @@ const MediaVideoGallery = ({
 
                     {/* Video Player */}
                     <video
-                        src={expandedVideo.url}
+                        src={getVideoUrl(expandedVideo)}
                         controls
                         playsInline
                         autoPlay
@@ -244,7 +268,7 @@ const MediaVideoGallery = ({
                     paddingBottom: (isRowCollapsed ?? true) ? 6 : 0,
                 }}
             >
-                {displayVideos.map((video, index) => (
+                {videos.map((video, index) => (
                     <div
                         key={`${video.id || index}`}
                         onClick={(event) => {
@@ -261,7 +285,7 @@ const MediaVideoGallery = ({
                         }}
                     >
                         <video
-                            src={video.url}
+                            src={getVideoUrl(video)}
                             title={video.name}
                             onClick={(event) => {
                                 event.preventDefault();

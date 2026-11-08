@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 /**
  * MediaPhotoGallery - Reusable photo gallery component with edit mode, delete, fullscreen, and slideshow
@@ -43,34 +43,54 @@ const MediaPhotoGallery = ({
     const [isSlideshow, setIsSlideshow] = useState(false);
     const [slideshowDelay, setSlideshowDelay] = useState(2);
     const [isFullscreen, setIsFullscreen] = useState(false);
-    const [photosWithUrls, setPhotosWithUrls] = useState([]);
+    const blobUrlCacheRef = useRef(new Map()); // Cache blob URLs by photo ID
+    const [, setRefresh] = useState(0); // Force re-render when URLs are loaded
 
-    // Load blob URLs for persisted photos
+    // Load blob URLs for persisted photos and cache them
     useEffect(() => {
         const loadPhotoUrls = async () => {
-            const updated = await Promise.all(
+            const cache = blobUrlCacheRef.current;
+            let hasNewUrls = false;
+
+            await Promise.all(
                 photos.map(async (photo) => {
-                    if (photo.url) return photo;
-                    if (!onGetPhotoBlob) return photo;
+                    // Skip if URL already cached or photo has inline URL
+                    if (photo.url || cache.has(photo.id)) return;
+                    if (!onGetPhotoBlob) return;
+
                     try {
                         const blob = await onGetPhotoBlob(photo.id);
                         if (blob) {
-                            return {
-                                ...photo,
-                                url: safeCreateObjectUrl(blob),
-                                blob,
-                            };
+                            const blobUrl = URL.createObjectURL(blob);
+                            cache.set(photo.id, blobUrl);
+                            hasNewUrls = true;
                         }
                     } catch (error) {
                         console.error(`Failed to load photo ${photo.id}:`, error);
                     }
-                    return photo;
                 })
             );
-            setPhotosWithUrls(updated);
+
+            // Trigger re-render if new URLs were loaded
+            if (hasNewUrls) {
+                setRefresh((prev) => prev + 1);
+            }
         };
 
         loadPhotoUrls();
+
+        // Cleanup: revoke URLs for photos that no longer exist
+        return () => {
+            const cache = blobUrlCacheRef.current;
+            const currentPhotoIds = new Set(photos.map((p) => p.id));
+            
+            for (const [photoId, blobUrl] of cache.entries()) {
+                if (!currentPhotoIds.has(photoId)) {
+                    URL.revokeObjectURL(blobUrl);
+                    cache.delete(photoId);
+                }
+            }
+        };
     }, [photos, onGetPhotoBlob]);
 
     const safeCreateObjectUrl = (file) => {
@@ -211,11 +231,15 @@ const MediaPhotoGallery = ({
         }
     };
 
-    const displayPhotos = photosWithUrls.length > 0 ? photosWithUrls : photos;
+    const getPhotoUrl = (photo) => {
+        if (photo.url) return photo.url;
+        return blobUrlCacheRef.current.get(photo.id) || '';
+    };
+
     const hasPhotos = photos.length > 0;
-    const expandedIndex = expandedPhoto ? displayPhotos.findIndex((photo) => photo.id === expandedPhoto.id) : -1;
+    const expandedIndex = expandedPhoto ? photos.findIndex((photo) => photo.id === expandedPhoto.id) : -1;
     const canGoPrev = expandedIndex > 0;
-    const canGoNext = expandedIndex < displayPhotos.length - 1;
+    const canGoNext = expandedIndex < photos.length - 1;
 
     return (
         <div className='containerDetail mt-10 bg-lite'>
@@ -326,7 +350,7 @@ const MediaPhotoGallery = ({
 
                     {/* Photo Image */}
                     <img
-                        src={expandedPhoto.url}
+                        src={getPhotoUrl(expandedPhoto)}
                         alt={expandedPhoto.name || 'Photo'}
                         onClick={() => {
                             if (isFullscreen) setIsFullscreen(false);
@@ -484,10 +508,10 @@ const MediaPhotoGallery = ({
                     paddingBottom: (isRowCollapsed ?? true) ? 6 : 0,
                 }}
             >
-                {displayPhotos.map((photo, index) => (
+                {photos.map((photo, index) => (
                     <div key={`${photo.id || index}`} style={{ position: 'relative', width: 64, height: 64, flex: '0 0 auto' }}>
                         <img
-                            src={photo.url}
+                            src={getPhotoUrl(photo)}
                             alt={photo.name || `Photo ${index + 1}`}
                             title={`${photo.name || 'Photo'}${photo.size ? ` (${formatBytes(photo.size)})` : ''}`}
                             onClick={() => handlePhotoClickInGrid(photo)}
