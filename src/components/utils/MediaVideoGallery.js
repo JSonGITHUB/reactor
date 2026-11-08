@@ -37,25 +37,27 @@ const MediaVideoGallery = ({
     const [expandedVideo, setExpandedVideo] = useState(null);
     const [isRowCollapsed, setIsRowCollapsed] = useState(true);
     const blobUrlCacheRef = useRef(new Map()); // Cache blob URLs by video ID
+    const loadedVideoIdsRef = useRef(new Set()); // Track which videos have been loaded
     const [, setRefresh] = useState(0); // Force re-render when URLs are loaded
 
     // Load blob URLs for persisted videos and cache them
     useEffect(() => {
         const loadVideoUrls = async () => {
             const cache = blobUrlCacheRef.current;
+            const loaded = loadedVideoIdsRef.current;
             let hasNewUrls = false;
 
             await Promise.all(
                 videos.map(async (video) => {
-                    // Skip if URL already cached or video has inline URL
-                    if (video.url || cache.has(video.id)) return;
-                    if (!onGetVideoBlob) return;
+                    // Skip if already loaded, has inline URL, or no callback
+                    if (loaded.has(video.id) || video.url || !onGetVideoBlob) return;
 
                     try {
                         const blob = await onGetVideoBlob(video.id);
                         if (blob) {
                             const blobUrl = URL.createObjectURL(blob);
                             cache.set(video.id, blobUrl);
+                            loaded.add(video.id); // Mark as loaded
                             hasNewUrls = true;
                         }
                     } catch (error) {
@@ -75,12 +77,14 @@ const MediaVideoGallery = ({
         // Cleanup: revoke URLs for videos that no longer exist
         return () => {
             const cache = blobUrlCacheRef.current;
+            const loaded = loadedVideoIdsRef.current;
             const currentVideoIds = new Set(videos.map((v) => v.id));
             
             for (const [videoId, blobUrl] of cache.entries()) {
                 if (!currentVideoIds.has(videoId)) {
                     URL.revokeObjectURL(blobUrl);
                     cache.delete(videoId);
+                    loaded.delete(videoId);
                 }
             }
         };
@@ -191,7 +195,8 @@ const MediaVideoGallery = ({
 
     const getVideoUrl = (video) => {
         if (video.url) return video.url;
-        return blobUrlCacheRef.current.get(video.id) || '';
+        const cachedUrl = blobUrlCacheRef.current.get(video.id);
+        return cachedUrl || null; // Return null if URL not ready yet
     };
 
     const hasVideos = videos.length > 0;
@@ -237,22 +242,31 @@ const MediaVideoGallery = ({
                         </div>
                     </div>
 
-                    {/* Video Player */}
-                    <video
-                        src={getVideoUrl(expandedVideo)}
-                        controls
-                        playsInline
-                        autoPlay
-                        preload='metadata'
-                        className='mb-20 mt-10 width-100-percent'
-                        style={{
-                            width: '100%',
-                            maxWidth: '100%',
-                            height: 'auto',
-                            display: 'block',
-                            margin: '0 auto',
-                        }}
-                    />
+                    {/* Video Player - Only render if URL is available */}
+                    {(() => {
+                        const videoUrl = getVideoUrl(expandedVideo);
+                        return videoUrl ? (
+                            <video
+                                src={videoUrl}
+                                controls
+                                playsInline
+                                autoPlay
+                                preload='metadata'
+                                className='mb-20 mt-10 width-100-percent'
+                                style={{
+                                    width: '100%',
+                                    maxWidth: '100%',
+                                    height: 'auto',
+                                    display: 'block',
+                                    margin: '0 auto',
+                                }}
+                            />
+                        ) : (
+                            <div style={{ color: '#999', textAlign: 'center', padding: '20px' }}>
+                                Loading video...
+                            </div>
+                        );
+                    })()}
                 </div>
             )}
 
@@ -268,7 +282,12 @@ const MediaVideoGallery = ({
                     paddingBottom: (isRowCollapsed ?? true) ? 6 : 0,
                 }}
             >
-                {videos.map((video, index) => (
+                {videos.map((video, index) => {
+                    const videoUrl = getVideoUrl(video);
+                    // Skip rendering videos without loaded URLs to avoid broken video tags
+                    if (!videoUrl) return null;
+                    
+                    return (
                     <div
                         key={`${video.id || index}`}
                         onClick={(event) => {
@@ -285,7 +304,7 @@ const MediaVideoGallery = ({
                         }}
                     >
                         <video
-                            src={getVideoUrl(video)}
+                            src={videoUrl}
                             title={video.name}
                             onClick={(event) => {
                                 event.preventDefault();
@@ -331,7 +350,8 @@ const MediaVideoGallery = ({
                             </div>
                         )}
                     </div>
-                ))}
+                    );
+                })}
             </div>
             )}
 

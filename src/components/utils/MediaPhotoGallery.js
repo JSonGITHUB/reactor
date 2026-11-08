@@ -44,25 +44,27 @@ const MediaPhotoGallery = ({
     const [slideshowDelay, setSlideshowDelay] = useState(2);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const blobUrlCacheRef = useRef(new Map()); // Cache blob URLs by photo ID
+    const loadedPhotoIdsRef = useRef(new Set()); // Track which photos have been loaded
     const [, setRefresh] = useState(0); // Force re-render when URLs are loaded
 
     // Load blob URLs for persisted photos and cache them
     useEffect(() => {
         const loadPhotoUrls = async () => {
             const cache = blobUrlCacheRef.current;
+            const loaded = loadedPhotoIdsRef.current;
             let hasNewUrls = false;
 
             await Promise.all(
                 photos.map(async (photo) => {
-                    // Skip if URL already cached or photo has inline URL
-                    if (photo.url || cache.has(photo.id)) return;
-                    if (!onGetPhotoBlob) return;
+                    // Skip if already loaded, has inline URL, or no callback
+                    if (loaded.has(photo.id) || photo.url || !onGetPhotoBlob) return;
 
                     try {
                         const blob = await onGetPhotoBlob(photo.id);
                         if (blob) {
                             const blobUrl = URL.createObjectURL(blob);
                             cache.set(photo.id, blobUrl);
+                            loaded.add(photo.id); // Mark as loaded
                             hasNewUrls = true;
                         }
                     } catch (error) {
@@ -82,12 +84,14 @@ const MediaPhotoGallery = ({
         // Cleanup: revoke URLs for photos that no longer exist
         return () => {
             const cache = blobUrlCacheRef.current;
+            const loaded = loadedPhotoIdsRef.current;
             const currentPhotoIds = new Set(photos.map((p) => p.id));
             
             for (const [photoId, blobUrl] of cache.entries()) {
                 if (!currentPhotoIds.has(photoId)) {
                     URL.revokeObjectURL(blobUrl);
                     cache.delete(photoId);
+                    loaded.delete(photoId);
                 }
             }
         };
@@ -233,7 +237,8 @@ const MediaPhotoGallery = ({
 
     const getPhotoUrl = (photo) => {
         if (photo.url) return photo.url;
-        return blobUrlCacheRef.current.get(photo.id) || '';
+        const cachedUrl = blobUrlCacheRef.current.get(photo.id);
+        return cachedUrl || null; // Return null if URL not ready yet
     };
 
     const hasPhotos = photos.length > 0;
@@ -348,27 +353,36 @@ const MediaPhotoGallery = ({
                         </div>
                     )}
 
-                    {/* Photo Image */}
-                    <img
-                        src={getPhotoUrl(expandedPhoto)}
-                        alt={expandedPhoto.name || 'Photo'}
-                        onClick={() => {
-                            if (isFullscreen) setIsFullscreen(false);
-                        }}
-                        style={isFullscreen ? {
-                            maxWidth: '100%',
-                            maxHeight: '100%',
-                            width: 'auto',
-                            height: 'auto',
-                            cursor: 'pointer',
-                        } : {
-                            width: '100%',
-                            maxWidth: '100%',
-                            height: 'auto',
-                            display: 'block',
-                            margin: '0 auto',
-                        }}
-                    />
+                    {/* Photo Image - Only render if URL is available */}
+                    {(() => {
+                        const photoUrl = getPhotoUrl(expandedPhoto);
+                        return photoUrl ? (
+                            <img
+                                src={photoUrl}
+                                alt={expandedPhoto.name || 'Photo'}
+                                onClick={() => {
+                                    if (isFullscreen) setIsFullscreen(false);
+                                }}
+                                style={isFullscreen ? {
+                                    maxWidth: '100%',
+                                    maxHeight: '100%',
+                                    width: 'auto',
+                                    height: 'auto',
+                                    cursor: 'pointer',
+                                } : {
+                                    width: '100%',
+                                    maxWidth: '100%',
+                                    height: 'auto',
+                                    display: 'block',
+                                    margin: '0 auto',
+                                }}
+                            />
+                        ) : (
+                            <div style={{ color: '#999', textAlign: 'center', padding: '20px' }}>
+                                Loading photo...
+                            </div>
+                        );
+                    })()}
 
                     {/* Fullscreen Info Badge */}
                     {isFullscreen && (
@@ -508,10 +522,15 @@ const MediaPhotoGallery = ({
                     paddingBottom: (isRowCollapsed ?? true) ? 6 : 0,
                 }}
             >
-                {photos.map((photo, index) => (
+                {photos.map((photo, index) => {
+                    const photoUrl = getPhotoUrl(photo);
+                    // Skip rendering photos without loaded URLs to avoid broken img tags
+                    if (!photoUrl) return null;
+                    
+                    return (
                     <div key={`${photo.id || index}`} style={{ position: 'relative', width: 64, height: 64, flex: '0 0 auto' }}>
                         <img
-                            src={getPhotoUrl(photo)}
+                            src={photoUrl}
                             alt={photo.name || `Photo ${index + 1}`}
                             title={`${photo.name || 'Photo'}${photo.size ? ` (${formatBytes(photo.size)})` : ''}`}
                             onClick={() => handlePhotoClickInGrid(photo)}
@@ -550,7 +569,8 @@ const MediaPhotoGallery = ({
                             </div>
                         )}
                     </div>
-                ))}
+                    );
+                })}
             </div>
             )}
 
