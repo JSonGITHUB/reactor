@@ -91,6 +91,9 @@ const Note = ({
     const photoInputId = `note-photo-${noteGroupIndex}-${noteIndex}`;
     const videoInputId = `note-video-${noteGroupIndex}-${noteIndex}`;
 
+    const isEditedTitle = () => editTitle;
+    const isEditedNote = () => editNote;
+
     const toggleEditTitle = () => {
         const toggleTitle = (editTitle)
             ? false
