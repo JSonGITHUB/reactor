@@ -18,6 +18,7 @@ import React, { useState, useEffect } from 'react';
  *   inputId: Unique ID for file input
  *   onPersistPhoto: Optional callback to persist photo (receives: id, file)
  *   onRemovePhoto: Optional callback to remove photo from storage (receives: id)
+ *   onGetPhotoBlob: Optional callback to retrieve blob for a photo ID (receives: id, returns: Promise<blob>)
  */
 const MediaPhotoGallery = ({
     photos = [],
@@ -34,6 +35,7 @@ const MediaPhotoGallery = ({
     inputId = 'media-photo-input',
     onPersistPhoto,
     onRemovePhoto,
+    onGetPhotoBlob,
 }) => {
     const [isEditMode, setIsEditMode] = useState(false);
     const [expandedPhoto, setExpandedPhoto] = useState(null);
@@ -41,6 +43,35 @@ const MediaPhotoGallery = ({
     const [isSlideshow, setIsSlideshow] = useState(false);
     const [slideshowDelay, setSlideshowDelay] = useState(2);
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [photosWithUrls, setPhotosWithUrls] = useState([]);
+
+    // Load blob URLs for persisted photos
+    useEffect(() => {
+        const loadPhotoUrls = async () => {
+            const updated = await Promise.all(
+                photos.map(async (photo) => {
+                    if (photo.url) return photo;
+                    if (!onGetPhotoBlob) return photo;
+                    try {
+                        const blob = await onGetPhotoBlob(photo.id);
+                        if (blob) {
+                            return {
+                                ...photo,
+                                url: safeCreateObjectUrl(blob),
+                                blob,
+                            };
+                        }
+                    } catch (error) {
+                        console.error(`Failed to load photo ${photo.id}:`, error);
+                    }
+                    return photo;
+                })
+            );
+            setPhotosWithUrls(updated);
+        };
+
+        loadPhotoUrls();
+    }, [photos, onGetPhotoBlob]);
 
     const safeCreateObjectUrl = (file) => {
         if (typeof URL === 'undefined' || typeof URL.createObjectURL !== 'function') {
@@ -184,9 +215,10 @@ const MediaPhotoGallery = ({
         return null;
     }
 
-    const expandedIndex = expandedPhoto ? photos.findIndex((photo) => photo.id === expandedPhoto.id) : -1;
+    const displayPhotos = photosWithUrls.length > 0 ? photosWithUrls : photos;
+    const expandedIndex = expandedPhoto ? displayPhotos.findIndex((photo) => photo.id === expandedPhoto.id) : -1;
     const canGoPrev = expandedIndex > 0;
-    const canGoNext = expandedIndex < photos.length - 1;
+    const canGoNext = expandedIndex < displayPhotos.length - 1;
 
     return (
         <div className='containerDetail mt-10 bg-lite'>
@@ -454,7 +486,7 @@ const MediaPhotoGallery = ({
                     paddingBottom: (isRowCollapsed ?? true) ? 6 : 0,
                 }}
             >
-                {photos.map((photo, index) => (
+                {displayPhotos.map((photo, index) => (
                     <div key={`${photo.id || index}`} style={{ position: 'relative', width: 64, height: 64, flex: '0 0 auto' }}>
                         <img
                             src={photo.url}

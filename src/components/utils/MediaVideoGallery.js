@@ -16,6 +16,7 @@ import React, { useState } from 'react';
  *   inputId: Unique ID for file input
  *   onPersistVideo: Optional callback to persist video (receives: id, file, metadata)
  *   onRemoveVideo: Optional callback to remove video from storage (receives: id)
+ *   onGetVideoBlob: Optional callback to retrieve blob for a video ID (receives: id, returns: Promise<blob>)
  */
 const MediaVideoGallery = ({
     videos = [],
@@ -30,10 +31,40 @@ const MediaVideoGallery = ({
     inputId = 'media-video-input',
     onPersistVideo,
     onRemoveVideo,
+    onGetVideoBlob,
 }) => {
     const [isEditMode, setIsEditMode] = useState(false);
     const [expandedVideo, setExpandedVideo] = useState(null);
     const [isRowCollapsed, setIsRowCollapsed] = useState(true);
+    const [videosWithUrls, setVideosWithUrls] = React.useState([]);
+
+    // Load blob URLs for persisted videos
+    React.useEffect(() => {
+        const loadVideoUrls = async () => {
+            const updated = await Promise.all(
+                videos.map(async (video) => {
+                    if (video.url) return video;
+                    if (!onGetVideoBlob) return video;
+                    try {
+                        const blob = await onGetVideoBlob(video.id);
+                        if (blob) {
+                            return {
+                                ...video,
+                                url: safeCreateObjectUrl(blob),
+                                blob,
+                            };
+                        }
+                    } catch (error) {
+                        console.error(`Failed to load video ${video.id}:`, error);
+                    }
+                    return video;
+                })
+            );
+            setVideosWithUrls(updated);
+        };
+
+        loadVideoUrls();
+    }, [videos, onGetVideoBlob]);
 
     const safeCreateObjectUrl = (file) => {
         if (typeof URL === 'undefined' || typeof URL.createObjectURL !== 'function') {
@@ -142,9 +173,10 @@ const MediaVideoGallery = ({
         return null;
     }
 
-    const expandedIndex = expandedVideo ? videos.findIndex((video) => video.id === expandedVideo.id) : -1;
+    const displayVideos = videosWithUrls.length > 0 ? videosWithUrls : videos;
+    const expandedIndex = expandedVideo ? displayVideos.findIndex((video) => video.id === expandedVideo.id) : -1;
     const canGoPrev = expandedIndex > 0;
-    const canGoNext = expandedIndex < videos.length - 1;
+    const canGoNext = expandedIndex < displayVideos.length - 1;
 
     return (
         <div className='containerDetail mt-10 bg-lite'>
@@ -214,7 +246,7 @@ const MediaVideoGallery = ({
                     paddingBottom: (isRowCollapsed ?? true) ? 6 : 0,
                 }}
             >
-                {videos.map((video, index) => (
+                {displayVideos.map((video, index) => (
                     <div
                         key={`${video.id || index}`}
                         onClick={(event) => {

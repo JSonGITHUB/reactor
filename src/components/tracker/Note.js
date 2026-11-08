@@ -65,6 +65,21 @@ const removeNoteVideoBlob = async (id) => {
     });
 };
 
+const getNoteVideoBlob = async (id) => {
+    const db = await openNoteVideoDb();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(NOTE_VIDEO_STORE_NAME, 'readonly');
+        const store = transaction.objectStore(NOTE_VIDEO_STORE_NAME);
+        const request = store.get(id);
+
+        request.onsuccess = () => resolve(request.result?.blob || null);
+        request.onerror = () => reject(request.error || new Error('Failed to read note video.'));
+        transaction.onerror = () => reject(transaction.error || new Error('Note video read transaction failed.'));
+        transaction.onabort = () => reject(transaction.error || new Error('Note video read transaction aborted.'));
+        transaction.oncomplete = () => db.close();
+    });
+};
+
 const Note = ({
     notes,
     setNotes,
@@ -217,6 +232,12 @@ const Note = ({
                                         console.error('Unable to remove note photo:', error);
                                     })
                                 }
+                                onGetPhotoBlob={(id) =>
+                                    getAssistantPhotoBlob(id).catch((error) => {
+                                        console.error('Unable to retrieve note photo:', error);
+                                        return null;
+                                    })
+                                }
                                 inputId={photoInputId}
                             />
                             <MediaVideoGallery
@@ -241,6 +262,12 @@ const Note = ({
                                 onRemoveVideo={(id) =>
                                     removeNoteVideoBlob(id).catch((error) => {
                                         console.error('Unable to remove note video:', error);
+                                    })
+                                }
+                                onGetVideoBlob={(id) =>
+                                    getNoteVideoBlob(id).catch((error) => {
+                                        console.error('Unable to retrieve note video:', error);
+                                        return null;
                                     })
                                 }
                                 inputId={videoInputId}
