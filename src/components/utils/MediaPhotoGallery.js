@@ -64,11 +64,14 @@ const MediaPhotoGallery = ({
                         if (blob) {
                             const blobUrl = URL.createObjectURL(blob);
                             cache.set(photo.id, blobUrl);
-                            loaded.add(photo.id); // Mark as loaded
                             hasNewUrls = true;
                         }
+                        // Mark as loaded regardless of success (prevent retry loop)
+                        loaded.add(photo.id);
                     } catch (error) {
                         console.error(`Failed to load photo ${photo.id}:`, error);
+                        // Still mark as attempted to avoid infinite retry
+                        loaded.add(photo.id);
                     }
                 })
             );

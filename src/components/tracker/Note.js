@@ -235,7 +235,7 @@ const Note = ({
                                 onGetPhotoBlob={(id) =>
                                     getAssistantPhotoBlob(id).catch((error) => {
                                         console.error('Unable to retrieve note photo:', error);
-                                        return null;
+                                        return Promise.resolve(null);
                                     })
                                 }
                                 inputId={photoInputId}
@@ -267,7 +267,7 @@ const Note = ({
                                 onGetVideoBlob={(id) =>
                                     getNoteVideoBlob(id).catch((error) => {
                                         console.error('Unable to retrieve note video:', error);
-                                        return null;
+                                        return Promise.resolve(null);
                                     })
                                 }
                                 inputId={videoInputId}

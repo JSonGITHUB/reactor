@@ -57,11 +57,14 @@ const MediaVideoGallery = ({
                         if (blob) {
                             const blobUrl = URL.createObjectURL(blob);
                             cache.set(video.id, blobUrl);
-                            loaded.add(video.id); // Mark as loaded
                             hasNewUrls = true;
                         }
+                        // Mark as loaded regardless of success (prevent retry loop)
+                        loaded.add(video.id);
                     } catch (error) {
                         console.error(`Failed to load video ${video.id}:`, error);
+                        // Still mark as attempted to avoid infinite retry
+                        loaded.add(video.id);
                     }
                 })
             );
