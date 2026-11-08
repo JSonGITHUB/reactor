@@ -211,11 +211,8 @@ const MediaPhotoGallery = ({
         }
     };
 
-    if (photos.length === 0) {
-        return null;
-    }
-
     const displayPhotos = photosWithUrls.length > 0 ? photosWithUrls : photos;
+    const hasPhotos = photos.length > 0;
     const expandedIndex = expandedPhoto ? displayPhotos.findIndex((photo) => photo.id === expandedPhoto.id) : -1;
     const canGoPrev = expandedIndex > 0;
     const canGoNext = expandedIndex < displayPhotos.length - 1;
@@ -223,7 +220,7 @@ const MediaPhotoGallery = ({
     return (
         <div className='containerDetail mt-10 bg-lite'>
             {/* Expanded Photo View */}
-            {expandedPhoto && (
+            {expandedPhoto && hasPhotos && (
                 <div 
                     className={`containerDetail ${isFullscreen ? '' : 'bg-dark mb-10'}`}
                     style={isFullscreen ? {
@@ -476,6 +473,7 @@ const MediaPhotoGallery = ({
             )}
 
             {/* Photo Grid/Row */}
+            {hasPhotos && (
             <div
                 className='flexContainer mt--5'
                 style={{
@@ -530,6 +528,7 @@ const MediaPhotoGallery = ({
                     </div>
                 ))}
             </div>
+            )}
 
             {/* Header with Add Button and Edit Toggle */}
             {showAddButton && (

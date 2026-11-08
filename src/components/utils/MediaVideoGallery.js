@@ -169,11 +169,8 @@ const MediaVideoGallery = ({
         }
     };
 
-    if (videos.length === 0) {
-        return null;
-    }
-
     const displayVideos = videosWithUrls.length > 0 ? videosWithUrls : videos;
+    const hasVideos = videos.length > 0;
     const expandedIndex = expandedVideo ? displayVideos.findIndex((video) => video.id === expandedVideo.id) : -1;
     const canGoPrev = expandedIndex > 0;
     const canGoNext = expandedIndex < displayVideos.length - 1;
@@ -181,7 +178,7 @@ const MediaVideoGallery = ({
     return (
         <div className='containerDetail mt-10 bg-lite'>
             {/* Expanded Video View */}
-            {expandedVideo && (
+            {expandedVideo && hasVideos && (
                 <div className='containerDetail bg-dark mb-10' style={{ width: '100%', boxSizing: 'border-box' }}>
                     {/* Video Controls */}
                     <div className='flexContainer centerVertical p-5'>
@@ -236,6 +233,7 @@ const MediaVideoGallery = ({
             )}
 
             {/* Video Grid/Row */}
+            {hasVideos && (
             <div
                 className='flexContainer mt--5'
                 style={{
@@ -311,6 +309,7 @@ const MediaVideoGallery = ({
                     </div>
                 ))}
             </div>
+            )}
 
             {/* Header with Add Button and Edit Toggle */}
             {showAddButton && (
