@@ -600,11 +600,11 @@ const Note = ({
                                     </div>
                             }
                         </div>
-                        <div className='containerDetail m-5 size20 p-10'>
+                        <div className='containerDetail m-5 size20 pl-10 pr-10 pb-10'>
                             <div className='containerDetail mt-10 bg-lite'>
                                 <CollapseToggleButton
                                     component={(
-                                        <div className='flexContainer centerVertical contentLeft'>
+                                        <div className='flexContainer'>
                                             <label htmlFor={photoInputId} className='flexColumn containerDetail bg-yellow button bg-lite color-dark size12 p-10' data-collapse-ignore='true'>
                                                 ➕📷
                                                 <input
@@ -621,7 +621,7 @@ const Note = ({
                                                 />
                                             </label>
                                             {notePhotos.length > 0 && (
-                                                <div className='flex2Column ml-5 flexContainer' style={{ alignItems: 'center', gap: 8 }}>
+                                                <div className='flexColumn ml-5'>
                                                     <div
                                                         className='containerDetail button bg-lite color-yellow p-10 size12'
                                                         onClick={() => setIsImageEditMode((prev) => !prev)}
@@ -632,7 +632,7 @@ const Note = ({
                                                     </div>
                                                 </div>
                                             )}
-                                            <div className='flex2Column ml-10 mr-10'>{`Photos (${notePhotos.length})`}</div>
+                                            <div className='flex2Column p-10'>{`Photos (${notePhotos.length})`}</div>
                                         </div>
                                     )}
                                     isCollapsed={isPhotoPanelCollapsed}
@@ -990,7 +990,7 @@ const Note = ({
                                                 </label>
                                             </div>
                                             {noteVideos.length > 0 && (
-                                                <div className='flex2Column ml-5 flexContainer' style={{ alignItems: 'center', gap: 8 }}>
+                                                <div className='flexColumn ml-5 flexContainer' style={{ alignItems: 'center', gap: 8 }}>
                                                     <div
                                                         className='containerDetail button bg-lite color-yellow p-10 size12'
                                                         onClick={() => setIsVideoEditMode((prev) => !prev)}
