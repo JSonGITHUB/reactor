@@ -218,8 +218,12 @@ const Note = ({
                             <MediaPhotoGallery
                                 photos={notePhotos}
                                 onPhotosChange={(nextPhotos) => {
+                                    // Only persist metadata to Redux, not blob URLs or blob objects
+                                    const photosToSave = nextPhotos.map(({ id, name, size, type, lastModified }) => ({
+                                        id, name, size, type, lastModified
+                                    }));
                                     const newNotes = [...notes];
-                                    newNotes[noteGroupIndex].notes[noteIndex].photos = nextPhotos;
+                                    newNotes[noteGroupIndex].notes[noteIndex].photos = photosToSave;
                                     setNotes(newNotes);
                                 }}
                                 onPersistPhoto={(id, file) =>
@@ -243,8 +247,12 @@ const Note = ({
                             <MediaVideoGallery
                                 videos={noteVideos}
                                 onVideosChange={(nextVideos) => {
+                                    // Only persist metadata to Redux, not blob URLs or blob objects
+                                    const videosToSave = nextVideos.map(({ id, name, size, type, lastModified }) => ({
+                                        id, name, size, type, lastModified
+                                    }));
                                     const newNotes = [...notes];
-                                    newNotes[noteGroupIndex].notes[noteIndex].videos = nextVideos;
+                                    newNotes[noteGroupIndex].notes[noteIndex].videos = videosToSave;
                                     setNotes(newNotes);
                                 }}
                                 onPersistVideo={(id, file, metadata) =>
