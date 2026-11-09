@@ -276,7 +276,7 @@ const MediaPhotoGallery = ({
                     className={`containerDetail ${isFullscreen ? '' : 'bg-dark mb-10'}`}
                     style={isFullscreen ? {
                         position: 'fixed',
-                        top: 60,
+                        top: 55,
                         left: 0,
                         right: 0,
                         bottom: 0,
@@ -286,9 +286,10 @@ const MediaPhotoGallery = ({
                         zIndex: 10000,
                         display: 'flex',
                         flexDirection: 'column',
-                        justifyContent: 'center',
+                        justifyContent: 'flex-start',
                         alignItems: 'center',
                         overflow: 'hidden',
+                        paddingTop: '20px',
                     } : {
                         width: '100%',
                         boxSizing: 'border-box',
@@ -303,13 +304,13 @@ const MediaPhotoGallery = ({
                     {!isFullscreen && (
                         <div className='flexContainer centerVertical p-5'>
                             <div
-                                className='button p-10 size20 color-soft'
+                                className='button size20 color-soft'
                                 onClick={() => canGoPrev && setExpandedPhoto(photos[expandedIndex - 1])}
                                 style={{
                                     opacity: canGoPrev ? 1 : 0.3,
                                     pointerEvents: canGoPrev ? 'auto' : 'none',
-                                    minWidth: 48,
-                                    textAlign: 'center',
+                                    minWidth: 30,
+                                    textAlign: 'left',
                                 }}
                                 title='Previous'
                             >
@@ -319,13 +320,13 @@ const MediaPhotoGallery = ({
                                 {expandedPhoto.name} ({expandedIndex + 1} / {photos.length})
                             </div>
                             <div
-                                className='button p-10 size20 color-soft'
+                                className='button size20 color-soft'
                                 onClick={() => canGoNext && setExpandedPhoto(photos[expandedIndex + 1])}
                                 style={{
                                     opacity: canGoNext ? 1 : 0.3,
                                     pointerEvents: canGoNext ? 'auto' : 'none',
-                                    minWidth: 48,
-                                    textAlign: 'center',
+                                    minWidth: 30,
+                                    textAlign: 'right',
                                 }}
                                 title='Next'
                             >
@@ -336,9 +337,9 @@ const MediaPhotoGallery = ({
 
                     {/* Normal View Slideshow Controls */}
                     {!isFullscreen && allowSlideshow && (
-                        <div className='flexContainer centerVertical p-5' style={{ gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
+                        <div className='pt-5 pb-5' style={{ gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
                             <div
-                                className={`containerDetail button p-8 size12 ${isSlideshow ? 'bg-dark color-lite' : 'bg-dark color-lite'}`}
+                                className={`containerDetail button mb-5 p-10 size12 ${isSlideshow ? 'bg-red color-yellow' : 'bg-green color-yellow'}`}
                                 onClick={() => {
                                     setIsSlideshow(!isSlideshow);
                                     if (!isSlideshow) {
@@ -352,7 +353,7 @@ const MediaPhotoGallery = ({
                             </div>
                             {isSlideshow && (
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                    <label style={{ fontSize: 12, color: '#999' }}>Delay (s):</label>
+                                    <label style={{ marginLeft: 8, fontSize: 12, color: '#999' }}>Delay (s):</label>
                                     <input
                                         type='number'
                                         min='0.5'
@@ -391,12 +392,14 @@ const MediaPhotoGallery = ({
                                     width: 'auto',
                                     height: 'auto',
                                     cursor: 'pointer',
+                                    transition: 'opacity 0.6s ease-in-out',
                                 } : {
                                     width: '100%',
                                     maxWidth: '100%',
                                     height: 'auto',
                                     display: 'block',
-                                    margin: '0 auto',
+                                    margin: '0 0 5px 0',
+                                    transition: 'opacity 0.6s ease-in-out',
                                 }}
                             />
                         ) : (
@@ -436,7 +439,7 @@ const MediaPhotoGallery = ({
                         <div style={{
                             position: 'absolute',
                             bottom: 12,
-                            left: '50%',
+                            left: '55%',
                             transform: 'translateX(-50%)',
                             color: '#fff',
                             fontSize: 14,
@@ -484,7 +487,7 @@ const MediaPhotoGallery = ({
                                     onClick={() => setIsSlideshow(!isSlideshow)}
                                     style={{
                                         position: 'absolute',
-                                        left: '50%',
+                                        left: '25%',
                                         transform: 'translateX(-50%)',
                                         bottom: 12,
                                         fontSize: 14,

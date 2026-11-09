@@ -90,9 +90,9 @@ const Notes = () => {
 
     return <div className='mt--30'>
         <div className='containerDetail color-lite bg-lite m-5 p-22 size30 contentLeft'>
-            <span className='size40 m-5'>{icons.notes}</span> Notes
+            <span className='size40 ml-5 mr-5'>{icons.notes}</span> Notes
         </div>
-        <div className='pt-5'>
+        <div className='mt--5'>
             <AddProjectInterface
                 newProjectDescription={newProjectDescription}
                 setNewProjectDescription={setNewProjectDescription}
