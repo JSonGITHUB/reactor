@@ -43,6 +43,7 @@ const MediaPhotoGallery = ({
     const [isSlideshow, setIsSlideshow] = useState(false);
     const [slideshowDelay, setSlideshowDelay] = useState(2);
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [photoOpacity, setPhotoOpacity] = useState(1); // For fade effect
     const blobUrlCacheRef = useRef(new Map()); // Cache blob URLs by photo ID
     const loadedPhotoIdsRef = useRef(new Set()); // Track which photos have been loaded
     const [, setRefresh] = useState(0); // Force re-render when URLs are loaded
@@ -215,23 +216,33 @@ const MediaPhotoGallery = ({
         }
 
         const currentIndex = photos.findIndex((photo) => photo.id === expandedPhoto.id);
-        const isLastPhoto = currentIndex === photos.length - 1;
 
         const timer = setTimeout(() => {
             const updatedIndex = photos.findIndex((photo) => photo.id === expandedPhoto.id);
-            const updatedIsLast = updatedIndex === photos.length - 1;
-
-            if (updatedIsLast) {
-                setIsSlideshow(false);
-                setIsFullscreen(false);
-            } else {
+            
+            // Fade out
+            setPhotoOpacity(0);
+            
+            // Change photo after fade completes
+            const fadeTimer = setTimeout(() => {
                 const nextIndex = (updatedIndex + 1) % photos.length;
                 setExpandedPhoto(photos[nextIndex]);
-            }
+                // Fade back in
+                setPhotoOpacity(1);
+            }, 300); // Half of transition duration to start fade mid-transition
+
+            return () => clearTimeout(fadeTimer);
         }, slideshowDelay * 1000);
 
         return () => clearTimeout(timer);
     }, [isSlideshow, expandedPhoto, slideshowDelay, photos]);
+
+    // Reset opacity when expanded photo changes (for smooth fade-in of new photo)
+    useEffect(() => {
+        if (expandedPhoto) {
+            setPhotoOpacity(1);
+        }
+    }, [expandedPhoto?.id]);
 
     const handlePhotoClick = (photo) => {
         if (expandedPhoto?.id === photo.id) {
@@ -393,6 +404,7 @@ const MediaPhotoGallery = ({
                                     height: 'auto',
                                     cursor: 'pointer',
                                     transition: 'opacity 0.6s ease-in-out',
+                                    opacity: photoOpacity,
                                 } : {
                                     width: '100%',
                                     maxWidth: '100%',
@@ -400,6 +412,7 @@ const MediaPhotoGallery = ({
                                     display: 'block',
                                     margin: '0 0 5px 0',
                                     transition: 'opacity 0.6s ease-in-out',
+                                    opacity: photoOpacity,
                                 }}
                             />
                         ) : (
