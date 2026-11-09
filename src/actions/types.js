@@ -1,6 +1,5 @@
 export const SIGN_IN = 'SIGN_IN';
 export const SIGN_OUT = 'SIGN_OUT';
-export const FETCH_USER = 'FETCH_USER';
 export const ADD_TODO = 'ADD_TODO';
 export const COMPLETE_TODO = 'COMPLETE_TODO';
 export const INCOMPLETE_TODO = 'INCOMPLETE_TODO';
@@ -17,8 +16,4 @@ export const SWELL2_HEIGHT = 'SWELL2_HEIGHT';
 export const SWELL1_INTERVAL = 'SWELL1_INTERVAL';
 export const SWELL2_INTERVAL = 'SWELL2_INTERVAL';
 export const WIND_DIRECTION = 'WIND_DIRECTION';
-export const DISTANCE = 'DISTANCE';
 export const FETCH_GPS = 'FETCH_GPS';
-const FETCH_POSTS = 'FETCH_POSTS';
-
-export default FETCH_POSTS;
