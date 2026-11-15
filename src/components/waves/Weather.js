@@ -23,30 +23,30 @@ const Weather = () => {
         1: '🌤️ Clear',
         2: '⛅️ Cloudy',
         3: '☁️ Overcast',
-        45: '😶‍🌫️ Fog',
-        48: '😶‍🌫️ Heavy fog',
+        45: '😶‍🌫️ Light',
+        48: '😶‍🌫️ Heavy',
         51: '🌦️ Sprinkles',
-        53: '🌦️ Drizzle',
-        55: '🌦️ Dense drizzle',
-        56: '🥶🌦️ Light freezing drizzle',
-        57: '🥶🌦️ Dense freezing drizzle',
-        61: '🌦️ Light rain',
-        63: '🌧️ Moderate rain',
-        65: '🌧️🌧️ Heavy rain',
-        66: '🥶🌧️ Light freezing rain',
-        67: '🥶🌧️🌧️ Heavy freezing rain',
-        71: '☃️ Light snow',
-        73: '🌨️ Moderate snow',
-        75: '🌨️🌨️ Heavy snow',
-        77: '❄️ Snow grains',
-        80: '🌦️ Light rain showers',
-        81: '🌦️ Moderate rain showers',
-        82: '🌧️🌧️🌧️ Violent rain showers',
-        85: '🌨️ Light snow showers',
-        86: '🌨️🌨️ Heavy snow showers',
+        53: '🌦️ Light',
+        55: '🌦️ Dense',
+        56: '🥶🌦️ Light',
+        57: '🥶🌦️ Dense',
+        61: '🌦️ Light',
+        63: '🌧️ Moderate',
+        65: '🌧️🌧️ Heavy',
+        66: '🥶🌧️ Light',
+        67: '🥶🌧️🌧️ Heavy',
+        71: '❄️ Light',
+        73: '❄️ Moderate',
+        75: '❄️ Heavy',
+        77: '❄️ Very Light',
+        80: '🌦️ Light',
+        81: '🌦️ Moderate',
+        82: '🌧️🌧️🌧️ Violent',
+        85: '🌨️ Light',
+        86: '🌨️🌨️ Heavy',
         95: '⛈️ Thunderstorm',
-        96: '🥶⛈️ Thunderstorm with slight hail',
-        99: '🥶⛈️⛈️ Thunderstorm with heavy hail'
+        96: '🥶⛈️ Slight hail',
+        99: '🥶⛈️⛈️ Heavy hail'
     };
     // Map Open-Meteo weather codes to emoji (or import from your icon set)
     const weatherCodeMap = {
@@ -487,21 +487,21 @@ const Weather = () => {
     }, -1);
 
     return (
-        <div className='containerDetail bg-lite color-lite size20 contentLeft ml-5 mr-5 mt--25 mb-10'>
-            <div className='containerDetail bg-lite mb-5 p-20 color-yellow size20'>
+        <div className='containerDetail bg-lite color-lite contentLeft ml-5 mr-5 mt--25 mb-10 size15'>
+            <div className='containerDetail bg-lite mb-5 p-20 color-yellow'>
                 Weather
             </div>
 
             {/* Alert Triggered Display */}
             {triggeredAlerts.length > 0 && (
-                <div className='containerDetail bg-lite mb-5 size20 contentLeft'>
-                    <div className='containerDetail bg-lite mb-5 p-10 color-red size20'>
+                <div className='containerDetail bg-lite mb-5 contentLeft'>
+                    <div className='containerDetail bg-lite mb-5 p-10 color-red'>
                         🚨 Active Alerts ({triggeredAlerts.length})
                     </div>
                     {triggeredAlerts.map((alert) => (
                         <div
                             key={alert.id}
-                            className='containerDetail bg-tintedMedium p-10 mb-5 size20 color-red'
+                            className='containerDetail bg-tintedMedium p-10 mb-5 color-red'
                             style={{ borderLeft: '4px solid #ff0000' }}
                         >
                             <div className='flexContainer'>
@@ -518,9 +518,9 @@ const Weather = () => {
             )}
 
             {/* Alert Configuration Panel */}
-            <div className='containerDetail bg-lite mb-5 size20 contentLeft'>
+            <div className='containerDetail bg-lite mb-5 contentLeft'>
                 <div
-                    className='containerDetail bg-lite mb-5 p-10 color-yellow size20'
+                    className='containerDetail bg-lite mb-5 p-10 color-yellow'
                     onClick={() => updateShowAlertPanel(!showAlertPanel)}
                     style={{ cursor: 'pointer', userSelect: 'none' }}
                 >
@@ -608,28 +608,22 @@ const Weather = () => {
                     </div>
                 )}
             </div>
-
-            <div className='containerDetail bg-lite mb-5 size20 contentLeft'>
-                <div className='containerDetail bg-lite mb-5 p-10 color-yellow size20'>
-                    Current Weather:
+            <div className='flexContainer containerDetail bg-tintedMedium p-10 mb-5'>
+                <div className='flexColumn'>
+                    {current ? (WEATHER_CODE_LABEL[current.weathercode] || ''): 'N/A'}
                 </div>
-                <div className='flexContainer containerDetail bg-tintedMedium p-10 size20'>
-                    <div className='flexColumn'>
-                        {current ? (WEATHER_CODE_LABEL[current.weathercode] || ''): 'N/A'}
-                    </div>
-                    <div className='flexColumn'>
-                        💨 {current ? `${current.windspeed} mph` : 'N/A'}
-                    </div>
-                    <div className='flexColumn'>
-                        🌡️ {current ? `${current.temperature}°F` : 'N/A'}
-                    </div>
+                <div className='flexColumn'>
+                    💨 {current ? `${current.windspeed} mph` : 'N/A'}
+                </div>
+                <div className='flexColumn'>
+                    🌡️ {current ? `${current.temperature}°F` : 'N/A'}
                 </div>
             </div>
-            <div className='containerDetail bg-lite mb-5 size20'>
-                <div className='containerDetail bg-lite mb-5 p-10 color-yellow size20 contentLeft'>
+            <div className='containerDetail bg-lite mb-5'>
+                <div className='containerDetail mb-5 p-10 color-yellow contentLeft'>
                     Hourly Forecast
                 </div>
-                <div className='containerDetail bg-tintedMedium size20 ht-200'>
+                <div className='containerDetail bg-tintedMedium ht-200'>
                     {hourly.map((h, idx) => {
                         const w = weatherCodeMap[h.code] || { };
                         const isMostCurrentHour = idx === mostCurrentHourlyIndex;
@@ -665,16 +659,16 @@ const Weather = () => {
                     })}
                 </div>
             </div>
-            <div className='containerDetail bg-lite size20'>
-                <div className='containerDetail bg-lite mb-5 p-10 color-yellow size20 contentLeft'>
+            <div className='containerDetail bg-lite'>
+                <div className='containerDetail mb-5 p-10 color-yellow contentLeft'>
                     Daily Forecast
                 </div>
-                <div className='containerDetail bg-tintedMedium size20'>
+                <div className='containerDetail bg-tintedMedium'>
                     {daily.map((d, idx) => {
                         const w = weatherCodeMap[d.code] || {};
                         const bgColor = getTempColor(d.maxF);
                         const textColor = getTextColor(bgColor);
-                        return <div key={idx} style={{backgroundColor: bgColor, color: textColor}} className={`containerDetail flexContainer  ${(idx === daily.length - 1)?'':'mb-5'} pt-10 pb-10 size20`}>
+                        return <div key={idx} style={{backgroundColor: bgColor, color: textColor}} className={`containerDetail flexContainer  ${(idx === daily.length - 1)?'':'mb-5'} pt-10 pb-10`}>
                                     <div className='flexColumn contentLeft'>
                                         📆 {formatDateWithNumber(d.date)}
                                     </div>

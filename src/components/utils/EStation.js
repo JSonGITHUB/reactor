@@ -182,7 +182,7 @@ const EStation = () => {
             lat: Number(station?.AddressInfo?.Latitude) || 0,
             lon: Number(station?.AddressInfo?.Longitude) || 0,
             powerKw: maxPowerKw || 0,
-            connectors: connectorSet.length > 0 ? connectorSet : ['Unknown'],
+            connectors: connectorSet.length > 0 ? connectorSet : ['？'],
             open24h: String(station?.UsageType?.Title || '').toLowerCase().includes('24'),
             amenities: inferAmenities(station),
             fastCharge
@@ -192,7 +192,7 @@ const EStation = () => {
     const toLocalStationFromNrel = (station) => {
         const connectors = Array.isArray(station?.ev_connector_types) && station.ev_connector_types.length > 0
             ? station.ev_connector_types
-            : ['Unknown'];
+            : ['？'];
         const fastCharge = Number(station?.ev_dc_fast_num) > 0;
         const fallbackPower = fastCharge ? 150 : 19;
         return {
@@ -225,7 +225,7 @@ const EStation = () => {
         const parsedConnectors = socketFields
             .filter((key) => String(tags[key] || '').toLowerCase() !== 'no')
             .map((key) => key.replace('socket:', '').replace(/_/g, ' '));
-        const connectors = parsedConnectors.length > 0 ? parsedConnectors : ['Unknown'];
+        const connectors = parsedConnectors.length > 0 ? parsedConnectors : ['？'];
 
         const outputText = [
             tags['socket:output'],
@@ -519,7 +519,7 @@ out center tags;
             const amenityStyle = amenityStyles[amenity] || amenityStyles.Nearby;
             return (
                 <span
-                    className='containerDetail pl-10 pr-10 mr-5 size10'
+                    className='containerDetail pl-10 pr-10 mr-5 size8'
                     key={amenity}
                     title={amenity}
                     style={amenityStyle}
@@ -689,24 +689,24 @@ out center tags;
                                     <div className='color-orange size12'>{station.network} | {station.powerKw}kW</div>
                                 </div>
 
-                                <div className='containerDetail bg-lite flexContainer mt-5 size10'>
-                                    <div className={`containerDetail  size10 p-10 mr-5 ${station.fastCharge ? 'bg-dkGreen brdr-green color-yellow' : 'bg-lite color-orange'}`}>
+                                <div className='containerDetail bg-lite flexContainer mt-5 size8'>
+                                    <div className={`containerDetail  size8 p-10 mr-5 ${station.fastCharge ? 'bg-dkGreen brdr-green color-yellow' : 'bg-lite color-orange'}`}>
                                         {station.fastCharge ? '⚡️ Fast Charge' : '🐌 Standard Charge'}
                                     </div>
-                                    <div className='containerDetail size10 p-10 mr-5 bg-lite color-lite'>
+                                    <div className='containerDetail size8 p-10 mr-5 bg-lite color-lite'>
                                         {station.open24h ? '🕛 24/7' : '🕘🕔 Limited Hours'}
                                     </div>
-                                    <div className='containerDetail size10 p-10 bg-lite color-lite'>
+                                    <div className='containerDetail size8 p-10 bg-lite color-lite'>
                                         🔌{station.connectors.join(' | ')}
                                     </div>
                                 </div>
 
-                                <div className='color-orange size25 flexContainer'>
+                                <div className='color-orange flexContainer'>
                                     <div className='containerDetail flexContainer flex2Column mt-5 mr-5'>
                                         {renderAmenities(station.amenities)}
                                     </div>
-                                    <div className='containerDetail flexColumn color-lite p-10 contentRight size15 mt-5'>
-                                        {station.distanceMiles == null ? '--' : `${station.distanceMiles.toFixed(1)}`}<span className='size10 color-yellow'>miles</span>
+                                    <div className='containerDetail flexColumn color-lite p-10 contentRight mt-5'>
+                                        {station.distanceMiles == null ? '--' : `${station.distanceMiles.toFixed(1)}`}<span className='size8 color-yellow'>miles</span>
                                     </div>
                                 </div>
                             </div>

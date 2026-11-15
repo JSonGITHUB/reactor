@@ -17,7 +17,7 @@ export const requestProvider = async (provider, parameters = {}, options = {}) =
         requestOptions.headers = { 'Content-Type': 'application/json' };
         requestOptions.body = JSON.stringify(parameters);
     }
-
+    console.log(`provider => Requesting provider endpoint: ${endpoint.toString()}, requestOptions: ${JSON.stringify(requestOptions)}`);
     const response = await fetch(endpoint.toString(), requestOptions);
     const data = await response.json();
     if (!response.ok) {

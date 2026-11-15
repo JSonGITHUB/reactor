@@ -215,35 +215,6 @@ const Note = ({
                             }
                         </div>
                         <div className='containerDetail m-5 size20 pl-10 pr-10 pb-10'>
-                            <MediaPhotoGallery
-                                photos={notePhotos}
-                                onPhotosChange={(nextPhotos) => {
-                                    // Only persist metadata to Redux, not blob URLs or blob objects
-                                    const photosToSave = nextPhotos.map(({ id, name, size, type, lastModified }) => ({
-                                        id, name, size, type, lastModified
-                                    }));
-                                    const newNotes = [...notes];
-                                    newNotes[noteGroupIndex].notes[noteIndex].photos = photosToSave;
-                                    setNotes(newNotes);
-                                }}
-                                onPersistPhoto={(id, file) =>
-                                    persistAssistantPhoto(id, file).catch((error) => {
-                                        console.error('Unable to persist note photo:', error);
-                                    })
-                                }
-                                onRemovePhoto={(id) =>
-                                    removeAssistantPhoto(id).catch((error) => {
-                                        console.error('Unable to remove note photo:', error);
-                                    })
-                                }
-                                onGetPhotoBlob={(id) =>
-                                    getAssistantPhotoBlob(id).catch((error) => {
-                                        console.error('Unable to retrieve note photo:', error);
-                                        return Promise.resolve(null);
-                                    })
-                                }
-                                inputId={photoInputId}
-                            />
                             <MediaVideoGallery
                                 videos={noteVideos}
                                 onVideosChange={(nextVideos) => {
@@ -279,6 +250,35 @@ const Note = ({
                                     })
                                 }
                                 inputId={videoInputId}
+                            />
+                            <MediaPhotoGallery
+                                photos={notePhotos}
+                                onPhotosChange={(nextPhotos) => {
+                                    // Only persist metadata to Redux, not blob URLs or blob objects
+                                    const photosToSave = nextPhotos.map(({ id, name, size, type, lastModified }) => ({
+                                        id, name, size, type, lastModified
+                                    }));
+                                    const newNotes = [...notes];
+                                    newNotes[noteGroupIndex].notes[noteIndex].photos = photosToSave;
+                                    setNotes(newNotes);
+                                }}
+                                onPersistPhoto={(id, file) =>
+                                    persistAssistantPhoto(id, file).catch((error) => {
+                                        console.error('Unable to persist note photo:', error);
+                                    })
+                                }
+                                onRemovePhoto={(id) =>
+                                    removeAssistantPhoto(id).catch((error) => {
+                                        console.error('Unable to remove note photo:', error);
+                                    })
+                                }
+                                onGetPhotoBlob={(id) =>
+                                    getAssistantPhotoBlob(id).catch((error) => {
+                                        console.error('Unable to retrieve note photo:', error);
+                                        return Promise.resolve(null);
+                                    })
+                                }
+                                inputId={photoInputId}
                             />
                         </div>
                     </div>

@@ -255,6 +255,7 @@ const Fuel = () => {
     const [guageStart, setGuageStart] = useState('');
     const [guageEnd, setGuageEnd] = useState('');
     const [formCollapse, setFormCollapse] = useState(true);
+    const [startCollapse, setStartCollapse] = useState(true);
     const [logCollapse, setLogCollapse] = useState(true);
     const [oilCollapse] = useState(true);
     const [graphCollapse, setGraphCollapse] = useState(true);
@@ -613,6 +614,7 @@ const Fuel = () => {
             setCategory('Gas');
         } else {
             setPrevOdometer(null);
+            setStartCollapse(true);
         }
     }, [formCollapse]);
 
@@ -1591,6 +1593,7 @@ const Fuel = () => {
                 const lastVehicleStop = vehicleTrips.length ? vehicleTrips[vehicleTrips.length - 1] : null;
                 const defaultOdo = lastVehicleStop?.odometer ?? odometer ?? '';
                 const input = window.prompt('Enter current odometer reading:', defaultOdo);
+                setStartCollapse(false);
                 if (input === null) return;
                 const parsedOdo = parseInt(input, 10);
                 if (isNaN(parsedOdo) || parsedOdo < 0) {
@@ -1715,6 +1718,8 @@ const Fuel = () => {
         setTrips(newTrips);
         resetInsertMode();
         setFormCollapse(true)
+        setHomeFormVisible(false)
+        setStartCollapse(true)
     };
 
     const insertAndRecord = () => {
@@ -4088,6 +4093,15 @@ const Fuel = () => {
             </div>
         </div>
     );
+    const start = () => {
+        setFormCollapse(false)
+        const newTrips = [...trips];
+        //newTrips[categoryDialogIndex].category = 'Start';
+        setTrips(newTrips);
+        setCategoryDialogOpen(false);
+        setCategoryDialogIndex(null);
+        setCategory('Start');
+    };
 
 
     return (
@@ -4217,7 +4231,7 @@ const Fuel = () => {
                     return (
                         <div
                             className={`containerDetail pt-20 pb-20 pl-10 pr-20 button width-100-percent color-yellow size20 mb-5 ${tripIsActive ? 'bg-dkRed' : 'bg-dkGreen'}`}
-                            onClick={() => handleTripAction(!tripIsActive)}
+                            onClick={() => /*handleTripAction(!tripIsActive)*/start()}
                         >
                             <span className='containerDetail size20 color-yellow bg-dkGreen brdr-green mt-10 mb-10 mr-10 pl-10 pr-10'>
                                 {tripIsActive ? `🏁` : `🚦`}
@@ -4226,6 +4240,11 @@ const Fuel = () => {
                         </div>
                     );
                 })()}
+                {
+                    (startCollapse)
+                    ? <div></div>
+                    : locationEntry()
+                }
                 <div className={`containerDetail bg-lite pt-5 pb-5 color-yellow button size20 contentLeft`}>
                     <CollapseToggleButton
                         title={<div className='color-yellow size20 ml--5'><span className='containerDetail size20 color-yellow bg-dkGreen brdr-green mr-10 pt-5 pb-5 pl-15 pr-15'>+</span>Add Stop</div>}
