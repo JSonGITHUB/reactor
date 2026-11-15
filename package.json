@@ -83,5 +83,8 @@
   },
   "exports": {
     "./lib/tokenize": "./lib/tokenize/index.js"
+  },
+  "overrides": {
+    "node-forge": "^1.4.3"
   }
 }
